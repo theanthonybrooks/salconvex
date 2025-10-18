@@ -12,10 +12,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import { noEventCategories, prodOnlyCategories } from "@/constants/eventConsts";
 import { EventOCFormValues } from "@/features/events/event-add-form";
-import { getEventCategoryLabelAbbr } from "@/lib/eventFns";
-import { cn } from "@/lib/utils";
-import { noEventCategories, prodOnlyCategories } from "@/types/event";
+import { getEventCategoryLabel } from "@/helpers/eventFns";
+import { cn } from "@/helpers/utilsFns";
 import { User } from "@/types/user";
 import { Controller, useFormContext } from "react-hook-form";
 import { HiArrowTurnLeftDown } from "react-icons/hi2";
@@ -99,7 +99,7 @@ const SubmissionFormEventStep2 = ({
             :{" "}
           </p>
           <p className="lg:text-xs">
-            {getEventCategoryLabelAbbr(category)} Links
+            {getEventCategoryLabel(category, true)} Links
           </p>
         </div>
 
@@ -146,13 +146,13 @@ const SubmissionFormEventStep2 = ({
                   :{" "}
                 </p>
                 <p className="flex items-center gap-1 lg:text-xs">
-                  Other {getEventCategoryLabelAbbr(category)} Info
+                  Other {getEventCategoryLabel(category, true)} Info
                 </p>
               </div>
 
               <div className="mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
                 <Label htmlFor="event.name" className="sr-only">
-                  {getEventCategoryLabelAbbr(category)} Other Info
+                  {getEventCategoryLabel(category, true)} Other Info
                 </Label>
 
                 <Controller

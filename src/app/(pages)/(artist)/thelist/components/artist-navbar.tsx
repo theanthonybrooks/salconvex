@@ -18,7 +18,7 @@ import { Search } from "@/features/Sidebar/Search";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { ListItem } from "@/features/wrapper-elements/navigation/components/navbar";
 import { NavbarSigninSection } from "@/features/wrapper-elements/navigation/components/navbar-signin-section";
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 import { useDevice } from "@/providers/device-provider";
 import { User } from "@/types/user";
 import { usePreloadedQuery } from "convex/react";
@@ -210,7 +210,7 @@ export default function TheListNavBar(
           {user === null && (
             <>
               <Link
-                href="/pricing#plans"
+                href="/pricing?type=artist"
                 prefetch={true}
                 className="hidden px-8 font-bold lg:flex"
               >

@@ -6,8 +6,8 @@ import {
   formatFacebookInput,
   formatHandleInput,
   PlatformType,
-} from "@/lib/linkFns";
-import { cn } from "@/lib/utils";
+} from "@/helpers/linkFns";
+import { cn } from "@/helpers/utilsFns";
 import { HiArrowTurnRightDown } from "react-icons/hi2";
 
 import { DebouncedControllerInput } from "@/components/ui/debounced-form-input";

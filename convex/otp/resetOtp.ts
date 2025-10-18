@@ -1,5 +1,5 @@
 import { generalStyling } from "@/constants/emailStyling";
-import { generateNumericToken } from "@/lib/otpFns";
+import { generateNumericToken } from "@/helpers/otpFns";
 import Resend from "@auth/core/providers/resend";
 import { html } from "common-tags";
 import { Resend as ResendAPI } from "resend";

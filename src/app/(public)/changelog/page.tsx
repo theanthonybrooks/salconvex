@@ -2,7 +2,7 @@
 
 import { iconClosedClass, iconOpenClass } from "@/constants/accordions";
 import { AccordionComponent } from "@/features/homepage/accordion-component";
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 import { useQuery } from "convex-helpers/react/cache";
 // import { useQuery } from "convex-helpers/react/cache"
 // import { useQuery } from "convex/react"

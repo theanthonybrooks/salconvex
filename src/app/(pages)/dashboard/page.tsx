@@ -13,8 +13,8 @@ import {
 } from "@/components/ui/card";
 import { Link } from "@/components/ui/custom-link";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
-import { countApplicationsByTimeRange } from "@/lib/applicationFns";
-import { getEventCategoryLabel } from "@/lib/eventFns";
+import { countApplicationsByTimeRange } from "@/helpers/applicationFns";
+import { getEventCategoryLabel } from "@/helpers/eventFns";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { useQueries } from "convex-helpers/react/cache";
 import { usePreloadedQuery } from "convex/react";

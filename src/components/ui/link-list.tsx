@@ -1,7 +1,5 @@
-import { formatDisplayUrl } from "@/lib/linkFns";
-import { cn } from "@/lib/utils";
-import { EventData } from "@/types/event";
-import { Organizer } from "@/types/organizer";
+import { formatDisplayUrl } from "@/helpers/linkFns";
+import { cn } from "@/helpers/utilsFns";
 import { Globe, Phone } from "lucide-react";
 import {
   FaFacebookF,
@@ -15,15 +13,20 @@ import {
   FaYoutube,
 } from "react-icons/fa6";
 import { formatPhoneNumberIntl } from "react-phone-number-input";
+import { LinksType } from "~/convex/schema";
+
+type EventLinks = LinksType & {
+  sameAsOrganizer?: boolean;
+};
 
 interface MinimalEventLinks {
   name: string;
-  links?: EventData["links"];
+  links?: EventLinks;
 }
 
 interface MinimalOrgLinks {
   name: string;
-  links?: Organizer["links"];
+  links?: LinksType;
 }
 
 interface LinkListProps {

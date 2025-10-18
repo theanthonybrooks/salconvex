@@ -4,7 +4,7 @@ import {
   lastUpdatedPrivacyRaw,
   lastUpdatedTermsRaw,
 } from "@/constants/siteInfo";
-import { formatDatePlain } from "@/lib/dateFns";
+import { formatDatePlain } from "@/helpers/dateFns";
 
 export function getPageMeta(pathname: string | null) {
   if (!pathname) return pageTitles[0];

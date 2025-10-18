@@ -1,9 +1,9 @@
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { TooltipSimple } from "@/components/ui/tooltip";
-import { getEventCategoryLabelAbbr } from "@/lib/eventFns";
-import { cn } from "@/lib/utils";
-import { EventCategory, SubmissionFormState } from "@/types/event";
-import { OpenCallState } from "@/types/openCall";
+import { getEventCategoryLabel } from "@/helpers/eventFns";
+import { cn } from "@/helpers/utilsFns";
+import { EventCategory, SubmissionFormState } from "@/types/eventTypes";
+import { OpenCallState } from "@/types/openCallTypes";
 import { useMutation } from "convex/react";
 import { ConvexError } from "convex/values";
 import {
@@ -203,7 +203,7 @@ export const OrgDuplicateEvent = ({
       className="flex items-center gap-x-1"
     >
       <FaRegCopy className="size-4" />
-      Duplicate {getEventCategoryLabelAbbr(category)}
+      Duplicate {getEventCategoryLabel(category, true)}
     </DropdownMenuItem>
   );
 };

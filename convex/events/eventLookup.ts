@@ -1,5 +1,5 @@
-import { approvedStates } from "@/types/event";
-import { validOCVals } from "@/types/openCall";
+import { approvedStates } from "@/constants/eventConsts";
+import { validOCVals } from "@/constants/openCallConsts";
 import { ConvexError, v } from "convex/values";
 import { internal } from "~/convex/_generated/api";
 import { internalMutation, mutation } from "~/convex/_generated/server";

@@ -1,5 +1,5 @@
-import { EventFormat } from "@/types/event";
-import { CallType } from "@/types/openCall";
+import { EventFormat } from "@/types/eventTypes";
+import { CallType } from "@/types/openCallTypes";
 import { DateTime } from "luxon";
 
 export const FAR_FUTURE = new Date("9999-12-31");

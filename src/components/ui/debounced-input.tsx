@@ -1,5 +1,5 @@
 import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 import { debounce } from "lodash";
 import { useEffect, useRef, useState } from "react";
 

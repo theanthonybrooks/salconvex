@@ -22,8 +22,8 @@ import {
 } from "@/constants/filterConsts";
 import { FilterBase } from "@/features/thelist/components/filters/filter-base";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
-import { getSearchLocationString } from "@/lib/locations";
-import { cn } from "@/lib/utils";
+import { getSearchLocationString } from "@/helpers/locations";
+import { cn } from "@/helpers/utilsFns";
 import { Command } from "cmdk";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { useQueries } from "convex-helpers/react/cache";

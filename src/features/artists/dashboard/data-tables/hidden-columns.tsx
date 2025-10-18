@@ -3,9 +3,9 @@
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 import { Link } from "@/components/ui/custom-link";
 import { ListActionSelector } from "@/features/artists/dashboard/data-tables/bookmark-hidden-selector";
-import { getEventCategoryLabelAbbr, getEventTypeLabel } from "@/lib/eventFns";
-import { cn } from "@/lib/utils";
-import { EventCategory, EventType } from "@/types/event";
+import { getEventCategoryLabel, getEventTypeLabel } from "@/helpers/eventFns";
+import { cn } from "@/helpers/utilsFns";
+import { EventCategory, EventType } from "@/types/eventTypes";
 import { ColumnDef } from "@tanstack/react-table";
 import { Id } from "~/convex/_generated/dataModel";
 
@@ -108,7 +108,7 @@ export const hiddenColumns: ColumnDef<hiddenColumnsProps>[] = [
       return (
         <div className="flex flex-col items-center gap-1">
           <span className="min-w-20 max-w-50 truncate text-center font-medium capitalize">
-            {getEventCategoryLabelAbbr(row.getValue("category"))}
+            {getEventCategoryLabel(row.getValue("category"), true)}
           </span>
         </div>
       );

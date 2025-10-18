@@ -24,7 +24,7 @@ const CalendarSkeleton = (
 );
 
 // Lazy-load the calendar component
-export const LazyCalendar = dynamic(() => import("./calendar"), {
+export const LazyCalendar = dynamic(() => import("./calendar-wrapper"), {
   ssr: false,
   loading: () => CalendarSkeleton,
 });

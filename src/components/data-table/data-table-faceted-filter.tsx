@@ -18,7 +18,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 import { FaCheck } from "react-icons/fa";
 import { TbFilterPlus } from "react-icons/tb";
 

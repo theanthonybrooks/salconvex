@@ -1,8 +1,8 @@
 "use client";
 
 import { PostPropertiesDashboard } from "@/components/ui/post-properties-dashboard";
-import { cn } from "@/lib/utils";
-import { OpenCallData } from "@/types/openCall";
+import { cn } from "@/helpers/utilsFns";
+import { OpenCallData } from "@/types/openCallTypes";
 
 import { OpenCallPost } from "@/app/(pages)/(artist)/thelist/components/open-call-post";
 import { Link } from "@/components/ui/custom-link";

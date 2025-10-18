@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 import { CalendarClockIcon, CheckIcon, X } from "lucide-react";
 
 import {
@@ -8,7 +8,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/state-accordion-test";
 
-import { OpenCall } from "@/types/openCall";
+import { OpenCall } from "@/types/openCallTypes";
 
 import { Card } from "@/components/ui/card";
 import { Link } from "@/components/ui/custom-link";
@@ -22,14 +22,14 @@ import {
 } from "@/features/events/open-calls/components/open-call-provided";
 import { getOpenCallStatus } from "@/features/events/open-calls/helpers/openCallStatus";
 import { hasId, OpenCallFilesTable } from "@/features/files/form-file-list";
-import { generateICSFile } from "@/lib/addToCalendar";
-import { formatOpenCallDeadline, isValidIsoDate } from "@/lib/dateFns";
-import { formatBudgetCurrency, formatRate } from "@/lib/eventFns";
-import { getMimeTypeFromHref } from "@/lib/fileFns";
-import { getFormattedLocationString } from "@/lib/locations";
-import { RichTextDisplay } from "@/lib/richTextFns";
+import { generateICSFile } from "@/helpers/addToCalendar";
+import { formatOpenCallDeadline, isValidIsoDate } from "@/helpers/dateFns";
+import { formatBudgetCurrency, formatRate } from "@/helpers/eventFns";
+import { getMimeTypeFromHref } from "@/helpers/fileFns";
+import { getFormattedLocationString } from "@/helpers/locations";
+import { RichTextDisplay } from "@/helpers/richTextFns";
 import { ArtistFull } from "@/types/artist";
-import { EventData } from "@/types/event";
+import { EventData } from "@/types/eventTypes";
 import { UserPref } from "@/types/user";
 
 interface OpenCallCardProps {
@@ -130,6 +130,7 @@ const OpenCallCard = ({
 
   const hasBudgetRange = budgetMax && budgetMax > 0 && budgetMax !== budgetMin;
   const hasBudget = !!(budgetMin > 0 || hasBudgetRange);
+  //TODO: Use actual "hasBudget" value from the db table values. But check that it won't break anything as it can still be true and have no budget info (the unknown ones)
   const hasRate = !!budgetRate && budgetRate > 0;
   const noBudgetInfo = !hasBudget && !hasRate;
   const eventStart = eventDates[0].start;

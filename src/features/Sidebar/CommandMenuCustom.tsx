@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/drawer";
 import { searchDialogVariants } from "@/constants/dialogConsts";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 import { usePreloadedQuery } from "convex/react";
 import { useRouter } from "next/navigation";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";

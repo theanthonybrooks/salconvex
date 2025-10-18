@@ -3,8 +3,8 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { FilePreviewer } from "@/components/ui/popover-file-preview";
-import { getMimeTypeFromHref } from "@/lib/fileFns";
-import { cn } from "@/lib/utils";
+import { getMimeTypeFromHref } from "@/helpers/fileFns";
+import { cn } from "@/helpers/utilsFns";
 import { useMutation } from "convex/react";
 import { Book, BookDashed, Download, X } from "lucide-react";
 import { useState } from "react";

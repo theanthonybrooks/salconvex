@@ -12,7 +12,7 @@ import { DialogCloseBtn } from "@/components/ui/dialog-close-btn";
 import { ArtistProfileForm } from "@/features/artists/artist-profile-form";
 import { EventOCForm } from "@/features/events/event-add-form";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 import { User } from "@/types/user";
 import { usePreloadedQuery } from "convex/react";
 import { isBefore } from "date-fns";

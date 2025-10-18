@@ -13,7 +13,7 @@ import { ConfirmDialog } from "@/components/ui/confirmation-dialog";
 import { Input } from "@/components/ui/input";
 import { TooltipSimple } from "@/components/ui/tooltip";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 import { getExternalRedirectHtml } from "@/utils/loading-page-html";
 import { ConvexError } from "convex/values";
 import { CircleCheck, CreditCard, Info, X } from "lucide-react";
@@ -44,6 +44,10 @@ export default function BillingPage() {
   );
   const deleteCoupon = useAction(
     api.stripeSubscriptions.deleteCouponFromSubscription,
+  );
+
+  const pauseOrCancelSub = useAction(
+    api.stripeSubscriptions.pauseOrCancelSubscription,
   );
   const currentPeriodEnd = new Date(
     subscription?.currentPeriodEnd ?? Date.now(),
@@ -113,7 +117,7 @@ export default function BillingPage() {
     }
 
     if (currentlyCanceled) {
-      router.push("/pricing#plans");
+      router.push("/pricing?type=artist");
       return;
     }
     const newTab = window.open("about:blank");
@@ -159,6 +163,27 @@ export default function BillingPage() {
         toast.error("An unknown error occurred.");
       }
       return;
+    }
+  };
+
+  // const handlePauseSubscription = async () => {
+  //   try {
+  //     await pauseOrCancelSub({
+  //       pause: true,
+  //     });
+  //     toast.success("Successfully paused your subscription!");
+  //   } catch (err) {
+  //     console.error("Failed to pause subscription:", err);
+  //     toast.error("Failed to pause subscription");
+  //   }
+  // };
+  const handleCancelSubscription = async () => {
+    try {
+      await pauseOrCancelSub({});
+      toast.success("Successfully canceled your subscription!");
+    } catch (err) {
+      console.error("Failed to cancel subscription:", err);
+      toast.error("Failed to cancel subscription");
     }
   };
 
@@ -212,7 +237,7 @@ export default function BillingPage() {
         toast.error("No active subscription found");
         return;
       }
-      deleteCoupon({ subscriptionId: subscription.stripeId });
+      deleteCoupon();
     } catch (err) {
       console.error("Error deleting coupon:", err);
     } finally {
@@ -259,10 +284,17 @@ export default function BillingPage() {
                 ? "Resume Membership"
                 : isCanceled
                   ? "Choose Plan"
-                  : "Manage Membership"}
+                  : "Update Membership"}
             </Button>
             {hasActiveSubscription && (
               <>
+                <Button
+                  className="mt-3 w-full max-w-lg"
+                  onClick={handleCancelSubscription}
+                  variant="salWithShadow"
+                >
+                  Cancel Membership
+                </Button>
                 {!subPromoCode ? (
                   <form
                     onSubmit={(e) => {

@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 import Typography from "@mui/material/Typography";
 import { motion } from "framer-motion";
 import { Check, CheckCircle2, LoaderCircle } from "lucide-react";

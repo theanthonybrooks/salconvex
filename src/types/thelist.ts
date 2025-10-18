@@ -1,4 +1,8 @@
-import { EventCategory, EventType, PostStatusOptions } from "@/types/event";
+import {
+  EventCategory,
+  EventType,
+  PostStatusOptions,
+} from "@/types/eventTypes";
 import { Id } from "~/convex/_generated/dataModel";
 
 type SortBy =

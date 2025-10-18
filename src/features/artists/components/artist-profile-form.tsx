@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 
 import { Label } from "@/components/ui/label";
-import { sortedGroupedCountries } from "@/lib/locations";
+import { sortedGroupedCountries } from "@/helpers/locations";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAction, useMutation, useQuery } from "convex/react";
@@ -26,8 +26,8 @@ import { Input } from "@/components/ui/input";
 import LogoUploader from "@/components/ui/logo-uploader";
 import { MapboxInputFull } from "@/components/ui/mapbox-search";
 import { SearchMappedMultiSelect } from "@/components/ui/mapped-select-multi";
-import { autoHttps, formatHandleInput } from "@/lib/linkFns";
-import { cn } from "@/lib/utils";
+import { autoHttps, formatHandleInput } from "@/helpers/linkFns";
+import { cn } from "@/helpers/utilsFns";
 import { UpdateArtistSchema, UpdateArtistSchemaValues } from "@/schemas/artist";
 import { User } from "@/types/user";
 import { FunctionReturnType } from "convex/server";

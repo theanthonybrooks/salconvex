@@ -9,17 +9,17 @@ import { MapboxInputFull } from "@/components/ui/mapbox-search";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { SelectSimple } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { EventNameSearch } from "@/features/events/components/event-search";
-import { EventOCFormValues } from "@/features/events/event-add-form";
-import { getEventCategoryLabelAbbr } from "@/lib/eventFns";
-import { cn } from "@/lib/utils";
 import {
-  EventCategory,
   eventCategoryOptions,
   eventTypeOptions,
   noEventCategories,
   prodOnlyCategories,
-} from "@/types/event";
+} from "@/constants/eventConsts";
+import { EventNameSearch } from "@/features/events/components/event-search";
+import { EventOCFormValues } from "@/features/events/event-add-form";
+import { getEventCategoryLabel } from "@/helpers/eventFns";
+import { cn } from "@/helpers/utilsFns";
+import { EventCategory } from "@/types/eventTypes";
 import { User } from "@/types/user";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { useQueries } from "convex-helpers/react/cache/hooks";
@@ -288,14 +288,14 @@ const SubmissionFormEventStep1 = ({
                 Step {categoryEvent && !eventOnly ? 3 : 2}:{" "}
               </p>
               <p className="lg:text-xs">
-                {getEventCategoryLabelAbbr(category)} Name + Edition
+                {getEventCategoryLabel(category, true)} Name + Edition
               </p>
             </div>
 
             <div className="mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
               <div className="flex w-full gap-2">
                 <Label htmlFor="event.name" className="sr-only">
-                  {getEventCategoryLabelAbbr(category)} Name
+                  {getEventCategoryLabel(category, true)} Name
                 </Label>
                 <Controller
                   name="event.name"
@@ -316,7 +316,7 @@ const SubmissionFormEventStep1 = ({
                   )}
                 />
                 <Label htmlFor="event.dates.edition" className="sr-only">
-                  {getEventCategoryLabelAbbr(category)} Edition
+                  {getEventCategoryLabel(category, true)} Edition
                 </Label>
                 <Controller
                   name="event.dates.edition"
@@ -341,7 +341,7 @@ const SubmissionFormEventStep1 = ({
                 <span className="mt-2 w-full text-center text-sm text-red-600">
                   {/* {category === "event"
                     ? "An event with that name already exists."
-                    : `A ${getEventCategoryLabelAbbr(category)} with this name already exists.`} */}
+                    : `A ${getEventCategoryLabel(category, true)} with this name already exists.`} */}
                   {eventNameErrorValue}
                 </span>
               )}
@@ -357,7 +357,7 @@ const SubmissionFormEventStep1 = ({
 
                 <div className="mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
                   <Label htmlFor="event.name" className="sr-only">
-                    {getEventCategoryLabelAbbr(category)} Location
+                    {getEventCategoryLabel(category, true)} Location
                   </Label>
 
                   <Controller
@@ -387,7 +387,7 @@ const SubmissionFormEventStep1 = ({
                     Step {categoryEvent && !eventOnly ? 5 : 4}:{" "}
                   </p>
                   <p className="lg:text-xs">
-                    {getEventCategoryLabelAbbr(category)} Logo
+                    {getEventCategoryLabel(category, true)} Logo
                   </p>
                 </div>
                 <div className="mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
@@ -425,13 +425,13 @@ const SubmissionFormEventStep1 = ({
                         Step {categoryEvent && !eventOnly ? 6 : 5}:{" "}
                       </p>
                       <p className="lg:text-xs">
-                        {getEventCategoryLabelAbbr(category)} Details/Notes
+                        {getEventCategoryLabel(category, true)} Details/Notes
                       </p>
                     </div>
 
                     <div className="mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
                       <Label htmlFor="event.name" className="sr-only">
-                        {getEventCategoryLabelAbbr(category)} About
+                        {getEventCategoryLabel(category, true)} About
                       </Label>
                       <Controller
                         name="event.blurb"
@@ -463,7 +463,7 @@ const SubmissionFormEventStep1 = ({
 
                     <div className="col-start-2 mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
                       <Label htmlFor="event.name" className="sr-only">
-                        {getEventCategoryLabelAbbr(category)} About
+                        {getEventCategoryLabel(category, true)} About
                       </Label>
                       <Controller
                         name="event.about"
@@ -512,7 +512,7 @@ const SubmissionFormEventStep1 = ({
                     Step {categoryEvent && !eventOnly ? 7 : 6}:{" "}
                   </p>
                   <p className="lg:text-xs">
-                    {getEventCategoryLabelAbbr(category)} Dates
+                    {getEventCategoryLabel(category, true)} Dates
                   </p>
                 </div>
 
@@ -611,13 +611,13 @@ const SubmissionFormEventStep1 = ({
                     :{" "}
                   </p>
                   <p className="lg:text-xs">
-                    {getEventCategoryLabelAbbr(category)} Timeline
+                    {getEventCategoryLabel(category, true)} Timeline
                   </p>
                 </div>
 
                 <div className="mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
                   <Label htmlFor="event.timeline" className="sr-only">
-                    {getEventCategoryLabelAbbr(category)} Timeline
+                    {getEventCategoryLabel(category, true)} Timeline
                   </Label>
                   <Controller
                     name="event.timeLine"

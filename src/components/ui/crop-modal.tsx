@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import DiscreteSlider from "@/components/ui/slider";
+import { cn } from "@/helpers/utilsFns";
 import { createImage, getCroppedImg, padImageToSquare } from "@/lib/imageFns";
-import { cn } from "@/lib/utils";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Cropper, { Area } from "react-easy-crop";
 import { BiColorFill } from "react-icons/bi";

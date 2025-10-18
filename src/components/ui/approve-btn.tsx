@@ -1,14 +1,14 @@
 import { Button } from "@/components/ui/button";
 import EventContextMenu from "@/features/events/ui/event-context-menu";
-import { getEventCategoryLabelAbbr } from "@/lib/eventFns";
-import { cn } from "@/lib/utils";
+import { getEventCategoryLabel } from "@/helpers/eventFns";
+import { cn } from "@/helpers/utilsFns";
 import { ApplicationStatus } from "@/types/applications";
 import {
   EventCategory,
   EventData,
   SubmissionFormState as EventState,
-} from "@/types/event";
-import { OpenCallState, OpenCallStatus } from "@/types/openCall";
+} from "@/types/eventTypes";
+import { OpenCallState, OpenCallStatus } from "@/types/openCallTypes";
 import { User } from "@/types/user";
 import { useMutation } from "convex/react";
 import { useRouter } from "next/navigation";
@@ -154,12 +154,12 @@ export const ApproveBtn = ({
               : eventDraft
                 ? "Finish Event"
                 : bothSubmitted || eventSubmitted
-                  ? `Update ${getEventCategoryLabelAbbr(eventCategory)}`
+                  ? `Update ${getEventCategoryLabel(eventCategory, true)}`
                   : openCallSubmitted
                     ? "Update Open Call"
                     : bothPublished
-                      ? `Edit ${getEventCategoryLabelAbbr(eventCategory)}`
-                      : `Edit ${getEventCategoryLabelAbbr(eventCategory)}`}
+                      ? `Edit ${getEventCategoryLabel(eventCategory, true)}`
+                      : `Edit ${getEventCategoryLabel(eventCategory, true)}`}
           </Button>
         )}
         {showContextMenu && (

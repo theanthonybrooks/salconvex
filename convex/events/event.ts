@@ -1,12 +1,13 @@
-import { COUNTRIES_REQUIRING_STATE, sortByLocation } from "@/lib/locations";
+import { COUNTRIES_REQUIRING_STATE } from "@/constants/locationConsts";
+
 import { sortByOcStatus } from "@/lib/openCallFns";
 import {
   EventCategory,
   EventFormat,
   ProdFormat,
   SubmissionFormState,
-} from "@/types/event";
-import { OpenCall, OpenCallApplication } from "@/types/openCall";
+} from "@/types/eventTypes";
+import { OpenCall, OpenCallApplication } from "@/types/openCallTypes";
 import { Organizer } from "@/types/organizer";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { ConvexError, v } from "convex/values";
@@ -21,6 +22,7 @@ import {
   prodFormatValidator,
 } from "~/convex/schema";
 
+import { sortByLocation } from "@/helpers/locations";
 import { internal } from "~/convex/_generated/api";
 import {
   eventsAggregate,

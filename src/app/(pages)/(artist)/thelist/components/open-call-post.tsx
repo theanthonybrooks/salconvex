@@ -1,15 +1,15 @@
 import { PostSettings } from "@/app/(pages)/(artist)/thelist/components/open-call-socials";
 import EventDates from "@/features/events/components/event-dates";
 import { EligibilityLabelServer } from "@/features/events/open-calls/components/eligibilty-label-server";
-import { formatOpenCallDeadlineForPost } from "@/lib/dateFns";
+import { formatOpenCallDeadlineForPost } from "@/helpers/dateFns";
 import {
   formatBudgetCurrency,
   formatRate,
-  getEventCategoryLabelAbbr,
-} from "@/lib/eventFns";
-import { getFormattedLocationString } from "@/lib/locations";
-import { cn } from "@/lib/utils";
-import { OpenCallData } from "@/types/openCall";
+  getEventCategoryLabel,
+} from "@/helpers/eventFns";
+import { getFormattedLocationString } from "@/helpers/locations";
+import { cn } from "@/helpers/utilsFns";
+import { OpenCallData } from "@/types/openCallTypes";
 import Image from "next/image";
 import styles from "./OpenCallPostDetail.module.css";
 
@@ -120,10 +120,10 @@ export const OpenCallPost = ({ data, postSettings }: OpenCallPostProps) => {
             <p className={cn("text-sm")}>Call Type:</p>
             <span className={cn("flex flex-col items-center leading-[0.8]")}>
               <p className="text-6xl font-black">
-                {getEventCategoryLabelAbbr(eventCategory).slice(0, 1)}
+                {getEventCategoryLabel(eventCategory, true).slice(0, 1)}
               </p>
               <p className={cn("text-sm")}>
-                {getEventCategoryLabelAbbr(eventCategory)}
+                {getEventCategoryLabel(eventCategory, true)}
               </p>
             </span>
           </div>

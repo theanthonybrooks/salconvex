@@ -1,14 +1,14 @@
 // app/components/server/ConvertedBudget.tsx
 
-import { formatCurrencyServer, formatRateServer } from "@/lib/eventFns"
+import { formatCurrencyServer, formatRateServer } from "@/helpers/eventFns";
 
 interface ConvertedBudgetProps {
-  min: number
-  max: number | null
-  currency: string
-  allInclusive: boolean
-  userCurrency?: string
-  preview?: boolean
+  min: number;
+  max: number | null;
+  currency: string;
+  allInclusive: boolean;
+  userCurrency?: string;
+  preview?: boolean;
 }
 
 export const ConvertedBudget = async ({
@@ -25,20 +25,20 @@ export const ConvertedBudget = async ({
     currency,
     preview,
     allInclusive,
-    userCurrency
-  )
+    userCurrency,
+  );
 
-  return <>{result}</>
-}
+  return <>{result}</>;
+};
 
 // app/components/server/ConvertedRate.tsx
 
 interface ConvertedRateProps {
-  rate: number
-  unit: string
-  currency: string
-  allInclusive: boolean
-  userCurrency?: string
+  rate: number;
+  unit: string;
+  currency: string;
+  allInclusive: boolean;
+  userCurrency?: string;
 }
 
 export const ConvertedRate = async ({
@@ -53,8 +53,8 @@ export const ConvertedRate = async ({
     unit,
     currency,
     allInclusive,
-    userCurrency
-  )
+    userCurrency,
+  );
 
-  return <>{result}</>
-}
+  return <>{result}</>;
+};

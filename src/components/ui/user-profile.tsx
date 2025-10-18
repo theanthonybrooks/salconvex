@@ -18,7 +18,7 @@ import {
 import { TooltipSimple } from "@/components/ui/tooltip";
 import SignOutBtn from "@/features/auth/components/sign-out-btn";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 import { usePreloadedQuery } from "convex/react";
 // import { SignOutButton, useUser } from "@clerk/nextjs";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
@@ -249,7 +249,7 @@ export function UserProfile({
               </DropdownMenuSubContent>
             </DropdownMenuPortal>
           </DropdownMenuSub>
-          {hasActiveSub && (
+          {hasActiveSub && subStatus !== "canceled" && (
             <Link
               href="/dashboard/billing"
               className="underline-offset-2 hover:cursor-pointer hover:underline"
@@ -263,7 +263,7 @@ export function UserProfile({
 
           {subStatus === "canceled" && isArtist && (
             <Link
-              href="/pricing#plans"
+              href="/pricing?type=artist"
               className="underline-offset-2 hover:cursor-pointer hover:underline"
             >
               <DropdownMenuItem className="focus:bg-salYellow/50">

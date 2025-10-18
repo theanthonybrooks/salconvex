@@ -13,19 +13,18 @@ import {
 import { EligibilityLabel } from "@/features/events/open-calls/components/eligibility-label-client";
 import { OpenCallProvidedPreview } from "@/features/events/open-calls/components/open-call-provided";
 import EventContextMenu from "@/features/events/ui/event-context-menu";
-import { formatOpenCallDeadline } from "@/lib/dateFns";
+import { formatOpenCallDeadline } from "@/helpers/dateFns";
 import {
   formatBudgetCurrency,
   formatRate,
   getEventCategoryLabel,
-  getEventCategoryLabelAbbr,
   getEventTypeLabel,
-} from "@/lib/eventFns";
+} from "@/helpers/eventFns";
+import { RichTextDisplay } from "@/helpers/richTextFns";
 import { getCallFormatLabel } from "@/lib/openCallFns";
-import { RichTextDisplay } from "@/lib/richTextFns";
 
-import { cn } from "@/lib/utils";
-import { CombinedEventPreviewCardData, PostStatus } from "@/types/event";
+import { cn } from "@/helpers/utilsFns";
+import { CombinedEventPreviewCardData, PostStatus } from "@/types/eventTypes";
 import { User, UserPref } from "@/types/user";
 import { useMutation } from "convex/react";
 import {
@@ -178,6 +177,11 @@ const EventCardPreview = ({
 
   // const userCurrency = userPref?.currency ?? ""
 
+  const linkPath =
+    !publicView || publicPreview || isUserOrg
+      ? `/thelist/event/${slug}/${event.dates.edition}${openCallStatus ? "/call" : ""}${openCallStatus === "ended" ? "?tab=event" : null}`
+      : "/pricing?type=artist";
+
   const { toggleListAction } = useToggleListAction(event._id);
   const updateUserLastActive = useMutation(api.users.updateUserLastActive);
   const updateEventPostStatus = useMutation(
@@ -225,11 +229,7 @@ const EventCardPreview = ({
       <Card className="mb-6 grid w-[90vw] min-w-[340px] max-w-[400px] grid-cols-[75px_minmax(0,auto)_50px] grid-rows-[repeat(3_auto)] gap-x-3 rounded-3xl border-foreground/20 bg-white/40 px-1 py-2 first:mt-6 last:mb-2 lg:hidden">
         <div
           onClick={() => {
-            router.push(
-              !publicView || publicPreview || isUserOrg
-                ? `/thelist/event/${slug}/${event.dates.edition}${openCallStatus ? "/call" : ""}`
-                : "/pricing#plans",
-            );
+            router.push(linkPath);
           }}
           className="col-span-1 row-start-1 mx-auto pl-2 pt-3 active:scale-95"
         >
@@ -387,7 +387,7 @@ const EventCardPreview = ({
             </span>
             {/* // todo: make this dynamic to show project, event, etc for the type */}
             <span className="text-2xs leading-[0.85rem]">
-              {getEventCategoryLabelAbbr(eventCategory)}
+              {getEventCategoryLabel(eventCategory, true)}
             </span>
           </div>
           <ApplyButtonShort
@@ -530,11 +530,7 @@ const EventCardPreview = ({
           <div className="mb-2 flex flex-col gap-y-1 p-2">
             <div
               onClick={() => {
-                router.push(
-                  !publicView || publicPreview || isUserOrg
-                    ? `/thelist/event/${slug}/${event.dates.edition}${openCallStatus ? "/call" : ""}`
-                    : "/pricing#plans",
-                );
+                router.push(linkPath);
               }}
               className="group hover:cursor-pointer"
             >

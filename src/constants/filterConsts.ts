@@ -1,5 +1,5 @@
 import { ViewOptions } from "@/features/events/event-list-client";
-import { EventCategory, EventType } from "@/types/event";
+import { EventCategory, EventType } from "@/types/eventTypes";
 import { Filters, SortOptions } from "@/types/thelist";
 import { Dispatch, SetStateAction } from "react";
 

@@ -5,7 +5,7 @@ import {
   CommandItem,
   CommandMenuCustom,
 } from "@/features/Sidebar/CommandMenuCustom";
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 import { useState } from "react";
 import { FiCommand, FiSearch } from "react-icons/fi";
 import { TbWorldSearch } from "react-icons/tb";

@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 import { useAction, usePreloadedQuery } from "convex/react";
 
 import { Link } from "@/components/ui/custom-link";
@@ -27,11 +27,12 @@ import { useQuery } from "convex-helpers/react/cache";
 import { motion } from "framer-motion";
 import { CheckCircle2, CircleX } from "lucide-react";
 import Image from "next/image";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { api } from "~/convex/_generated/api";
 import { Doc } from "~/convex/_generated/dataModel";
+import { AccountTypeBase } from "~/convex/schema";
 
 type SwitchProps = {
   onSwitchAction: (value: string) => void;
@@ -237,12 +238,16 @@ export const AccountTypeSwitch = ({
   hasSub,
 }: {
   isArtist: boolean;
-  setSelectedAccountTypeAction: (value: string) => void;
+  setSelectedAccountTypeAction: (value: AccountTypeBase) => void;
   selectedAccountType: string;
   orgAccount: boolean;
   setIsYearlyAction: (value: boolean) => void;
   hasSub: boolean;
 }) => {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const typeParam = searchParams.get("type");
+
   return (
     <div className="flex flex-col items-center justify-center text-center">
       <div className={cn("mt-8 flex flex-col items-center gap-4 3xl:mt-14")}>
@@ -263,6 +268,7 @@ export const AccountTypeSwitch = ({
           variant="salWithShadowHidden"
           size="lg"
           onClick={() => {
+            if (typeParam) router.replace("/pricing");
             setSelectedAccountTypeAction(isArtist ? "organizer" : "artist");
             setIsYearlyAction(false);
             // window.scrollTo({ top: 0, behavior: "smooth" });
@@ -563,6 +569,7 @@ const PricingCard = ({
 export default function Pricing() {
   useScrollToTopOnMount();
   const searchParams = useSearchParams();
+  const typeParam = searchParams.get("type") as AccountTypeBase;
   const [isYearly, setIsYearly] = useState<boolean>(false);
   const [hasOpenCall, setHasOpenCall] = useState<boolean>(true);
 
@@ -579,8 +586,11 @@ export default function Pricing() {
   const user = userData?.user;
   const userAccountTypes = user?.accountType ?? [];
   // const multiType = userAccountTypes.length > 1
-  const [urlAccountType, setUrlAccountType] = useState<string | null>(null);
-  const accountType = urlAccountType ?? user?.accountType[0] ?? "artist";
+  const [urlAccountType, setUrlAccountType] = useState<AccountTypeBase | null>(
+    null,
+  );
+  const accountType =
+    typeParam ?? urlAccountType ?? user?.accountType[0] ?? "artist";
   const isAdmin = user?.role?.includes("admin");
 
   // if (hasSub) {

@@ -39,6 +39,7 @@ import {
 } from "@/features/organizers/schemas/event-add-schema";
 
 import { DialogCloseBtn } from "@/components/ui/dialog-close-btn";
+import { validOCVals } from "@/constants/openCallConsts";
 import SubmissionFormEventStep1 from "@/features/events/submission-form/steps/submission-form-event-1";
 import SubmissionFormEventStep2 from "@/features/events/submission-form/steps/submission-form-event-2";
 import SubmissionFormOC1 from "@/features/events/submission-form/steps/submission-form-oc-1";
@@ -47,17 +48,14 @@ import SubmissionFormOrgStep from "@/features/events/submission-form/steps/submi
 import SubmissionFormOrgStep2 from "@/features/events/submission-form/steps/submission-form-org-2";
 import { SubmissionFormRecapDesktop } from "@/features/events/submission-form/steps/submission-form-recap-desktop";
 import { SubmissionFormRecapMobile } from "@/features/events/submission-form/steps/submission-form-recap-mobile";
-import { toSeason, toYear, toYearMonth } from "@/lib/dateFns";
-import {
-  getEventCategoryLabel,
-  getEventCategoryLabelAbbr,
-} from "@/lib/eventFns";
+import { toSeason, toYear, toYearMonth } from "@/helpers/dateFns";
+import { getEventCategoryLabel } from "@/helpers/eventFns";
+import { getOcPricing } from "@/helpers/pricingFns";
+import { cn } from "@/helpers/utilsFns";
 import { handleFileUrl, handleOrgFileUrl } from "@/lib/fileUploadFns";
-import { getOcPricing } from "@/lib/pricingFns";
-import { cn } from "@/lib/utils";
 import { useDevice } from "@/providers/device-provider";
-import { EnrichedEvent, EventCategory } from "@/types/event";
-import { OpenCallState, validOCVals } from "@/types/openCall";
+import { EnrichedEvent, EventCategory } from "@/types/eventTypes";
+import { OpenCallState } from "@/types/openCallTypes";
 import { getExternalRedirectHtml } from "@/utils/loading-page-html";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
@@ -563,7 +561,7 @@ export const EventOCForm = ({
         toast.success(
           alreadyPaid || alreadyApproved
             ? "Successfully updated project!"
-            : `Successfully submitted ${eventOnly ? "event" : getEventCategoryLabelAbbr(category) + " and open call"}!`,
+            : `Successfully submitted ${eventOnly ? "event" : getEventCategoryLabel(category, true) + " and open call"}!`,
           {
             onClick: () => toast.dismiss(),
           },

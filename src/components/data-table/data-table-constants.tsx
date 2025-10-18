@@ -31,6 +31,7 @@ import {
 import { ArrowDown, ArrowRight, ArrowUp, CheckCircle } from "lucide-react";
 
 import { FaMoneyBill } from "react-icons/fa6";
+import { EventStateType } from "~/convex/schema";
 
 // interface DataTableRowActionsProps<TData> {
 //   row: Row<TData>;
@@ -141,6 +142,34 @@ export const eventStates = [
     icon: Scroll,
   },
 ];
+export const eventStates2 = [
+  {
+    value: "draft",
+    label: "Draft",
+    icon: Pencil,
+  },
+  { value: "editing", label: "Editing", icon: Pencil },
+  {
+    value: "submitted",
+    label: "Submitted",
+    icon: Clock,
+  },
+  { value: "pending", label: "Pending", icon: DollarSign },
+  {
+    value: "published",
+    label: "Published",
+    icon: CheckCircle,
+  },
+  {
+    value: "archived",
+    label: "Archived",
+    icon: Scroll,
+  },
+] as const;
+
+export const eventStateValues = [
+  ...eventStates.map((s) => s.value),
+] as unknown as readonly [EventStateType];
 
 export const openCallStates = [
   {

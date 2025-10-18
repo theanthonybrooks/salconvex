@@ -9,7 +9,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { ArtistProfileForm } from "@/features/artists/components/artist-profile-form";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 import { usePreloadedQuery } from "convex/react";
 export const ArtistMainPage = () => {
   const { preloadedUserData, preloadedSubStatus } = useConvexPreload();

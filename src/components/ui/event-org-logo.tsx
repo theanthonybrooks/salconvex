@@ -1,4 +1,4 @@
-import { capitalize, cn } from "@/lib/utils";
+import { capitalize, cn } from "@/helpers/utilsFns";
 import Image from "next/image";
 import { useState } from "react";
 

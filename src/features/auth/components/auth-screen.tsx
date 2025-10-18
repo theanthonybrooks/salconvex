@@ -4,7 +4,7 @@ import ForgotPassword from "@/features/auth/components/forgot-password";
 import RegisterForm from "@/features/auth/components/register-form";
 import SignInCard from "@/features/auth/components/sign-in-card";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 
 import { usePathname, useRouter } from "next/navigation";
 

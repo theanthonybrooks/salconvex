@@ -14,7 +14,7 @@ import {
 
 import { FormError } from "@/components/form-error";
 import { Label } from "@/components/ui/label";
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 
 const Form = FormProvider;
 

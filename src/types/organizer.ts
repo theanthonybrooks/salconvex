@@ -1,5 +1,5 @@
 import { ArtistFull } from "@/types/artist";
-import { EventData } from "@/types/event";
+import { EventData } from "@/types/eventTypes";
 import { Id } from "~/convex/_generated/dataModel";
 
 export const primaryContacts = [

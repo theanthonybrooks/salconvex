@@ -1,6 +1,6 @@
 import { Link } from "@/components/ui/custom-link";
-import { SubmissionFormState as EventState } from "@/types/event";
-import { OpenCallState } from "@/types/openCall";
+import { SubmissionFormState as EventState } from "@/types/eventTypes";
+import { OpenCallState } from "@/types/openCallTypes";
 import { Id } from "~/convex/_generated/dataModel";
 
 interface DraftPendingBannerProps {

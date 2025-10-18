@@ -49,15 +49,15 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { SocialDropdownMenus } from "@/features/events/components/social-dropdown-menus";
-import { getEventCategoryLabelAbbr, getEventTypeLabel } from "@/lib/eventFns";
-import { cn } from "@/lib/utils";
+import { getEventCategoryLabel, getEventTypeLabel } from "@/helpers/eventFns";
+import { cn } from "@/helpers/utilsFns";
 import {
   EventCategory,
   EventType,
   PostStatus,
   SubmissionFormState,
-} from "@/types/event";
-import { OpenCallState } from "@/types/openCall";
+} from "@/types/eventTypes";
+import { OpenCallState } from "@/types/openCallTypes";
 import { Globe, LucideClipboardCopy, MoreHorizontal } from "lucide-react";
 import { Id } from "~/convex/_generated/dataModel";
 
@@ -350,7 +350,7 @@ export const getColumns = (isAdmin: boolean): ColumnDef<Event>[] => {
         return (
           <div className="flex justify-center space-x-2">
             <span className="min-w-20 max-w-[500px] truncate text-center font-medium capitalize">
-              {getEventCategoryLabelAbbr(row.getValue("category"))}
+              {getEventCategoryLabel(row.getValue("category"), true)}
             </span>
           </div>
         );

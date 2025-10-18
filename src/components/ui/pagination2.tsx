@@ -8,7 +8,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ViewOptions } from "@/features/events/event-list-client";
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";

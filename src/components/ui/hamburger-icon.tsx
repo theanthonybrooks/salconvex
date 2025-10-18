@@ -1,5 +1,5 @@
 import { TooltipSimple } from "@/components/ui/tooltip";
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 import { Dispatch, SetStateAction } from "react";
 import styles from "./hamburger-icon.module.css";
 

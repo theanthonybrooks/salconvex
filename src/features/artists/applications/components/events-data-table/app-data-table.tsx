@@ -27,7 +27,7 @@ import {
 
 import { DataTablePagination } from "@/components/data-table/data-table-pagination";
 import { DataTableToolbar } from "@/features/artists/applications/components/events-data-table/apps-data-table-toolbar";
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 import { PageTypes, TableTypes } from "@/types/tanstack-table";
 import { useEffect } from "react";
 

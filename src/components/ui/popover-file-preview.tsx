@@ -10,7 +10,7 @@ import {
   FILE_TYPE_LABELS,
   IMAGE_TYPES,
 } from "@/constants/fileConsts";
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 import { Download, Eye } from "lucide-react";
 import { useState } from "react";
 

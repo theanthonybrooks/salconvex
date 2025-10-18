@@ -2,8 +2,8 @@
 
 import { Input } from "@/components/ui/input";
 
+import { cn } from "@/helpers/utilsFns";
 import { useDebounce } from "@/hooks/use-debounce";
-import { cn } from "@/lib/utils";
 import { useEffect, useRef, useState } from "react";
 import { FaRemoveFormat } from "react-icons/fa";
 import { titleCase } from "title-case";

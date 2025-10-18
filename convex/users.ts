@@ -1,7 +1,7 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { action, QueryCtx } from "./_generated/server";
 
-import { formatSubscriptionLabel } from "@/lib/subscriptionFns";
+import { formatSubscriptionLabel } from "@/helpers/subscriptionFns";
 import { getAuthSessionId, invalidateSessions } from "@convex-dev/auth/server";
 import { ConvexError, Infer, v } from "convex/values";
 import { Id } from "~/convex/_generated/dataModel";

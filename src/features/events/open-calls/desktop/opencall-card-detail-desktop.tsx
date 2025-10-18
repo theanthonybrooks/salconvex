@@ -1,6 +1,7 @@
 "use client";
 
-import { OpenCallCardProps, publicStateValues } from "@/types/openCall";
+import { publicStateValues } from "@/constants/openCallConsts";
+import { OpenCallCardProps } from "@/types/openCallTypes";
 
 import { Card } from "@/components/ui/card";
 import NavTabs from "@/components/ui/nav-tabs";
@@ -28,11 +29,11 @@ import { OrganizerCard } from "@/features/organizers/components/organizer-card";
 import EventDates from "@/features/events/components/event-dates";
 import { SalBackNavigation } from "@/features/events/components/sal-back-navigation";
 import { OrganizerLogoNameCard } from "@/features/organizers/components/organizer-logo-name-card";
-import { formatOpenCallDeadline, formatSingleDate } from "@/lib/dateFns";
-import { getEventCategoryLabel, getEventTypeLabel } from "@/lib/eventFns";
-import { getFormattedLocationString } from "@/lib/locations";
-import { RichTextDisplay } from "@/lib/richTextFns";
-import { cn } from "@/lib/utils";
+import { formatOpenCallDeadline, formatSingleDate } from "@/helpers/dateFns";
+import { getEventCategoryLabel, getEventTypeLabel } from "@/helpers/eventFns";
+import { getFormattedLocationString } from "@/helpers/locations";
+import { RichTextDisplay } from "@/helpers/richTextFns";
+import { cn } from "@/helpers/utilsFns";
 import { api } from "~/convex/_generated/api";
 
 import { ApproveBtn } from "@/components/ui/approve-btn";
@@ -41,7 +42,7 @@ import { DraftPendingBanner } from "@/components/ui/draft-pending-banner";
 import { EventOrgLogo } from "@/components/ui/event-org-logo";
 import { Separator } from "@/components/ui/separator";
 import { TooltipSimple } from "@/components/ui/tooltip";
-import { formatApplicationLink } from "@/lib/applicationFns";
+import { formatApplicationLink } from "@/helpers/applicationFns";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Id } from "~/convex/_generated/dataModel";

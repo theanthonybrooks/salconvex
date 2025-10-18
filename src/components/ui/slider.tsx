@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 import Box from "@mui/material/Box";
 import Slider from "@mui/material/Slider";
 

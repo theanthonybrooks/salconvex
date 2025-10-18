@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 import { ReactNode } from "react";
 import { FaCheckCircle } from "react-icons/fa";
 

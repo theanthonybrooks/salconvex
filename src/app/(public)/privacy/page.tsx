@@ -4,7 +4,7 @@ import {
   lastUpdatedPrivacyRaw,
   siteUrl,
 } from "@/constants/siteInfo";
-import { DateWrapper } from "@/lib/dateFns";
+import { DateWrapper } from "@/helpers/dateFns";
 
 export default function PrivacyPage() {
   return (

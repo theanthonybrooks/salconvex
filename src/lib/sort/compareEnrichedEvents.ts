@@ -1,8 +1,8 @@
-import { FAR_FUTURE, isValidIsoDate, parseEventDate } from "@/lib/dateFns";
+import { FAR_FUTURE, isValidIsoDate, parseEventDate } from "@/helpers/dateFns";
 import { SortOptions } from "@/types/thelist";
 
-import { EventData } from "@/types/event";
-import { OpenCall, OpenCallStatus } from "@/types/openCall";
+import { EventData } from "@/types/eventTypes";
+import { OpenCall, OpenCallStatus } from "@/types/openCallTypes";
 
 export type EnrichedEventsCardData = EventData & {
   tabs: { opencall: OpenCall | null };

@@ -1,6 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 import { forwardRef } from "react";
 
 interface RecapCoverProps {

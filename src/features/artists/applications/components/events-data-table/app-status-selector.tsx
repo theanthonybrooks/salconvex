@@ -7,7 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 import { ArtistStatus, artistStatusOptions } from "@/types/applications";
 import { useMutation } from "convex/react";
 import { useState } from "react";

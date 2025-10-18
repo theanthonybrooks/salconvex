@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { EventOCFormValues } from "@/features/events/event-add-form";
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 import { User } from "@/types/user";
 import FilePondPluginFileValidateSize from "filepond-plugin-file-validate-size";
 import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type";
@@ -25,13 +25,11 @@ registerPlugin(FilePondPluginFileValidateSize, FilePondPluginFileValidateType);
 import { MultiSelect } from "@/components/multi-select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DebouncedControllerNumInput } from "@/components/ui/debounced-form-num-input";
+import { openCallCategoryFields } from "@/constants/openCallConsts";
 import { siteUrl } from "@/constants/siteInfo";
-import { getCurrencySymbol } from "@/lib/currencyFns";
-import { convertBooleanToString } from "@/lib/selectFns";
-import { openCallCategoryFields } from "@/types/openCall";
+import { getCurrencySymbol } from "@/helpers/currencyFns";
+import { OpenCallCategoryKey } from "@/types/openCallTypes";
 import "filepond/dist/filepond.min.css";
-
-type CategoryKey = (typeof openCallCategoryFields)[number]["value"];
 
 interface SubmissionFormOC2Props {
   user: User | undefined;
@@ -81,7 +79,7 @@ const SubmissionFormOC2 = ({
   const existingHasBudget = openCall?.compensation?.budget?.hasBudget;
   const [hasBudget, setHasBudget] = useState<"true" | "false" | "">(
     typeof existingHasBudget === "boolean"
-      ? convertBooleanToString(existingHasBudget)
+      ? (String(existingHasBudget) as "true" | "false")
       : paidCall
         ? "true"
         : "",
@@ -643,7 +641,7 @@ const SubmissionFormOC2 = ({
 
                       const updated = Object.fromEntries(
                         selected.map((key) => {
-                          const typedKey = key as CategoryKey;
+                          const typedKey = key as OpenCallCategoryKey;
                           const existingValue = currentValues[typedKey];
                           return [
                             typedKey,
@@ -652,7 +650,7 @@ const SubmissionFormOC2 = ({
                               : true,
                           ];
                         }),
-                      ) as Record<CategoryKey, boolean | number>;
+                      ) as Record<OpenCallCategoryKey, boolean | number>;
 
                       field.onChange(updated);
                       handleCheckSchema();

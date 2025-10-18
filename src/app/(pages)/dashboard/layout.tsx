@@ -55,7 +55,7 @@ export default async function DashboardLayout({
   // const userType = user?.user?.accountType;
 
   if (!user) redirect("/auth/sign-in");
-  if (!subStatus) redirect("/pricing#plans");
+  if (!subStatus) redirect("/pricing?type=artist");
   // if (subStatus?.subStatus === "canceled") {
   //   redirect("/pricing#plans")
   // }

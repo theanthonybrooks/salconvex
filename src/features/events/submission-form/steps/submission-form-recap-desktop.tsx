@@ -18,18 +18,18 @@ import { EligibilityLabel } from "@/features/events/open-calls/components/eligib
 import { OpenCallProvided } from "@/features/events/open-calls/components/open-call-provided";
 import { hasId, OpenCallFilesTable } from "@/features/files/form-file-list";
 import { OrganizerCardLogoName } from "@/features/organizers/components/organizer-logo-name-card";
-import { formatOpenCallDeadline } from "@/lib/dateFns";
+import { formatOpenCallDeadline } from "@/helpers/dateFns";
 import {
   formatBudgetCurrency,
   formatRate,
   getCallTypeLabel,
   getEventCategoryLabel,
   getEventTypeLabel,
-} from "@/lib/eventFns";
+} from "@/helpers/eventFns";
+import { RichTextDisplay } from "@/helpers/richTextFns";
+import { cn } from "@/helpers/utilsFns";
 import { getCallFormatLabel } from "@/lib/openCallFns";
-import { RichTextDisplay } from "@/lib/richTextFns";
-import { cn } from "@/lib/utils";
-import { EligibilityType } from "@/types/openCall";
+import { EligibilityType } from "@/types/openCallTypes";
 import { capitalize } from "lodash";
 import { useState } from "react";
 import { useFormContext } from "react-hook-form";

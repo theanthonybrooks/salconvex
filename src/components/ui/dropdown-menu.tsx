@@ -4,7 +4,7 @@ import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 import { Check, Circle, Minus, Plus } from "lucide-react";
 import * as React from "react";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 
 const DropdownMenu = DropdownMenuPrimitive.Root;
 

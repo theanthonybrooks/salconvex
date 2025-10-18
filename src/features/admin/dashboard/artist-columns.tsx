@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { TooltipSimple } from "@/components/ui/tooltip";
 import { ConvexDashboardLink } from "@/features/events/ui/convex-dashboard-link";
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 import { ColumnDef } from "@tanstack/react-table";
 import { LucideClipboardCopy, MoreHorizontal } from "lucide-react";
 import { Id } from "~/convex/_generated/dataModel";

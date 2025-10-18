@@ -7,7 +7,7 @@ import {
   SOCIAL_MEDIA_LINKS,
 } from "@/constants/links";
 import { footerCRText } from "@/constants/text";
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 import { useQuery } from "convex-helpers/react/cache";
 import { useAction, useMutation } from "convex/react";
 import { ConvexError } from "convex/values";

@@ -1,6 +1,6 @@
 import { Input, InputProps } from "@/components/ui/input";
 import { PasswordChecklist } from "@/components/ui/password-checklist";
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 

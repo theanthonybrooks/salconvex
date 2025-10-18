@@ -10,16 +10,16 @@ import { getGroupKeyFromEvent } from "@/features/events/helpers/groupHeadings";
 import Pricing from "@/features/homepage/pricing";
 import { useArtistPreload } from "@/features/wrapper-elements/artist-preload-context";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
+import { generateSkeletonGroups } from "@/helpers/skeletonFns";
+import { cn, setParamIfNotDefault } from "@/helpers/utilsFns";
 import { useFilteredEventsQuery } from "@/hooks/use-filtered-events-query";
-import { generateSkeletonGroups } from "@/lib/skeletonFns";
-import { cn, setParamIfNotDefault } from "@/lib/utils";
 import { useDevice } from "@/providers/device-provider";
-import type { MergedEventPreviewData } from "@/types/event";
+import type { MergedEventPreviewData } from "@/types/eventTypes";
 import {
   CombinedEventPreviewCardData,
   EventCategory,
   EventType,
-} from "@/types/event";
+} from "@/types/eventTypes";
 import { Continents, Filters, SortOptions } from "@/types/thelist";
 import { usePreloadedQuery } from "convex/react";
 import { motion } from "framer-motion";

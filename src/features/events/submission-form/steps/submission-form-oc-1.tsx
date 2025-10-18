@@ -15,17 +15,19 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import {
+  eligibilityOptionValues,
+  openCallLinkFormatOptions,
+} from "@/constants/openCallConsts";
 import { siteUrl } from "@/constants/siteInfo";
 import { EventOCFormValues } from "@/features/events/event-add-form";
-import { enhancedGroupedCountries } from "@/lib/locations";
-import { cn } from "@/lib/utils";
+import { enhancedGroupedCountries } from "@/helpers/locations";
+import { cn } from "@/helpers/utilsFns";
 import {
   CallFormat,
-  eligibilityOptionValues,
   EligibilityType,
   openCallFileType,
-  openCallLinkFormatOptions,
-} from "@/types/openCall";
+} from "@/types/openCallTypes";
 import { User } from "@/types/user";
 import FilePondPluginFileValidateSize from "filepond-plugin-file-validate-size";
 import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type";
@@ -42,7 +44,7 @@ import { ExternalLinksInput } from "@/features/events/open-calls/components/exte
 import { FilePondInput } from "@/features/files/filepond";
 import { hasId, OpenCallFilesTable } from "@/features/files/form-file-list";
 import { OpenCallStep1 } from "@/features/organizers/schemas/event-add-schema";
-import { autoHttps } from "@/lib/linkFns";
+import { autoHttps } from "@/helpers/linkFns";
 import "filepond/dist/filepond.min.css";
 import { DateTime } from "luxon";
 import { Id } from "~/convex/_generated/dataModel";

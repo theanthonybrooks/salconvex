@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 import {
   Listbox,
   ListboxButton,

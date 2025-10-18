@@ -18,10 +18,10 @@ import {
   toSeason,
   toYear,
   toYearMonth,
-} from "@/lib/dateFns";
-import { getEventCategoryLabelAbbr } from "@/lib/eventFns";
-import { cn } from "@/lib/utils";
-import { EventCategory } from "@/types/event";
+} from "@/helpers/dateFns";
+import { getEventCategoryLabel } from "@/helpers/eventFns";
+import { cn } from "@/helpers/utilsFns";
+import { EventCategory } from "@/types/eventTypes";
 import { motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -276,8 +276,9 @@ export const FormDatePicker = <T extends EventOCFormValues>({
                 <SelectValue
                   placeholder={
                     isEvent
-                      ? `${getEventCategoryLabelAbbr(
+                      ? `${getEventCategoryLabel(
                           eventData?.category as EventCategory,
+                          true,
                         )} Date Format (select one)`
                       : "Production Date Format (select one)"
                   }
@@ -288,8 +289,9 @@ export const FormDatePicker = <T extends EventOCFormValues>({
                 {isProduction && hasEventDates && (
                   <SelectItem fit value="sameAsEvent">
                     Same as{" "}
-                    {getEventCategoryLabelAbbr(
+                    {getEventCategoryLabel(
                       eventData?.category as EventCategory,
+                      true,
                     )}
                   </SelectItem>
                 )}

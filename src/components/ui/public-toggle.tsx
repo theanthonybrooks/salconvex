@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 import { Eye, EyeOff } from "lucide-react";
 import styled from "styled-components";
 

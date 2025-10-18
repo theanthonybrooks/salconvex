@@ -2,7 +2,11 @@ import { filter } from "convex-helpers/server/filter";
 import { ConvexError, v } from "convex/values";
 
 import { supportEmail } from "@/constants/siteInfo";
-import { EventCategory, EventData, SubmissionFormState } from "@/types/event";
+import {
+  EventCategory,
+  EventData,
+  SubmissionFormState,
+} from "@/types/eventTypes";
 import { Organizer } from "@/types/organizer";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import slugify from "slugify";

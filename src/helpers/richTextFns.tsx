@@ -1,7 +1,7 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Link } from "@/components/ui/custom-link";
 import { ALLOWED_ATTR, ALLOWED_TAGS } from "@/components/ui/rich-text-editor";
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 import DOMPurify from "dompurify";
 import parse, { DOMNode, domToReact, Element, Text } from "html-react-parser";
 import { JSX } from "react";

@@ -1,14 +1,13 @@
-import { CALL_TYPE_LABELS } from "@/constants/openCallConsts";
-import { convertCurrency } from "@/lib/currencyFns";
 import {
-  EventCategory,
   eventCategoryOptions,
-  EventType,
   eventTypeOptions,
   freeEvents,
   paidEvents,
-} from "@/types/event";
-import { CallType } from "@/types/openCall";
+} from "@/constants/eventConsts";
+import { CALL_TYPE_LABELS } from "@/constants/openCallConsts";
+import { convertCurrency } from "@/helpers/currencyFns";
+import { EventCategory, EventType } from "@/types/eventTypes";
+import { CallType } from "@/types/openCallTypes";
 import currencies from "currency-codes";
 
 export const isFreeEvent = (eventTypes: EventType[] | string[]): boolean => {
@@ -22,26 +21,8 @@ export const getCallTypeLabel = (callType: CallType): string => {
   return CALL_TYPE_LABELS[callType] ?? "Unknown";
 };
 
-// export const getEventTypeLabel = (
-//   eventType: EventType | [EventType, EventType] | null,
-// ): string => {
-//   if (!eventType) return "";
-
-//   if (Array.isArray(eventType)) {
-//     return eventType
-//       .filter((type): type is Exclude<EventType, null> => !!type)
-//       .map((type) => EVENT_TYPE_LABELS[type] ?? "Other")
-//       .join(" & ");
-//   }
-
-//   return EVENT_TYPE_LABELS[eventType] ?? "";
-// };
-
 export const getEventTypeLabel = (
-  // eventType: EventType | [EventType, EventType] | null,
   eventType: EventType | EventType[] | null,
-
-  // eventType: EventType[] | null,
 ): string => {
   if (!eventType) return "";
 
@@ -54,25 +35,17 @@ export const getEventTypeLabel = (
       .map(getLabel)
       .join(" & ");
   }
-
   return getLabel(eventType);
 };
 
-export const getEventCategoryLabel = (category: EventCategory): string => {
-  return (
-    eventCategoryOptions.find((opt) => opt.value === category)?.label ??
-    "Unknown"
-  );
+export const getEventCategoryLabel = (
+  category: EventCategory,
+  abbreviate: boolean = false,
+): string => {
+  const match = eventCategoryOptions.find((opt) => opt.value === category);
+
+  return (abbreviate ? match?.abbr : match?.label) ?? "Unknown";
 };
-
-export const getEventCategoryLabelAbbr = (category: EventCategory): string => {
-  return (
-    eventCategoryOptions.find((opt) => opt.value === category)?.abbr ??
-    "Unknown"
-  );
-};
-
-
 
 export const formatBudgetCurrency = (
   min: number,
@@ -115,8 +88,6 @@ export const formatBudgetCurrency = (
   // If no max value, return only min formatted
   return formatter.format(min);
 };
-
-
 
 export const formatRate = (
   rate: number,

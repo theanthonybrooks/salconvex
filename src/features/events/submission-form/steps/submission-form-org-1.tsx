@@ -14,8 +14,8 @@ import {
 } from "@/features/events/components/events-data-table/columns";
 import { EventOCFormValues } from "@/features/events/event-add-form";
 import { OrgSearch } from "@/features/organizers/components/org-search";
-import { cn } from "@/lib/utils";
-import { EnrichedEvent } from "@/types/event";
+import { cn } from "@/helpers/utilsFns";
+import { EnrichedEvent } from "@/types/eventTypes";
 import { AnimatePresence, motion } from "framer-motion";
 import { LucideChevronLeft, LucideChevronRight } from "lucide-react";
 import { useEffect, useRef, useState } from "react";

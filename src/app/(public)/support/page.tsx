@@ -17,7 +17,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { infoEmail } from "@/constants/siteInfo";
 import { supportCategoryOptions } from "@/constants/supportConsts";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 import { useDevice } from "@/providers/device-provider";
 import { ContactFormValues, contactSchema } from "@/schemas/public";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -27,7 +27,7 @@ import { useAction, usePreloadedQuery } from "convex/react";
 import { ConvexError } from "convex/values";
 import { capitalize } from "lodash";
 import { LoaderCircle } from "lucide-react";
-import { useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { api } from "~/convex/_generated/api";
@@ -36,11 +36,16 @@ const SupportPage = () => {
   const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
 
   const { preloadedUserData } = useConvexPreload();
+  const pathName = usePathname();
+  const router = useRouter();
   const searchParams = useSearchParams();
+  const categoryParam = searchParams.get("reason");
+  const billingIssue = categoryParam === "account";
   const existingTicketNumber = searchParams?.get("ticketNumber");
   const userData = usePreloadedQuery(preloadedUserData);
-  const userId = userData?.userId ?? null;
-  const user = userData?.user;
+  const { userId: id, user, userPref } = userData ?? {};
+  const userId = id ?? null;
+
   const { isMobile } = useDevice();
   const [pending, setPending] = useState(false);
   const [sent, setSent] = useState(false);
@@ -55,7 +60,7 @@ const SupportPage = () => {
     defaultValues: {
       name: user?.name ?? "",
       email: user?.email ?? "",
-      category: "",
+      category: categoryParam ?? "",
       message: "",
     },
     mode: "onChange",
@@ -102,7 +107,9 @@ const SupportPage = () => {
         subject: "Support Form Submission",
         email: user?.email ?? values.email,
         category: values.category,
-        message: values.message,
+        message: billingIssue
+          ? "Billing Issue: \n" + values.message
+          : values.message,
       });
       handleReset();
       setSent(true);
@@ -120,6 +127,9 @@ const SupportPage = () => {
       return;
     } finally {
       setPending(false);
+      if (Array.from(searchParams.keys()).length > 0) {
+        router.replace(pathName);
+      }
     }
   };
 

@@ -35,7 +35,7 @@ import {
 import { PasswordInput } from "@/components/ui/password-input";
 import SmileySvg from "@/features/auth/components/smiley-svg";
 import SpeechBubble from "@/features/auth/components/speech-bubble";
-import { onEmailChange } from "@/lib/privacy";
+import { onEmailChange } from "@/helpers/privacyFns";
 import { RegisterSchema } from "@/schemas/auth";
 import { accountTypeOptions } from "@/types/user";
 import { zodResolver } from "@hookform/resolvers/zod";

@@ -1251,36 +1251,58 @@ export const markCouponApplied = mutation({
 });
 
 export const deleteCouponFromSubscription = action({
-  args: {
-    subscriptionId: v.string(),
-  },
-  handler: async (ctx, args) => {
-    const subscriptionId = args.subscriptionId;
+  handler: async (ctx) => {
     const userId = await getAuthUserId(ctx);
-    if (!userId) throw new Error("Not authenticated");
-
-    const result = await ctx.runQuery(
-      api.subscriptions.getUserSubscriptionStatus,
-      {},
-    );
+    const result = userId
+      ? await ctx.runQuery(api.subscriptions.getUserSubscriptionStatus, {})
+      : null;
 
     if (!result) throw new Error("User not found");
     const { subscription, hasActiveSubscription } = result;
 
-    const subId = subscription?.stripeId;
-    console.log(subId, subscriptionId);
-    if (subId !== subscriptionId) throw new Error("Invalid subscription");
-    const stripeSubscriptionId = subscriptionId;
+    const stripeId = subscription?.stripeId;
+    if (!stripeId || !subscription) throw new Error("No subscription found");
 
-    if (!subscription || !stripeSubscriptionId || !hasActiveSubscription)
+    if (!hasActiveSubscription)
       throw new Error("Active subscription not found");
 
-    const stripeSub = await stripe.subscriptions.retrieve(stripeSubscriptionId);
+    const stripeSub = await stripe.subscriptions.retrieve(stripeId);
     if (!stripeSub.discounts) {
       throw new ConvexError("No active coupon found");
     }
 
-    await stripe.subscriptions.deleteDiscount(stripeSubscriptionId);
+    await stripe.subscriptions.deleteDiscount(stripeId);
+
+    return { success: true };
+  },
+});
+
+export const pauseOrCancelSubscription = action({
+  args: {
+    atPeriodEnd: v.optional(v.boolean()),
+    pause: v.optional(v.boolean()),
+  },
+  handler: async (ctx, { atPeriodEnd, pause }) => {
+    const userId = await getAuthUserId(ctx);
+    const result = userId
+      ? await ctx.runQuery(api.subscriptions.getUserSubscriptionStatus, {})
+      : null;
+
+    if (!result) throw new Error("User not found");
+    const { subscription, hasActiveSubscription } = result;
+    const stripeId = subscription?.stripeId;
+    if (!subscription || !stripeId) {
+      throw new ConvexError("No active subscription found");
+  }
+  if (pause) {
+    //what logic is there for pausing a subscription? I know that I can resume it, but what to pause?
+  } else if (atPeriodEnd) {
+      await stripe.subscriptions.update(stripeId, {
+        cancel_at_period_end: true,
+      });
+    } else {
+      await stripe.subscriptions.cancel(stripeId);
+    }
 
     return { success: true };
   },

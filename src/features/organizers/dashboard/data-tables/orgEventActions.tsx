@@ -1,6 +1,6 @@
 "use client";
 
-import { validOCVals } from "@/types/openCall";
+import { validOCVals } from "@/constants/openCallConsts";
 import { OrgEventData } from "@/types/organizer";
 import { useRouter } from "next/navigation";
 import slugify from "slugify";

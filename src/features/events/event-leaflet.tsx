@@ -2,8 +2,8 @@
 
 import LeafletMapIcon from "@/components/ui/map-icon";
 import ClickToZoom from "@/features/wrapper-elements/map/clickToZoom";
-import { cn } from "@/lib/utils";
-import { EventCategory, EventType } from "@/types/event";
+import { cn } from "@/helpers/utilsFns";
+import { EventCategory, EventType } from "@/types/eventTypes";
 import "leaflet/dist/leaflet.css";
 import { useMemo, useState } from "react";
 import { FaMapLocationDot } from "react-icons/fa6";

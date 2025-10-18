@@ -22,8 +22,8 @@ import {
   cleanHtml,
   RichTextDisplay,
   trimTrailingEmptyParagraphs,
-} from "@/lib/richTextFns";
-import { cn } from "@/lib/utils";
+} from "@/helpers/richTextFns";
+import { cn } from "@/helpers/utilsFns";
 import CharacterCount from "@tiptap/extension-character-count";
 import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";

@@ -14,10 +14,10 @@ import { TooltipSimple } from "@/components/ui/tooltip";
 import { useArtistApplicationActions } from "@/features/artists/helpers/appActions";
 import { useToggleListAction } from "@/features/artists/helpers/listActions";
 import EventContextMenu from "@/features/events/ui/event-context-menu";
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 import { ApplicationStatus } from "@/types/applications";
-import { EventCategory, EventData } from "@/types/event";
-import { CallType, OpenCallState, OpenCallStatus } from "@/types/openCall";
+import { EventCategory, EventData } from "@/types/eventTypes";
+import { CallType, OpenCallState, OpenCallStatus } from "@/types/openCallTypes";
 import { User, UserPref } from "@/types/user";
 import {
   getExternalErrorHtml,
@@ -68,7 +68,7 @@ export const ApplyButtonShort = ({
     publicView && !openCall
       ? `/thelist/event/${slug}/${edition}`
       : publicView && openCall === "active"
-        ? "/pricing#plans"
+        ? "/pricing?type=artist"
         : !publicView && openCall
           ? `/thelist/event/${slug}/${edition}/call`
           : `/thelist/event/${slug}/${edition}`;
@@ -284,7 +284,7 @@ export const ApplyButton = ({
       : publicView && !openCall
         ? `/thelist/event/${slug}/${edition}`
         : publicView && openCall === "active"
-          ? "/pricing#plans"
+          ? "/pricing?type=artist"
           : !publicView && openCall
             ? `/thelist/event/${slug}/${edition}/call`
             : `/thelist/event/${slug}/${edition}`;

@@ -1,6 +1,6 @@
 import IconComponent from "@/components/ui/icon-component";
 import { TooltipSimple } from "@/components/ui/tooltip";
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 import { Check, LucideIcon } from "lucide-react";
 import { ReactNode, useState } from "react";
 import { toast } from "react-toastify";

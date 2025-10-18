@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { eventWithOCSchema } from "@/features/organizers/schemas/event-add-schema";
 
+import { validOCVals } from "@/constants/openCallConsts";
 import SubmissionFormEventStep1 from "@/features/events/submission-form/steps/submission-form-event-1";
 import SubmissionFormEventStep2 from "@/features/events/submission-form/steps/submission-form-event-2";
 import SubmissionFormOC1 from "@/features/events/submission-form/steps/submission-form-oc-1";
@@ -32,11 +33,10 @@ import SubmissionFormOrgStep from "@/features/events/submission-form/steps/submi
 import SubmissionFormOrgStep2 from "@/features/events/submission-form/steps/submission-form-org-2";
 import { SubmissionFormRecapDesktop } from "@/features/events/submission-form/steps/submission-form-recap-desktop";
 import { SubmissionFormRecapMobile } from "@/features/events/submission-form/steps/submission-form-recap-mobile";
-import { toSeason, toYearMonth } from "@/lib/dateFns";
+import { toSeason, toYearMonth } from "@/helpers/dateFns";
+import { getOcPricing } from "@/helpers/pricingFns";
 import { handleFileUrl, handleOrgFileUrl } from "@/lib/fileUploadFns";
-import { getOcPricing } from "@/lib/pricingFns";
-import { EnrichedEvent, EventCategory } from "@/types/event";
-import { validOCVals } from "@/types/openCall";
+import { EnrichedEvent, EventCategory } from "@/types/eventTypes";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { useQueries, useQuery } from "convex-helpers/react/cache/hooks";
@@ -51,7 +51,7 @@ import { Doc, Id } from "~/convex/_generated/dataModel";
 
 import { useDashboard } from "@/app/(pages)/dashboard/_components/dashboard-context";
 import { getSteps } from "@/features/events/event-add-form";
-import { getEventCategoryLabelAbbr } from "@/lib/eventFns";
+import { getEventCategoryLabel } from "@/helpers/eventFns";
 import { useDevice } from "@/providers/device-provider";
 import { getExternalRedirectHtml } from "@/utils/loading-page-html";
 import { LuBadge, LuBadgeCheck, LuBadgeDollarSign } from "react-icons/lu";
@@ -531,7 +531,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
         //TODO: Make some sort of confirmation page and/or forward the user to... dashboard? The list? Their event (?)
         // handleReset();
         toast.success(
-          `You've successfully updated your ${getEventCategoryLabelAbbr(eventCategory)}!`,
+          `You've successfully updated your ${getEventCategoryLabel(eventCategory, true)}!`,
         );
       }
       setTimeout(() => {

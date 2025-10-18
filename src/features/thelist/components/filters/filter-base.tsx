@@ -16,25 +16,25 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { ViewOptions } from "@/features/events/event-list-client";
 
-import { select_continents } from "@/lib/locations";
-import { cn } from "@/lib/utils";
 import {
-  EventCategory,
   eventCategoryOptions,
-  EventType,
   eventTypeOptions,
-  PostStatus,
-  PostStatusOptions,
   PostStatusOptionValues,
-} from "@/types/event";
+} from "@/constants/eventConsts";
+import { select_continents } from "@/constants/locationConsts";
 import {
-  CallFormat,
   callFormat_option_values,
-  CallType,
   callType_option_values,
   eligibilityOptionValues,
-  EligibilityType,
-} from "@/types/openCall";
+} from "@/constants/openCallConsts";
+import { cn } from "@/helpers/utilsFns";
+import {
+  EventCategory,
+  EventType,
+  PostStatus,
+  PostStatusOptions,
+} from "@/types/eventTypes";
+import { CallFormat, CallType, EligibilityType } from "@/types/openCallTypes";
 import { Continents, Filters, SortOptions } from "@/types/thelist";
 import {
   ChevronDown,

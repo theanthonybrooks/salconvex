@@ -1,7 +1,7 @@
 //TODO: Replace with react-day-picker. Link: https://daypicker.dev/guides/timepicker
 import { DatePickerHeader } from "@/components/ui/date-picker/date-picker-header";
-import { getTimezoneFormat, toDate } from "@/lib/dateFns";
-import { cn } from "@/lib/utils";
+import { getTimezoneFormat, toDate } from "@/helpers/dateFns";
+import { cn } from "@/helpers/utilsFns";
 import { isValid, parseISO } from "date-fns";
 import { formatInTimeZone } from "date-fns-tz";
 import { DateTime } from "luxon";

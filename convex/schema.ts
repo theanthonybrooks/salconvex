@@ -43,6 +43,8 @@ export const eventStateValidator = v.union(
   v.literal("archived"),
 );
 
+export type EventStateType = Infer<typeof eventStateValidator>;
+
 export const ocStateValidator = v.union(
   v.literal("draft"),
   v.literal("editing"),
@@ -53,16 +55,20 @@ export const ocStateValidator = v.union(
   v.literal("initial"),
 );
 
-export const typeValidator = v.array(
-  v.union(
-    v.literal("gjm"),
-    v.literal("mur"),
-    v.literal("pup"),
-    v.literal("saf"),
-    v.literal("mus"),
-    v.literal("oth"),
-  ),
+export type OpenCallStateType = Infer<typeof ocStateValidator>;
+
+export const typeValidator = v.union(
+  v.literal("gjm"),
+  v.literal("mur"),
+  v.literal("pup"),
+  v.literal("saf"),
+  v.literal("mus"),
+  v.literal("oth"),
 );
+
+const typeArrayValidator = v.array(typeValidator);
+
+export type EventTypeType = Infer<typeof typeValidator>;
 
 export const categoryValidator = v.union(
   v.literal("event"),
@@ -71,6 +77,8 @@ export const categoryValidator = v.union(
   v.literal("gfund"),
   v.literal("roster"),
 );
+
+export type EventCategoryType = Infer<typeof categoryValidator>;
 
 export const prodFormatValidator = v.union(
   v.literal("sameAsEvent"),
@@ -81,6 +89,8 @@ export const prodFormatValidator = v.union(
   v.literal("noProd"),
 );
 
+export type ProdFormatType = Infer<typeof prodFormatValidator>;
+
 export const eventFormatValidator = v.union(
   v.literal("noEvent"),
   v.literal("setDates"),
@@ -89,6 +99,8 @@ export const eventFormatValidator = v.union(
   v.literal("seasonRange"),
   v.literal("ongoing"),
 );
+
+export type EventFormatType = Infer<typeof eventFormatValidator>;
 
 export const hasOpenCallValidator = v.union(
   v.literal("Fixed"),
@@ -99,11 +111,15 @@ export const hasOpenCallValidator = v.union(
   v.literal("False"),
 );
 
+export type OpenCallTypeType = Infer<typeof hasOpenCallValidator>;
+
 export const callFormatValidator = v.union(
   v.literal("RFQ"),
   v.literal("RFP"),
   v.literal("RFA"),
 );
+
+export type CallFormatType = Infer<typeof callFormatValidator>;
 
 export const eligibilityTypeValidator = v.union(
   v.literal("International"),
@@ -112,6 +128,29 @@ export const eligibilityTypeValidator = v.union(
   v.literal("Other"),
   v.literal("Unknown"),
 );
+
+export type EligibilityTypeType = Infer<typeof eligibilityTypeValidator>;
+
+export const rateUnitValidator = v.union(
+  v.literal("ft²"),
+  v.literal("m²"),
+  v.literal(""),
+);
+export type RateUnitType = Infer<typeof rateUnitValidator>;
+
+export const compensationCategoryValidator = v.object({
+  artistStipend: v.optional(v.union(v.number(), v.boolean())),
+  designFee: v.optional(v.union(v.number(), v.boolean())),
+  accommodation: v.optional(v.union(v.number(), v.boolean())),
+  food: v.optional(v.union(v.number(), v.boolean())),
+  travelCosts: v.optional(v.union(v.number(), v.boolean())),
+  materials: v.optional(v.union(v.number(), v.boolean())),
+  equipment: v.optional(v.union(v.number(), v.boolean())),
+});
+
+export type CompensationCategoryType = Infer<
+  typeof compensationCategoryValidator
+>;
 
 export const supportCategoryValidator = v.union(
   v.literal("general"),
@@ -139,6 +178,8 @@ export const postStatusValidator = v.union(
   v.literal("toPost"),
 );
 
+export type PostStatusType = Infer<typeof postStatusValidator>;
+
 export const kanbanColumnValidator = v.union(
   v.literal("proposed"),
   v.literal("backlog"),
@@ -164,6 +205,13 @@ export const linksFields = {
 };
 
 export const linksValidator = v.object(linksFields);
+export type LinksType = Infer<typeof linksValidator>;
+
+export const linkFormatValidator = v.union(
+  v.literal("mailto:"),
+  v.literal("https://"),
+);
+export type LinkFormatType = Infer<typeof linkFormatValidator>;
 
 const openCallFilesSchema = v.object({
   storageId: v.id("_storage"),
@@ -205,6 +253,34 @@ const customUserSchema = v.object({
 });
 
 export type UserType = Infer<typeof customUserSchema>;
+
+const locationBaseFields = {
+  full: v.optional(v.string()),
+  locale: v.optional(v.string()),
+  city: v.optional(v.string()),
+  region: v.optional(v.string()),
+  state: v.optional(v.string()),
+  stateAbbr: v.optional(v.string()),
+  country: v.string(), // base check moved to superRefine
+  countryAbbr: v.string(),
+  continent: v.optional(v.string()),
+};
+const coordinateFields = {
+  coordinates: v.optional(
+    v.object({
+      latitude: v.number(),
+      longitude: v.number(),
+    }),
+  ),
+};
+const locationFullFields = {
+  ...locationBaseFields,
+  ...coordinateFields,
+};
+export const locationBaseValidator = v.object(locationBaseFields);
+export const locationFullValidator = v.object(locationFullFields);
+export type LocationBase = Infer<typeof locationBaseValidator>;
+export type LocationFull = Infer<typeof locationFullValidator>;
 
 const userRolesTable = v.object({
   userId: v.id("users"),
@@ -249,15 +325,9 @@ const artistSchema = {
   artistSlug: v.optional(v.string()),
   artistNationality: v.array(v.string()),
   artistResidency: v.object({
-    full: v.optional(v.string()),
-    locale: v.optional(v.string()),
-    city: v.optional(v.string()),
-    region: v.optional(v.string()),
-    state: v.optional(v.string()),
-    stateAbbr: v.optional(v.string()),
+    ...locationBaseFields,
     country: v.optional(v.string()),
     countryAbbr: v.optional(v.string()),
-    continent: v.optional(v.string()),
     location: v.optional(v.array(v.number())),
     timezone: v.optional(v.string()),
     timezoneOffset: v.optional(v.number()),
@@ -271,18 +341,7 @@ const artistSchema = {
     ),
   }),
 
-  contact: v.optional(
-    v.object({
-      website: v.optional(v.string()),
-      instagram: v.optional(v.string()),
-      facebook: v.optional(v.string()),
-      threads: v.optional(v.string()),
-      linkedIn: v.optional(v.string()),
-      vk: v.optional(v.string()),
-      phone: v.optional(v.string()),
-      youTube: v.optional(v.string()),
-    }),
-  ),
+  contact: v.optional(linksValidator),
 
   documents: v.optional(
     v.object({
@@ -323,21 +382,7 @@ const organizationSchema = {
 
   location: v.optional(
     v.object({
-      full: v.optional(v.string()),
-      locale: v.optional(v.string()),
-      city: v.optional(v.string()),
-      state: v.optional(v.string()),
-      stateAbbr: v.optional(v.string()),
-      region: v.optional(v.string()),
-      country: v.string(),
-      countryAbbr: v.string(),
-      continent: v.string(),
-      coordinates: v.optional(
-        v.object({
-          latitude: v.number(),
-          longitude: v.number(),
-        }),
-      ),
+      ...locationFullFields,
       currency: v.optional(
         v.object({
           code: v.string(),
@@ -372,14 +417,14 @@ const organizationSchema = {
 
 export const eventSchema = {
   adminNote: v.optional(v.string()),
-  //TODO: use a lookup table for these (I think?)
+  //todo: use a lookup table for the organizers (I think?) Probably also for associated organizations for the cases where multiple orgs are associated with an event.
   organizerId: v.array(v.id("organizations")),
   mainOrgId: v.id("organizations"),
   slug: v.string(),
   name: v.string(),
   logo: v.string(),
   logoStorageId: v.optional(v.id("_storage")),
-  type: typeValidator,
+  type: typeArrayValidator,
   category: categoryValidator,
   hasOpenCall: hasOpenCallValidator,
 
@@ -391,8 +436,6 @@ export const eventSchema = {
         end: v.string(),
       }),
     ),
-    eventStart: v.optional(v.string()),
-    eventEnd: v.optional(v.string()),
     prodDates: v.optional(
       v.array(
         v.object({
@@ -407,22 +450,8 @@ export const eventSchema = {
     noProdStart: v.boolean(),
   }),
   location: v.object({
+    ...locationFullFields,
     sameAsOrganizer: v.optional(v.boolean()),
-    full: v.optional(v.string()),
-    locale: v.optional(v.string()),
-    city: v.optional(v.string()),
-    state: v.optional(v.string()),
-    stateAbbr: v.optional(v.string()),
-    region: v.optional(v.string()),
-    country: v.string(),
-    countryAbbr: v.string(),
-    continent: v.optional(v.string()),
-    coordinates: v.optional(
-      v.object({
-        latitude: v.number(),
-        longitude: v.number(),
-      }),
-    ),
     currency: v.optional(
       v.object({
         code: v.string(),
@@ -456,6 +485,8 @@ export const eventSchema = {
   approvedAt: v.optional(v.number()),
   formType: v.optional(v.number()),
 };
+const eventSchemaValidator = v.object(eventSchema);
+export type EventSchemaType = Infer<typeof eventSchemaValidator>;
 
 const eventOrganizerSchema = {
   eventId: v.id("events"),
@@ -486,7 +517,7 @@ const eventLookupSchema = {
   // eventState: v.optional(v.string()),
   eventCategory: v.optional(categoryValidator),
   // eventCategory: v.optional(v.string()),
-  eventType: v.optional(typeValidator),
+  eventType: v.optional(typeArrayValidator),
   // eventType: v.optional(v.string()),
   country: v.string(),
   continent: v.string(),
@@ -513,14 +544,7 @@ export const openCallSchema = {
   basicInfo: v.object({
     appFee: v.number(),
     callFormat: callFormatValidator,
-    callType: v.union(
-      v.literal("Fixed"),
-      v.literal("Rolling"),
-      v.literal("Email"),
-      v.literal("Invite"),
-      v.literal("Unknown"),
-      v.literal("False"),
-    ),
+    callType: hasOpenCallValidator,
     dates: v.object({
       ocStart: v.union(v.string(), v.null()),
       ocEnd: v.union(v.string(), v.null()),
@@ -540,21 +564,13 @@ export const openCallSchema = {
       min: v.number(),
       max: v.optional(v.number()),
       rate: v.number(),
-      unit: v.union(v.literal("ft²"), v.literal("m²"), v.literal("")),
+      unit: rateUnitValidator,
       currency: v.string(),
       allInclusive: v.boolean(),
       moreInfo: v.optional(v.string()),
     }),
 
-    categories: v.object({
-      artistStipend: v.optional(v.union(v.number(), v.boolean())),
-      designFee: v.optional(v.union(v.number(), v.boolean())),
-      accommodation: v.optional(v.union(v.number(), v.boolean())),
-      food: v.optional(v.union(v.number(), v.boolean())),
-      travelCosts: v.optional(v.union(v.number(), v.boolean())),
-      materials: v.optional(v.union(v.number(), v.boolean())),
-      equipment: v.optional(v.union(v.number(), v.boolean())),
-    }),
+    categories: compensationCategoryValidator,
   }),
   selectionCriteria: v.optional(v.string()),
 
@@ -569,7 +585,7 @@ export const openCallSchema = {
       }),
     ),
     applicationLink: v.string(),
-    applicationLinkFormat: v.union(v.literal("https://"), v.literal("mailto:")),
+    applicationLinkFormat: linkFormatValidator,
 
     applicationLinkSubject: v.optional(v.string()),
     otherInfo: v.optional(v.string()), //todo: make not optional later
@@ -585,17 +601,7 @@ export const openCallSchema = {
     ),
   ),
   // state: v.string(), //draft, submitted, published, archived
-  state: v.optional(
-    v.union(
-      v.literal("draft"),
-      v.literal("editing"),
-      v.literal("pending"),
-      v.literal("submitted"),
-      v.literal("published"),
-      v.literal("archived"),
-      v.literal("initial"),
-    ),
-  ), //draft, submitted, published, archived
+  state: ocStateValidator, //draft, submitted, published, archived
   lastUpdatedBy: v.optional(v.id("users")),
   lastUpdatedAt: v.optional(v.number()),
   approvedBy: v.optional(v.id("users")),
@@ -604,6 +610,8 @@ export const openCallSchema = {
   paidAt: v.optional(v.number()),
   publicPreview: v.optional(v.boolean()),
 };
+const openCallSchemaValidator = v.object(openCallSchema);
+export type OpenCallType = Infer<typeof openCallSchemaValidator>;
 
 const openCallOrganizerSchema = {
   openCallId: v.id("openCalls"),
@@ -776,7 +784,11 @@ export default defineSchema({
   listActions: defineTable(listActionsSchema)
     .index("by_eventId", ["eventId"])
     .index("by_eventId_artistId", ["eventId", "artistId"])
-    .index("by_eventId_artistId_bookmarked", ["eventId", "artistId", "bookmarked"])
+    .index("by_eventId_artistId_bookmarked", [
+      "eventId",
+      "artistId",
+      "bookmarked",
+    ])
     .index("by_eventId_artistId_hidden", ["eventId", "artistId", "hidden"])
     .index("by_artistId_bookmarked", ["artistId", "bookmarked"])
     .index("by_artistId_hidden", ["artistId", "hidden"])

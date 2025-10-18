@@ -8,8 +8,8 @@ import {
 } from "@/components/ui/dialog";
 import { LazyCalendar } from "@/features/calendar/lazy-calendar";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
-import { getFormattedLocationString } from "@/lib/locations";
-import { cn } from "@/lib/utils";
+import { getFormattedLocationString } from "@/helpers/locations";
+import { cn } from "@/helpers/utilsFns";
 import type { EventApi, EventClickArg, MoreLinkArg } from "@fullcalendar/core";
 
 import { useQuery } from "convex-helpers/react/cache";
@@ -19,7 +19,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { api } from "~/convex/_generated/api";
 
-const Calendar = () => {
+const CalendarPage = () => {
   // const {isMobile} = useDevice()
   const router = useRouter();
   const { preloadedUserData, preloadedSubStatus } = useConvexPreload();
@@ -142,7 +142,7 @@ const Calendar = () => {
 
                         if (event.extendedProps.hasOpenCall && activeArtist) {
                           router.push(
-                            `/thelist/event/${event.extendedProps.slug}/${event.extendedProps.edition}/call/`,
+                            `/thelist/event/${event.extendedProps.slug}/${event.extendedProps.edition}/call/tab=event`,
                           );
                         } else {
                           router.push(
@@ -175,4 +175,4 @@ const Calendar = () => {
   );
 };
 
-export default Calendar;
+export default CalendarPage;

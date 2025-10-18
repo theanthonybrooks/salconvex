@@ -11,9 +11,9 @@ import {
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Event } from "@/features/events/components/events-data-table/columns";
-import { getEventCategoryLabelAbbr } from "@/lib/eventFns";
-import { cn } from "@/lib/utils";
-import { EventCategory } from "@/types/event";
+import { getEventCategoryLabel } from "@/helpers/eventFns";
+import { cn } from "@/helpers/utilsFns";
+import { EventCategory } from "@/types/eventTypes";
 import { useMutation } from "convex/react";
 import { ConvexError } from "convex/values";
 import { useEffect, useRef, useState } from "react";
@@ -84,7 +84,7 @@ export function RenameEventDialog({ event }: EventNameProps) {
         }}
       >
         <BiRename className="size-4" />
-        Rename {getEventCategoryLabelAbbr(event.category as EventCategory)}
+        Rename {getEventCategoryLabel(event.category as EventCategory, true)}
       </DropdownMenuItem>
 
       <Dialog open={open} onOpenChange={setOpen}>
@@ -92,7 +92,7 @@ export function RenameEventDialog({ event }: EventNameProps) {
           <DialogHeader>
             <DialogTitle>
               Rename{" "}
-              {getEventCategoryLabelAbbr(event.category as EventCategory)}
+              {getEventCategoryLabel(event.category as EventCategory, true)}
             </DialogTitle>
           </DialogHeader>
 

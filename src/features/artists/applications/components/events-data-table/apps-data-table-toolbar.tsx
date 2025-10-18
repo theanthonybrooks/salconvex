@@ -12,7 +12,7 @@ import {
 } from "@/components/data-table/data-table-constants";
 import { DataTableFacetedFilter } from "@/components/data-table/data-table-faceted-filter";
 import { DataTableViewOptions } from "@/components/data-table/data-table-view-options";
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 import { useMutation } from "convex/react";
 import { toast } from "react-toastify";
 import { api } from "~/convex/_generated/api";

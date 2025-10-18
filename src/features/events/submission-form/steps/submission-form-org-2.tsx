@@ -4,7 +4,7 @@ import { Label } from "@/components/ui/label";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { Separator } from "@/components/ui/separator";
 import { EventOCFormValues } from "@/features/events/event-add-form";
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 import { Controller, useFormContext } from "react-hook-form";
 
 interface SubmissionFormOrgStep2Props {

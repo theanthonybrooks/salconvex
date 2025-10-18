@@ -15,7 +15,7 @@ import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { SelectSimple } from "@/components/ui/select";
 import { TooltipSimple } from "@/components/ui/tooltip";
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 import { useQuery } from "convex-helpers/react/cache";
 import { useMutation } from "convex/react";
 import slugify from "slugify";

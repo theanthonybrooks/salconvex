@@ -6,7 +6,7 @@ import ThemeToggle from "@/components/ui/theme-toggle";
 import { DeviceOptions, mainMenuItems } from "@/constants/menuLinks";
 import { footerCRText } from "@/constants/text";
 import SignOutBtn from "@/features/auth/components/sign-out-btn";
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 import { User, UserPref } from "@/types/user";
 import { Authenticated, Unauthenticated } from "convex/react";
 import { AnimatePresence, motion, Variants } from "framer-motion";

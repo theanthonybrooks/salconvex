@@ -1,6 +1,6 @@
 import EventEditionDetail from "@/app/(pages)/(artist)/thelist/components/event-edition-page";
 
-import { capitalize } from "@/lib/utils";
+import { capitalize } from "@/helpers/utilsFns";
 import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
 
 import { fetchQuery } from "convex/nextjs";

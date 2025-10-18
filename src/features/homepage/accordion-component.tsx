@@ -6,7 +6,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/mapped-accordion";
 import { AccordionSection } from "@/constants/accordions";
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import slugify from "slugify";

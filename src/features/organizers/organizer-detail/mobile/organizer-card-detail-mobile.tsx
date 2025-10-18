@@ -1,17 +1,17 @@
 "use client";
 
 import { Card } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { Link } from "@/components/ui/custom-link";
 import { EventOrgLogo } from "@/components/ui/event-org-logo";
+import { validOCVals } from "@/constants/openCallConsts";
 import { OrganizerCard } from "@/features/organizers/components/organizer-card";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
-import { formatEventDates } from "@/lib/dateFns";
-import { getFormattedLocationString } from "@/lib/locations";
-import { validOCVals } from "@/types/openCall";
+import { formatEventDates } from "@/helpers/dateFns";
+import { getFormattedLocationString } from "@/helpers/locations";
 import { OrganizerCardProps } from "@/types/organizer";
 import { usePreloadedQuery } from "convex/react";
 import { motion } from "framer-motion";

@@ -17,7 +17,7 @@ type Props = {
   onMoreLinkClick: (arg: MoreLinkArg) => void;
 };
 
-const Calendar = ({ events, onEventClick, onMoreLinkClick }: Props) => {
+const CalendarWrapper = ({ events, onEventClick, onMoreLinkClick }: Props) => {
   const { isMobile } = useDevice();
   return (
     <FullCalendar
@@ -34,4 +34,4 @@ const Calendar = ({ events, onEventClick, onMoreLinkClick }: Props) => {
   );
 };
 
-export default Calendar;
+export default CalendarWrapper;

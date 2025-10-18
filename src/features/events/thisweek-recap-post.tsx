@@ -4,15 +4,15 @@ import {
   RecapLastPage,
 } from "@/features/events/ui/thisweek-recap/recap-cover";
 import RecapPost from "@/features/events/ui/thisweek-recap/recap-post";
+import { formatCondensedDateRange } from "@/helpers/dateFns";
 import { useFilteredEventsQuery } from "@/hooks/use-filtered-events-query";
-import { formatCondensedDateRange } from "@/lib/dateFns";
 import { SortOptions } from "@/types/thelist";
 import { useEffect, useMemo } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { waitForImagesToLoad } from "@/lib/thisWeekFns";
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
+import { waitForImagesToLoad } from "@/lib/imageFns";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { useQueries } from "convex-helpers/react/cache";
 import { formatInTimeZone } from "date-fns-tz";

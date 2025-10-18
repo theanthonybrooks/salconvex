@@ -1,7 +1,7 @@
 "use client";
 
 import { Card } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 import { Eye, EyeOff, MapPin } from "lucide-react";
 
 import {
@@ -32,10 +32,10 @@ import { SalBackNavigation } from "@/features/events/components/sal-back-navigat
 import { OrganizerCard } from "@/features/organizers/components/organizer-card";
 import { OrganizerLogoNameCard } from "@/features/organizers/components/organizer-logo-name-card";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
-import { getEventCategoryLabel, getEventTypeLabel } from "@/lib/eventFns";
-import { getFormattedLocationString } from "@/lib/locations";
-import { RichTextDisplay } from "@/lib/richTextFns";
-import { EventCardProps } from "@/types/event";
+import { getEventCategoryLabel, getEventTypeLabel } from "@/helpers/eventFns";
+import { getFormattedLocationString } from "@/helpers/locations";
+import { RichTextDisplay } from "@/helpers/richTextFns";
+import { EventCardProps } from "@/types/eventTypes";
 import { useMutation, usePreloadedQuery } from "convex/react";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";

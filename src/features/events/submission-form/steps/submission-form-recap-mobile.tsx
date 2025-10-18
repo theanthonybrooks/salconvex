@@ -22,18 +22,18 @@ import {
   OrganizerMainContact,
   OrgContactProps,
 } from "@/features/organizers/components/organizer-main-contact";
-import { formatOpenCallDeadline } from "@/lib/dateFns";
+import { formatOpenCallDeadline } from "@/helpers/dateFns";
 import {
   formatBudgetCurrency,
   formatRate,
   getCallTypeLabel,
   getEventCategoryLabel,
   getEventTypeLabel,
-} from "@/lib/eventFns";
+} from "@/helpers/eventFns";
+import { RichTextDisplay } from "@/helpers/richTextFns";
+import { cn } from "@/helpers/utilsFns";
 import { getCallFormatLabel } from "@/lib/openCallFns";
-import { RichTextDisplay } from "@/lib/richTextFns";
-import { cn } from "@/lib/utils";
-import { EligibilityType } from "@/types/openCall";
+import { EligibilityType } from "@/types/openCallTypes";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { useEffect, useState } from "react";

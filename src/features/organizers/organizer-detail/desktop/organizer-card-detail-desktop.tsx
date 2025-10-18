@@ -2,7 +2,7 @@
 //TODO: once map page is built, connect the mapPin icons to that. Should have an organizer view on the map page.
 
 import { Card } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 import { ExternalLink } from "lucide-react";
 
 import { Link } from "@/components/ui/custom-link";
@@ -14,14 +14,14 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/state-accordion-test";
+import { validOCVals } from "@/constants/openCallConsts";
 import { SalBackNavigation } from "@/features/events/components/sal-back-navigation";
 import { ConvexDashboardLink } from "@/features/events/ui/convex-dashboard-link";
 import { OrganizerCard } from "@/features/organizers/components/organizer-card";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
-import { formatEventDates } from "@/lib/dateFns";
-import { getFormattedLocationString } from "@/lib/locations";
-import { RichTextDisplay } from "@/lib/richTextFns";
-import { validOCVals } from "@/types/openCall";
+import { formatEventDates } from "@/helpers/dateFns";
+import { getFormattedLocationString } from "@/helpers/locations";
+import { RichTextDisplay } from "@/helpers/richTextFns";
 import { OrganizerCardProps } from "@/types/organizer";
 import { usePreloadedQuery } from "convex/react";
 import Image from "next/image";

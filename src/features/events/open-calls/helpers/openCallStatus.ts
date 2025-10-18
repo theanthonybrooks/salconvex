@@ -1,4 +1,4 @@
-import { CallType, OpenCallStatus } from "@/types/openCall";
+import { CallType, OpenCallStatus } from "@/types/openCallTypes";
 
 export function getOpenCallStatus(
   start: Date | null | undefined,

@@ -1,5 +1,5 @@
+import { cn } from "@/helpers/utilsFns";
 import { useSalBackNavigation } from "@/hooks/use-back-navigation";
-import { cn } from "@/lib/utils";
 import { User } from "@/types/user";
 import { useRouter } from "next/navigation";
 import { IoIosArrowRoundBack } from "react-icons/io";

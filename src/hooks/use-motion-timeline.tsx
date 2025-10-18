@@ -3,13 +3,13 @@ import {
   DOMKeyframesDefinition,
   ElementOrSelector,
   useAnimate,
-} from "framer-motion"
-import { useCallback, useEffect, useRef } from "react"
+} from "framer-motion";
+import { useCallback, useEffect, useRef } from "react";
 
 const TRANSITION: AnimationOptions = {
   ease: "easeInOut",
   duration: 0.5,
-}
+};
 
 export const TimelineExample = () => {
   const scope = useMotionTimeline(
@@ -50,87 +50,88 @@ export const TimelineExample = () => {
         ],
       ],
     ],
-    Infinity
-  )
+    Infinity,
+  );
 
   return (
     <div
       ref={scope}
-      className='flex min-h-screen items-center justify-center overflow-hidden bg-zinc-950 bg-grid-zinc-900'>
+      className="bg-grid-zinc-900 flex min-h-screen items-center justify-center overflow-hidden bg-zinc-950"
+    >
       <div
         style={{
           width: 48,
           height: 96,
         }}
-        className='bar-1 bg-white'
+        className="bar-1 bg-white"
       />
       <div
         style={{
           width: 48,
           height: 96,
         }}
-        className='bar-2 bg-white'
+        className="bar-2 bg-white"
       />
       <div
         style={{
           width: 48,
           height: 96,
         }}
-        className='bar-3 bg-white'
+        className="bar-3 bg-white"
       />
     </div>
-  )
-}
+  );
+};
 
 type AnimateParams = [
   ElementOrSelector,
   DOMKeyframesDefinition,
-  (AnimationOptions | undefined)?
-]
+  (AnimationOptions | undefined)?,
+];
 
-type Animation = AnimateParams | Animation[]
+type Animation = AnimateParams | Animation[];
 
 export const useMotionTimeline = (
   keyframes: Animation[],
-  count: number = 1
+  count: number = 1,
 ) => {
-  const mounted = useRef(true)
+  const mounted = useRef(true);
 
-  const [scope, animate] = useAnimate()
+  const [scope, animate] = useAnimate();
 
   const isAnimationArray = (animation: Animation): animation is Animation[] => {
-    return Array.isArray(animation[0])
-  }
+    return Array.isArray(animation[0]);
+  };
 
   const processAnimation = useCallback(
     async (animation: Animation) => {
       if (isAnimationArray(animation)) {
-        await Promise.all(animation.map(processAnimation))
+        await Promise.all(animation.map(processAnimation));
       } else {
-        await animate(...animation)
+        await animate(...animation);
       }
     },
-    [animate]
-  )
+    [animate],
+  );
 
   const handleAnimate = useCallback(async () => {
     for (let i = 0; i < count; i++) {
       for (const animation of keyframes) {
-        if (!mounted.current) return
-        await processAnimation(animation)
+        if (!mounted.current) return;
+        await processAnimation(animation);
       }
     }
-  }, [count, keyframes, processAnimation])
+  }, [count, keyframes, processAnimation]);
 
   useEffect(() => {
-    mounted.current = true
+    mounted.current = true;
 
-    handleAnimate()
+    handleAnimate();
 
     return () => {
-      mounted.current = false
-    }
-  }, [handleAnimate])
+      mounted.current = false;
+    };
+  }, [handleAnimate]);
 
-  return scope
-}
+  return scope;
+};

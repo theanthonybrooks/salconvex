@@ -13,7 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { capitalize, cn } from "@/lib/utils";
+import { capitalize, cn } from "@/helpers/utilsFns";
 import {
   ArrowRightCircle,
   ArrowRightCircleIcon,
@@ -36,8 +36,8 @@ import {
   EventData,
   SubmissionFormState as EventState,
   PostStatus,
-} from "@/types/event";
-import { OpenCallState, OpenCallStatus } from "@/types/openCall";
+} from "@/types/eventTypes";
+import { OpenCallState, OpenCallStatus } from "@/types/openCallTypes";
 
 import { CopyableItem } from "@/components/ui/copyable-item";
 import { TooltipSimple } from "@/components/ui/tooltip";
@@ -46,7 +46,7 @@ import { useToggleListAction } from "@/features/artists/helpers/listActions";
 import { SocialDropdownMenus } from "@/features/events/components/social-dropdown-menus";
 import { ConvexDashboardLink } from "@/features/events/ui/convex-dashboard-link";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
-import { getEventCategoryLabel } from "@/lib/eventFns";
+import { getEventCategoryLabel } from "@/helpers/eventFns";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { useQueries } from "convex-helpers/react/cache/hooks";
 import { useMutation, usePreloadedQuery } from "convex/react";
@@ -210,7 +210,7 @@ const EventContextMenu = ({
               <Pencil className="size-4" />{" "}
               {openCallState === "pending"
                 ? "Finish Submission"
-                : `Edit ${getEventCategoryLabelAbbr(eventCategory)}`}
+                : `Edit ${getEventCategoryLabel(eventCategory, true)}`}
             </DropdownMenuItem> */}
             {appLink && (
               <DropdownMenuItem>

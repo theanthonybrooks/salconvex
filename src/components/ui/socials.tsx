@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { SOCIAL_MEDIA_LINKS } from "@/constants/links";
 import { infoEmail } from "@/constants/siteInfo";
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 import Link from "next/link";
 import { FaRegEnvelope } from "react-icons/fa6";
 

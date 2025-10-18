@@ -4,9 +4,9 @@ import {
   getOrdinalSuffix,
   isValidIsoDate,
   seasonalTerms,
-} from "@/lib/dateFns";
+} from "@/helpers/dateFns";
 
-import { PublicEventPreviewData } from "@/types/event";
+import { PublicEventPreviewData } from "@/types/eventTypes";
 
 import { DateTime } from "luxon";
 import { JSX } from "react";

@@ -9,10 +9,10 @@ import {
   EuropeanCountries,
   EuropeanEUCountries,
   EuropeanNonEUCountries,
-  getDemonym,
-} from "@/lib/locations";
-import { cn } from "@/lib/utils";
-import { EligibilityType } from "@/types/openCall";
+} from "@/constants/locationConsts";
+import { getDemonym } from "@/helpers/locations";
+import { cn } from "@/helpers/utilsFns";
+import { EligibilityType } from "@/types/openCallTypes";
 import { CheckIcon, XIcon } from "lucide-react";
 import { useState } from "react";
 

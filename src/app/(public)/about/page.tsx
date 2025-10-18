@@ -2,7 +2,7 @@
 import { Link } from "@/components/ui/custom-link";
 import { PopoverSimple } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 import { useQuery } from "convex-helpers/react/cache/hooks";
 import Image from "next/image";
 import { ReactNode } from "react";

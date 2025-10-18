@@ -21,7 +21,7 @@ import {
   ChangeUserRole,
 } from "@/features/admin/dashboard/components/admin-user-actions";
 import { ConvexDashboardLink } from "@/features/events/ui/convex-dashboard-link";
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 import { ColumnDef } from "@tanstack/react-table";
 import { LucideClipboardCopy, MoreHorizontal, User } from "lucide-react";
 import { BsRobot } from "react-icons/bs";

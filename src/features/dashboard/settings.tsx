@@ -97,7 +97,7 @@ import {
   newsletterTypeOptions,
 } from "@/constants/newsletterConsts";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 import { useDevice } from "@/providers/device-provider";
 import { CookiePref } from "@/types/user";
 import { AlertDialogTitle } from "@radix-ui/react-alert-dialog";

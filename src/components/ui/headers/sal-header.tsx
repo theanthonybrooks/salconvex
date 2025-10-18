@@ -1,6 +1,6 @@
 import SocialsRow from "@/components/ui/socials";
+import { cn } from "@/helpers/utilsFns";
 import { Source } from "@/hooks/use-filtered-events-query";
-import { cn } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
 

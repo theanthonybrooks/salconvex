@@ -9,8 +9,8 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { DebouncedControllerInput } from "@/components/ui/debounced-form-input";
-import { autoHttps } from "@/lib/linkFns";
-import { cn } from "@/lib/utils";
+import { autoHttps } from "@/helpers/linkFns";
+import { cn } from "@/helpers/utilsFns";
 import { BiExpandVertical } from "react-icons/bi";
 
 interface ExternalLinksInputProps {

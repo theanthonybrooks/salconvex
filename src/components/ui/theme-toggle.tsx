@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 import { User, UserPref } from "@/types/user";
 import { motion as m, Variants } from "framer-motion";
 import { useTheme } from "next-themes";

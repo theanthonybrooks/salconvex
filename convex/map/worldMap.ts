@@ -1,4 +1,4 @@
-import { validOCVals } from "@/types/openCall";
+import { validOCVals } from "@/constants/openCallConsts";
 import { v } from "convex/values";
 import { query } from "~/convex/_generated/server";
 

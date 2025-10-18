@@ -7,7 +7,7 @@ import {
   dashboardNavItems as navItems,
 } from "@/constants/links";
 import { Search } from "@/features/Sidebar/Search";
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 import { User, UserPref } from "@/types/user";
 
 import { makeUseQueryWithStatus } from "convex-helpers/react";

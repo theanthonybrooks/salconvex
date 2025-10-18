@@ -1,6 +1,5 @@
 import { Link } from "@/components/ui/custom-link";
-import { supportEmail } from "@/constants/siteInfo";
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 import { FaExclamationTriangle } from "react-icons/fa";
 
 interface CanceledBannerProps {
@@ -34,12 +33,12 @@ export const CanceledBanner = ({
                   href="/dashboard/billing"
                   fontSize={fontSize}
                 >
-                  check your payment method
+                  update your payment method
                 </Link>{" "}
                 and try again or{" "}
                 <Link
                   className="underline underline-offset-2"
-                  href={`mailto:${supportEmail}?Subject=Past Due Subscription`}
+                  href="/support?reason=account"
                   fontSize={fontSize}
                 >
                   contact support
@@ -61,7 +60,7 @@ export const CanceledBanner = ({
                 Your membership has been canceled.{" "}
                 <Link
                   className="underline underline-offset-2"
-                  href="/pricing#plans"
+                  href="/pricing?type=artist"
                   fontSize={fontSize}
                 >
                   Select a plan
@@ -69,7 +68,7 @@ export const CanceledBanner = ({
                 to continue using the site.{" "}
                 <Link
                   className="underline underline-offset-2"
-                  href={`mailto:${supportEmail}?Subject=Canceled Subscription`}
+                  href="/support?reason=account"
                   fontSize={fontSize}
                 >
                   Contact support

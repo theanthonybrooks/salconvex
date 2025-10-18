@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 import { cva, type VariantProps } from "class-variance-authority";
 import Link from "next/link";
 import { type ComponentPropsWithRef } from "react";

@@ -1,4 +1,4 @@
-import { formatDisplayUrl } from "@/lib/linkFns";
+import { formatDisplayUrl } from "@/helpers/linkFns";
 import { Globe, Phone } from "lucide-react";
 import {
   FaFacebookF,
@@ -49,7 +49,7 @@ const contactLabel = (type: string, value: string) => {
   }
 };
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 import { Organizer } from "@/types/organizer";
 import React from "react";
 

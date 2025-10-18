@@ -3,7 +3,7 @@ import { cva } from "class-variance-authority";
 import * as React from "react";
 import { TiArrowSortedDown } from "react-icons/ti";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 import { FaChevronDown } from "react-icons/fa";
 
 interface NavigationMenuProps

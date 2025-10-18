@@ -1,8 +1,9 @@
 import { TooltipSimple } from "@/components/ui/tooltip";
+import { openCallCategoryFields } from "@/constants/openCallConsts";
 import { siteUrl } from "@/constants/siteInfo";
-import { formatCurrency } from "@/lib/currencyFns";
-import { cn } from "@/lib/utils";
-import { OpenCall, openCallCategoryFields } from "@/types/openCall";
+import { formatCurrency } from "@/helpers/currencyFns";
+import { cn } from "@/helpers/utilsFns";
+import { OpenCall } from "@/types/openCallTypes";
 import { X } from "lucide-react";
 import { FaPaintRoller, FaUserCheck } from "react-icons/fa6";
 import { IoAirplane } from "react-icons/io5";

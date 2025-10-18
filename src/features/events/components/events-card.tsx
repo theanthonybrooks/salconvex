@@ -5,14 +5,14 @@ import {
   AccordionTrigger,
 } from "@/components/ui/state-accordion-test";
 import { LazyMap } from "@/features/wrapper-elements/map/lazy-map";
-import { EventData } from "@/types/event";
+import { EventData } from "@/types/eventTypes";
 
 import { Card } from "@/components/ui/card";
 import { LinkList } from "@/components/ui/link-list";
 import EventDates from "@/features/events/components/event-dates";
-import { getEventCategoryLabel } from "@/lib/eventFns";
-import { RichTextDisplay } from "@/lib/richTextFns";
-import { cn } from "@/lib/utils";
+import { getEventCategoryLabel } from "@/helpers/eventFns";
+import { RichTextDisplay } from "@/helpers/richTextFns";
+import { cn } from "@/helpers/utilsFns";
 import { RefObject } from "react";
 import { FaMapLocationDot } from "react-icons/fa6";
 

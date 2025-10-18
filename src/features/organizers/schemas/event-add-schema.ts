@@ -1,4 +1,16 @@
-import { cleanHtml } from "@/lib/richTextFns";
+import { eventStateValues } from "@/components/data-table/data-table-constants";
+import {
+  eventCategoryValues,
+  eventFormatValues,
+  eventTypeValues,
+  prodFormatValues,
+} from "@/constants/eventConsts";
+import {
+  callFormatValues,
+  callTypeValues,
+  validOCVals,
+} from "@/constants/openCallConsts";
+import { cleanHtml } from "@/helpers/richTextFns";
 import {
   domainRegex,
   isValidFacebook,
@@ -8,14 +20,6 @@ import {
   isValidVK,
   toMutableEnum,
 } from "@/lib/zodFns";
-import {
-  eventCategoryValues,
-  eventFormatValues,
-  eventStates,
-  eventTypeValues,
-  prodFormatValues,
-} from "@/types/event";
-import { callTypeValues, validOCVals } from "@/types/openCall";
 import { z } from "zod";
 
 const locationBase = z.object({
@@ -511,7 +515,7 @@ export const openCallBaseSchema = z.object({
   // mainOrgId: z.string(), //todo: add this later when multiple orgs are supported
   basicInfo: z.object({
     appFee: z.number(),
-    callFormat: z.union([z.literal("RFQ"), z.literal("RFP"), z.literal("RFA")]),
+    callFormat: z.union([z.enum(callFormatValues)]),
     // callType: z.union([
     //   z.literal("Fixed"),
     //   z.literal("Rolling"),
@@ -703,7 +707,7 @@ export const eventWithOCSchema = z
   .object({
     organization: organizationSchema,
     event: eventBase.extend({
-      state: z.enum(eventStates),
+      state: z.enum(eventStateValues),
       hasOpenCall: z.union([z.enum(callTypeValues), z.literal("False")]),
     }),
     openCall: openCallSchema.optional(),
@@ -733,7 +737,7 @@ export const eventSubmitSchema = z.object({
   organization: organizationSchema,
   event: eventBase.extend({
     links: linksSchemaStrict,
-    state: z.enum(eventStates),
+    state: z.enum(eventStateValues),
   }),
 });
 

@@ -13,7 +13,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 import { CookiePref } from "@/types/user";
 import { useMutation, usePreloadedQuery } from "convex/react";
 import { CookieIcon, ExternalLink } from "lucide-react";

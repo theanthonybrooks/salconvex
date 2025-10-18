@@ -1,10 +1,10 @@
 import EventDates from "@/features/events/components/event-dates";
 import { EligibilityLabel } from "@/features/events/open-calls/components/eligibility-label-client";
-import { formatOpenCallDeadline } from "@/lib/dateFns";
-import { formatBudgetCurrency } from "@/lib/eventFns";
-import { getFormattedLocationString } from "@/lib/locations";
-import { cn } from "@/lib/utils";
-import { PublicEventPreviewData } from "@/types/event";
+import { formatOpenCallDeadline } from "@/helpers/dateFns";
+import { formatBudgetCurrency } from "@/helpers/eventFns";
+import { getFormattedLocationString } from "@/helpers/locations";
+import { cn } from "@/helpers/utilsFns";
+import { PublicEventPreviewData } from "@/types/eventTypes";
 import Image from "next/image";
 import { forwardRef } from "react";
 import { PiSkullBold } from "react-icons/pi";

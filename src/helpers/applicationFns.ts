@@ -1,4 +1,4 @@
-import { OpenCallLinkFormat } from "@/types/openCall";
+import { OpenCallLinkFormat } from "@/types/openCallTypes";
 
 type TimeRange = "day" | "week" | "month" | "year";
 

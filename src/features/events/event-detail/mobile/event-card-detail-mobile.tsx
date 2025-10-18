@@ -1,7 +1,7 @@
 "use client";
 
 import { Card } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 import { CalendarClockIcon, EyeOff, MapPin } from "lucide-react";
 
 import { FaBookmark, FaRegBookmark } from "react-icons/fa6";
@@ -15,11 +15,11 @@ import EventDates from "@/features/events/components/event-dates";
 import { EventCard } from "@/features/events/components/events-card";
 import { OrganizerCard } from "@/features/organizers/components/organizer-card";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
-import { generateICSFile } from "@/lib/addToCalendar";
-import { isValidIsoDate } from "@/lib/dateFns";
-import { getEventCategoryLabel, getEventTypeLabel } from "@/lib/eventFns";
-import { getFormattedLocationString } from "@/lib/locations";
-import { EventCardProps } from "@/types/event";
+import { generateICSFile } from "@/helpers/addToCalendar";
+import { isValidIsoDate } from "@/helpers/dateFns";
+import { getEventCategoryLabel, getEventTypeLabel } from "@/helpers/eventFns";
+import { getFormattedLocationString } from "@/helpers/locations";
+import { EventCardProps } from "@/types/eventTypes";
 import { useMutation, usePreloadedQuery } from "convex/react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";

@@ -1,6 +1,6 @@
 import { Link } from "@/components/ui/custom-link";
 import { supportEmail } from "@/constants/siteInfo";
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 import { Minus, Plus } from "lucide-react";
 import { JSX } from "react";
 

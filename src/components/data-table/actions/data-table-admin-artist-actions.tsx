@@ -3,7 +3,7 @@ import { api } from "~/convex/_generated/api";
 import { Id } from "~/convex/_generated/dataModel";
 
 import { SelectSimple } from "@/components/ui/select";
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 import { Check, X } from "lucide-react";
 
 export interface ArtistActionProps {

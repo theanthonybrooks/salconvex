@@ -3,7 +3,7 @@
 import * as AvatarPrimitive from "@radix-ui/react-avatar";
 import * as React from "react";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 import { User } from "@/types/user";
 import { User as UserIcon } from "lucide-react";
 

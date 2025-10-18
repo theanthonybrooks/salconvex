@@ -1,12 +1,12 @@
 import { useConfirmAction } from "@/components/ui/confirmation-dialog-context";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
-import { EventCategory, SubmissionFormState } from "@/types/event";
+import { EventCategory, SubmissionFormState } from "@/types/eventTypes";
 
 import { useMutation } from "convex/react";
 import { api } from "~/convex/_generated/api";
 import { Id } from "~/convex/_generated/dataModel";
 
-import { getEventCategoryLabelAbbr } from "@/lib/eventFns";
+import { getEventCategoryLabel } from "@/helpers/eventFns";
 import {
   Eye,
   Image as ImageIcon,
@@ -65,7 +65,7 @@ export const GoToEvent = ({
         ? "Listing"
         : hasOpenCall
           ? "Open Call"
-          : getEventCategoryLabelAbbr(category)}
+          : getEventCategoryLabel(category, true)}
     </DropdownMenuItem>
   );
 };

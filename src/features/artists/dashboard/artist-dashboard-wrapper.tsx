@@ -6,7 +6,7 @@ import { applicationColumns } from "@/features/artists/applications/components/e
 import { bookmarkColumns } from "@/features/artists/dashboard/data-tables/bookmark-columns";
 import { hiddenColumns } from "@/features/artists/dashboard/data-tables/hidden-columns";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 import { TableTypes } from "@/types/tanstack-table";
 import { useQuery } from "convex-helpers/react/cache";
 import { usePreloadedQuery } from "convex/react";

@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/table";
 
 import { AdminToolbar } from "@/features/admin/dashboard/user-admin-toolbar";
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 import {
   ApplicationStatus,
   NonNullApplicationStatus,

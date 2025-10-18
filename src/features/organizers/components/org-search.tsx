@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 import { useQuery } from "convex/react";
 import { Check, CircleCheck, CircleX, Search } from "lucide-react";
 import Image from "next/image";

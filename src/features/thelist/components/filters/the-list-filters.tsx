@@ -4,7 +4,7 @@ import { SearchType, TheListFilterCommandItem } from "@/constants/filterConsts";
 import { ViewOptions } from "@/features/events/event-list-client";
 import { TheListFilterDrawer } from "@/features/thelist/components/filter-drawer";
 import { FilterBase } from "@/features/thelist/components/filters/filter-base";
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 import { Filters, SortOptions } from "@/types/thelist";
 import { User } from "@/types/user";
 import { useState } from "react";

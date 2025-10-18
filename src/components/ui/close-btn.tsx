@@ -1,5 +1,5 @@
 import { Button, ButtonSize, ButtonVariant } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 import { X } from "lucide-react";
 import { ReactNode } from "react";
 

@@ -2,8 +2,8 @@
 
 import { Button } from "@/components/ui/button";
 import { CropModal } from "@/components/ui/crop-modal";
+import { cn } from "@/helpers/utilsFns";
 import { fetchImageAsObjectURL } from "@/lib/imageFns";
-import { cn } from "@/lib/utils";
 import { LoaderCircle, PlusIcon } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";

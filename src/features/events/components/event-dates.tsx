@@ -1,6 +1,6 @@
-import { formatEventDates } from "@/lib/dateFns";
-import { cn } from "@/lib/utils";
-import { EventData } from "@/types/event";
+import { formatEventDates } from "@/helpers/dateFns";
+import { cn } from "@/helpers/utilsFns";
+import { EventData } from "@/types/eventTypes";
 
 type MinimalEventWithDates = Pick<EventData, "dates">;
 

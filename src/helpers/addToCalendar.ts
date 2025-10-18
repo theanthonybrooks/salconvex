@@ -1,8 +1,8 @@
 import { siteUrl } from "@/constants/siteInfo";
-import { getFourCharMonth } from "@/lib/dateFns";
-import { getEventCategoryLabel } from "@/lib/eventFns";
-import { cleanInput } from "@/lib/utils";
-import { EventCategory } from "@/types/event";
+import { getFourCharMonth } from "@/helpers/dateFns";
+import { getEventCategoryLabel } from "@/helpers/eventFns";
+import { cleanInput } from "@/helpers/utilsFns";
+import { EventCategory } from "@/types/eventTypes";
 import slugify from "slugify";
 
 export const generateICSFile = (

@@ -5,7 +5,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 import { useMutation } from "convex/react";
 import { useState } from "react";
 import { api } from "~/convex/_generated/api";

@@ -1,6 +1,6 @@
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
-import { EventData, PostStatus } from "@/types/event";
+import { EventData, PostStatus } from "@/types/eventTypes";
 import { useMutation, usePreloadedQuery } from "convex/react";
 import { X } from "lucide-react";
 import { MdPhoto } from "react-icons/md";

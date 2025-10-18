@@ -1,7 +1,7 @@
 "use client";
 
 import { Card } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 import { CheckCircleIcon, EyeOff, MapPin } from "lucide-react";
 
 import { FaBookmark, FaRegBookmark } from "react-icons/fa6";
@@ -9,7 +9,7 @@ import { FaBookmark, FaRegBookmark } from "react-icons/fa6";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { ApplyButton } from "@/features/events/event-apply-btn";
-import { OpenCallCardProps } from "@/types/openCall";
+import { OpenCallCardProps } from "@/types/openCallTypes";
 
 import { DraftPendingBanner } from "@/components/ui/draft-pending-banner";
 import { EventOrgLogo } from "@/components/ui/event-org-logo";
@@ -20,8 +20,8 @@ import OpenCallCard from "@/features/events/open-calls/components/open-call-card
 import { getOpenCallStatus } from "@/features/events/open-calls/helpers/openCallStatus";
 import { OrganizerCard } from "@/features/organizers/components/organizer-card";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
-import { getEventCategoryLabel, getEventTypeLabel } from "@/lib/eventFns";
-import { getFormattedLocationString } from "@/lib/locations";
+import { getEventCategoryLabel, getEventTypeLabel } from "@/helpers/eventFns";
+import { getFormattedLocationString } from "@/helpers/locations";
 import { useMutation, usePreloadedQuery } from "convex/react";
 import { motion } from "framer-motion";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";

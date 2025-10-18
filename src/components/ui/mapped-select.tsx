@@ -20,7 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 import { Check, ChevronDown, ChevronUp, X } from "lucide-react";
 import { useState } from "react";
 

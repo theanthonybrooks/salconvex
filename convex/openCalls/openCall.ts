@@ -5,7 +5,7 @@ import {
   OpenCallLinkFormat,
   OpenCallState,
   RateUnit,
-} from "@/types/openCall";
+} from "@/types/openCallTypes";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { ConvexError, v } from "convex/values";
 import { internal } from "~/convex/_generated/api";

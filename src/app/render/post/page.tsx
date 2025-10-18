@@ -1,5 +1,5 @@
 import { OpenCallPost } from "@/app/(pages)/(artist)/thelist/components/open-call-post";
-import { OpenCallData } from "@/types/openCall";
+import { OpenCallData } from "@/types/openCallTypes";
 import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
 import { fetchQuery } from "convex/nextjs";
 import { redirect } from "next/navigation";

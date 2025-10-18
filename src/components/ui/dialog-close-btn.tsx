@@ -11,8 +11,8 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button, ButtonSize, ButtonVariant } from "@/components/ui/button";
-import { findScrollableParent } from "@/lib/scrollFns";
-import { cn } from "@/lib/utils";
+import { findScrollableParent } from "@/helpers/scrollFns";
+import { cn } from "@/helpers/utilsFns";
 import { X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 

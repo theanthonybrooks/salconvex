@@ -16,7 +16,7 @@ import { useEffect, useRef, useState } from "react";
 import { FiPlus } from "react-icons/fi";
 import { api } from "~/convex/_generated/api";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 import { Pencil } from "lucide-react";
 
 import { MultiSelect } from "@/components/multi-select";
@@ -67,7 +67,7 @@ import {
   supportCategoryOptions,
 } from "@/constants/supportConsts";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
-import { RichTextDisplay } from "@/lib/richTextFns";
+import { RichTextDisplay } from "@/helpers/richTextFns";
 import { useDevice } from "@/providers/device-provider";
 import { User } from "@/types/user";
 import { capitalize, debounce } from "lodash";

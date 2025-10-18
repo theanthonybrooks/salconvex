@@ -8,16 +8,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { formatCurrency } from "@/lib/currencyFns";
-import { formatEventDates, formatOpenCallDeadline } from "@/lib/dateFns";
-import { formatBudgetCurrency } from "@/lib/eventFns";
-import { getDemonym, getFormattedLocationString } from "@/lib/locations";
-import { cn } from "@/lib/utils";
-import {
-  callFormatMap,
-  openCallCategoryFields,
-  OpenCallData,
-} from "@/types/openCall";
+import { openCallCategoryFields } from "@/constants/openCallConsts";
+import { formatCurrency } from "@/helpers/currencyFns";
+import { formatEventDates, formatOpenCallDeadline } from "@/helpers/dateFns";
+import { formatBudgetCurrency } from "@/helpers/eventFns";
+import { getDemonym, getFormattedLocationString } from "@/helpers/locations";
+import { cn } from "@/helpers/utilsFns";
+import { getCallFormatLabel } from "@/lib/openCallFns";
+import { OpenCallData } from "@/types/openCallTypes";
 import { Check, Clipboard } from "lucide-react";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 
@@ -55,7 +53,7 @@ export const PostCaptionDialog = ({
     content += `${event.name} || ${formatEventDates(eventStart, eventEnd, event.dates.eventFormat ?? null)}`;
     content += `\n————————————————————————`;
     content += `\nDeadline: ${formatOpenCallDeadline(openCall.basicInfo.dates.ocEnd || "", openCall.basicInfo.dates.timezone, openCall.basicInfo.callType)}`;
-    content += `\nCall Format: ${callFormatMap[openCall.basicInfo.callFormat]}`;
+    content += `\nCall Format: ${getCallFormatLabel(openCall.basicInfo.callFormat)}`;
     content += `\nOpen to: ${openCall.eligibility.type === "International" ? "International (all)" : openCall.eligibility.type}`;
     if (
       openCall.eligibility.whom.length === 1 &&

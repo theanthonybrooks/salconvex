@@ -2,8 +2,9 @@
 
 //TODO: Split the list actions, user sub, user orgs, and other queries into their own files.
 
+import { validOCVals } from "@/constants/openCallConsts";
 import { compareEnrichedEvents } from "@/lib/sort/compareEnrichedEvents";
-import { OpenCallStatus, validOCVals } from "@/types/openCall";
+import { OpenCallStatus } from "@/types/openCallTypes";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { doc } from "convex-helpers/validators";
 import { Infer, v } from "convex/values";

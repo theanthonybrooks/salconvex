@@ -17,7 +17,7 @@ import {
   NewsletterFrequency,
   NewsletterType,
 } from "@/constants/newsletterConsts";
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 import { ColumnDef } from "@tanstack/react-table";
 import {
   CheckCircle2,

@@ -7,7 +7,7 @@ import {
   BookmarkListActionSelector,
   BookmarkNotesInput,
 } from "@/features/artists/dashboard/data-tables/bookmark-list-actions";
-import { cn } from "@/lib/utils";
+import { cn } from "@/helpers/utilsFns";
 import { ApplicationStatus } from "@/types/applications";
 import { ColumnDef } from "@tanstack/react-table";
 import { formatInTimeZone } from "date-fns-tz";

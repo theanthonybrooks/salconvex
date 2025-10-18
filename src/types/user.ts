@@ -43,7 +43,9 @@ export type UserPref = {
 
 export type UserPrefType = (typeof userPrefValues)[number]["value"];
 
-export type User = UserType;
+export type User = UserType & {
+  _id: Id<"users">;
+};
 
 export type UserData = {
   userId: Id<"users">;

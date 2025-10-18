@@ -5,7 +5,7 @@ import {
   NewsletterFrequency,
   NewsletterType,
 } from "@/constants/newsletterConsts";
-import { cleanInput } from "@/lib/utils";
+import { cleanInput } from "@/helpers/utilsFns";
 import { html } from "common-tags";
 import { ConvexError, v } from "convex/values";
 import { capitalize } from "lodash";

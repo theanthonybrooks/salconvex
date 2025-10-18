@@ -11,8 +11,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { convertCurrency, formatAmount } from "@/lib/currencyFns";
-import { cn } from "@/lib/utils";
+import { convertCurrency, formatAmount } from "@/helpers/currencyFns";
+import { cn } from "@/helpers/utilsFns";
 import { TableTypes } from "@/types/tanstack-table";
 import { useQuery } from "convex-helpers/react/cache";
 import { useEffect, useState } from "react";
