@@ -1,3 +1,4 @@
+import { getSubscriptionStatusVals } from "@/helpers/subscriptionFns";
 import { getExternalRedirectHtml } from "@/utils/loading-page-html";
 import { useAction } from "convex/react";
 import { ConvexError } from "convex/values";
@@ -17,10 +18,13 @@ export function useManageSubscription({
   type = "existing",
   destination = "newTab",
 }: ManageSubscriptionArgs) {
-  const { customerId, status, canceledAt } = subscription ?? {};
+  const subData = getSubscriptionStatusVals(subscription);
+  const { status, cancelDetails } = subData ?? {};
+  const customerId = subscription?.customerId;
   const router = useRouter();
   const getDashboardUrl = useAction(api.subscriptions.getStripeDashboardUrl);
-  const currentlyCanceled = status === "canceled" || canceledAt;
+  const currentlyCanceled =
+    status?.isCanceled || cancelDetails?.currentlyCanceled;
 
   async function handleManageSubscription() {
     const tabDestination = destination === "newTab";

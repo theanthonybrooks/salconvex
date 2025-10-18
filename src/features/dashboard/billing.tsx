@@ -381,24 +381,17 @@ export default function BillingPage() {
                       {cancelDetails?.hasCanceled && (
                         <>
                           <span className="text-muted-foreground">
-                            {!cancelDetails?.currentlyCanceled
-                              ? "Cancels "
-                              : "Canceled "}{" "}
+                            {cancelDetails?.currentlyCanceled
+                              ? "Canceled "
+                              : "Cancels "}
                             on:
                           </span>
                           <span className="font-medium text-red-500">
                             {cancelDetails?.cancelAtTime &&
-                            !cancelDetails?.currentlyCanceled
-                              ? format(
-                                  cancelDetails.cancelAtTime,
-                                  "MMM do, yyyy",
-                                )
-                              : subscription?.canceledAt
-                                ? format(
-                                    subscription.canceledAt,
-                                    "MMM do, yyyy",
-                                  )
-                                : null}
+                              format(
+                                cancelDetails.cancelAtTime,
+                                "MMM do, yyyy",
+                              )}
                           </span>
                         </>
                       )}

@@ -208,7 +208,7 @@ export const SubDialog = ({
                             onChange={field.onChange}
                             placeholder="Any feedback is greatly appreciated!"
                             className={cn(
-                              "min-h-24 resize-none border-1.5 border-foreground bg-card placeholder:text-foreground/40 sm:min-h-32",
+                              "min-h-24 resize-none border-1.5 border-foreground bg-card placeholder:text-foreground/40",
                               fontSize,
                             )}
                           />

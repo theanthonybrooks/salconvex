@@ -125,11 +125,8 @@ export function getSubscriptionStatusVals(
     ? new Date(subscription.cancelAt)
     : undefined;
 
-  const canceledAt =
-    subscription.canceledAt !== undefined && Boolean(subscription.canceledAt);
-  const currentlyCanceled =
-    Boolean(cancelAtTime && cancelAtTime < now) || canceledAt;
-  const willCancel = Boolean(cancelAtTime) && !currentlyCanceled;
+  const currentlyCanceled = Boolean(cancelAtTime && cancelAtTime < now);
+  const willCancel = Boolean(cancelAtTime && cancelAtTime > now);
   // #endregion
 
   return {
