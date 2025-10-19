@@ -54,6 +54,7 @@ export default function Dashboard() {
   const userPref = userData?.userPref ?? null;
   const fontSizePref = getUserFontSizePref(userPref?.fontSize);
   const fontSize = fontSizePref?.body;
+  const subFontSize = fontSizePref?.small;
   const accountType = user?.accountType;
   const role = user?.role;
   const isAdmin = role?.includes("admin");
@@ -381,26 +382,29 @@ export default function Dashboard() {
                         className="flex flex-col justify-between gap-1 sm:flex-row sm:gap-4"
                       >
                         <div>
-                          <p className="text-sm font-medium">
-                            <Link
-                              href={`/thelist/event/${event.slug}/${event.dates.edition}/call`}
-                              className="hover:underline"
-                              fontSize={fontSize}
-                            >
-                              {event.name}
-                            </Link>
-                          </p>
+                          <Link
+                            href={`/thelist/event/${event.slug}/${event.dates.edition}/call`}
+                            className="font-medium hover:underline"
+                            fontSize={fontSize}
+                          >
+                            {event.name}
+                          </Link>
                           <span
                             className={cn(
                               "flex items-center gap-1 text-sm text-muted-foreground",
-                              fontSize,
+                              subFontSize,
                             )}
                           >
                             <p>{event.location.country}</p>-
                             <p> {getEventCategoryLabel(event.category)}</p>
                           </span>
                         </div>
-                        <p className="whitespace-nowrap text-xs text-muted-foreground">
+                        <p
+                          className={cn(
+                            "whitespace-nowrap text-xs text-muted-foreground",
+                            subFontSize,
+                          )}
+                        >
                           {event.approvedAt
                             ? formatDistanceToNow(new Date(event.approvedAt), {
                                 addSuffix: true,
