@@ -13,6 +13,7 @@ import {
   FaYoutube,
 } from "react-icons/fa6";
 import { formatPhoneNumberIntl } from "react-phone-number-input";
+import truncateMiddle from "truncate-middle";
 import { LinksType } from "~/convex/schema";
 
 type EventLinks = LinksType & {
@@ -234,7 +235,9 @@ export const LinkList = ({
                     submitRecap && "truncate",
                   )}
                 >
-                  {submitRecap ? event.links.youTube : "YouTube"}
+                  {submitRecap
+                    ? truncateMiddle(event.links.youTube, 25, 5, "...")
+                    : "YouTube"}
                 </span>
               </div>
             </a>
@@ -431,11 +434,13 @@ export const LinkList = ({
 
                   <span
                     className={cn(
-                      "underline-offset-2 hover:underline",
+                      "max-w-[35ch] truncate underline-offset-2 hover:underline",
                       submitRecap && "truncate",
                     )}
                   >
-                    {submitRecap ? organizer.links.youTube : "YouTube"}{" "}
+                    {submitRecap
+                      ? truncateMiddle(organizer.links.youTube, 25, 5, "...")
+                      : "YouTube"}{" "}
                   </span>
                 </div>
               </a>
@@ -451,10 +456,7 @@ export const LinkList = ({
                     )}
                   >
                     {submitRecap
-                      ? organizer.links.linkedIn.replace(
-                          "https://linkedin.com/in/",
-                          "",
-                        )
+                      ? truncateMiddle(organizer.links.linkedIn, 25, 5, "...")
                       : "LinkedIn"}
                   </span>
                 </div>

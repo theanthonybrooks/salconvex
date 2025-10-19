@@ -8,7 +8,7 @@ import { OpenCallStatus } from "@/types/openCallTypes";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { doc } from "convex-helpers/validators";
 import { Infer, v } from "convex/values";
-import { addDays, addMonths, addWeeks, endOfWeek, startOfWeek } from "date-fns";
+import { addDays, addMonths, addWeeks, startOfWeek } from "date-fns";
 import { query } from "~/convex/_generated/server";
 
 import type { Id } from "~/convex/_generated/dataModel";
@@ -129,8 +129,10 @@ export const getFilteredEventsPublic = query({
     //TODO: Decide if it should start on Sunday or Monday.
     const startDay = startOfWeek(refDate, { weekStartsOn: 0 });
     const shiftedWeekStart = addWeeks(startDay, targetWeekOffset);
-    const endDay = endOfWeek(refDate, { weekStartsOn: 1 });
-    const shiftedWeekEnd = addWeeks(endDay, targetWeekOffset);
+    // const endDay = endOfWeek(refDate, { weekStartsOn: 0 }); // or have it start on monday
+    // const shiftedWeekEnd = addWeeks(endDay, targetWeekOffset);
+    const shiftedWeekEnd = addDays(shiftedWeekStart, 8);
+
     const monthFromNow = addMonths(refDate, 1);
     const weekStartISO = shiftedWeekStart.toISOString();
     const weekEndISO = shiftedWeekEnd.toISOString();

@@ -116,11 +116,11 @@ export const SubmissionFormRecapDesktop = ({
 
                 <tr>
                   <th className="pr-4 align-top font-medium">
-                    Primary Contact
+                    Primary Contact:
                   </th>
                   <td>
                     <p className="capitalize">
-                      <span className="font-medium">Preferred Method:</span>{" "}
+                      <span className="font-medium">Preferred Method - </span>{" "}
                       {capitalize(orgData?.contact?.primaryContact)}
                     </p>{" "}
                     {orgData?.contact?.organizer && (
@@ -138,7 +138,7 @@ export const SubmissionFormRecapDesktop = ({
                 </tr>
 
                 <tr>
-                  <th className="pr-4 align-top font-medium">Links</th>
+                  <th className="pr-4 align-top font-medium">Links:</th>
                   <td>
                     <LinkList organizer={orgData} purpose="recap" />
                   </td>
@@ -153,7 +153,7 @@ export const SubmissionFormRecapDesktop = ({
               <tbody>
                 <tr>
                   <th className="first-child pr-4 align-top font-medium">
-                    Logo
+                    Logo:
                   </th>
                   <td className="first-child">
                     {typeof eventData.logo === "string" && (
@@ -166,23 +166,23 @@ export const SubmissionFormRecapDesktop = ({
                   </td>
                 </tr>
                 <tr>
-                  <th className="pr-4 align-top font-medium">Name</th>
+                  <th className="pr-4 align-top font-medium">Name:</th>
                   <td>{eventData.name}</td>
                 </tr>
 
                 <tr>
-                  <th className="pr-4 align-top font-medium">Location</th>
+                  <th className="pr-4 align-top font-medium">Location:</th>
                   <td>{eventData.location?.full}</td>
                 </tr>
 
                 <tr>
-                  <th className="pr-4 align-top font-medium">Category</th>
+                  <th className="pr-4 align-top font-medium">Category:</th>
                   <td>{getEventCategoryLabel(eventData.category)}</td>
                 </tr>
 
                 {eventData.type && eventData.type?.length > 0 && (
                   <tr>
-                    <th className="pr-4 align-top font-medium">Type</th>
+                    <th className="pr-4 align-top font-medium">Type:</th>
                     <td>
                       {Array.isArray(eventData.type)
                         ? getEventTypeLabel(eventData.type)
@@ -192,14 +192,14 @@ export const SubmissionFormRecapDesktop = ({
                 )}
                 {eventOnly && eventData.hasOpenCall === "Invite" && (
                   <tr>
-                    <th className="pr-4 align-top font-medium">Invite Only</th>
+                    <th className="pr-4 align-top font-medium">Invite Only:</th>
                     <td>Yes</td>
                   </tr>
                 )}
 
                 {eventData.category !== "project" && (
                   <tr>
-                    <th className="pr-4 align-top font-medium">Event Dates</th>
+                    <th className="pr-4 align-top font-medium">Event Dates:</th>
                     <td>
                       <EventDates
                         event={{
@@ -229,7 +229,7 @@ export const SubmissionFormRecapDesktop = ({
                   eventData.dates?.eventFormat !== "ongoing" && (
                     <tr>
                       <th className="pr-4 align-top font-medium">
-                        Production Dates
+                        Production Dates:
                       </th>
                       <td>
                         <EventDates
@@ -256,7 +256,7 @@ export const SubmissionFormRecapDesktop = ({
 
                 <tr>
                   <th className="last-child pr-4 align-top font-medium">
-                    Links
+                    Links:
                   </th>
                   <td className="last-child">
                     <LinkList
@@ -281,7 +281,7 @@ export const SubmissionFormRecapDesktop = ({
                 {eventData.about && (
                   <AccordionItem value="About">
                     {/* <p className="mb-1 text-sm font-medium">About</p> */}
-                    <AccordionTrigger title="About" />
+                    <AccordionTrigger title="About:" />
                     <AccordionContent>
                       <RichTextDisplay
                         html={eventData.about || ""}
@@ -292,7 +292,7 @@ export const SubmissionFormRecapDesktop = ({
                 )}
                 {eventData.timeLine && (
                   <AccordionItem value="Timeline">
-                    <AccordionTrigger title="Timeline" />
+                    <AccordionTrigger title="Timeline:" />
                     <AccordionContent>
                       <RichTextDisplay
                         html={eventData.timeLine || ""}
@@ -304,7 +304,7 @@ export const SubmissionFormRecapDesktop = ({
                 {eventData.otherInfo && (
                   <AccordionItem value="OtherInfo">
                     {/* <p className="mb-1 text-sm font-medium">About</p> */}
-                    <AccordionTrigger title="Other Info" />
+                    <AccordionTrigger title="Other Info:" />
                     <AccordionContent>
                       <RichTextDisplay
                         html={eventData.otherInfo || ""}
@@ -333,14 +333,14 @@ export const SubmissionFormRecapDesktop = ({
                   </tr>
 
                   <tr>
-                    <th className="pr-4 align-top font-medium">Format</th>
+                    <th className="pr-4 align-top font-medium">Format:</th>
                     <td>
                       {getCallFormatLabel(ocData?.basicInfo?.callFormat ?? "")}
                     </td>
                   </tr>
 
                   <tr>
-                    <th className="pr-4 align-top font-medium">Deadline</th>
+                    <th className="pr-4 align-top font-medium">Deadline:</th>
                     <td>
                       {eventData?.hasOpenCall !== "Rolling" ? (
                         formatOpenCallDeadline(
@@ -355,7 +355,7 @@ export const SubmissionFormRecapDesktop = ({
                   </tr>
 
                   <tr>
-                    <th className="pr-4 align-top font-medium">Eligibility</th>
+                    <th className="pr-4 align-top font-medium">Eligibility:</th>
                     <td>
                       <EligibilityLabel
                         type={
@@ -365,23 +365,28 @@ export const SubmissionFormRecapDesktop = ({
                         format="desktop"
                       />
                     </td>
-                    <td>
-                      <p className="text-sm italic text-muted-foreground">
-                        {ocData?.selectionCriteria}
-                      </p>
-                    </td>
                   </tr>
+                  {ocData?.selectionCriteria && (
+                    <tr>
+                      <th className="pr-4 align-top font-medium">
+                        Selection Criteria:
+                      </th>
+                      <td>
+                        <RichTextDisplay html={ocData.selectionCriteria} />
+                      </td>
+                    </tr>
+                  )}
 
                   {typeof ocData?.basicInfo?.appFee === "number" &&
                     ocData?.basicInfo?.appFee > 0 && (
                       <tr>
-                        <th className="pr-4 align-top font-medium">App Fee</th>
+                        <th className="pr-4 align-top font-medium">App Fee:</th>
                         <td>{`$${ocData?.basicInfo?.appFee}`}</td>
                       </tr>
                     )}
 
                   <tr>
-                    <th className="pr-4 align-top font-medium">Budget</th>
+                    <th className="pr-4 align-top font-medium">Budget:</th>
                     <td>
                       <div className="flex items-center gap-2">
                         {hasBudget &&
@@ -406,7 +411,7 @@ export const SubmissionFormRecapDesktop = ({
                   </tr>
                   <tr>
                     <th className="last-child pr-4 align-top font-medium">
-                      Compensation
+                      Compensation:
                     </th>
                     <td className="last-child">
                       <OpenCallProvided
@@ -422,7 +427,7 @@ export const SubmissionFormRecapDesktop = ({
                   {ocData?.compensation?.budget?.moreInfo && (
                     <tr>
                       <th className="last-child pr-4 align-top font-medium">
-                        <p>Compensation</p> <p>(more info)</p>
+                        <p>Compensation</p> <p>(more info):</p>
                       </th>
                       <td className="last-child">
                         <RichTextDisplay
@@ -454,7 +459,7 @@ export const SubmissionFormRecapDesktop = ({
                   defaultValue={["Reqs", "Docs", "links"]}
                 >
                   <AccordionItem value="Reqs">
-                    <AccordionTrigger title="Requirements" />
+                    <AccordionTrigger title="Requirements:" />
                     <AccordionContent>
                       <RichTextDisplay
                         html={ocData?.requirements?.requirements || ""}

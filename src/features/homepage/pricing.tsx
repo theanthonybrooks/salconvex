@@ -20,6 +20,7 @@ import {
   ModeType,
 } from "@/features/account/account-profile-form";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
+import { getUserFontSizePref } from "@/helpers/stylingFns";
 import { useManageSubscription } from "@/hooks/use-manage-subscription";
 import { User } from "@/types/user";
 import { useQuery } from "convex-helpers/react/cache";
@@ -564,6 +565,9 @@ export default function Pricing() {
   const { preloadedSubStatus, preloadedUserData } = useConvexPreload();
   const subData = usePreloadedQuery(preloadedSubStatus);
   const userData = usePreloadedQuery(preloadedUserData);
+  const userPref = userData?.userPref;
+  const fontSizePref = getUserFontSizePref(userPref?.fontSize);
+  const baseFontSize = fontSizePref?.body;
 
   const hasSub = subData?.hasActiveSubscription;
   const hadTrial = subData?.hadTrial;
@@ -667,6 +671,7 @@ export default function Pricing() {
                     <Link
                       href="/submit#submission-costs"
                       className="font-semibold underline underline-offset-2"
+                      fontSize={baseFontSize}
                     >
                       Pricing FAQ
                     </Link>{" "}

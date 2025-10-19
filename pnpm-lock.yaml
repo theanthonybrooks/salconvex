@@ -357,6 +357,9 @@ importers:
       truncate:
         specifier: ^3.0.0
         version: 3.0.0
+      truncate-middle:
+        specifier: ^2.0.1
+        version: 2.0.1
       truncatise:
         specifier: ^0.0.8
         version: 0.0.8
@@ -5809,6 +5812,9 @@ packages:
 
   tr46@0.0.3:
     resolution: {integrity: sha512-N3WMsuqV66lT30CrXNbEjx4GEwlow3v6rr4mCcv6prnfwhS01rkgyFdjPNBYd9br7LpXV1+Emh01fHnq2Gdgrw==}
+
+  truncate-middle@2.0.1:
+    resolution: {integrity: sha512-upHYhCcywHt40b/H3TU6q75GCE7p8Na5Gp0xwC0JKSDg9p7ByWiMDBzAz0YpC1hvOi/L0y5YE3Ml5ngSA4IRtQ==}
 
   truncate@3.0.0:
     resolution: {integrity: sha512-C+0Xojw7wZPl6MDq5UjMTuxZvBPK04mtdFet7k+GSZPINcvLZFCXg+15kWIL4wAqDB7CksIsKiRLbQ1wa7rKdw==}
@@ -11813,6 +11819,8 @@ snapshots:
   toggle-selection@1.0.6: {}
 
   tr46@0.0.3: {}
+
+  truncate-middle@2.0.1: {}
 
   truncate@3.0.0: {}
 

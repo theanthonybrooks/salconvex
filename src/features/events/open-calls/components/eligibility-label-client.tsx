@@ -141,9 +141,10 @@ export const EligibilityLabel = ({
       if (hasDetails && (eligible !== false || regionalType)) {
         parts.push("*");
       }
-    } else {
-      parts.push(whom[0]);
     }
+    // else if  {
+    //   parts.push(whom[0]);
+    // }
 
     // if (mobilePreview && type !== "National") {
     //   parts.push(type);

@@ -124,6 +124,7 @@
     "tailwindcss-animate": "^1.0.7",
     "title-case": "^4.3.2",
     "truncate": "^3.0.0",
+    "truncate-middle": "^2.0.1",
     "truncatise": "^0.0.8",
     "ua-parser-js": "^2.0.4",
     "uuid": "^11.1.0",
