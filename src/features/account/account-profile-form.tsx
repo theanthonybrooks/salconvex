@@ -50,6 +50,7 @@ export const AccountSubscribeForm = ({
 }: AccountSubscribeFormProps) => {
   const { preloadedSubStatus } = useConvexPreload();
   const subData = usePreloadedQuery(preloadedSubStatus);
+  const { hasActiveSubscription } = subData ?? {};
   const trialEndsAt = subData?.trialEndsAt;
   const trialEnded = trialEndsAt && isBefore(new Date(trialEndsAt), new Date());
   const activeSub = subData?.subStatus === "active";
@@ -115,7 +116,8 @@ export const AccountSubscribeForm = ({
             router.push("/auth/register");
           }
           if (
-            typeof isCurrentUserPlan === "boolean" &&
+            hasActiveSubscription &&
+            isCurrentUserPlan !== undefined &&
             !isCurrentUserPlan &&
             isArtist
           ) {

@@ -646,10 +646,13 @@ export default function Pricing() {
           </>
         )}
         {isArtist && hasSub && (
-          <PricingHeader
-            title="Your Plan"
-            subtitle="Manage your plan or payment method at any time."
-          />
+          <>
+            <PricingHeader
+              title="Your Plan"
+              subtitle="Manage your plan or payment method at any time."
+            />
+            <PricingSwitch onSwitchAction={togglePricingPeriod} />
+          </>
         )}
 
         {isOrganizer && (
