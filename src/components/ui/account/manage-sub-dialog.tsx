@@ -84,6 +84,8 @@ export const SubDialog = ({
   const { watch, formState, reset } = form;
 
   const reason = watch("reason");
+  const hasReason = reason.length > 0;
+  console.log(reason);
 
   const handleCancelSubscription = async (
     data: CancelSubDialogSchemaValues,
@@ -145,7 +147,13 @@ export const SubDialog = ({
             onSubmit={form?.handleSubmit(handleCancelSubscription)}
             className="space-y-3"
           >
-            <p className={cn("text-sm text-foreground", fontSize)}>
+            <p
+              className={cn(
+                "text-sm text-foreground",
+                fontSize,
+                hasReason && "hidden",
+              )}
+            >
               {descText}
             </p>
             <Button
@@ -162,7 +170,12 @@ export const SubDialog = ({
             </Button>
             {hasActiveSubscription && !cancelDetails?.hasCanceled && (
               <>
-                <p className="flex items-center gap-x-3 py-8 text-sm text-foreground before:h-[1px] before:flex-1 before:bg-foreground after:h-[1px] after:flex-1 after:bg-foreground">
+                <p
+                  className={cn(
+                    "flex items-center gap-x-3 py-8 text-sm text-foreground before:h-[1px] before:flex-1 before:bg-foreground after:h-[1px] after:flex-1 after:bg-foreground",
+                    hasReason && "py-3 sm:py-5",
+                  )}
+                >
                   or
                 </p>
                 <p className={cn("text-sm text-foreground", fontSize)}>
@@ -179,6 +192,7 @@ export const SubDialog = ({
 
                       <FormControl>
                         <SelectSimple
+                          hasReset
                           options={[...BaseFeedbackOptions]}
                           value={field.value}
                           onChangeAction={(value) =>
@@ -196,7 +210,7 @@ export const SubDialog = ({
                   )}
                 />
 
-                {reason.length > 0 && (
+                {hasReason && (
                   <FormField
                     control={form.control}
                     name="comment"
@@ -237,7 +251,7 @@ export const SubDialog = ({
                   </DialogClose>
 
                   <Button
-                    disabled={!formState?.isValid}
+                    disabled={!formState?.isValid || reason === "-"}
                     type="submit"
                     variant={
                       formState?.isValid

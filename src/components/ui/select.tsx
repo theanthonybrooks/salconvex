@@ -206,6 +206,7 @@ interface SelectSimpleProps {
   invalid?: boolean;
   disabled?: boolean;
   fontSize?: string;
+  hasReset?: boolean;
 }
 
 export const SelectSimple = ({
@@ -221,9 +222,24 @@ export const SelectSimple = ({
   disabled,
   id,
   fontSize,
+  hasReset,
 }: SelectSimpleProps) => {
+  const selectOptions = [
+    ...options,
+    ...(hasReset && value !== "-" ? [{ value: "-", label: "--Reset--" }] : []),
+  ];
+  console.log(value);
   return (
-    <Select value={value} onValueChange={onChangeAction}>
+    <Select
+      value={value}
+      onValueChange={(val) => {
+        if (val === "-") {
+          onChangeAction("");
+          return;
+        }
+        onChangeAction(val);
+      }}
+    >
       <SelectTrigger
         id={id}
         disabled={disabled}
@@ -239,7 +255,7 @@ export const SelectSimple = ({
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
       <SelectContent className={cn("z-top max-h-64", contentClassName)}>
-        {options.map((option) => {
+        {selectOptions.map((option) => {
           return (
             <SelectItem
               key={option.value}
@@ -247,7 +263,9 @@ export const SelectSimple = ({
               disabled={option.disabled}
               className={cn(
                 itemClassName,
-                option.disabled && "pointer-events-none rounded-sm opacity-50",
+                option.disabled &&
+                  "pointer-events-none rounded-sm text-center opacity-50",
+                option.value === "-" && "bg-salPinkLt/30 text-destructive",
               )}
               fontSize={fontSize}
             >
