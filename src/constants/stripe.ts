@@ -23,6 +23,11 @@ export const FeedbackLabels: Record<Feedback, string> = {
   other: "Other reason",
 };
 
+export const CancelReasonLabels: Record<string, string> = {
+  cancellation_requested: "User Cancelled",
+  payment_failed: "Payment Failed",
+};
+
 export const BaseFeedbackOptions = [
   { value: "switched_service", label: "I found an alternative" },
   { value: "unused", label: "I no longer need it" },

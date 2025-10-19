@@ -1,7 +1,11 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { action, QueryCtx } from "./_generated/server";
 
-import { formatSubscriptionLabel } from "@/helpers/subscriptionFns";
+import {
+  formatSubscriptionLabel,
+  getCancelReasonLabel,
+  getFeedbackLabel,
+} from "@/helpers/subscriptionFns";
 import { getAuthSessionId, invalidateSessions } from "@convex-dev/auth/server";
 import { ConvexError, v } from "convex/values";
 import { Id } from "~/convex/_generated/dataModel";
@@ -138,17 +142,18 @@ export const usersWithSubscriptions = query({
         const cancelAt = subscription?.cancelAt;
         const canceledAt = subscription?.canceledAt;
         const customerId = subscription?.customerId;
+
         const currentStatus = cancelAt ? "canceled" : subscription?.status;
         const inactiveStatus =
           currentStatus === "canceled" || currentStatus === "past_due";
         const cancelReason = cancelAt
-          ? subscription?.customerCancellationReason
+          ? getCancelReasonLabel(subscription?.customerCancellationReason)
           : undefined;
         const cancelComment = cancelAt
           ? subscription?.customerCancellationComment
           : undefined;
         const cancelFeedback = cancelAt
-          ? subscription?.customerCancellationFeedback
+          ? getFeedbackLabel(subscription?.customerCancellationFeedback)
           : undefined;
         const interval = subscription?.interval ?? "unknown";
         const subAmount = activeSub && !cancelAt ? subscription?.amount : 0;

@@ -21,7 +21,6 @@ import {
   ChangeUserRole,
 } from "@/features/admin/dashboard/components/admin-user-actions";
 import { ConvexDashboardLink } from "@/features/events/ui/convex-dashboard-link";
-import { getFeedbackLabel } from "@/helpers/subscriptionFns";
 import { cn } from "@/helpers/utilsFns";
 import { ColumnDef } from "@tanstack/react-table";
 import { LucideClipboardCopy, MoreHorizontal, User } from "lucide-react";
@@ -182,7 +181,7 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
     ),
     cell: ({ row }) => {
       const { subStatus, cancelReason } = row.original;
-      const systemCancel = cancelReason === "payment_failed";
+      const systemCancel = cancelReason === "Payment Failed";
 
       return (
         <div
@@ -252,14 +251,14 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
     cell: ({ row }) => {
       const { cancelFeedback } = row.original;
       return (
-        <TooltipSimple content={getFeedbackLabel(cancelFeedback)}>
+        <TooltipSimple content={cancelFeedback}>
           <div
             className={cn(
               "truncate text-sm text-muted-foreground",
               !cancelFeedback && "text-center",
             )}
           >
-            {getFeedbackLabel(cancelFeedback) || "-"}
+            {cancelFeedback || "-"}
           </div>
         </TooltipSimple>
       );

@@ -1,4 +1,4 @@
-import { FeedbackLabels } from "@/constants/stripe";
+import { CancelReasonLabels, FeedbackLabels } from "@/constants/stripe";
 import { intervalToLetter, userPlans } from "@/constants/subscriptions";
 import { getExternalRedirectHtml } from "@/utils/loading-page-html";
 import { ConvexError } from "convex/values";
@@ -19,9 +19,18 @@ export function formatSubscriptionLabel(planName: string, interval: string) {
   return `${planNumber}${intervalLetter}. ${intervalLabel}-${planName}`;
 }
 
-export function getFeedbackLabel(feedback: unknown): string | undefined {
+export function getFeedbackLabel(
+  feedback: string | undefined,
+): string | undefined {
   if (typeof feedback !== "string") return undefined;
   return FeedbackLabels[feedback as keyof typeof FeedbackLabels];
+}
+
+export function getCancelReasonLabel(
+  reason: string | undefined,
+): string | undefined {
+  if (typeof reason !== "string") return undefined;
+  return CancelReasonLabels[reason as keyof typeof CancelReasonLabels];
 }
 
 export type SubscriptionOutput = {
