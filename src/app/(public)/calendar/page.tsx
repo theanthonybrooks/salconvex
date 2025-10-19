@@ -55,7 +55,7 @@ const CalendarPage = () => {
 
     return "no-modal";
   };
-
+  //TODO: Add an index for this that sets the date range, so that it only loads events for the next week or 2 at a time, rather than all of the events in the db.
   const eventsData = useQuery(api.events.event.getEventsForCalendar);
   const events = eventsData?.events ?? [];
 

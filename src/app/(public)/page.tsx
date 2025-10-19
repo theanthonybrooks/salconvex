@@ -40,12 +40,13 @@ export default function Home() {
   const { preloadedUserData, preloadedSubStatus } = useConvexPreload();
   const { theme, setTheme } = useTheme();
   const userData = usePreloadedQuery(preloadedUserData);
+
   const subStatus = usePreloadedQuery(preloadedSubStatus);
   const hasActiveSubscription = subStatus?.hasActiveSubscription;
   const userPref = userData?.userPref;
 
-  // const user = userData?.user ?? null;
-  // const isAdmin = user?.role?.includes("admin");
+  const user = userData?.user ?? null;
+  const isAdmin = user?.role?.includes("admin");
 
   const { data: totalOpenCallsData } = useQueryWithStatus(
     api.openCalls.openCall.getTotalNumberOfOpenCalls,
@@ -498,6 +499,7 @@ export default function Home() {
       {!hasActiveSubscription && <Pricing />}
       {/* </>
       )} */}
+      {isAdmin && <p>testing info on secondary branch</p>}
     </>
   );
 }
