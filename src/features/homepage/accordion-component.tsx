@@ -14,12 +14,14 @@ import slugify from "slugify";
 interface AccordionComponentProps {
   src: AccordionSection;
   className?: string;
+  fontSize?: string;
 }
 
 const AccordionContainer = motion.section;
 export function AccordionComponent({
   src,
   className,
+  fontSize,
 }: AccordionComponentProps) {
   const sectionSlug = slugify(
     src?.title ?? src?.sectionTitle ?? `section ${+1}`,
@@ -62,7 +64,9 @@ export function AccordionComponent({
             </h2>
           )}
           {src.description && (
-            <p className="mx-auto mt-4 max-w-2xl text-sm font-bold text-foreground">
+            <p
+              className={cn("mx-auto mt-4 max-w-2xl font-bold text-foreground")}
+            >
               {src.description}
             </p>
           )}
@@ -90,7 +94,7 @@ export function AccordionComponent({
                 <AccordionItem
                   key={anchorId}
                   value={`${sectionSlug}-item-${index + 1}`}
-                  className="mb-4 rounded-lg border border-foreground/50 px-2 hover:bg-card/20 data-[state=open]:bg-card/50"
+                  className="mb-4 rounded-lg border-2 border-foreground/30 px-2 hover:bg-card/20 data-[state=open]:bg-card/50"
                 >
                   <AccordionTrigger
                     className="px-2 py-4 hover:no-underline"
@@ -103,7 +107,7 @@ export function AccordionComponent({
                       {item.subtitle}
                     </span>
                   </AccordionTrigger>
-                  <AccordionContent className="px-2 pb-4">
+                  <AccordionContent className={cn("px-2 pb-4", fontSize)}>
                     {Array.isArray(item.text) && src.isList ? (
                       <ul className={`${src.listStyle} list-inside`}>
                         {item.text.map((entry, i) => (

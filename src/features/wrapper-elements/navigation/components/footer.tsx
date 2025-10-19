@@ -9,7 +9,7 @@ import {
 import { footerCRText } from "@/constants/text";
 import { cn } from "@/helpers/utilsFns";
 import { useQuery } from "convex-helpers/react/cache";
-import { useAction, useMutation } from "convex/react";
+import { useAction, useMutation, usePreloadedQuery } from "convex/react";
 import { ArrowRight, CheckCircle, LoaderCircle } from "lucide-react";
 
 import {
@@ -21,6 +21,8 @@ import {
 } from "@/components/ui/form";
 import { Separator } from "@/components/ui/separator";
 import { infoEmail } from "@/constants/siteInfo";
+import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
+import { getUserFontSizePref } from "@/helpers/stylingFns";
 import { NewsletterFormValues, newsletterSignupSchema } from "@/schemas/public";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
@@ -32,6 +34,11 @@ import { toast } from "react-toastify";
 import { api } from "~/convex/_generated/api";
 
 export default function Footer({ className }: { className?: string }) {
+  const { preloadedUserData } = useConvexPreload();
+  const userData = usePreloadedQuery(preloadedUserData);
+  const userPref = userData?.userPref;
+  const fontSizePref = getUserFontSizePref(userPref?.fontSize);
+  const fontSize = fontSizePref?.body;
   const form = useForm<NewsletterFormValues>({
     resolver: zodResolver(newsletterSignupSchema),
     defaultValues: {
@@ -148,7 +155,12 @@ export default function Footer({ className }: { className?: string }) {
             >
               {filteredLinks.map(({ section, items }) => (
                 <div key={section}>
-                  <p className="text-sm font-semibold capitalize text-foreground">
+                  <p
+                    className={cn(
+                      "text-sm font-semibold capitalize text-foreground",
+                      fontSize,
+                    )}
+                  >
                     {section.charAt(0).toUpperCase() + section.slice(1)}
                   </p>
                   <ul className="mt-4 space-y-4">
@@ -157,6 +169,7 @@ export default function Footer({ className }: { className?: string }) {
                         <Link
                           href={item.href}
                           className="text-sm text-foreground underline-offset-2"
+                          fontSize={fontSize}
                         >
                           {item.name}
                         </Link>

@@ -23,7 +23,13 @@ type FontPref = {
 };
 
 export function getUserFontSizePref(pref?: FontSizeType): FontPref | null {
-  if (!pref) return null;
+  if (!pref)
+    return {
+      subHeading: "text-base",
+      body: "text-sm",
+      small: "text-xs",
+      tiny: "text-xs",
+    };
 
   let subHeading: string | null;
   let body: string | null;
