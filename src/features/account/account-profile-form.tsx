@@ -35,6 +35,7 @@ interface AccountSubscribeFormProps {
   children?: React.ReactNode;
   planKey: string;
   isEligibleForFree: boolean;
+  isCurrentUserPlan?: boolean;
 }
 
 export const AccountSubscribeForm = ({
@@ -45,6 +46,7 @@ export const AccountSubscribeForm = ({
   onClick,
   planKey,
   isEligibleForFree,
+  isCurrentUserPlan,
 }: AccountSubscribeFormProps) => {
   const { preloadedSubStatus } = useConvexPreload();
   const subData = usePreloadedQuery(preloadedSubStatus);
@@ -111,6 +113,10 @@ export const AccountSubscribeForm = ({
             e.stopPropagation();
             sessionStorage.setItem("src", "newUser");
             router.push("/auth/register");
+          }
+          if (typeof isCurrentUserPlan === "boolean" && !isCurrentUserPlan) {
+            e.preventDefault();
+            e.stopPropagation();
           }
         }}
       >

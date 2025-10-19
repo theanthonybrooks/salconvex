@@ -329,7 +329,6 @@ const PricingCard = ({
   accountType,
   image,
   stripePriceId,
-
   subscription,
 }: PricingCardProps) => {
   const [comingSoon, setComingSoon] = useState(false);
@@ -351,6 +350,8 @@ const PricingCard = ({
     api.stripeSubscriptions.getOrgHadFreeCall,
     user ? {} : "skip",
   );
+
+  const handleManageSubscription = useManageSubscription({ subscription });
 
   const isEligibleForFree = (isOrganizer && hadFreeCall === false) || !user;
   const hadTrial = subscription?.hadTrial;
@@ -388,11 +389,13 @@ const PricingCard = ({
     <Card
       id={`pricing-card-${title}`}
       className={cn(
-        "pricing-card mx-auto flex w-full min-w-[20vw] max-w-sm flex-col justify-between border-2 px-2 py-1 lg:mx-0",
+        "pricing-card mx-auto flex w-full min-w-[20vw] max-w-sm flex-col justify-between border-2 px-2 py-1 transition-opacity duration-200 ease-in-out lg:mx-0",
         {
           relative: popular || isFree || isCurrentUserPlan,
         },
-        !isCurrentUserPlan && "pointer-events-none opacity-50 grayscale",
+        activeSub &&
+          !isCurrentUserPlan &&
+          "opacity-50 grayscale hover:opacity-100 hover:grayscale-0",
         isOrganizer && "self-start",
         isCurrentUserPlan && "border-3",
         // isFree && "self-start",
@@ -527,9 +530,14 @@ const PricingCard = ({
           }}
           planKey={planKey}
           isEligibleForFree={isEligibleForFree}
+          isCurrentUserPlan={isCurrentUserPlan}
         >
           <Button
-            disabled={!isCurrentUserPlan && activeSub}
+            // disabled={!isCurrentUserPlan && activeSub}
+            onClick={() => {
+              if (!activeSub || isCurrentUserPlan) return;
+              handleManageSubscription();
+            }}
             variant={
               (!activeSub && (popular || isFree)) || isCurrentUserPlan
                 ? "salWithShadowPink"
@@ -768,9 +776,8 @@ export default function Pricing() {
         )}
         {isArtist && hasSub && (
           <p className="mx-auto w-full max-w-[90vw] pb-3 pt-6 sm:text-center">
-            If you would like to change your plan, you can do so by clicking
-            &quot;<strong>Update My Plan</strong>&quot; above and selecting a
-            new plan via Stripe.
+            If you would like to change your plan, you can do so by clicking the
+            desired plan above and updating your membership via Stripe.
           </p>
         )}
 
