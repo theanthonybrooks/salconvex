@@ -234,7 +234,7 @@ export const SubDialog = ({
                     )}
                   />
                 )}
-                <DialogFooter className="!mt-6 flex w-full flex-row justify-end gap-2">
+                <DialogFooter className="!mt-6 flex w-full flex-row justify-end gap-3">
                   <DialogClose asChild>
                     <Button
                       className="w-fit px-6"

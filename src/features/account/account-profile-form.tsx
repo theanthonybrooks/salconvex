@@ -114,7 +114,11 @@ export const AccountSubscribeForm = ({
             sessionStorage.setItem("src", "newUser");
             router.push("/auth/register");
           }
-          if (typeof isCurrentUserPlan === "boolean" && !isCurrentUserPlan) {
+          if (
+            typeof isCurrentUserPlan === "boolean" &&
+            !isCurrentUserPlan &&
+            isArtist
+          ) {
             e.preventDefault();
             e.stopPropagation();
           }
