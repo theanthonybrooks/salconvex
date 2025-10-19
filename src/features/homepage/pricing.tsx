@@ -392,6 +392,7 @@ const PricingCard = ({
         {
           relative: popular || isFree || isCurrentUserPlan,
         },
+        !isCurrentUserPlan && "pointer-events-none opacity-50 grayscale",
         isOrganizer && "self-start",
         isCurrentUserPlan && "border-3",
         // isFree && "self-start",
@@ -598,7 +599,7 @@ export default function Pricing() {
     if (user) return;
     setSelectedAccountType("artist");
     setIsYearly(false);
-  }, [user]);
+  }, [user, subscription]);
 
   // useEffect(() => {
   //   if (!isArtist) return;
@@ -689,20 +690,20 @@ export default function Pricing() {
                   : (b.prices.month?.usd?.amount ?? Infinity);
                 return priceA - priceB;
               })
-              .filter((plan) => {
-                if (!hasSub) return true; // show all if user doesn’t have a subscription
+              // .filter((plan) => {
+              //   if (!hasSub) return true; // show all if user doesn’t have a subscription
 
-                const stripePriceId = isYearly
-                  ? plan.prices?.year?.usd?.stripeId
-                  : plan.prices?.month?.usd?.stripeId;
+              //   const stripePriceId = isYearly
+              //     ? plan.prices?.year?.usd?.stripeId
+              //     : plan.prices?.month?.usd?.stripeId;
 
-                const isCurrentUserPlan =
-                  typeof stripePriceId === "string" &&
-                  typeof userSubPriceId === "string" &&
-                  stripePriceId === userSubPriceId;
+              //   const isCurrentUserPlan =
+              //     typeof stripePriceId === "string" &&
+              //     typeof userSubPriceId === "string" &&
+              //     stripePriceId === userSubPriceId;
 
-                return isCurrentUserPlan;
-              })
+              //   return isCurrentUserPlan;
+              // })
               .map((plan) => {
                 const stripePriceId = isYearly
                   ? plan.prices?.year?.usd?.stripeId
@@ -764,6 +765,13 @@ export default function Pricing() {
                   );
                 })}
           </motion.div>
+        )}
+        {isArtist && hasSub && (
+          <p className="mx-auto w-full max-w-[90vw] pb-3 pt-6 sm:text-center">
+            If you would like to change your plan, you can do so by clicking
+            &quot;<strong>Update My Plan</strong>&quot; above and selecting a
+            new plan via Stripe.
+          </p>
         )}
 
         <AccountTypeSwitch

@@ -18,7 +18,7 @@ import { cn } from "@/helpers/utilsFns";
 import { ApplicationStatus } from "@/types/applications";
 import { EventCategory, EventData } from "@/types/eventTypes";
 import { CallType, OpenCallState, OpenCallStatus } from "@/types/openCallTypes";
-import { User, UserPref } from "@/types/user";
+import { User } from "@/types/user";
 import {
   getExternalErrorHtml,
   getExternalRedirectHtml,
@@ -36,6 +36,7 @@ import { FaBookmark, FaRegBookmark } from "react-icons/fa6";
 import { toast } from "react-toastify";
 import { api } from "~/convex/_generated/api";
 import { Id } from "~/convex/_generated/dataModel";
+import { UserPrefsType } from "~/convex/schema";
 
 interface ApplyButtonShortProps {
   slug: string;
@@ -145,7 +146,7 @@ interface ApplyButtonProps {
   detailCard?: boolean;
   publicPreview?: boolean;
   orgPreview?: boolean;
-  userPref?: UserPref | null;
+  userPref?: UserPrefsType | null;
   user?: User | null;
   activeSub: boolean;
   callType?: CallType;

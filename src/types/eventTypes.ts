@@ -2,11 +2,10 @@ import { ApplicationStatus } from "@/types/applications";
 import { ArtistFull } from "@/types/artist";
 import { OpenCall, OpenCallStatus } from "@/types/openCallTypes";
 import { Organizer } from "@/types/organizer";
-import { Id } from "~/convex/_generated/dataModel";
+import { Doc, Id } from "~/convex/_generated/dataModel";
 import {
   EventCategoryType,
   EventFormatType,
-  EventSchemaType,
   EventStateType,
   EventTypeType,
   PostStatusType,
@@ -21,10 +20,7 @@ export type EventFormat = EventFormatType;
 export type PostStatusOptions = PostStatusType | "all";
 export type PostStatus = PostStatusType;
 
-export type EventData = EventSchemaType & {
-  _id: Id<"events">;
-  _creationTime: number;
-};
+export type EventData = Doc<"events">;
 
 export type EnrichedEventData = EventData & {
   isUserOrg: boolean;

@@ -30,16 +30,16 @@ import { getFormattedLocationString } from "@/helpers/locations";
 import { RichTextDisplay } from "@/helpers/richTextFns";
 import { ArtistFull } from "@/types/artist";
 import { EventData } from "@/types/eventTypes";
-import { UserPref } from "@/types/user";
+import { UserPrefsType } from "~/convex/schema";
 
 interface OpenCallCardProps {
   artist?: ArtistFull | null;
   event: EventData;
   openCall: OpenCall;
-  userPref: UserPref | null;
+  userPref: UserPrefsType | null;
   format: "mobile" | "desktop";
   publicPreview?: boolean;
-  fontSize: string;
+  fontSize?: string;
 }
 
 const OpenCallCard = ({

@@ -121,24 +121,25 @@ export default function SettingsPage() {
   const userData = usePreloadedQuery(preloadedUserData);
   const subData = usePreloadedQuery(preloadedSubStatus);
   const { signOut } = useAuthActions();
-
+  const { subscription, subStatus, cancelAt, hasActiveSubscription } =
+    subData ?? {};
   const user = userData?.user;
   const userType = user?.accountType;
   const isAdmin = user?.role?.includes("admin");
   const isArtist = userType?.includes("artist");
   const { isMobile } = useDevice();
 
-  const userPrefs = userData?.userPref;
-  const fontSize = getUserFontSizePref(userPrefs?.fontSize);
+  const userPref = userData?.userPref;
+  const fontSizePref = getUserFontSizePref(userPref?.fontSize);
+  const fontSize = fontSizePref?.body;
   const userId = userData?.userId;
-  const activeSub = subData?.hasActiveSubscription;
-  const canDelete = !subData?.subscription || subData?.subStatus === "canceled";
+  const activeSub = hasActiveSubscription;
+  const canDelete = !subscription || subStatus === "canceled";
 
-  const subStatus = subData?.subStatus ?? "none";
   const userPlan = subData?.subPlan ?? 0;
   const minBananaUser = activeSub && userPlan >= 2;
   // const minFatCapUser = activeSub && userPlan >= 3;
-  const signedUpForNewsletter = userPrefs?.notifications?.newsletter ?? false;
+  const signedUpForNewsletter = userPref?.notifications?.newsletter ?? false;
 
   const newsletterInfo = useQuery(
     api.newsletter.subscriber.getNewsletterStatus,
@@ -405,7 +406,7 @@ export default function SettingsPage() {
     }
     try {
       const updated = {
-        ...userPrefs?.notifications,
+        ...userPref?.notifications,
         [type]: value,
       };
 
@@ -551,6 +552,7 @@ export default function SettingsPage() {
         activeSub={activeSub}
         subStatus={subStatus}
         fontSize={fontSize}
+        willCancel={cancelAt}
       />
       {/* Header */}
       <div>
@@ -798,7 +800,7 @@ export default function SettingsPage() {
                           "gmtAbbreviation",
                           "iana",
                         ]}
-                        value={userPrefs?.timezone ?? ""}
+                        value={userPref?.timezone ?? ""}
                         onChange={(value) =>
                           handleUpdateUserPrefs({ timezone: value })
                         }
@@ -892,7 +894,7 @@ export default function SettingsPage() {
                           </p>
                         </div>
                         <Select
-                          value={String(userPrefs?.autoApply ?? true)}
+                          value={String(userPref?.autoApply ?? true)}
                           onValueChange={(value) =>
                             handleUpdateUserPrefs({
                               autoApply: value === "true",
@@ -950,7 +952,7 @@ export default function SettingsPage() {
                     </div>
                   </div>
                   <Switch
-                    checked={!!userPrefs?.notifications?.general}
+                    checked={!!userPref?.notifications?.general}
                     onCheckedChange={(value) =>
                       handleUpdateNotifications("general", value)
                     }
@@ -969,7 +971,7 @@ export default function SettingsPage() {
                     </div>
                   </div>
                   <Switch
-                    checked={!!userPrefs?.notifications?.newsletter}
+                    checked={!!userPref?.notifications?.newsletter}
                     onCheckedChange={(value) =>
                       handleUpdateNotifications("newsletter", value)
                     }
@@ -997,7 +999,7 @@ export default function SettingsPage() {
                   </div>
                   <Switch
                     disabled
-                    checked={!!userPrefs?.notifications?.applications}
+                    checked={!!userPref?.notifications?.applications}
                     onCheckedChange={(value) =>
                       handleUpdateNotifications("applications", value)
                     }
@@ -1117,7 +1119,7 @@ export default function SettingsPage() {
                   </div>
 
                   <Select
-                    value={userPrefs?.theme ?? theme}
+                    value={userPref?.theme ?? theme}
                     onValueChange={(value) => {
                       setTheme(value);
                       handleUpdateUserPrefs({ theme: value });
@@ -1166,7 +1168,7 @@ export default function SettingsPage() {
                   </div>
 
                   <Select
-                    value={userPrefs?.fontSize ?? "normal"}
+                    value={userPref?.fontSize ?? "normal"}
                     onValueChange={(value) => {
                       handleUpdateUserPrefs({
                         fontSize: value as FontSizeType,
@@ -1217,7 +1219,7 @@ export default function SettingsPage() {
                     </div>
 
                     <Select
-                      value={userPrefs?.cookiePrefs}
+                      value={userPref?.cookiePrefs}
                       onValueChange={(value) =>
                         handleUpdateUserPrefs({
                           cookiePrefs: value as CookiePref,

@@ -13,7 +13,7 @@ const buttonVariants = cva(
       variant: {
         richTextButton:
           "bg-white text-foreground border-foreground/20 hover:bg-salYellow/30 border [&_svg]:size-4 [&_svg]:pointer-events-none",
-        icon: "bg-transparent text-foreground hover:scale-110  [&_svg]:shrink-0 ",
+        icon: "bg-transparent text-foreground hover:scale-105  [&_svg]:shrink-0 ",
         default: `bg-white text-foreground hover:bg-salYellow/30 border `,
         destructive: `bg-destructive text-destructive-foreground hover:bg-destructive/90 `,
         outline: `border-1.5 border-foreground bg-background hover:bg-white/30 `,

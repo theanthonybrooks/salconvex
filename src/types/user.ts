@@ -1,5 +1,5 @@
 import { Doc, Id } from "~/convex/_generated/dataModel";
-import { UserType } from "~/convex/schema";
+import { AccountTypeBase } from "~/convex/schema";
 
 export const cookiePrefTypes = ["all", "required"] as const;
 
@@ -20,7 +20,7 @@ export const accountTypeOptions = [
   { value: "organizer", label: "Organizer" },
 ];
 
-export type AccountType = (typeof accountTypeOptions)[number]["value"];
+export type AccountType = AccountTypeBase
 
 export const userRoleOptions = [
   { value: "user", label: "User" },
@@ -31,25 +31,10 @@ export const userRoleOptions = [
   { value: "creator", label: "Creator" },
 ];
 
-type UserPrefEntry = (typeof userPrefValues)[number];
-
-export type UserPref = {
-  [K in UserPrefEntry as K["value"]]?: K["type"] extends "boolean"
-    ? boolean
-    : K["type"] extends "string"
-      ? string
-      : never;
-};
-
-export type UserPrefType = (typeof userPrefValues)[number]["value"];
-
-export type User = UserType & {
-  _id: Id<"users">;
-};
-
+export type User = Doc<"users">;
 export type UserData = {
   userId: Id<"users">;
-  user: Doc<"users">;
+  user: User;
   userPref: Doc<"userPreferences">;
 } | null;
 

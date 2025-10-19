@@ -5,16 +5,15 @@ import {
 import { ArtistFull } from "@/types/artist";
 import { EnrichedEventData } from "@/types/eventTypes";
 import { Organizer } from "@/types/organizer";
-import { UserPref } from "@/types/user";
 import { Doc, Id } from "~/convex/_generated/dataModel";
 import {
   CallFormatType,
   EligibilityTypeType,
   LinkFormatType,
   OpenCallStateType,
-  OpenCallType,
   OpenCallTypeType,
   RateUnitType,
+  UserPrefsType,
 } from "~/convex/schema";
 
 export type CallFormat = CallFormatType;
@@ -33,11 +32,7 @@ export type openCallFileType = {
   archived?: boolean;
 };
 
-export type OpenCall = OpenCallType & {
-  _id: Id<"openCalls">;
-  _creationTime: number;
-};
-
+export type OpenCall = Doc<"openCalls">;
 export type OpenCallApplication = Doc<"applications">;
 
 export interface OpenCallData {
@@ -49,7 +44,7 @@ export interface OpenCallData {
 
 export interface OpenCallCardProps {
   data: OpenCallData;
-  userPref: UserPref | null;
+  userPref: UserPrefsType | null;
   artist?: ArtistFull | null; //todo:make this required
   className?: string;
 }

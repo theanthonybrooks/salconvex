@@ -26,7 +26,7 @@ import { getCallFormatLabel } from "@/lib/openCallFns";
 import { getUserFontSizePref } from "@/helpers/stylingFns";
 import { cn } from "@/helpers/utilsFns";
 import { CombinedEventPreviewCardData, PostStatus } from "@/types/eventTypes";
-import { User, UserPref } from "@/types/user";
+import { User } from "@/types/user";
 import { useMutation } from "convex/react";
 import {
   CheckCircleIcon,
@@ -43,11 +43,12 @@ import {
   FaRegSquare,
 } from "react-icons/fa6";
 import { api } from "~/convex/_generated/api";
+import { UserPrefsType } from "~/convex/schema";
 
 export interface EventCardPreviewProps {
   event: CombinedEventPreviewCardData;
   user: User | null;
-  userPref: UserPref | null;
+  userPref: UserPrefsType | null;
   publicView?: boolean;
   publicPreview?: boolean;
   activeSub: boolean;
@@ -90,7 +91,8 @@ const EventCardPreview = ({
     artistNationality,
     posted,
   } = event;
-  const fontSize = getUserFontSizePref(userPref?.fontSize);
+  const fontSizePref = getUserFontSizePref(userPref?.fontSize);
+  const fontSize = fontSizePref?.body;
   const { opencall } = tabs;
   const compensation = event.hasActiveOpenCall
     ? opencall?.compensation

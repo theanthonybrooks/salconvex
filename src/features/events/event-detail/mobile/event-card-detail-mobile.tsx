@@ -37,7 +37,8 @@ export const EventCardDetailMobile = (props: EventCardProps) => {
   const userPref = userData?.userPref;
   const hasActiveSubscription =
     (subData?.hasActiveSubscription || isAdmin) ?? false;
-  const fontSize = getUserFontSizePref(userPref?.fontSize);
+  const fontSizePref = getUserFontSizePref(userPref?.fontSize);
+  const fontSize = fontSizePref?.body;
 
   const {
     data,

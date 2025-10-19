@@ -2,15 +2,15 @@
 "use client";
 
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
-import { UserPref } from "@/types/user";
 import { usePreloadedQuery } from "convex/react";
 import { ThemeProvider } from "next-themes";
 import { usePathname } from "next/navigation";
 import { createContext, ReactNode } from "react";
+import { UserPrefsType } from "~/convex/schema";
 
 interface ThemedProviderProps {
   children: ReactNode;
-  userPref?: UserPref;
+  userPref?: UserPrefsType;
 }
 
 export const PendingThemeContext = createContext<{

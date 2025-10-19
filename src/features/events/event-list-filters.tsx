@@ -5,7 +5,8 @@ import { dashboardNavItems } from "@/constants/links";
 import { ViewOptions } from "@/features/events/event-list-client";
 import { TheListFilters } from "@/features/thelist/components/filters/the-list-filters";
 import { Filters, SortOptions } from "@/types/thelist";
-import { User, UserPref } from "@/types/user";
+import { User } from "@/types/user";
+import { UserPrefsType } from "~/convex/schema";
 
 interface Props {
   user: User | null;
@@ -14,7 +15,7 @@ interface Props {
   onChange: (newFilters: Partial<Filters>) => void;
   onSortChange: (newSort: Partial<SortOptions>) => void;
   onResetFilters: () => void;
-  userPref: UserPref | null;
+  userPref: UserPrefsType | null;
   isMobile: boolean;
   view: ViewOptions;
 }

@@ -27,7 +27,7 @@ interface ListFilterProps<T extends TheListFilterCommandItem> {
   onResetFilters: () => void;
   hasActiveFilters: boolean | undefined;
   view: ViewOptions;
-  // userPref: UserPref | null;
+  // userPref: UserPrefsType | null;
 }
 
 export const TheListFilters = <T extends TheListFilterCommandItem>({

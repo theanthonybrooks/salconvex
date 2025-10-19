@@ -49,7 +49,8 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
   const userData = usePreloadedQuery(preloadedUserData);
   const user = userData?.user ?? null;
   const userPref = userData?.userPref ?? null;
-  const fontSize = getUserFontSizePref(userPref?.fontSize);
+  const fontSizePref = getUserFontSizePref(userPref?.fontSize);
+  const fontSize = fontSizePref?.body;
 
   const isAdmin = user?.role?.includes("admin") || false;
 

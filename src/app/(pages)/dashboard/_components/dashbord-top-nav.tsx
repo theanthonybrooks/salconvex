@@ -6,17 +6,18 @@ import { UserProfile } from "@/components/ui/user-profile";
 import { dashboardNavItems } from "@/constants/links";
 import { Search } from "@/features/Sidebar/Search";
 import { useDevice } from "@/providers/device-provider";
-import { User, UserPref } from "@/types/user";
+import { User } from "@/types/user";
 import { Unauthenticated } from "convex/react";
 import { motion, useMotionValueEvent, useScroll } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { UserPrefsType } from "~/convex/schema";
 
 interface NavBarProps {
   userId: string | undefined;
   user: User | undefined | null;
-  userPref: UserPref | null;
+  userPref: UserPrefsType | null;
   subStatus: string | undefined;
 }
 

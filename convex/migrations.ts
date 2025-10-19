@@ -327,6 +327,24 @@ export const runBackfillOCA = migrations.runner(
 //   internal.migrations.addUserIdToKanban,
 // );
 
+export const backfillUserFontPref = migrations.define({
+  table: "userPreferences",
+  migrateOne: async (ctx, userPref) => {
+    if (userPref.fontSize === "normal") {
+      const user = await ctx.db.get(userPref.userId);
+      console.log("ignored user: ", user?.name);
+      return;
+    }
+    await ctx.db.patch(userPref._id, {
+      fontSize: "normal",
+    });
+  },
+});
+
+export const runBUFP = migrations.runner(
+  internal.migrations.backfillUserFontPref,
+);
+
 // export const backfillUserPlan = migrations.define({
 //   table: "users",
 //   migrateOne: async (ctx, user) => {

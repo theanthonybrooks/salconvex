@@ -48,7 +48,9 @@ export const getUserSubscriptionStatus = query({
     const hasActiveSubscription =
       subscription?.status === "active" ||
       subscription?.status === "trialing" ||
-      (isAdmin && subscription?.status !== "canceled");
+      (isAdmin &&
+        subscription?.status !== "canceled" &&
+        subscription?.status !== "past_due");
 
     const subStatus = subscription?.status || "none";
     const hadTrial = subscription?.hadTrial || false;
@@ -56,6 +58,13 @@ export const getUserSubscriptionStatus = query({
     const subInterval = subscription?.interval || "none";
     const trialEndsAt = subscription?.trialEndsAt;
     const subPlan = subscription?.plan;
+    const now = new Date();
+    const cancelAtTime = subscription?.cancelAt
+      ? new Date(subscription.cancelAt)
+      : undefined;
+
+    const willCancel = Boolean(cancelAtTime && cancelAtTime > now);
+    const cancelAt = willCancel ? subscription?.cancelAt : undefined;
     // console.log("Sub status: ", subStatus)
     return {
       subscription,
@@ -66,6 +75,7 @@ export const getUserSubscriptionStatus = query({
       trialEndsAt,
       subAmount,
       subInterval,
+      cancelAt,
     };
   },
 });

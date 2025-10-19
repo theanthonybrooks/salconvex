@@ -7,7 +7,7 @@ import { DeviceOptions, mainMenuItems } from "@/constants/menuLinks";
 import { footerCRText } from "@/constants/text";
 import SignOutBtn from "@/features/auth/components/sign-out-btn";
 import { cn } from "@/helpers/utilsFns";
-import { User, UserPref } from "@/types/user";
+import { User } from "@/types/user";
 import { Authenticated, Unauthenticated } from "convex/react";
 import { AnimatePresence, motion, Variants } from "framer-motion";
 import Image from "next/image";
@@ -15,6 +15,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { PiHeartBold } from "react-icons/pi";
+import { UserPrefsType } from "~/convex/schema";
 
 interface FullPageNavProps {
   // userId?: string | undefined
@@ -23,7 +24,7 @@ interface FullPageNavProps {
   isMobile?: boolean;
   // className?: string
   isDashboard?: boolean;
-  userPref: UserPref | null;
+  userPref: UserPrefsType | null;
   subStatus?: string | undefined;
 }
 

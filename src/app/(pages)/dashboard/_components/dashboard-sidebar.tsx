@@ -9,7 +9,7 @@ import {
 import { Search } from "@/features/Sidebar/Search";
 import { getUserFontSizePref } from "@/helpers/stylingFns";
 import { cn } from "@/helpers/utilsFns";
-import { User, UserPref } from "@/types/user";
+import { User } from "@/types/user";
 
 import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { useQueries } from "convex-helpers/react/cache";
@@ -22,6 +22,7 @@ import { MdChevronRight } from "react-icons/md";
 import { RiExpandLeftRightLine } from "react-icons/ri";
 
 import { api } from "~/convex/_generated/api";
+import { UserPrefsType } from "~/convex/schema";
 
 const sectionVariants: Variants = {
   collapsed: {
@@ -48,7 +49,7 @@ interface DashboardSideBarProps {
   subStatus: string | undefined;
   role: string[] | undefined;
   user: User | null;
-  userPref: UserPref | null;
+  userPref: UserPrefsType | null;
 }
 
 export default function DashboardSideBar({
@@ -67,12 +68,11 @@ export default function DashboardSideBar({
     setActiveSection,
   } = useDashboard();
 
-  console.log(collapsedSidebar, openSection, activeSection);
-
   const statusKey = subStatus ? subStatus : "none";
   const hasAdminRole = role?.includes("admin");
   const userType = user?.accountType;
-  const fontSize = getUserFontSizePref(userPref?.fontSize);
+  const fontSizePref = getUserFontSizePref(userPref?.fontSize);
+  const fontSize = fontSizePref?.body;
   const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
   const { data: submittedEventsData } = useQueryWithStatus(
     api.events.event.getSubmittedEventCount,
@@ -203,7 +203,7 @@ export default function DashboardSideBar({
                         ? "bg-primary/10 font-bold text-primary hover:bg-primary/20"
                         : "text-primary hover:bg-primary/10 hover:text-foreground",
                       !collapsedSidebar ? "pl-5" : "justify-center",
-                      fontSize === "text-base" ? "sm:text-base" : "text-sm",
+                      fontSize,
                     )}
                     onClick={() => {
                       handleSectionToggle(null);
@@ -232,13 +232,7 @@ export default function DashboardSideBar({
                   key={section.sectionCat}
                   className={cn("space-y-2", collapsedSidebar && "px-2")}
                 >
-                  {/* Section header */}
-                  <section
-                    className={
-                      cn("mt-2")
-                      // pathname.includes(section.href) && "hover:bg-primary/10",
-                    }
-                  >
+                  <section className={cn("mt-2")}>
                     <TooltipSimple
                       content={section.heading}
                       side="right"
@@ -249,7 +243,7 @@ export default function DashboardSideBar({
                       <div
                         className={cn(
                           "mb-1 flex cursor-pointer flex-col gap-2 rounded-lg py-3 transition-colors",
-                          fontSize,
+
                           pathname.includes(section.href)
                             ? "bg-primary/5 font-bold"
                             : "text-primary hover:bg-primary/10 hover:text-foreground",
@@ -259,6 +253,7 @@ export default function DashboardSideBar({
                             collapsedSidebar &&
                             "border-2 border-primary/10 bg-primary/5",
                           !collapsedSidebar && "pl-5 pr-3",
+                          fontSize,
                         )}
                         onClick={() => handleSectionToggle(section.sectionCat!)}
                       >
@@ -413,9 +408,9 @@ export default function DashboardSideBar({
                   href={item.href}
                   className={cn(
                     "flex items-center justify-center gap-2 rounded-lg py-3 text-center transition-colors",
-                    fontSize === "text-base" ? "sm:text-base" : "text-sm",
-
                     "text-primary hover:bg-primary/10 hover:text-foreground",
+                    fontSize,
+
                     // collapsedSidebar && "pl-0",
                   )}
                 >

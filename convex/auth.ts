@@ -183,6 +183,7 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
       await ctx.db.insert("userPreferences", {
         userId: newUserId,
         //todo: how to use this... do I enter a blank value for the timezone or leave it empty unless chosen? same for currency. Planning to leave currency as USD is the default shown, but for timezone, will leave it blank.
+        fontSize: "normal",
         timezone: "",
         language: "EN",
         currency: "USD",

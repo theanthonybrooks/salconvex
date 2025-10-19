@@ -22,7 +22,8 @@ export const OrganizerCardDetailMobile = (props: OrganizerCardProps) => {
   const { preloadedUserData } = useConvexPreload();
   const userData = usePreloadedQuery(preloadedUserData);
   const userPref = userData?.userPref ?? null;
-  const fontSize = getUserFontSizePref(userPref?.fontSize);
+  const fontSizePref = getUserFontSizePref(userPref?.fontSize);
+  const fontSize = fontSizePref?.body;
 
   const {
     data,

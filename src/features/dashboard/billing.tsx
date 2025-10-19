@@ -32,8 +32,9 @@ export default function BillingPage() {
   const subData = usePreloadedQuery(preloadedSubStatus);
   const userData = usePreloadedQuery(preloadedUserData);
   const userPref = userData?.userPref ?? null;
-  const fontSize = getUserFontSizePref(userPref?.fontSize);
-  const { subscription, hasActiveSubscription, subStatus } = subData;
+  const fontSizePref = getUserFontSizePref(userPref?.fontSize);
+  const fontSize = fontSizePref?.body;
+  const { subscription, hasActiveSubscription, subStatus, cancelAt } = subData;
   const subDetails = getSubscriptionStatusVals(subscription);
   const { status, cancelDetails, baseDetails } = subDetails ?? {};
   const { discount, interval } = baseDetails ?? {};
@@ -114,12 +115,13 @@ export default function BillingPage() {
   };
 
   return (
-    <div className="flex w-max max-w-[100dvw] flex-col gap-6 p-6">
+    <div className="flex w-max max-w-full flex-col gap-6 p-6">
       {showConfetti && <ConfettiBlast active={showConfetti} />}
       {/* //!! todo: show the canceled banner even when it's been canceled, but is still active, to let them know that they can still re-activate it */}
 
       <CanceledBanner
         activeSub={hasActiveSubscription}
+        willCancel={cancelAt}
         subStatus={subStatus}
         fontSize={fontSize}
       />
@@ -132,13 +134,6 @@ export default function BillingPage() {
           Manage/cancel your membership or update your billing information.
         </p>
       </div>
-      {subStatus === "past_due" && (
-        <span className="mt-2 flex items-center gap-4 rounded-lg border-1.5 border-red-600 bg-red-50 p-3 text-sm text-red-600">
-          <FaExclamationTriangle className="color-red-600 size-10 shrink-0" />
-          There was a problem with your last payment. Please update your payment
-          method to resume access to the full membership features.
-        </span>
-      )}
 
       {/* Account Information Grid */}
       {typeof subStatus === "string" && (

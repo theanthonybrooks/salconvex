@@ -33,7 +33,6 @@ import { useEffect, useRef, useState } from "react";
 interface TheListNavBarProps {
   userId?: string | undefined;
   user?: User | undefined | null;
-  // userPref: UserPref | null
   subStatus?: string | undefined;
 }
 
