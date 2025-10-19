@@ -31,7 +31,8 @@
     "Data Tables",
     "Account/Billing",
     "Map",
-    "Convex"
+    "Convex",
+    "Type"
   ],
   "typescript.tsdk": "node_modules\\typescript\\lib",
   "python.analysis.autoImportCompletions": true
