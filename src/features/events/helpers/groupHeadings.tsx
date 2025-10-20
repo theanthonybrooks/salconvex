@@ -30,7 +30,7 @@ export function getGroupKeyFromEvent(
   };
   isEnded?: boolean;
 } {
-  const basicInfo = event.tabs.opencall?.basicInfo;
+  const basicInfo = event.tabs.openCall?.basicInfo;
   // const isPublished = event.tabs.opencall?.state === "published";
   const callType = basicInfo?.callType;
   const ocEnd = basicInfo?.dates?.ocEnd;
@@ -202,7 +202,7 @@ export function getGroupKeyFromEvent(
     const country = event.location?.country ?? "Unknown";
     const countryAbbr = event.location?.countryAbbr;
     const state = event.location?.state;
-    const orgName = event.orgName ?? undefined;
+    const orgName = event.orgData?.orgName ?? undefined;
 
     const isUS =
       country.toLowerCase() === "united states" ||
@@ -258,7 +258,7 @@ export function getGroupKeyFromEvent(
   }
 
   if (sortBy === "organizer") {
-    const orgName = event.orgName ?? "";
+    const orgName = event.orgData?.orgName ?? "";
     return { raw: orgName };
   }
 
