@@ -830,22 +830,19 @@ export const subscriptionStoreWebhook = mutation({
             cancelAtPeriodEnd: baseObject.cancel_at_period_end ?? false,
             stripeId: baseObject.id,
             metadata: updatedMetadata,
-            plan: planNumber,
+            plan: planNumber ?? 0,
             //test if actually needed - the stripeId changes when the subscription is updated, but I don't know if it's able to reference/find the new one in reference to the old one or not. Wait and see.
             lastEditedAt: new Date().getTime(),
           };
 
           await ctx.db.patch(customerSubData._id, {
             ...updates,
-            ...(cancellationDetails.comment && {
-              customerCancellationComment: cancellationDetails.comment,
-            }),
-            ...(cancellationDetails.reason && {
-              customerCancellationReason: cancellationDetails.reason,
-            }),
-            ...(cancellationDetails.feedback && {
-              customerCancellationFeedback: cancellationDetails.feedback,
-            }),
+            customerCancellationComment:
+              cancellationDetails?.comment ?? undefined,
+            customerCancellationReason:
+              cancellationDetails?.reason ?? undefined,
+            customerCancellationFeedback:
+              cancellationDetails?.feedback ?? undefined,
           });
         }
 
@@ -997,15 +994,10 @@ export const subscriptionStoreWebhook = mutation({
           await ctx.db.patch(invoicePaid._id, {
             paidStatus: args.body.data.object.paid,
             ...(typeof productPlan === "number" && { plan: productPlan }),
-            ...(invoicePaid.customerCancellationComment && {
-              customerCancellationComment: undefined,
-            }),
-            ...(invoicePaid.customerCancellationReason && {
-              customerCancellationReason: undefined,
-            }),
-            ...(invoicePaid.customerCancellationFeedback && {
-              customerCancellationFeedback: undefined,
-            }),
+
+            customerCancellationComment: undefined,
+            customerCancellationReason: undefined,
+            customerCancellationFeedback: undefined,
           });
         }
 

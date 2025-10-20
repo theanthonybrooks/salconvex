@@ -21,10 +21,16 @@ export default function LeafletMapIcon({
   iconSize = 30,
   iconColor = "#E53E3E",
 }: LeafletMapIconProps) {
+  // const iconMarkup = renderToStaticMarkup(
+  //   <div className="leaflet-custom-marker-wrapper">
+  //     <div className="leaflet-custom-shadow" />
+  //     <FaMapMarkerAlt size={iconSize} color={iconColor} />
+  //   </div>,
+  // );
   const iconMarkup = renderToStaticMarkup(
-    <div className="leaflet-custom-marker-wrapper">
-      <div className="leaflet-custom-shadow" />
-      <FaMapMarkerAlt size={iconSize} color={iconColor} />
+    <div className="leaflet-custom-marker-wrapper relative flex h-[30px] w-[30px] items-center justify-center">
+      <div className="absolute h-[40%] w-[40%] -translate-y-1 rounded-full bg-card" />
+      <FaMapMarkerAlt color={iconColor} size={iconSize} />
     </div>,
   );
 

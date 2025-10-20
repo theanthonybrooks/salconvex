@@ -98,6 +98,7 @@ import {
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { getUserFontSizePref } from "@/helpers/stylingFns";
 import { cn } from "@/helpers/utilsFns";
+import { useManageSubscription } from "@/hooks/use-manage-subscription";
 import { useDevice } from "@/providers/device-provider";
 import { CookiePref } from "@/types/user";
 import { AlertDialogTitle } from "@radix-ui/react-alert-dialog";
@@ -123,6 +124,7 @@ export default function SettingsPage() {
   const { signOut } = useAuthActions();
   const { subscription, subStatus, cancelAt, hasActiveSubscription } =
     subData ?? {};
+  const handleManageSubscription = useManageSubscription({ subscription });
   const user = userData?.user;
   const userType = user?.accountType;
   const isAdmin = user?.role?.includes("admin");
@@ -134,7 +136,8 @@ export default function SettingsPage() {
   const fontSize = fontSizePref?.body;
   const userId = userData?.userId;
   const activeSub = hasActiveSubscription;
-  const canDelete = !subscription || subStatus === "canceled";
+  const canDelete =
+    !subscription || subStatus === "canceled" || typeof cancelAt === "number";
 
   const userPlan = subData?.subPlan ?? 0;
   const minBananaUser = activeSub && userPlan >= 2;
@@ -1497,37 +1500,50 @@ export default function SettingsPage() {
                       </p>
                     </div>
 
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button
-                          disabled={!canDelete}
-                          type="button"
-                          variant="destructive"
-                          className="w-full min-w-[150px] font-bold sm:w-auto"
-                        >
-                          Delete Account
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent className="w-[80dvw] bg-salYellow text-foreground">
-                        <AlertDialogHeader>
-                          <AlertDialogTitle className="text-foreground">
+                    {canDelete ? (
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            disabled={!canDelete}
+                            type="button"
+                            variant="destructive"
+                            className="w-full min-w-[150px] font-bold sm:w-auto"
+                          >
                             Delete Account
-                          </AlertDialogTitle>
-                        </AlertDialogHeader>
-                        <AlertDialogDescription className="text-foreground">
-                          Are you sure you want to delete your account? Any
-                          active memberships need to be canceled before this is
-                          possible and all data will be permanently deleted.
-                        </AlertDialogDescription>
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent className="w-[80dvw] bg-salYellow text-foreground">
+                          <AlertDialogHeader>
+                            <AlertDialogTitle className="text-foreground">
+                              Delete Account
+                            </AlertDialogTitle>
+                          </AlertDialogHeader>
+                          <AlertDialogDescription className="text-foreground">
+                            Are you sure you want to delete your account? Any
+                            active memberships need to be canceled before this
+                            is possible and all data will be permanently
+                            deleted.
+                          </AlertDialogDescription>
 
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction onClick={onDeleteAccount}>
-                            Yes, Delete
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={onDeleteAccount}>
+                              Yes, Delete
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    ) : (
+                      <Button
+                        disabled={canDelete}
+                        type="button"
+                        variant="destructive"
+                        className="w-full min-w-[150px] font-bold sm:w-auto"
+                        onClick={() => handleManageSubscription()}
+                      >
+                        Cancel Membership
+                      </Button>
+                    )}
                   </div>
                 </div>
               </CardContent>
