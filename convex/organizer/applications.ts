@@ -66,6 +66,7 @@ export const getOpenCallApplications = query({
   },
 });
 
+
 export const getAllApplications = query({
   handler: async (ctx) => {
     const userId = await getAuthUserId(ctx);

@@ -31,7 +31,6 @@ import { motion } from "framer-motion";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { api } from "~/convex/_generated/api";
-import { Id } from "~/convex/_generated/dataModel";
 
 const tabs = ["opencall", "event", "organizer"];
 
@@ -159,9 +158,9 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
   }, [tabParam, activeTab, router, pathname, searchParams]);
 
   const { data: appChartData, isPending: appChartLoading } = useQueryWithStatus(
-    api.organizer.applications.getOpenCallApplications,
+    api.analytics.eventAnalytics.getEventAnalytics,
     openCallId && isAdmin && activeTab === "admin"
-      ? { openCallId, ownerId: userData?.userId as Id<"users"> }
+      ? { eventId: event._id }
       : "skip",
   );
 

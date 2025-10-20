@@ -46,7 +46,6 @@ import { formatApplicationLink } from "@/helpers/applicationFns";
 import { getUserFontSizePref } from "@/helpers/stylingFns";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Id } from "~/convex/_generated/dataModel";
 
 export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
   const searchParams = useSearchParams();
@@ -188,9 +187,9 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
   }, [tabParam, activeTab, router, pathname, searchParams]);
 
   const { data: appChartData, isPending: appChartLoading } = useQueryWithStatus(
-    api.organizer.applications.getOpenCallApplications,
+    api.analytics.eventAnalytics.getEventAnalytics,
     openCallId && isAdmin && activeTab === "admin"
-      ? { openCallId, ownerId: userData?.userId as Id<"users"> }
+      ? { eventId: event._id }
       : "skip",
   );
 
