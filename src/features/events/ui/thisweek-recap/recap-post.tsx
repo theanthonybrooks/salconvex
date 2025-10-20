@@ -17,7 +17,7 @@ interface RecapPostProps {
 
 const RecapPost = forwardRef<HTMLDivElement, RecapPostProps>((props, ref) => {
   const { event, index } = props;
-  const { openCall } = event;
+  const { openCall } = event.tabs;
   const eligibility = event.hasActiveOpenCall
     ? openCall?.eligibility
     : undefined;

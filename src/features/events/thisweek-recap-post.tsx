@@ -78,16 +78,16 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
     return (
       queryResult?.results
         ?.filter((event) => {
-          const dueDate = event.openCall?.basicInfo?.dates?.ocEnd;
+          const dueDate = event.tabs?.openCall?.basicInfo?.dates?.ocEnd;
           if (!dueDate) return false;
           return new Date(dueDate) >= now;
         })
         .sort((a, b) => {
           const aDate = new Date(
-            a.openCall?.basicInfo?.dates?.ocEnd ?? 0,
+            a.tabs?.openCall?.basicInfo?.dates?.ocEnd ?? 0,
           ).getTime();
           const bDate = new Date(
-            b.openCall?.basicInfo?.dates?.ocEnd ?? 0,
+            b.tabs?.openCall?.basicInfo?.dates?.ocEnd ?? 0,
           ).getTime();
           return aDate - bDate;
         }) ?? []
@@ -172,9 +172,9 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
 
     for (const event of filteredResults) {
       const name = event.name;
-      const dueDate = event.openCall?.basicInfo.dates?.ocEnd ?? "";
+      const dueDate = event.tabs?.openCall?.basicInfo.dates?.ocEnd ?? "";
       const timeZone =
-        event?.openCall?.basicInfo?.dates?.timezone ?? "Europe/Berlin";
+        event?.tabs?.openCall?.basicInfo?.dates?.timezone ?? "Europe/Berlin";
       const dateKey = formatInTimeZone(dueDate, timeZone, "yyyy-MM-dd");
 
       const instagram = event.links?.instagram;
