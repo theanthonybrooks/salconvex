@@ -804,7 +804,7 @@ const SubmissionFormOC1 = ({
                           return (
                             <SelectSimple
                               options={[...openCallLinkFormatOptions]}
-                              value={field.value}
+                              value={field.value || "https://"}
                               onChangeAction={(value) => field.onChange(value)}
                               placeholder="Link Format"
                               className="w-24 rounded border bg-card text-center text-base sm:h-11"
