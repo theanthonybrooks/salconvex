@@ -234,7 +234,8 @@ type OpenCallStatusProps = {
 export const getOpenCallStatusLabel = ({
   event,
 }: OpenCallStatusProps): number => {
-  const { hasOpenCall, openCall } = event;
+  const { hasOpenCall } = event;
+  const { openCall } = event.tabs;
   const now = Date.now();
   const ocStart = openCall?.basicInfo?.dates?.ocStart
     ? new Date(openCall.basicInfo.dates.ocStart).getTime()
