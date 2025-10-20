@@ -22,6 +22,7 @@ interface Props {
   isMobile: boolean;
   view: ViewOptions;
   results: MergedEventPreviewData[];
+  isLoading: boolean;
 }
 
 export const EventFilters = ({
@@ -36,6 +37,7 @@ export const EventFilters = ({
   isMobile,
   view,
   results,
+  isLoading,
 }: Props) => {
   const hasActiveFilters =
     filters.bookmarkedOnly ||
@@ -46,7 +48,8 @@ export const EventFilters = ({
     (filters.eligibility && filters.eligibility.length > 0) ||
     (filters.callType && filters.callType.length > 0) ||
     !!(filters.callFormat && filters.callFormat !== "") ||
-    (filters.postStatus && filters.postStatus !== "all");
+    (filters.postStatus && filters.postStatus !== "all") ||
+    search.searchTerm !== "";
 
   //TODO: Add filters for: applied, open calls, budget range?, eligibility, ... ?
   return (
@@ -73,6 +76,7 @@ export const EventFilters = ({
         isMobile={isMobile}
         view={view}
         results={results}
+        isLoading={isLoading}
       />
 
       <Separator className="mx-auto" thickness={2} />

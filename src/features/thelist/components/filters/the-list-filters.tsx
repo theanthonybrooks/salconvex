@@ -34,6 +34,7 @@ interface ListFilterProps<T extends TheListFilterCommandItem> {
   hasActiveFilters: boolean | undefined;
   view: ViewOptions;
   results: MergedEventPreviewData[];
+  isLoading: boolean;
   // userPref: UserPrefsType | null;
 }
 
@@ -57,6 +58,7 @@ export const TheListFilters = <T extends TheListFilterCommandItem>({
   onResetFilters,
   view,
   results,
+  isLoading,
 }: ListFilterProps<T>) => {
   const { preloadedSubStatus } = useConvexPreload();
   const subData = usePreloadedQuery(preloadedSubStatus);
@@ -64,11 +66,10 @@ export const TheListFilters = <T extends TheListFilterCommandItem>({
 
   const [open, setOpen] = useState(false);
   const [localValue, setLocalValue] = useState(search?.searchTerm ?? "");
-  const [isLoading, setIsLoading] = useState(false);
+
   const [searchType, setSearchType] = useState<SearchType>(
     search?.searchType ?? "all",
   );
-  const [checkLoading, setCheckLoading] = useState(false);
   const userType = user?.accountType;
   const userRole = user?.role;
 
@@ -78,53 +79,22 @@ export const TheListFilters = <T extends TheListFilterCommandItem>({
         const cleaned = value.replace(/[^a-zA-Z0-9\s]/g, "");
         if (cleaned.length >= 2 || value.length === 0)
           onSearchChange({ searchTerm: value, searchType });
-        setCheckLoading(true);
       }, 600),
     [onSearchChange],
   );
-
-  useEffect(() => {
-    if (!checkLoading) return;
-
-    const MIN_DURATION = 1500;
-    const start = Date.now();
-
-    const checkResults = () => {
-      const elapsed = Date.now() - start;
-
-      if (results && results.length > 0) {
-        setIsLoading(false);
-        setCheckLoading(false);
-        return;
-      }
-
-      if (elapsed >= MIN_DURATION) {
-        setIsLoading(false);
-        setCheckLoading(false);
-        return;
-      }
-
-      requestAnimationFrame(checkResults);
-    };
-
-    checkResults();
-  }, [checkLoading, results]);
 
   useEffect(() => {
     if (
       localValue !== search.searchTerm ||
       (localValue.length > 0 && searchType !== search.searchType)
     ) {
-      const cleaned = localValue.replace(/[^a-zA-Z0-9\s]/g, "");
-      if (cleaned.length >= 2 || localValue.length === 0) setIsLoading(true);
-
       debouncedSearch(localValue, searchType);
     }
     return () => {
       debouncedSearch.cancel();
     };
   }, [localValue, debouncedSearch, search, searchType]);
-  // "organizer" | "event" | "openCall" | "archive" | "orgView"
+
   useEffect(() => {
     if (view === "organizer") {
       setSearchType("orgs");

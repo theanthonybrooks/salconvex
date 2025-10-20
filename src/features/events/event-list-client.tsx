@@ -225,7 +225,8 @@ const ClientEventList = () => {
   const totalOpen = queryResult?.totalOpenCalls;
   const totalActive = queryResult?.totalActive;
   const totalArchived = queryResult?.totalArchived;
-  const isLoading = !queryResult;
+  // const isLoading = !queryResult;
+  const isLoading = !queryResult?.finishedLoading;
 
   const handleResetFilters = useCallback(() => {
     setFilters(defaultFilters);
@@ -443,6 +444,7 @@ const ClientEventList = () => {
             isMobile={isMobile}
             view={view}
             results={paginatedEvents}
+            isLoading={isLoading}
           />
 
           {hasActiveSubscription && (

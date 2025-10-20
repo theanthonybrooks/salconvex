@@ -47,6 +47,7 @@ import {
   ChevronUp,
   LucideFilter,
   LucideFilterX,
+  X,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
@@ -103,6 +104,7 @@ export const FilterBase = ({
   onChange,
   onSortChange,
   onResetFilters,
+  // onSearchChange,
   // isLoading,
   className,
   shortcut,
@@ -711,9 +713,17 @@ export const FilterBase = ({
                     )}
                   />
 
-                  {hasShortcut && (
+                  {hasShortcut && !localValue && (
                     <span className="absolute right-2 top-1/2 hidden -translate-y-1/2 items-center gap-0.5 rounded bg-transparent p-1 text-sm lg:flex">
                       <FiCommand /> + {shortcut}
+                    </span>
+                  )}
+                  {localValue?.trim().length > 0 && (
+                    <span
+                      onClick={() => setLocalValue("")}
+                      className="absolute right-2 top-1/2 hidden -translate-y-1/2 cursor-pointer items-center gap-0.5 rounded bg-transparent p-1 text-sm lg:flex"
+                    >
+                      <X className="size-5 hover:scale-110 hover:text-red-600 active:scale-95" />
                     </span>
                   )}
                 </div>
@@ -907,7 +917,10 @@ export const FilterBase = ({
                   !hasActiveFilters &&
                     "pointer-events-none cursor-default opacity-30",
                 )}
-                onClick={onResetFilters}
+                onClick={() => {
+                  setLocalValue("");
+                  onResetFilters();
+                }}
               >
                 {hasActiveFilters ? (
                   <LucideFilterX className="size-4" />

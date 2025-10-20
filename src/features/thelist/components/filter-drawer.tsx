@@ -58,6 +58,7 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
   results: searchResults,
 }: FilterDrawerProps<T>) => {
   // const searchType = search.searchType ?? "all";
+  const eventView = view === "event";
   const router = useRouter();
   const { preloadedSubStatus, preloadedUserData } = useConvexPreload();
   const subData = usePreloadedQuery(preloadedSubStatus);
@@ -85,9 +86,8 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
       case "archive":
         return searchTypeOptions.filter((opt) => !["all"].includes(opt.value));
       case "event":
-        return hasActiveSubscription
-          ? searchTypeOptions.filter((opt) => !["all"].includes(opt.value))
-          : searchTypeOptions.filter((opt) => ["events"].includes(opt.value));
+        return searchTypeOptions.filter((opt) => !["all"].includes(opt.value));
+
       default:
         return searchTypeOptions;
     }
@@ -187,7 +187,11 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
 
     groupedItems["Events"] = searchResults.map((event) => ({
       name: event.name,
-      path: formatEventLink(event, hasActiveSubscription),
+      path: formatEventLink(
+        event,
+        hasActiveSubscription,
+        hasActiveSubscription && eventView,
+      ),
       meta:
         getSearchLocationString(event.location, true) ||
         event.location?.full ||
@@ -211,7 +215,11 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
       })
       .map((event) => ({
         name: event.orgData?.orgName ?? "",
-        path: formatEventLink(event, hasActiveSubscription),
+        path: formatEventLink(
+          event,
+          hasActiveSubscription,
+          hasActiveSubscription && eventView,
+        ),
         meta:
           getSearchLocationString(
             event.orgData?.orgLocation ?? event.location,
@@ -221,7 +229,11 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
       }));
     groupedItems["Events by Organizer"] = searchResults.map((event) => ({
       name: event.name,
-      path: formatEventLink(event, hasActiveSubscription),
+      path: formatEventLink(
+        event,
+        hasActiveSubscription,
+        hasActiveSubscription && eventView,
+      ),
       meta:
         getSearchLocationString(event.location) || event.location?.full || "",
       orgName: event.orgData?.orgName ?? "",
@@ -235,7 +247,11 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
   ) {
     groupedItems["Events"] = searchResults.map((event) => ({
       name: event.name,
-      path: formatEventLink(event, hasActiveSubscription),
+      path: formatEventLink(
+        event,
+        hasActiveSubscription,
+        hasActiveSubscription && eventView,
+      ),
       meta:
         getSearchLocationString(event.location) || event.location?.full || "",
       ocStatus: getOpenCallStatusLabel({ event }),
@@ -292,7 +308,11 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
 
       return {
         name: event.name,
-        path: formatEventLink(event, hasActiveSubscription),
+        path: formatEventLink(
+          event,
+          hasActiveSubscription,
+          hasActiveSubscription && eventView,
+        ),
         meta: locationString ?? event.location?.full ?? "",
         category: event.category.toUpperCase(),
         edition: event.dates?.edition,
@@ -365,11 +385,12 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
         {localValue?.trim().length > 0 && (
           <button
             onClick={() => {
-              onSearchChange({ searchTerm: "" });
+              // onSearchChange({ searchTerm: "" });
+              setLocalValue("");
             }}
             className="rounded p-1 px-2 hover:scale-125 active:scale-110"
           >
-            <X className="size-7 text-stone-600 hover:scale-105 hover:text-red-700 active:scale-95 sm:size-5" />
+            <X className="size-7 text-stone-600 hover:scale-105 hover:text-red-600 active:scale-95 sm:size-5" />
           </button>
         )}
       </div>
@@ -456,7 +477,7 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
                   }
                   if (e.key === "Escape") {
                     setLocalValue("");
-                    onSearchChange({ searchTerm: "" });
+                    // onSearchChange({ searchTerm: "" });
 
                     setOpen(false);
                   }
@@ -469,7 +490,7 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
                 <button
                   onClick={() => {
                     setLocalValue("");
-                    onSearchChange({ searchTerm: "" });
+                    // onSearchChange({ searchTerm: "" });
                   }}
                   className="rounded p-1 px-2 hover:scale-125 active:scale-110"
                 >
@@ -496,7 +517,7 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
                   (items) => items.length === 0,
                 ) ? (
                   <>
-                    {localValue && localValue.length !== 0 && !isLoading ? (
+                    {localValue?.trim().length > 0 && !isLoading ? (
                       <Command.Empty className="flex flex-col items-center gap-5">
                         <span className="inline-flex items-center gap-2">
                           No results found for
@@ -535,7 +556,7 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
                           {view !== "openCall" ? "events" : "open calls"},
                           organizers, or locations.{" "}
                         </span>
-                        {view !== "archive" && (
+                        {view !== "archive" && hasActiveSubscription && (
                           <p className="mt-2 text-sm text-foreground/50">
                             To search the full database, including past events
                             and archived open calls, switch to the Archive view

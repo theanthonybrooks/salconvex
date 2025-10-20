@@ -341,14 +341,14 @@ export const getFilteredEventsPublic = query({
         lookupResults = await ctx.db
           .query("eventLookup")
           .withSearchIndex("search_by_name", (q) =>
-            q.search("eventName", searchTerm).eq("ocState", "published"),
+            q.search("eventName", searchTerm).eq("eventState", "published"),
           )
           .take(30);
       } else if (searchType === "orgs" && searchTerm) {
         lookupResults = await ctx.db
           .query("eventLookup")
           .withSearchIndex("search_by_orgName", (q) =>
-            q.search("orgName", searchTerm).eq("ocState", "published"),
+            q.search("orgName", searchTerm).eq("eventState", "published"),
           )
           .take(30);
       } else if (searchType === "loc" && searchTerm) {
@@ -357,14 +357,20 @@ export const getFilteredEventsPublic = query({
             ctx.db
               .query("eventLookup")
               .withSearchIndex("search_by_location", (q) =>
-                q.search("locationFull", searchTerm).eq("ocState", "published"),
+                q
+                  .search("locationFull", searchTerm)
+                  .eq("eventState", "published")
+                  .eq("eventCategory", "event"),
               )
               .take(40),
 
             ctx.db
               .query("eventLookup")
               .withSearchIndex("search_by_countryAbbr", (q) =>
-                q.search("countryAbbr", searchTerm).eq("ocState", "published"),
+                q
+                  .search("countryAbbr", searchTerm)
+                  .eq("eventState", "published")
+                  .eq("eventCategory", "event"),
               )
               .take(40),
             ctx.db
@@ -372,7 +378,8 @@ export const getFilteredEventsPublic = query({
               .withSearchIndex("search_by_org_location", (q) =>
                 q
                   .search("orgLocation.full", searchTerm)
-                  .eq("ocState", "published"),
+                  .eq("eventState", "published")
+                  .eq("eventCategory", "event"),
               )
               .take(30),
             ctx.db
@@ -380,7 +387,8 @@ export const getFilteredEventsPublic = query({
               .withSearchIndex("search_by_org_countryAbbr", (q) =>
                 q
                   .search("orgLocation.countryAbbr", searchTerm)
-                  .eq("ocState", "published"),
+                  .eq("eventState", "published")
+                  .eq("eventCategory", "event"),
               )
               .take(20),
           ]);
@@ -807,6 +815,7 @@ export const getFilteredEventsPublic = query({
       totalOpenCalls,
       weekStartISO,
       weekEndISO,
+      finishedLoading: true,
       ...(view === "archive" ? { totalActive, totalArchived } : {}),
     };
   },

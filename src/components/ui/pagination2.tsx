@@ -113,7 +113,7 @@ export const BasicPagination = ({
                   }}
                 >
                   <SelectTrigger
-                    className="w-fit border-2 border-foreground px-4 text-center text-2xl font-bold hover:bg-white/40 disabled:opacity-100 disabled:hover:bg-transparent sm:text-xl [&>svg]:hidden"
+                    className="!disabled:cursor-default w-fit border-2 border-foreground px-4 text-center text-2xl font-bold hover:bg-white/40 disabled:pointer-events-none disabled:opacity-100 disabled:hover:bg-transparent sm:text-xl [&>svg]:hidden"
                     disabled={singlePage}
                   >
                     <SelectValue placeholder={`Page ${inputVal}`} />

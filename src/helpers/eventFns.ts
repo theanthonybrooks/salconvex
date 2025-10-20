@@ -224,7 +224,7 @@ export const formatEventLink = (
   toEvent?: boolean,
 ) => {
   const { slug, dates, hasOpenCall } = event;
-  return `/thelist/event/${slug}/${dates?.edition}/${hasOpenCall && activeSub ? "call" : ""}${activeSub && toEvent ? "/tab=event" : ""}`;
+  return `/thelist/event/${slug}/${dates?.edition}/${hasOpenCall && activeSub ? "call" : ""}${activeSub && toEvent ? "?tab=event" : ""}`;
 };
 
 type OpenCallStatusProps = {

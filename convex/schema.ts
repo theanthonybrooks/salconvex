@@ -1029,27 +1029,54 @@ export default defineSchema({
   eventLookup: defineTable(eventLookupSchema)
     .searchIndex("search_by_name", {
       searchField: "eventName",
-      filterFields: ["continent", "ocState"],
+      filterFields: ["continent", "ocState", "eventState", "eventCategory"],
     })
     .searchIndex("search_by_location", {
       searchField: "locationFull",
-      filterFields: ["continent", "ocState", "country", "countryAbbr"],
+      filterFields: [
+        "continent",
+        "ocState",
+        "country",
+        "countryAbbr",
+        "eventState",
+        "eventCategory",
+      ],
     })
     .searchIndex("search_by_org_location", {
       searchField: "orgLocation.full",
-      filterFields: ["continent", "ocState", "country", "countryAbbr"],
+      filterFields: [
+        "continent",
+        "ocState",
+        "country",
+        "countryAbbr",
+        "eventState",
+        "eventCategory",
+      ],
     })
     .searchIndex("search_by_org_countryAbbr", {
       searchField: "orgLocation.countryAbbr",
-      filterFields: ["continent", "ocState", "country", "countryAbbr"],
+      filterFields: [
+        "continent",
+        "ocState",
+        "country",
+        "countryAbbr",
+        "eventState",
+        "eventCategory",
+      ],
     })
     .searchIndex("search_by_countryAbbr", {
       searchField: "countryAbbr",
-      filterFields: ["continent", "ocState", "country"],
+      filterFields: [
+        "continent",
+        "ocState",
+        "country",
+        "eventState",
+        "eventCategory",
+      ],
     })
     .searchIndex("search_by_orgName", {
       searchField: "orgName",
-      filterFields: ["continent", "ocState"],
+      filterFields: ["continent", "ocState", "eventState", "eventCategory"],
     })
     // Common filters
     // .index("by_eventName", ["eventName"])
