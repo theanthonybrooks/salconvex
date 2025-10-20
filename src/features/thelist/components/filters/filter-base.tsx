@@ -111,7 +111,6 @@ export const FilterBase = ({
   view,
   // user,
 }: FilterBaseProps) => {
-  console.log(view);
   // const searchTerm = search.searchTerm ?? "";
   const { preloadedSubStatus, preloadedUserData } = useConvexPreload();
   const router = useRouter();

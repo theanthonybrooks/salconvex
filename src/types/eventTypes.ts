@@ -25,13 +25,13 @@ export type EventData = Doc<"events">;
 
 export type EnrichedEventData = EventData & {
   isUserOrg: boolean;
-  hasActiveOpenCall: boolean;
+  hasActiveOpenCall?: boolean;
 };
 
-export type EventCardDetailProps = {
-  data: { event: EnrichedEventData; openCall: OpenCall; organizer: Organizer };
-  artist?: ArtistFull | null;
-};
+// export type EventCardDetailProps = {
+//   data: { event: EnrichedEventData; openCall: OpenCall; organizer: Organizer };
+//   artist?: ArtistFull | null;
+// };
 
 export type EventCardProps = {
   data: { event: EnrichedEventData; organizer: Organizer };
