@@ -331,6 +331,35 @@ export const locationFullValidator = v.object(locationFullFields);
 export type LocationBase = Infer<typeof locationBaseValidator>;
 export type LocationFull = Infer<typeof locationFullValidator>;
 
+export const eventLookupOrganization = {
+  mainOrgId: v.id("organizations"),
+  orgName: v.string(),
+  ownerId: v.id("users"),
+  orgSlug: v.optional(v.string()),
+  orgLocation: v.optional(
+    v.object({
+      ...locationFullFields,
+      currency: v.optional(
+        v.object({
+          code: v.string(),
+          name: v.string(),
+          symbol: v.string(),
+          format: v.optional(v.string()),
+        }),
+      ),
+      demonym: v.optional(v.string()),
+      timezone: v.optional(v.string()),
+      timezoneOffset: v.optional(v.number()),
+    }),
+  ),
+};
+
+export type EventLookupOrgBase = Infer<typeof eventLookupOrganizationValidator>;
+
+export const eventLookupOrganizationValidator = v.object(
+  eventLookupOrganization,
+);
+
 const userRolesTable = v.object({
   userId: v.id("users"),
   role: userRoleValidator,
@@ -557,9 +586,7 @@ const eventOpenCallSchema = {
 const eventLookupSchema = {
   eventId: v.id("events"),
   openCallId: v.optional(v.id("openCalls")),
-  mainOrgId: v.id("organizations"),
-  orgName: v.optional(v.string()),
-  ownerId: v.id("users"),
+  ...eventLookupOrganization,
   eventName: v.string(),
   eventSlug: v.string(),
   eventState: v.optional(eventStateValidator),
@@ -568,7 +595,9 @@ const eventLookupSchema = {
   // eventCategory: v.optional(v.string()),
   eventType: v.optional(typeArrayValidator),
   // eventType: v.optional(v.string()),
+  locationFull: v.optional(v.string()),
   country: v.string(),
+  countryAbbr: v.optional(v.string()),
   continent: v.string(),
   eventStart: v.optional(v.string()),
   hasOpenCall: v.boolean(),
@@ -998,6 +1027,30 @@ export default defineSchema({
     .index("by_openCallId", ["openCallId"]),
 
   eventLookup: defineTable(eventLookupSchema)
+    .searchIndex("search_by_name", {
+      searchField: "eventName",
+      filterFields: ["continent", "ocState"],
+    })
+    .searchIndex("search_by_location", {
+      searchField: "locationFull",
+      filterFields: ["continent", "ocState", "country", "countryAbbr"],
+    })
+    .searchIndex("search_by_org_location", {
+      searchField: "orgLocation.full",
+      filterFields: ["continent", "ocState", "country", "countryAbbr"],
+    })
+    .searchIndex("search_by_org_countryAbbr", {
+      searchField: "orgLocation.countryAbbr",
+      filterFields: ["continent", "ocState", "country", "countryAbbr"],
+    })
+    .searchIndex("search_by_countryAbbr", {
+      searchField: "countryAbbr",
+      filterFields: ["continent", "ocState", "country"],
+    })
+    .searchIndex("search_by_orgName", {
+      searchField: "orgName",
+      filterFields: ["continent", "ocState"],
+    })
     // Common filters
     // .index("by_eventName", ["eventName"])
     // .index("by_eventCategory", ["eventCategory"])
@@ -1006,6 +1059,7 @@ export default defineSchema({
     // .index("by_country", ["country"])
 
     // // Relationships
+    .index("by_countryAbbr", ["countryAbbr"])
     .index("by_mainOrgId", ["mainOrgId"])
     .index("by_orgName", ["orgName"])
     .index("by_ownerId", ["ownerId"])

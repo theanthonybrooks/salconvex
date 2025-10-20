@@ -25,7 +25,7 @@ import { getCallFormatLabel } from "@/lib/openCallFns";
 
 import { getUserFontSizePref } from "@/helpers/stylingFns";
 import { cn } from "@/helpers/utilsFns";
-import { CombinedEventPreviewCardData, PostStatus } from "@/types/eventTypes";
+import { MergedEventPreviewData, PostStatus } from "@/types/eventTypes";
 import { User } from "@/types/user";
 import { useMutation } from "convex/react";
 import {
@@ -46,7 +46,7 @@ import { api } from "~/convex/_generated/api";
 import { UserPrefsType } from "~/convex/schema";
 
 export interface EventCardPreviewProps {
-  event: CombinedEventPreviewCardData;
+  event: MergedEventPreviewData;
   user: User | null;
   userPref: UserPrefsType | null;
   publicView?: boolean;
@@ -93,16 +93,16 @@ const EventCardPreview = ({
   } = event;
   const fontSizePref = getUserFontSizePref(userPref?.fontSize);
   const fontSize = fontSizePref?.body;
-  const { opencall } = tabs;
+  const { openCall } = tabs;
   const compensation = event.hasActiveOpenCall
-    ? opencall?.compensation
+    ? openCall?.compensation
     : undefined;
-  const ocState = opencall?.state;
-  const ocAppLink = opencall?.requirements?.applicationLink;
+  const ocState = openCall?.state;
+  const ocAppLink = openCall?.requirements?.applicationLink;
 
-  const basicInfo = event.hasActiveOpenCall ? opencall?.basicInfo : undefined;
+  const basicInfo = event.hasActiveOpenCall ? openCall?.basicInfo : undefined;
   const eligibility = event.hasActiveOpenCall
-    ? opencall?.eligibility
+    ? openCall?.eligibility
     : undefined;
   const eligibilityType = eligibility?.type ?? "";
   const eligibilityWhom = eligibility?.whom ?? [];
@@ -515,7 +515,7 @@ const EventCardPreview = ({
             isUserOrg={isUserOrg}
             eventId={event._id}
             mainOrgId={mainOrgId}
-            openCallId={opencall ? opencall._id : null}
+            openCallId={openCall ? openCall._id : null}
             appLink={ocAppLink}
             isHidden={hidden}
             publicView={publicView}
@@ -810,7 +810,7 @@ const EventCardPreview = ({
             isUserOrg={isUserOrg}
             activeSub={activeSub}
             event={event}
-            openCallId={opencall ? opencall._id : null}
+            openCallId={openCall ? openCall._id : null}
             openCallState={ocState ?? null}
             appUrl={ocAppLink}
             slug={slug}

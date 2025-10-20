@@ -4,31 +4,38 @@ import { Separator } from "@/components/ui/separator";
 import { dashboardNavItems } from "@/constants/links";
 import { ViewOptions } from "@/features/events/event-list-client";
 import { TheListFilters } from "@/features/thelist/components/filters/the-list-filters";
-import { Filters, SortOptions } from "@/types/thelist";
+import { MergedEventPreviewData } from "@/types/eventTypes";
+import { Filters, SearchParams, SortOptions } from "@/types/thelist";
 import { User } from "@/types/user";
 import { UserPrefsType } from "~/convex/schema";
 
 interface Props {
   user: User | null;
+  search: SearchParams;
   filters: Filters;
   sortOptions: SortOptions;
+  onSearchChange: (newSearch: Partial<SearchParams>) => void;
   onChange: (newFilters: Partial<Filters>) => void;
   onSortChange: (newSort: Partial<SortOptions>) => void;
   onResetFilters: () => void;
   userPref: UserPrefsType | null;
   isMobile: boolean;
   view: ViewOptions;
+  results: MergedEventPreviewData[];
 }
 
 export const EventFilters = ({
   user,
+  search,
   filters,
   sortOptions,
+  onSearchChange,
   onChange,
   onSortChange,
   onResetFilters,
   isMobile,
   view,
+  results,
 }: Props) => {
   const hasActiveFilters =
     filters.bookmarkedOnly ||
@@ -55,14 +62,17 @@ export const EventFilters = ({
         placeholder="Search"
         user={user}
         // userPref={userPref}
+        search={search}
         filters={filters}
         sortOptions={sortOptions}
+        onSearchChange={onSearchChange}
         onChange={onChange}
         onSortChange={onSortChange}
         onResetFilters={onResetFilters}
         hasActiveFilters={hasActiveFilters}
         isMobile={isMobile}
         view={view}
+        results={results}
       />
 
       <Separator className="mx-auto" thickness={2} />

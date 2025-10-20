@@ -635,9 +635,7 @@ export const subscriptionStoreWebhook = mutation({
             await ctx.db.delete(customer._id);
             console.log("deleted incomplete customer: ", customer);
           } else {
-            throw new ConvexError(
-              "Customer has active subscription: " + customerId,
-            );
+            console.log("Customer has active subscription: " + customerId);
           }
         } else {
           throw new ConvexError("Customer not found: " + customerId);

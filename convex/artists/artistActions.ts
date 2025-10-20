@@ -5,6 +5,7 @@ import { ConvexError, v } from "convex/values";
 import slugify from "slugify";
 import { Doc, Id } from "~/convex/_generated/dataModel";
 import { mutation, query } from "~/convex/_generated/server";
+import { ArtistEventMetadata } from "~/convex/artists/getArtistEventMetadata";
 
 export const updateOrCreateArtist = mutation({
   args: {
@@ -303,19 +304,19 @@ export const artistListActions = mutation({
   },
 });
 
-export type ArtistEventMetadata = {
-  bookmarked: Id<"events">[];
-  hidden: Id<"events">[];
-  applied: Id<"events">[];
-  artistNationality: string[];
-  applicationData: Record<
-    Id<"openCalls">,
-    {
-      status: ApplicationStatus | null;
-      manualApplied: boolean;
-    }
-  >;
-};
+// export type ArtistEventMetadata = {
+//   bookmarked: Id<"events">[];
+//   hidden: Id<"events">[];
+//   applied: Id<"events">[];
+//   artistNationality: string[];
+//   applicationData: Record<
+//     Id<"openCalls">,
+//     {
+//       status: ApplicationStatus | null;
+//       manualApplied: boolean;
+//     }
+//   >;
+// };
 
 export type ArtistListActions = Pick<
   ArtistEventMetadata,

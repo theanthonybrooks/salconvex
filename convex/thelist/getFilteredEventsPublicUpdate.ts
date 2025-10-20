@@ -55,6 +55,17 @@ export const getFilteredEventsPublic = query({
       ),
       sortDirection: v.optional(v.union(v.literal("asc"), v.literal("desc"))),
     }),
+    search: v.optional(
+      v.object({
+        searchTerm: v.optional(v.string()),
+        searchType: v.union(
+          v.literal("events"),
+          v.literal("orgs"),
+          v.literal("loc"),
+          v.literal("all"),
+        ),
+      }),
+    ),
     page: v.optional(v.number()),
     source: v.union(
       v.literal("thelist"),
@@ -84,10 +95,13 @@ export const getFilteredEventsPublic = query({
       page,
       source,
       viewType,
+      search,
       // artistData,
       userAccountData,
     },
   ) => {
+    const { searchTerm, searchType } = search ?? {};
+
     const thisWeekPg = source === "thisweek";
     const nextWeekPg = source === "nextweek";
     const theListPg = source === "thelist";
@@ -114,6 +128,7 @@ export const getFilteredEventsPublic = query({
       sortBy: sortOptions.sortBy,
       sortDirection: sortOptions.sortDirection ?? "desc",
       filters,
+      search,
     });
 
     const hasActiveSubscription =
@@ -157,6 +172,7 @@ export const getFilteredEventsPublic = query({
     let lookupResults = [];
 
     if (view === "openCall" && !thisWeekPg && !nextWeekPg) {
+      console.log("by oc");
       if (!hasActiveSubscription) {
         lookupResults = await ctx.db
           .query("eventLookup")
@@ -168,10 +184,135 @@ export const getFilteredEventsPublic = query({
           )
           .take(10);
       } else {
-        lookupResults = await ctx.db
-          .query("eventLookup")
-          .withIndex("by_ocState", (q) => q.eq("ocState", "published"))
-          .collect();
+        if (searchType === "all" && searchTerm) {
+          console.log("by all");
+          const [
+            events,
+            eventLocs,
+            orgLocs,
+            orgs,
+            countryAbbrs,
+            orgCountryAbbrs,
+          ] = await Promise.all([
+            ctx.db
+              .query("eventLookup")
+              .withSearchIndex("search_by_name", (q) =>
+                q.search("eventName", searchTerm).eq("ocState", "published"),
+              )
+              .take(20),
+            ctx.db
+              .query("eventLookup")
+              .withSearchIndex("search_by_location", (q) =>
+                q.search("locationFull", searchTerm).eq("ocState", "published"),
+              )
+              .take(40),
+            ctx.db
+              .query("eventLookup")
+              .withSearchIndex("search_by_org_location", (q) =>
+                q
+                  .search("orgLocation.full", searchTerm)
+                  .eq("ocState", "published"),
+              )
+              .take(30),
+            ctx.db
+              .query("eventLookup")
+              .withSearchIndex("search_by_orgName", (q) =>
+                q.search("orgName", searchTerm).eq("ocState", "published"),
+              )
+              .take(20),
+            ctx.db
+              .query("eventLookup")
+              .withSearchIndex("search_by_countryAbbr", (q) =>
+                q.search("countryAbbr", searchTerm).eq("ocState", "published"),
+              )
+              .take(40),
+            ctx.db
+              .query("eventLookup")
+              .withSearchIndex("search_by_org_countryAbbr", (q) =>
+                q
+                  .search("orgLocation.countryAbbr", searchTerm)
+                  .eq("ocState", "published"),
+              )
+              .take(30),
+          ]);
+          //! Remove the dups. Avoiding any duplicate key issues that I was having
+          lookupResults = [
+            ...events,
+            ...eventLocs,
+            ...orgLocs,
+            ...orgs,
+            ...countryAbbrs,
+            ...orgCountryAbbrs,
+          ].filter(
+            (item, index, self) =>
+              index === self.findIndex((t) => t._id === item._id),
+          );
+        } else if (searchType === "events" && searchTerm) {
+          lookupResults = await ctx.db
+            .query("eventLookup")
+            .withSearchIndex("search_by_name", (q) =>
+              q.search("eventName", searchTerm).eq("ocState", "published"),
+            )
+            .take(30);
+        } else if (searchType === "orgs" && searchTerm) {
+          lookupResults = await ctx.db
+            .query("eventLookup")
+            .withSearchIndex("search_by_orgName", (q) =>
+              q.search("orgName", searchTerm).eq("ocState", "published"),
+            )
+            .take(30);
+        } else if (searchType === "loc" && searchTerm) {
+          const [locs, countryAbbrs, orgLocs, orgCountryAbbrs] =
+            await Promise.all([
+              ctx.db
+                .query("eventLookup")
+                .withSearchIndex("search_by_location", (q) =>
+                  q
+                    .search("locationFull", searchTerm)
+                    .eq("ocState", "published"),
+                )
+                .take(40),
+
+              ctx.db
+                .query("eventLookup")
+                .withSearchIndex("search_by_countryAbbr", (q) =>
+                  q
+                    .search("countryAbbr", searchTerm)
+                    .eq("ocState", "published"),
+                )
+                .take(40),
+              ctx.db
+                .query("eventLookup")
+                .withSearchIndex("search_by_org_location", (q) =>
+                  q
+                    .search("orgLocation.full", searchTerm)
+                    .eq("ocState", "published"),
+                )
+                .take(30),
+              ctx.db
+                .query("eventLookup")
+                .withSearchIndex("search_by_org_countryAbbr", (q) =>
+                  q
+                    .search("orgLocation.countryAbbr", searchTerm)
+                    .eq("ocState", "published"),
+                )
+                .take(20),
+            ]);
+          lookupResults = [
+            ...locs,
+            ...countryAbbrs,
+            ...orgLocs,
+            ...orgCountryAbbrs,
+          ].filter(
+            (item, index, self) =>
+              index === self.findIndex((t) => t._id === item._id),
+          );
+        } else {
+          lookupResults = await ctx.db
+            .query("eventLookup")
+            .withIndex("by_ocState", (q) => q.eq("ocState", "published"))
+            .collect();
+        }
       }
     } else if (thisWeekPg || nextWeekPg) {
       if (!hasActiveSubscription) {
@@ -196,14 +337,127 @@ export const getFilteredEventsPublic = query({
           .collect();
       }
     } else if (view === "event") {
-      lookupResults = await ctx.db
-        .query("eventLookup")
-        .withIndex("by_eventState_eventCategory", (q) =>
-          q.eq("eventState", "published").eq("eventCategory", "event"),
-        )
-        .collect();
+      if (searchType === "events" && searchTerm) {
+        lookupResults = await ctx.db
+          .query("eventLookup")
+          .withSearchIndex("search_by_name", (q) =>
+            q.search("eventName", searchTerm).eq("ocState", "published"),
+          )
+          .take(30);
+      } else if (searchType === "orgs" && searchTerm) {
+        lookupResults = await ctx.db
+          .query("eventLookup")
+          .withSearchIndex("search_by_orgName", (q) =>
+            q.search("orgName", searchTerm).eq("ocState", "published"),
+          )
+          .take(30);
+      } else if (searchType === "loc" && searchTerm) {
+        const [locs, countryAbbrs, orgLocs, orgCountryAbbrs] =
+          await Promise.all([
+            ctx.db
+              .query("eventLookup")
+              .withSearchIndex("search_by_location", (q) =>
+                q.search("locationFull", searchTerm).eq("ocState", "published"),
+              )
+              .take(40),
+
+            ctx.db
+              .query("eventLookup")
+              .withSearchIndex("search_by_countryAbbr", (q) =>
+                q.search("countryAbbr", searchTerm).eq("ocState", "published"),
+              )
+              .take(40),
+            ctx.db
+              .query("eventLookup")
+              .withSearchIndex("search_by_org_location", (q) =>
+                q
+                  .search("orgLocation.full", searchTerm)
+                  .eq("ocState", "published"),
+              )
+              .take(30),
+            ctx.db
+              .query("eventLookup")
+              .withSearchIndex("search_by_org_countryAbbr", (q) =>
+                q
+                  .search("orgLocation.countryAbbr", searchTerm)
+                  .eq("ocState", "published"),
+              )
+              .take(20),
+          ]);
+        lookupResults = [
+          ...locs,
+          ...countryAbbrs,
+          ...orgLocs,
+          ...orgCountryAbbrs,
+        ].filter(
+          (item, index, self) =>
+            index === self.findIndex((t) => t._id === item._id),
+        );
+      } else {
+        lookupResults = await ctx.db
+          .query("eventLookup")
+          .withIndex("by_eventState_eventCategory", (q) =>
+            q.eq("eventState", "published").eq("eventCategory", "event"),
+          )
+          .collect();
+      }
     } else if (view === "archive") {
-      lookupResults = await ctx.db.query("eventLookup").collect();
+      if (searchType === "events" && searchTerm) {
+        lookupResults = await ctx.db
+          .query("eventLookup")
+          .withSearchIndex("search_by_name", (q) =>
+            q.search("eventName", searchTerm),
+          )
+          .take(40);
+      } else if (searchType === "orgs" && searchTerm) {
+        lookupResults = await ctx.db
+          .query("eventLookup")
+          .withSearchIndex("search_by_orgName", (q) =>
+            q.search("orgName", searchTerm),
+          )
+          .take(30);
+      } else if (searchType === "loc" && searchTerm) {
+        console.log("searching by location");
+        const [locs, countryAbbrs, orgLocs, orgCountryAbbrs] =
+          await Promise.all([
+            ctx.db
+              .query("eventLookup")
+              .withSearchIndex("search_by_location", (q) =>
+                q.search("locationFull", searchTerm),
+              )
+              .take(50),
+
+            ctx.db
+              .query("eventLookup")
+              .withSearchIndex("search_by_countryAbbr", (q) =>
+                q.search("countryAbbr", searchTerm),
+              )
+              .take(30),
+            ctx.db
+              .query("eventLookup")
+              .withSearchIndex("search_by_org_location", (q) =>
+                q.search("orgLocation.full", searchTerm),
+              )
+              .take(30),
+            ctx.db
+              .query("eventLookup")
+              .withSearchIndex("search_by_org_countryAbbr", (q) =>
+                q.search("orgLocation.countryAbbr", searchTerm),
+              )
+              .take(30),
+          ]);
+        lookupResults = [
+          ...locs,
+          ...countryAbbrs,
+          ...orgLocs,
+          ...orgCountryAbbrs,
+        ].filter(
+          (item, index, self) =>
+            index === self.findIndex((t) => t._id === item._id),
+        );
+      } else {
+        lookupResults = await ctx.db.query("eventLookup").collect();
+      }
     } else if (view === "orgView" && userId) {
       lookupResults = await ctx.db
         .query("eventLookup")
@@ -211,23 +465,77 @@ export const getFilteredEventsPublic = query({
         .collect();
     } else {
       //TODO: Make organizer cards and just show them here.
-      let results = [];
-      let doc = await ctx.db
-        .query("eventLookup")
-        .withIndex("by_orgName")
-        .order("asc")
-        .first();
-
-      while (doc !== null) {
-        results.push(doc);
-        const orgName = doc.orgName;
-        doc = await ctx.db
+      if (searchType === "events" && searchTerm) {
+        lookupResults = await ctx.db
           .query("eventLookup")
-          .withIndex("by_orgName", (q) => q.gt("orgName", orgName))
+          .withSearchIndex("search_by_name", (q) =>
+            q.search("eventName", searchTerm),
+          )
+          .take(30);
+      } else if (searchType === "orgs" && searchTerm) {
+        lookupResults = await ctx.db
+          .query("eventLookup")
+          .withSearchIndex("search_by_orgName", (q) =>
+            q.search("orgName", searchTerm),
+          )
+          .take(30);
+      } else if (searchType === "loc" && searchTerm) {
+        const [locs, countryAbbrs, orgLocs, orgCountryAbbrs] =
+          await Promise.all([
+            ctx.db
+              .query("eventLookup")
+              .withSearchIndex("search_by_location", (q) =>
+                q.search("locationFull", searchTerm),
+              )
+              .take(40),
+
+            ctx.db
+              .query("eventLookup")
+              .withSearchIndex("search_by_countryAbbr", (q) =>
+                q.search("countryAbbr", searchTerm),
+              )
+              .take(40),
+            ctx.db
+              .query("eventLookup")
+              .withSearchIndex("search_by_org_location", (q) =>
+                q.search("orgLocation.full", searchTerm),
+              )
+              .take(30),
+            ctx.db
+              .query("eventLookup")
+              .withSearchIndex("search_by_org_countryAbbr", (q) =>
+                q.search("orgLocation.countryAbbr", searchTerm),
+              )
+              .take(20),
+          ]);
+        lookupResults = [
+          ...locs,
+          ...countryAbbrs,
+          ...orgLocs,
+          ...orgCountryAbbrs,
+        ].filter(
+          (item, index, self) =>
+            index === self.findIndex((t) => t._id === item._id),
+        );
+      } else {
+        let results = [];
+        let doc = await ctx.db
+          .query("eventLookup")
+          .withIndex("by_orgName")
           .order("asc")
           .first();
+
+        while (doc !== null) {
+          results.push(doc);
+          const orgName = doc.orgName;
+          doc = await ctx.db
+            .query("eventLookup")
+            .withIndex("by_orgName", (q) => q.gt("orgName", orgName))
+            .order("asc")
+            .first();
+        }
+        lookupResults = results;
       }
-      lookupResults = results;
     }
 
     if (
@@ -245,8 +553,22 @@ export const getFilteredEventsPublic = query({
       .map((r) => r.eventId)
       .filter(Boolean) as Id<"events">[];
 
-    const orgNameMap = new Map(
-      lookupResults.map((r) => [r.mainOrgId, r.orgName]),
+    // const orgNameMap = new Map(
+    //   lookupResults.map((r) => [r.mainOrgId, r.orgName]),
+    // );
+    const orgMap = new Map(
+      lookupResults
+        .filter((r) => r.mainOrgId)
+        .map((r) => [
+          r.mainOrgId,
+          {
+            orgName: r.orgName,
+            orgSlug: r.orgSlug,
+            orgLocation: r.orgLocation,
+            ownerId: r.ownerId,
+            mainOrgId: r.mainOrgId,
+          },
+        ]),
     );
 
     const openCallEventPairs: [Id<"events">, Id<"openCalls">][] = lookupResults
@@ -309,12 +631,16 @@ export const getFilteredEventsPublic = query({
         }
         let openCallStatus: OpenCallStatus | null = null;
         let hasActiveOpenCall = false;
-        let orgName: string | null = null;
-        //TODO: Split this out into a separate fn. it's currently querying the entire organizatoin just for the org name.
+        // let orgName: string | null = null;
+        // //TODO: Split this out into a separate fn. it's currently querying the entire organizatoin just for the org name.
 
-        if (event.mainOrgId) {
-          orgName = orgNameMap.get(event.mainOrgId) ?? null;
-        }
+        // if (event.mainOrgId) {
+        //   orgName = orgNameMap.get(event.mainOrgId) ?? null;
+        // }
+
+        const orgData = event.mainOrgId
+          ? (orgMap.get(event.mainOrgId) ?? null)
+          : null;
 
         const now = Date.now();
         const ocType = openCall?.basicInfo?.callType;
@@ -370,13 +696,12 @@ export const getFilteredEventsPublic = query({
           openCall = null;
           openCallStatus = null;
         }
-
+        //TODO: add organization location to this
         return {
           ...event,
-          orgName,
+          orgData,
           _creationTime: event._creationTime,
           isUserOrg,
-          openCall: openCall ?? null,
           openCallStatus,
           hasActiveOpenCall,
 
@@ -384,7 +709,7 @@ export const getFilteredEventsPublic = query({
           slug: event.slug,
           dates: event.dates,
           name: event.name,
-          tabs: { opencall: openCall ?? null },
+          tabs: { openCall: openCall ?? null },
         };
       }),
     );
@@ -398,11 +723,11 @@ export const getFilteredEventsPublic = query({
       thisWeekPg || nextWeekPg
         ? enriched.filter(
             (e) =>
-              e.openCall &&
+              e.tabs.openCall &&
               (e.hasActiveOpenCall || e.openCallStatus === "ended"),
           )
         : enriched.filter((e) => {
-            const oc = e.openCall;
+            const oc = e.tabs.openCall;
             // if (!oc) return false;
             if (!oc) return !openCallFilterActive;
 
@@ -444,7 +769,7 @@ export const getFilteredEventsPublic = query({
     if (view === "event") {
       // viewFiltered = sorted.filter((e) => !e.openCall);
     } else if (view === "openCall") {
-      viewFiltered = sorted.filter((e) => e.openCall);
+      viewFiltered = sorted.filter((e) => e.tabs.openCall);
     }
 
     if (view === "organizer") {
@@ -462,7 +787,7 @@ export const getFilteredEventsPublic = query({
 
     if (view === "archive") {
       for (const e of viewFiltered) {
-        if (!e.openCall) continue;
+        if (!e.tabs.openCall) continue;
         if (e.openCallStatus === "active") {
           totalActive++;
         } else if (e.openCallStatus === "ended") {

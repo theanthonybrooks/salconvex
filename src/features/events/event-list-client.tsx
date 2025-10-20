@@ -1,9 +1,10 @@
 "use client";
-
+//TODO: Add view sync to the params. Otherwise when you refresh or go back, it resets to the default view.
 import { Button } from "@/components/ui/button";
 import { BasicPagination } from "@/components/ui/pagination2";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { SearchType } from "@/constants/filterConsts";
 import EventCardPreview from "@/features/events/event-card-preview";
 import { EventFilters } from "@/features/events/event-list-filters";
 import { getGroupKeyFromEvent } from "@/features/events/helpers/groupHeadings";
@@ -14,13 +15,17 @@ import { generateSkeletonGroups } from "@/helpers/skeletonFns";
 import { cn, setParamIfNotDefault } from "@/helpers/utilsFns";
 import { useFilteredEventsQuery } from "@/hooks/use-filtered-events-query";
 import { useDevice } from "@/providers/device-provider";
-import type { MergedEventPreviewData } from "@/types/eventTypes";
 import {
-  CombinedEventPreviewCardData,
   EventCategory,
   EventType,
+  MergedEventPreviewData,
 } from "@/types/eventTypes";
-import { Continents, Filters, SortOptions } from "@/types/thelist";
+import {
+  Continents,
+  Filters,
+  SearchParams,
+  SortOptions,
+} from "@/types/thelist";
 import { usePreloadedQuery } from "convex/react";
 import { motion } from "framer-motion";
 import Image from "next/image";
@@ -107,6 +112,18 @@ const ClientEventList = () => {
   };
 
   const defaultSort = useMemo(() => getDefaultSortForView(view), [view]);
+  const defaultSearch = useMemo<SearchParams>(
+    () => ({
+      searchTerm: "",
+      searchType:
+        view === "event" || view === "archive"
+          ? "events"
+          : view === "organizer"
+            ? "orgs"
+            : "all",
+    }),
+    [view],
+  );
 
   const currentFilters: Filters = {
     showHidden: searchParams.get("h") === "true",
@@ -132,8 +149,14 @@ const ClientEventList = () => {
       defaultSort.sortDirection,
   };
 
+  const currentSearch: SearchParams = {
+    searchTerm: searchParams.get("term") ?? "",
+    searchType: (searchParams.get("st") as SearchType) ?? "all",
+  };
+
   const [filters, setFilters] = useState<Filters>(currentFilters);
   const [sortOptions, setSortOptions] = useState<SortOptions>(currentSort);
+  const [search, setSearch] = useState<SearchParams>(currentSearch);
   const [page, setPage] = useState(Number(searchParams.get("page")) || 1);
   const prevPage = Math.max(page - 1, 1);
 
@@ -152,6 +175,9 @@ const ClientEventList = () => {
       subscription: subscription ?? undefined,
       userOrgs: orgData?.orgIds ?? [],
     },
+    false,
+    // { searchTerm: "fresh", searchType: "all" },
+    search,
   );
   void useFilteredEventsQuery(
     filters,
@@ -170,6 +196,7 @@ const ClientEventList = () => {
       userOrgs: orgData?.orgIds ?? [],
     },
     !hasActiveSubscription || view === "organizer" || view === "archive",
+    hasActiveSubscription ? search : undefined,
   );
   void useFilteredEventsQuery(
     filters,
@@ -191,6 +218,7 @@ const ClientEventList = () => {
       view === "organizer" ||
       view === "archive" ||
       page === 1,
+    hasActiveSubscription ? search : undefined,
   );
 
   const total = queryResult?.total ?? 0;
@@ -202,24 +230,13 @@ const ClientEventList = () => {
   const handleResetFilters = useCallback(() => {
     setFilters(defaultFilters);
     setSortOptions(defaultSort);
+    setSearch(defaultSearch);
     setPage(1);
-  }, [defaultFilters, defaultSort]);
+  }, [defaultFilters, defaultSort, defaultSearch]);
 
   useEffect(() => {
     sessionStorage.setItem("salView", view);
   }, [view]);
-
-  // useEffect(() => {
-  //   if (hasValidSub) return
-  //   if (initialTitleRef.current !== null && !hasValidSub) {
-  //     // handleResetFilters();
-  //     if (view === "event") {
-  //       setSortOptions({ sortBy: "eventStart", sortDirection: "asc" });
-  //     } else if (view === "openCall") {
-  //       setSortOptions({ sortBy: "openCall", sortDirection: "asc" });
-  //     }
-  //   }
-  // }, [view, handleResetFilters, hasValidSub]);
 
   useEffect(() => {
     const params = new URLSearchParams();
@@ -249,6 +266,13 @@ const ClientEventList = () => {
     setParamIfNotDefault(params, "sb", sortOptions.sortBy, defaultSort.sortBy);
     setParamIfNotDefault(params, "sd", sortOptions.sortDirection, "asc");
 
+    setParamIfNotDefault(params, "term", search.searchTerm, "");
+    if (search?.searchTerm && search.searchTerm.length > 0) {
+      setParamIfNotDefault(params, "st", search.searchType, "all");
+    } else {
+      params.delete("st");
+    }
+
     const queryString = params.toString();
     const baseUrl = window.location.origin + window.location.pathname;
     sessionStorage.setItem(
@@ -260,17 +284,17 @@ const ClientEventList = () => {
       "",
       baseUrl + (queryString ? `?${queryString}` : ""),
     );
-  }, [filters, sortOptions, page, defaultSort]);
+  }, [filters, sortOptions, page, defaultSort, search]);
 
   useEffect(() => {
     window.scroll({ top: 240 });
   }, [page]);
 
   const totalPages = Math.ceil(total / filters.limit);
-
+  //? todo: - would it make sense to separate out the fetching logic? So that it gathers the events through one and the opencalls and orgs through another? Simultaneously or perhaps sequentially? That way each can be cached and then filtered on device, which I imagine would speed things up considerably while still remaining reactive to its respective dataset.
   const enrichedEvents: MergedEventPreviewData[] = useMemo(() => {
     return (queryResult?.results ?? []).map((event) => {
-      const openCallId = event.tabs?.opencall?._id;
+      const openCallId = event.tabs?.openCall?._id;
       return {
         ...event,
         bookmarked: artistData?.bookmarked.includes(event._id) ?? false,
@@ -302,8 +326,8 @@ const ClientEventList = () => {
       string,
       {
         title: ReturnType<typeof getGroupKeyFromEvent>;
-        subgroups: Record<string, CombinedEventPreviewCardData[]>;
-        events: CombinedEventPreviewCardData[];
+        subgroups: Record<string, MergedEventPreviewData[]>;
+        events: MergedEventPreviewData[];
       }
     > = {};
 
@@ -349,6 +373,11 @@ const ClientEventList = () => {
 
   const handleSortChange = (partial: Partial<SortOptions>) => {
     setSortOptions((prev) => ({ ...prev, ...partial }));
+    setPage(1);
+  };
+
+  const handleSearchChange = (partial: Partial<SearchParams>) => {
+    setSearch((prev) => ({ ...prev, ...partial }));
     setPage(1);
   };
 
@@ -403,7 +432,9 @@ const ClientEventList = () => {
 
           <EventFilters
             filters={filters}
+            search={search}
             sortOptions={sortOptions}
+            onSearchChange={handleSearchChange}
             onChange={handleFilterChange}
             onSortChange={handleSortChange}
             onResetFilters={handleResetFilters}
@@ -411,6 +442,7 @@ const ClientEventList = () => {
             user={user}
             isMobile={isMobile}
             view={view}
+            results={paginatedEvents}
           />
 
           {hasActiveSubscription && (

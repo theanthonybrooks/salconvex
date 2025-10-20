@@ -1,16 +1,20 @@
 import { ViewOptions } from "@/features/events/event-list-client";
-import { EventCategory, EventType } from "@/types/eventTypes";
-import { Filters, SortOptions } from "@/types/thelist";
+import {
+  EventCategory,
+  EventType,
+  MergedEventPreviewData,
+} from "@/types/eventTypes";
+import { Filters, SearchParams, SortOptions } from "@/types/thelist";
 import { Dispatch, SetStateAction } from "react";
 
-export const searchTermOptions = [
+export const searchTypeOptions = [
   { value: "all", label: "All" },
   { value: "events", label: "Event Name" },
   { value: "orgs", label: "Organizer Name" },
   { value: "loc", label: "Location" },
 ] as const;
 
-export type SearchType = (typeof searchTermOptions)[number]["value"];
+export type SearchType = (typeof searchTypeOptions)[number]["value"];
 
 export interface TheListFilterCommandItem {
   label?: string;
@@ -23,6 +27,7 @@ export interface TheListFilterCommandItem {
   edition?: number;
   category?: string;
   ocStatus?: number;
+  orgName?: string;
 }
 
 export interface FilterDrawerProps<T extends TheListFilterCommandItem> {
@@ -33,19 +38,24 @@ export interface FilterDrawerProps<T extends TheListFilterCommandItem> {
   source: T[];
   shortcut?: string;
   placeholder?: string;
-  setSearch: React.Dispatch<React.SetStateAction<string>>;
   userType?: string[];
   userRole?: string[] | undefined;
+  search: SearchParams;
   filters: Filters;
   sortOptions: SortOptions;
+  onSearchChange: (newSearch: Partial<SearchParams>) => void;
   onChange: (newFilters: Partial<Filters>) => void;
   onSortChange: (newSort: Partial<SortOptions>) => void;
-  searchType: SearchType;
-  setSearchType: React.Dispatch<React.SetStateAction<SearchType>>;
   onResetFilters: () => void;
+  isLoading: boolean;
   // user: User | null;
   hasActiveFilters: boolean | undefined;
   view: ViewOptions;
+  results: MergedEventPreviewData[];
+  localValue: string;
+  setLocalValue: Dispatch<SetStateAction<string>>;
+  searchType: SearchType;
+  setSearchType: Dispatch<SetStateAction<SearchType>>;
 }
 
 export type Location = {

@@ -171,7 +171,7 @@ export const OrganizerCardDetailMobile = (props: OrganizerCardProps) => {
                 )}
 
                 <span className="relative z-10">
-                  {tab === "opencall" && "Open Call"}
+               
                   {tab === "events" && "Events/Projects"}
                   {tab === "organizer" && "Organizer"}
                 </span>

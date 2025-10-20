@@ -6,15 +6,15 @@ import { getGroupKeyFromEvent } from "@/features/events/helpers/groupHeadings";
 import Pricing from "@/features/homepage/pricing";
 import { generateSkeletonGroups } from "@/helpers/skeletonFns";
 // import { getFourCharMonth } from "@/lib/dateFns"
-import { CombinedEventPreviewCardData } from "@/types/eventTypes";
+import { MergedEventPreviewData } from "@/types/eventTypes";
 import { SortOptions } from "@/types/thelist";
 // import { format } from "date-fns"
-// import { CombinedEventPreviewCardData } from "@/types/event";
+// import { MergedEventPreviewData } from "@/types/event";
 
 import { useArtistPreload } from "@/features/wrapper-elements/artist-preload-context";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { useFilteredEventsQuery } from "@/hooks/use-filtered-events-query";
-import type { MergedEventPreviewData } from "@/types/eventTypes"; // or define a local merged type inline
+
 import { usePreloadedQuery } from "convex/react";
 
 import { Button } from "@/components/ui/button";
@@ -100,7 +100,7 @@ const ClientThisWeekList = (
 
   const enrichedEvents: MergedEventPreviewData[] = useMemo(() => {
     return (queryResult?.results ?? []).map((event) => {
-      const openCallId = event.tabs?.opencall?._id;
+      const openCallId = event.tabs?.openCall?._id;
       return {
         ...event,
         bookmarked: artistData?.bookmarked.includes(event._id) ?? false,
@@ -126,7 +126,7 @@ const ClientThisWeekList = (
       string,
       {
         title: ReturnType<typeof getGroupKeyFromEvent>;
-        events: CombinedEventPreviewCardData[];
+        events: MergedEventPreviewData[];
       }
     > = {};
     const orderedGroupKeys: string[] = [];

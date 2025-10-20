@@ -258,7 +258,6 @@ export const EventCardDetailMobile = (props: EventCardProps) => {
                 )}
 
                 <span className="relative z-10">
-                  {tab === "opencall" && "Open Call"}
                   {tab === "event" && getEventCategoryLabel(eventCategory)}
                   {tab === "organizer" && "Organizer"}
                 </span>

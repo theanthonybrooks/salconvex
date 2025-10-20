@@ -228,7 +228,6 @@ export const SelectSimple = ({
     ...options,
     ...(hasReset && value !== "-" ? [{ value: "-", label: "--Reset--" }] : []),
   ];
-  console.log(value);
   return (
     <Select
       value={value}

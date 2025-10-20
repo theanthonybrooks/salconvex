@@ -2,7 +2,7 @@
 
 // TODO: Add the ability for users to suggest a task to the board. This will go into the proposed column. The user will be able to add a title, category, and the priority will default to medium (I'll update it to high or low later as I see fit). I also need to add the ability to vote on the suggestion by other users. Should be pretty simple. Use the purpose prop to determine whether to show the voting buttons or not (as well as the priority toggle/display). Or maybe just disable the changing of priority for non-admins?
 import { Id } from "convex/_generated/dataModel";
-import { useMutation, usePreloadedQuery, useQuery } from "convex/react";
+import { useMutation, usePreloadedQuery } from "convex/react";
 import { motion } from "framer-motion";
 import {
   Eye,
@@ -70,6 +70,7 @@ import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-con
 import { RichTextDisplay } from "@/helpers/richTextFns";
 import { useDevice } from "@/providers/device-provider";
 import { User } from "@/types/user";
+import { useQuery } from "convex-helpers/react/cache";
 import { capitalize, debounce } from "lodash";
 
 export const KanbanBoard = ({ purpose = "todo" }: KanbanBoardProps) => {

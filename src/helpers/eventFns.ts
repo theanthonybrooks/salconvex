@@ -6,7 +6,11 @@ import {
 } from "@/constants/eventConsts";
 import { CALL_TYPE_LABELS } from "@/constants/openCallConsts";
 import { convertCurrency } from "@/helpers/currencyFns";
-import { EventCategory, EventType } from "@/types/eventTypes";
+import {
+  EventCategory,
+  EventType,
+  MergedEventPreviewData,
+} from "@/types/eventTypes";
 import { CallType } from "@/types/openCallTypes";
 import currencies from "currency-codes";
 
@@ -212,4 +216,47 @@ export const formatRateServer = async (
     return `${currencySymbol}${convertedRate.toLocaleString(locale)}/${unit}+`;
 
   return `${currencySymbol}${convertedRate.toLocaleString(locale)}/${unit}`;
+};
+
+export const formatEventLink = (
+  event: MergedEventPreviewData,
+  activeSub?: boolean,
+  toEvent?: boolean,
+) => {
+  const { slug, dates, hasOpenCall } = event;
+  return `/thelist/event/${slug}/${dates?.edition}/${hasOpenCall && activeSub ? "call" : ""}${activeSub && toEvent ? "/tab=event" : ""}`;
+};
+
+type OpenCallStatusProps = {
+  event: MergedEventPreviewData;
+};
+
+export const getOpenCallStatusLabel = ({
+  event,
+}: OpenCallStatusProps): number => {
+  const { hasOpenCall, openCall } = event;
+  const now = Date.now();
+  const ocStart = openCall?.basicInfo?.dates?.ocStart
+    ? new Date(openCall.basicInfo.dates.ocStart).getTime()
+    : null;
+  const ocEnd = openCall?.basicInfo?.dates?.ocEnd
+    ? new Date(openCall.basicInfo.dates.ocEnd).getTime()
+    : null;
+
+  if (hasOpenCall) {
+    const isCurrent = ocStart && now > ocStart && ocEnd && now < ocEnd;
+    const isComing = ocEnd && ocStart && now > ocStart && now < ocEnd;
+    const isEnded = ocEnd && now > ocEnd;
+    if (isCurrent) {
+      return 2;
+    } else if (isComing) {
+      return 3;
+    } else if (isEnded) {
+      return 1;
+    } else {
+      return 0;
+    }
+  } else {
+    return 0;
+  }
 };

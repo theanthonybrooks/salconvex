@@ -19,6 +19,25 @@ import { DataModel } from "./_generated/dataModel.js";
 export const migrations = new Migrations<DataModel>(components.migrations);
 export const run = migrations.runner();
 
+export const populateEventLookupLoc = migrations.define({
+  table: "eventLookup",
+  migrateOne: async (ctx, eventLookup) => {
+    const event = await ctx.db.get(eventLookup.eventId);
+    const org = await ctx.db.get(eventLookup.mainOrgId);
+    if (!org || !org?.location || !event) return;
+    await ctx.db.patch(eventLookup._id, {
+      orgLocation: org.location,
+      orgSlug: org.slug,
+      locationFull: event.location?.full,
+      countryAbbr: event.location?.countryAbbr,
+    });
+  },
+});
+
+export const runELL = migrations.runner(
+  internal.migrations.populateEventLookupLoc,
+);
+
 export const populateUserRoles = migrations.define({
   table: "users",
   migrateOne: async (ctx, user) => {

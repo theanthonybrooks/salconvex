@@ -6,6 +6,7 @@ import { Doc, Id } from "~/convex/_generated/dataModel";
 import {
   EventCategoryType,
   EventFormatType,
+  EventLookupOrgBase,
   EventStateType,
   EventTypeType,
   PostStatusType,
@@ -24,6 +25,7 @@ export type EventData = Doc<"events">;
 
 export type EnrichedEventData = EventData & {
   isUserOrg: boolean;
+  hasActiveOpenCall: boolean;
 };
 
 export type EventCardDetailProps = {
@@ -42,56 +44,25 @@ export type EnrichedEvent = EventData & {
   openCallId?: Id<"openCalls"> | null;
 };
 
-export type PublicEventPreviewData = EventData & {
-  openCall: OpenCall | null;
-  openCallStatus: OpenCallStatus | null;
-  hasActiveOpenCall: boolean;
-  orgName: string | null;
-  eventId: Id<"events">;
-  slug: string;
-  tabs: {
-    opencall: OpenCall | null;
-  };
-};
-
-export type ArtistEventMetadata = {
-  bookmarked: Id<"events">[];
-  hidden: Id<"events">[];
-  applied: Id<"events">[];
+export type ArtistListDataBase = {
   artistNationality: string[];
-  applicationData: Record<
-    Id<"openCalls">,
-    {
-      status: ApplicationStatus | null;
-      manualApplied: boolean;
-    }
-  >;
-};
-
-export type MergedEventPreviewData = PublicEventPreviewData & {
   bookmarked: boolean;
   hidden: boolean;
-  applied: boolean;
   manualApplied: boolean;
   status: ApplicationStatus | null;
-  artistNationality: string[];
-  isUserOrg: boolean;
+  applied: boolean;
 };
 
-export type CombinedEventPreviewCardData = EventData & {
-  tabs: { opencall: OpenCall | null };
+export type PublicEventPreviewData = EnrichedEventData & {
+  tabs: {
+    openCall: OpenCall | null;
+  };
   hasActiveOpenCall: boolean;
-  appFee?: number;
   openCallStatus: OpenCallStatus | null;
-  adminNoteOC?: string | null;
-  eventId: string;
+  orgData: EventLookupOrgBase | null;
+  eventId: Id<"events">;
   slug: string;
-
-  // User-specific metadata (nullable when unauthenticated)
-  isUserOrg: boolean;
-  artistNationality: string[];
-  bookmarked: boolean;
-  hidden: boolean;
-  manualApplied?: boolean;
-  status: ApplicationStatus | null;
 };
+
+export type MergedEventPreviewData = PublicEventPreviewData &
+  ArtistListDataBase;

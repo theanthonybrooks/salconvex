@@ -12,30 +12,24 @@ import { Input } from "@/components/ui/input";
 import { SelectSimple } from "@/components/ui/select";
 import { searchDialogVariants } from "@/constants/dialogConsts";
 import {
-  AllSearchResults,
-  EventResult,
   FilterDrawerProps,
-  OrgResult,
-  searchTermOptions,
   SearchType,
+  searchTypeOptions,
   TheListFilterCommandItem,
 } from "@/constants/filterConsts";
 import { FilterBase } from "@/features/thelist/components/filters/filter-base";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
+import { formatEventLink, getOpenCallStatusLabel } from "@/helpers/eventFns";
 import { getSearchLocationString } from "@/helpers/locations";
 import { cn } from "@/helpers/utilsFns";
 import { Command } from "cmdk";
-import { makeUseQueryWithStatus } from "convex-helpers/react";
-import { useQueries } from "convex-helpers/react/cache";
 import { usePreloadedQuery } from "convex/react";
 import { AnimatePresence, motion } from "framer-motion";
-import { debounce } from "lodash";
-import { X } from "lucide-react";
+import { LoaderCircle, X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { BiSolidQuoteLeft, BiSolidQuoteRight } from "react-icons/bi";
 import { IoSearch } from "react-icons/io5";
-import { api } from "~/convex/_generated/api";
 
 export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
   open,
@@ -47,59 +41,81 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
 
   // groupName,
   placeholder = `Hello. Is it me you're looking for? Use ctrl + ${shortcut} to search faster.`,
-  setSearch,
+  search,
   filters,
   sortOptions,
+  onSearchChange,
   onChange,
   onSortChange,
   onResetFilters,
-  searchType,
-  setSearchType,
+  isLoading,
   hasActiveFilters,
   view,
+  localValue,
+  setLocalValue,
+  searchType,
+  setSearchType,
+  results: searchResults,
 }: FilterDrawerProps<T>) => {
+  // const searchType = search.searchType ?? "all";
   const router = useRouter();
   const { preloadedSubStatus, preloadedUserData } = useConvexPreload();
   const subData = usePreloadedQuery(preloadedSubStatus);
+  const { hasActiveSubscription } = subData ?? {};
   const userData = usePreloadedQuery(preloadedUserData);
   const userPref = userData?.userPref ?? null;
   const baseFontSize = userPref?.fontSize === "large" ? "text-base" : "text-sm";
   // const smFontSize = userPref?.fontSize === "large" ? "text-sm" : "text-xs";
   const subFontColor = "text-stone-500";
 
-  const hasActiveSubscription = subData?.hasActiveSubscription;
-  const isArtist = userData?.user?.accountType?.includes("artist");
-  const paidUser = isArtist && hasActiveSubscription;
+  // const hasActiveSubscription = subData?.hasActiveSubscription;
+  // const isArtist = userData?.user?.accountType?.includes("artist");
+  // const paidUser = isArtist && hasActiveSubscription;
   // console.log(subStatus);
   const shortcutRef = useRef(shortcut);
   const inputRef = useRef<HTMLInputElement>(null);
-  const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
 
-  const [value, setValue] = useState("");
-  const [debouncedValue, setDebouncedValue] = useState(value);
+  function getSearchTypeOptions(view: string) {
+    switch (view) {
+      case "organizer":
+        // Remove "events"
+        return searchTypeOptions.filter((opt) =>
+          ["events", "orgs", "loc"].includes(opt.value),
+        );
+      case "archive":
+        return searchTypeOptions.filter((opt) => !["all"].includes(opt.value));
+      case "event":
+        return hasActiveSubscription
+          ? searchTypeOptions.filter((opt) => !["all"].includes(opt.value))
+          : searchTypeOptions.filter((opt) => ["events"].includes(opt.value));
+      default:
+        return searchTypeOptions;
+    }
+  }
+  // const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
 
-  const { data: searchResults } = useQueryWithStatus(
-    api.events.event.globalSearch,
-    value.trim().length >= 2
-      ? {
-          searchTerm: debouncedValue,
-          searchType,
-          activeSub: paidUser,
-        }
-      : "skip",
-  );
+  // const { data: searchResults } = useQueryWithStatus(
+  //   api.events.event.globalSearch,
+  //   value.trim().length >= 2
+  //     ? {
+  //         searchTerm: localValue,
+  //         searchType,
+  //         activeSub: paidUser,
+  //       }
+  //     : "skip",
+  // );
 
-  useEffect(() => {
-    const handler = debounce((nextValue: string) => {
-      setDebouncedValue(nextValue);
-    }, 300);
+  // useEffect(() => {
+  //   const handler = debounce((nextValue: string) => {
+  //     setDebouncedValue(nextValue);
+  //   }, 300);
 
-    handler(value);
+  //   handler(value);
 
-    return () => {
-      handler.cancel();
-    };
-  }, [value]);
+  //   return () => {
+  //     handler.cancel();
+  //   };
+  // }, [value]);
 
   useEffect(() => {
     shortcutRef.current = shortcut;
@@ -115,6 +131,8 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
   }, [open, isMobile]);
 
   useEffect(() => {
+    if (view === "orgView") return;
+
     const down = (e: KeyboardEvent) => {
       if (e.key === shortcutRef.current && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
@@ -123,11 +141,11 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
     };
     document.addEventListener("keydown", down);
     return () => document.removeEventListener("keydown", down);
-  }, [setOpen]);
+  }, [setOpen, view]);
 
   const handleValueChange = (newValue: string) => {
-    setSearch(newValue);
-    setValue(newValue);
+    // onSearchChange({ searchTerm: newValue });
+    setLocalValue(newValue);
   };
 
   // const handleLinkClick = () => {
@@ -143,97 +161,129 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
   // }, [searchResults, value]);
   // Location search
   if (
-    searchResults?.label === "Location" &&
-    typeof searchResults.results === "object" &&
-    !Array.isArray(searchResults.results)
+    Array.isArray(searchResults) &&
+    search?.searchTerm !== "" &&
+    searchType === "loc"
   ) {
-    const { organizers = [], events = [] } = searchResults.results;
+    // const { organizers = [], events = [] } = searchResults;
 
-    groupedItems["Organizers"] = organizers.map((org) => ({
-      name: org.name,
-      path: `/thelist/organizer/${org.slug}`,
-      meta:
-        getSearchLocationString(
-          org.location?.city,
-          org.location?.countryAbbr,
-          org.location?.stateAbbr,
-        ) ||
-        org.location?.full ||
-        "",
-    }));
+    groupedItems["Organizers"] = searchResults
+      .filter((item, index, self) => {
+        const id = item.orgData?.mainOrgId;
+        if (!id) return false;
+        return index === self.findIndex((t) => t.orgData?.mainOrgId === id);
+      })
+      .map((org) => ({
+        name: org?.orgData?.orgName,
+        path: `/thelist/organizer/${org?.orgData?.orgSlug}`,
+        meta:
+          getSearchLocationString(
+            org?.orgData?.orgLocation ?? org?.location,
+            true,
+          ) ||
+          org.location?.full ||
+          "",
+      }));
 
-    groupedItems["Events"] = events.map((event) => ({
+    groupedItems["Events"] = searchResults.map((event) => ({
       name: event.name,
-      path:
-        typeof event.ocStatus === "number" && event.ocStatus > 0
-          ? `/thelist/event/${event.slug}/${event.dates?.edition}/call`
-          : `/thelist/event/${event.slug}/${event.dates?.edition}`,
+      path: formatEventLink(event, hasActiveSubscription),
       meta:
-        getSearchLocationString(
-          event.location?.city,
-          event.location?.countryAbbr,
-          event.location?.stateAbbr,
-        ) ||
+        getSearchLocationString(event.location, true) ||
         event.location?.full ||
         "",
-      ocStatus: event.ocStatus,
+      ocStatus: getOpenCallStatusLabel({ event }),
+      orgName: event.orgData?.orgName,
     }));
   }
 
+  //TODO: Split this up and add the logic for displaying the organizations.
   if (
-    searchResults?.label === "Events" &&
-    Array.isArray(searchResults.results)
+    Array.isArray(searchResults) &&
+    search?.searchTerm !== "" &&
+    searchType === "orgs"
   ) {
-    const events = searchResults.results as EventResult[]; // 👈 Explicit assertion
-    console.log(events);
-    groupedItems["Events"] = events.map((event) => ({
+    groupedItems["Organizers"] = searchResults
+      .filter((item, index, self) => {
+        const id = item.orgData?.mainOrgId;
+        if (!id) return false;
+        return index === self.findIndex((t) => t.orgData?.mainOrgId === id);
+      })
+      .map((event) => ({
+        name: event.orgData?.orgName ?? "",
+        path: formatEventLink(event, hasActiveSubscription),
+        meta:
+          getSearchLocationString(
+            event.orgData?.orgLocation ?? event.location,
+          ) ||
+          event.location?.full ||
+          "",
+      }));
+    groupedItems["Events by Organizer"] = searchResults.map((event) => ({
       name: event.name,
-      path:
-        typeof event.ocStatus === "number" && event.ocStatus > 0
-          ? `/thelist/event/${event.slug}/${event.dates?.edition}/call`
-          : `/thelist/event/${event.slug}/${event.dates?.edition}`,
+      path: formatEventLink(event, hasActiveSubscription),
       meta:
-        getSearchLocationString(
-          event.location?.city,
-          event.location?.countryAbbr,
-          event.location?.stateAbbr,
-        ) ??
-        event.location?.full ??
-        "",
-      edition: event.dates?.edition,
-      ocStatus: event.ocStatus,
+        getSearchLocationString(event.location) || event.location?.full || "",
+      orgName: event.orgData?.orgName ?? "",
     }));
   }
 
   if (
-    searchResults?.label === "Organizers" &&
-    Array.isArray(searchResults.results)
+    Array.isArray(searchResults) &&
+    search?.searchTerm !== "" &&
+    searchType === "events"
   ) {
-    const organizers = searchResults.results as OrgResult[];
-    console.log(organizers);
-    groupedItems["Organizers"] = organizers.map((organizer) => ({
-      name: organizer.name,
-      path: `/thelist/organizer/${organizer.slug}`,
+    groupedItems["Events"] = searchResults.map((event) => ({
+      name: event.name,
+      path: formatEventLink(event, hasActiveSubscription),
       meta:
-        getSearchLocationString(
-          organizer.location?.city,
-          organizer.location?.countryAbbr,
-          organizer.location?.stateAbbr,
-        ) ??
-        organizer.location?.full ??
-        "",
+        getSearchLocationString(event.location) || event.location?.full || "",
+      ocStatus: getOpenCallStatusLabel({ event }),
+      edition: event.dates?.edition,
+      orgName: event.orgData?.orgName,
     }));
+
+    groupedItems["Organizers"] = searchResults.map((org) => {
+      const locationString = getSearchLocationString(
+        org.orgData?.orgLocation ?? org.location,
+      );
+
+      return {
+        name: org.orgData?.orgName,
+        path: `/thelist/organizer/${org?.orgData?.orgSlug}`,
+        meta: locationString ?? org.location?.full ?? "",
+        category: org.category.toUpperCase(),
+      };
+    });
   }
 
-  if (searchType === "all" && searchResults?.label === "All") {
-    const allResults = searchResults.results as AllSearchResults;
+  // if (
+  //   searchResults?.label === "Organizers" &&
+  //   Array.isArray(searchResults.results)
+  // ) {
+  //   const organizers = searchResults.results as OrgResult[];
+  //   console.log(organizers);
+  //   groupedItems["Organizers"] = organizers.map((organizer) => ({
+  //     name: organizer.name,
+  //     path: `/thelist/organizer/${organizer.slug}`,
+  //     meta:
+  //       getSearchLocationString(
+  //         organizer.location?.city,
+  //         organizer.location?.countryAbbr,
+  //         organizer.location?.stateAbbr,
+  //       ) ??
+  //       organizer.location?.full ??
+  //       "",
+  //   }));
+  // }
 
-    groupedItems["Events by Name"] = allResults.eventName.map((event) => {
-      const locationString = getSearchLocationString(
-        event.location?.city,
-        event.location?.countryAbbr,
-        event.location?.stateAbbr,
-      );
+  if (
+    Array.isArray(searchResults) &&
+    search?.searchTerm !== "" &&
+    searchType === "all"
+  ) {
+    groupedItems["Events"] = searchResults.map((event) => {
+      const locationString = getSearchLocationString(event.location);
 
       // const typeLabel =
       //   event.category === "event" && event.type?.length
@@ -242,64 +292,63 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
 
       return {
         name: event.name,
-        path:
-          typeof event.ocStatus === "number" && event.ocStatus > 0
-            ? `/thelist/event/${event.slug}/${event.dates?.edition}/call`
-            : `/thelist/event/${event.slug}/${event.dates?.edition}`,
+        path: formatEventLink(event, hasActiveSubscription),
         meta: locationString ?? event.location?.full ?? "",
         category: event.category.toUpperCase(),
         edition: event.dates?.edition,
-        ocStatus: event.ocStatus,
+        ocStatus: getOpenCallStatusLabel({ event }),
+        orgName: event.orgData?.orgName,
         // meta: `${event.category.toUpperCase()}${typeLabel ? ": " + typeLabel : ""} — ${locationString ?? event.location?.full ?? ""}`,
         // edition: event.dates?.edition,
       };
     });
+    // });
 
-    groupedItems["Organizers by Name"] = allResults.orgName.map((org) => ({
-      name: org.name,
-      path: `/thelist/organizer/${org.slug}`,
-      meta:
-        getSearchLocationString(
-          org.location?.city,
-          org.location?.countryAbbr,
-          org.location?.stateAbbr,
-        ) ??
-        org.location?.full ??
-        "",
-    }));
+    groupedItems["Organizers"] = searchResults
+      .filter((item, index, self) => {
+        const id = item.orgData?.mainOrgId;
+        if (!id) return false;
+        return index === self.findIndex((t) => t.orgData?.mainOrgId === id);
+      })
+      .map((org) => ({
+        name: org.orgData?.orgName ?? "",
+        path: `/thelist/organizer/${org.orgData?.orgSlug}`,
+        meta:
+          getSearchLocationString(
+            org.orgData?.orgLocation ?? org.location,
+            true,
+          ) ??
+          org.location?.full ??
+          "",
+      }));
 
-    groupedItems["Events by Location"] = allResults.eventLoc.map((event) => {
-      const locationString = getSearchLocationString(
-        event.location?.city,
-        event.location?.countryAbbr,
-        event.location?.stateAbbr,
-      );
+    // groupedItems["Events by Location"] = searchResults.map((event) => {
+    //   const locationString = getSearchLocationString(event.location);
 
-      return {
-        name: event.name,
-        path:
-          typeof event.ocStatus === "number" && event.ocStatus > 0
-            ? `/thelist/event/${event.slug}/${event.dates?.edition}/call`
-            : `/thelist/event/${event.slug}/${event.dates?.edition}`,
-        meta: locationString ?? event.location?.full ?? "",
-        category: event.category.toUpperCase(),
-        edition: event.dates?.edition,
-        ocStatus: event.ocStatus,
-      };
-    });
+    //   return {
+    //     name: event.name,
+    //     path: formatEventLink(event, hasActiveSubscription),
+    //     meta: locationString ?? event.location?.full ?? "",
+    //     category: event.category.toUpperCase(),
+    //     edition: event.dates?.edition,
+    //     ocStatus: getOpenCallStatusLabel({ event }),
+    //   };
+    // });
 
-    groupedItems["Organizers by Location"] = allResults.orgLoc.map((org) => ({
-      name: org.name,
-      path: `/thelist/organizer/${org.slug}`,
-      meta:
-        getSearchLocationString(
-          org.location?.city,
-          org.location?.countryAbbr,
-          org.location?.stateAbbr,
-        ) ??
-        org.location?.full ??
-        "",
-    }));
+    // groupedItems["Organizers by Location"] = searchResults
+    //   .filter((item, index, self) => {
+    //     const id = item.orgData?.mainOrgId;
+    //     if (!id) return false;
+    //     return index === self.findIndex((t) => t.orgData?.mainOrgId === id);
+    //   })
+    //   .map((org) => ({
+    //     name: org.orgData?.orgName ?? "",
+    //     path: `/thelist/organizer/${org.slug}`,
+    //     meta:
+    //       getSearchLocationString(org.orgData?.orgLocation ?? org.location) ??
+    //       org.location?.full ??
+    //       "",
+    //   }));
   }
 
   return isMobile ? (
@@ -307,17 +356,16 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
       <div className="flex items-center gap-1 rounded-lg border p-2 px-3">
         <IoSearch className="size-7 shrink-0 p-1 text-foreground" />
         <Input
-          value={value}
+          value={localValue}
           readOnly
           onClick={() => setOpen(true)}
           placeholder={cn(placeholder)}
           className="focus:outline-hidden relative z-10 w-full border-none bg-transparent p-3 text-lg selection:italic selection:text-foreground placeholder:text-foreground/40"
         />
-        {value?.trim().length > 0 && (
+        {localValue?.trim().length > 0 && (
           <button
             onClick={() => {
-              setValue("");
-              setSearch("");
+              onSearchChange({ searchTerm: "" });
             }}
             className="rounded p-1 px-2 hover:scale-125 active:scale-110"
           >
@@ -338,22 +386,25 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
 
               <FilterBase
                 isMobile={isMobile}
+                search={search}
                 filters={filters}
                 sortOptions={sortOptions}
                 hasActiveFilters={hasActiveFilters}
                 setOpen={setOpen}
-                setValue={setValue}
-                searchType={searchType}
-                setSearchType={setSearchType}
-                value={value}
                 shortcut={shortcut}
                 hasShortcut={false}
                 placeholder={placeholder}
+                onSearchChange={onSearchChange}
                 onChange={onChange}
                 onSortChange={onSortChange}
                 onResetFilters={onResetFilters}
+                isLoading={isLoading}
                 groupedResults={groupedItems}
                 view={view}
+                localValue={localValue}
+                setLocalValue={setLocalValue}
+                searchType={searchType}
+                setSearchType={setSearchType}
               />
             </div>
           </div>
@@ -385,34 +436,40 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
             initial="hidden"
             animate="visible"
             exit="exit"
-            className="relative flex max-h-[80dvh] w-full max-w-[90vw] flex-col rounded-lg border border-stone-300 bg-card p-4 shadow-xl md:max-w-[min(70vw,70rem)]"
+            className="relative flex max-h-[80dvh] w-full max-w-[90vw] flex-col rounded-lg border border-stone-300 bg-card p-4 shadow-xl md:max-w-[min(60vw,60rem)]"
             onClick={(e) => e.stopPropagation()}
           >
             <DialogTitle className="sr-only">{title}</DialogTitle>
             <div className="flex items-center gap-1 border-b border-stone-300 pr-2">
-              <IoSearch className="size-7 shrink-0 p-1 text-stone-400" />
+              {isLoading ? (
+                <LoaderCircle className="size-6 shrink-0 animate-spin p-1" />
+              ) : (
+                <IoSearch className="size-7 shrink-0 p-1 text-stone-400" />
+              )}
               <Command.Input
                 ref={inputRef}
-                value={value}
+                value={localValue}
                 onValueChange={handleValueChange}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
                     setOpen(false);
                   }
                   if (e.key === "Escape") {
-                    setValue("");
-                    setSearch("");
+                    setLocalValue("");
+                    onSearchChange({ searchTerm: "" });
+
                     setOpen(false);
                   }
                 }}
                 placeholder={cn(placeholder)}
                 className="focus:outline-hidden relative z-10 w-full bg-card p-3 text-lg selection:italic selection:text-foreground placeholder:text-stone-400"
               />
-              {value?.trim().length > 0 && (
+
+              {localValue?.trim().length > 0 && (
                 <button
                   onClick={() => {
-                    setValue("");
-                    setSearch("");
+                    setLocalValue("");
+                    onSearchChange({ searchTerm: "" });
                   }}
                   className="rounded p-1 px-2 hover:scale-125 active:scale-110"
                 >
@@ -421,26 +478,31 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
               )}
 
               <SelectSimple
-                options={[...searchTermOptions]}
+                options={[...getSearchTypeOptions(view)]}
                 value={searchType}
                 onChangeAction={(value) => setSearchType(value as SearchType)}
                 placeholder="Search Type"
                 className="w-50"
               />
             </div>
-            <div className="max-h-60dvh search scrollable mini p-3">
+            <div
+              className={cn(
+                "max-h-60dvh search scrollable mini p-3",
+                isLoading && "invisible",
+              )}
+            >
               <Command.List>
                 {Object.values(groupedItems).every(
                   (items) => items.length === 0,
                 ) ? (
                   <>
-                    {value.length !== 0 ? (
+                    {localValue && localValue.length !== 0 && !isLoading ? (
                       <Command.Empty className="flex flex-col items-center gap-5">
                         <span className="inline-flex items-center gap-2">
                           No results found for
                           <span className="inline-flex items-center gap-[1px] italic">
                             <BiSolidQuoteLeft className="size-1 -translate-y-1" />
-                            {value}
+                            {localValue}
                             <BiSolidQuoteRight className="ml-[2px] size-1 -translate-y-1" />
                           </span>
                         </span>
@@ -459,11 +521,26 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
                           .
                         </p>
                       </Command.Empty>
+                    ) : isLoading ? (
+                      <Command.Empty>
+                        {/* <span className="text-foreground/60">Loading...</span> */}
+                      </Command.Empty>
                     ) : (
                       <Command.Empty>
                         <span className="text-foreground/60">
-                          Search for events, organizers, or locations
+                          Search for{" "}
+                          {view === "event" || view === "openCall"
+                            ? "active "
+                            : null}
+                          {view !== "openCall" ? "events" : "open calls"},
+                          organizers, or locations.{" "}
                         </span>
+                        {view !== "archive" && (
+                          <p className="mt-2 text-sm text-foreground/50">
+                            To search the full database, including past events
+                            and archived open calls, switch to the Archive view
+                          </p>
+                        )}
                       </Command.Empty>
                     )}
                   </>
@@ -479,83 +556,96 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
                           baseFontSize,
                         )}
                       >
-                        {groupItems.map((item) => (
-                          <Command.Item
-                            key={`${groupKey}-${item.path}`}
-                            value={`${groupKey}-${item.path}`}
-                            className={cn(
-                              "group flex cursor-pointer items-center rounded p-2 pl-5 text-foreground transition-colors hover:bg-stone-100 hover:text-stone-900 data-[selected='true']:bg-salYellow/40",
-                              baseFontSize,
-                            )}
-                            onSelect={() => {
-                              router.push(item.path || "/thelist");
-                              setOpen(false);
-                            }}
-                          >
-                            {groupKey.startsWith("Events") ? (
-                              <div className="grid w-full grid-cols-[1fr_72px_auto_auto_1fr] items-center gap-2">
-                                <span className="flex items-center gap-1 truncate text-wrap">
-                                  {item.name}
-                                </span>
-                                {item.ocStatus === 2 ? (
-                                  <FlairBadge className="mx-auto bg-green-500/20">
-                                    Open Call
-                                  </FlairBadge>
-                                ) : (
-                                  <span />
-                                )}
-                                {item.edition ? (
+                        {groupItems.map((item) => {
+                          return (
+                            <Command.Item
+                              key={`${groupKey}-${item.path}`}
+                              value={`${groupKey}-${item.path}`}
+                              className={cn(
+                                "group flex cursor-pointer items-center rounded p-2 pl-5 text-foreground transition-colors hover:bg-stone-100 hover:text-stone-900 data-[selected='true']:bg-salYellow/40",
+                                baseFontSize,
+                              )}
+                              onSelect={() => {
+                                router.push(item.path || "/thelist");
+                                setOpen(false);
+                              }}
+                            >
+                              {groupKey.startsWith("Events") ? (
+                                <div className="grid w-full grid-cols-[1fr_72px_auto_auto_1fr] items-center gap-2">
+                                  <span className="flex items-center gap-1 truncate text-wrap">
+                                    {item.name}
+                                  </span>
+                                  {item.ocStatus === 2 ? (
+                                    <FlairBadge className="mx-auto bg-green-500/20">
+                                      Open Call
+                                    </FlairBadge>
+                                  ) : (
+                                    <span />
+                                  )}
+                                  {item.edition ? (
+                                    <span
+                                      className={cn(
+                                        "text-center",
+                                        subFontColor,
+                                        baseFontSize,
+                                      )}
+                                    >
+                                      {item.edition}
+                                    </span>
+                                  ) : (
+                                    <span />
+                                  )}
+
+                                  {item.category ? (
+                                    <span
+                                      className={cn(
+                                        "flex items-center gap-2 text-center",
+                                        subFontColor,
+                                        baseFontSize,
+                                      )}
+                                    >
+                                      |<p>{item.category}</p>
+                                    </span>
+                                  ) : null}
+
+                                  {item.orgName && view !== "openCall" && (
+                                    <span
+                                      className={cn(
+                                        "flex items-center gap-2 text-center",
+                                        subFontColor,
+                                        baseFontSize,
+                                      )}
+                                    >
+                                      <p>{item.orgName}</p>
+                                    </span>
+                                  )}
                                   <span
                                     className={cn(
-                                      "text-center",
+                                      "truncate text-right",
                                       subFontColor,
                                       baseFontSize,
                                     )}
                                   >
-                                    {item.edition}
+                                    {item.meta}
                                   </span>
-                                ) : (
-                                  <span />
-                                )}
-                                {item.category ? (
+                                </div>
+                              ) : (
+                                <div className="flex w-full justify-between gap-2">
+                                  <span className="truncate">{item.name}</span>
                                   <span
                                     className={cn(
-                                      "flex items-center gap-2 text-center",
+                                      "truncate text-right",
                                       subFontColor,
                                       baseFontSize,
                                     )}
                                   >
-                                    |<p>{item.category}</p>
+                                    {item.meta}
                                   </span>
-                                ) : (
-                                  <span />
-                                )}
-                                <span
-                                  className={cn(
-                                    "truncate text-right",
-                                    subFontColor,
-                                    baseFontSize,
-                                  )}
-                                >
-                                  {item.meta}
-                                </span>
-                              </div>
-                            ) : (
-                              <div className="flex w-full justify-between gap-2">
-                                <span className="truncate">{item.name}</span>
-                                <span
-                                  className={cn(
-                                    "truncate text-right",
-                                    subFontColor,
-                                    baseFontSize,
-                                  )}
-                                >
-                                  {item.meta}
-                                </span>
-                              </div>
-                            )}
-                          </Command.Item>
-                        ))}
+                                </div>
+                              )}
+                            </Command.Item>
+                          );
+                        })}
                       </Command.Group>
                     ))
                 )}

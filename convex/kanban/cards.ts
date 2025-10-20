@@ -17,26 +17,35 @@ export const searchCards = query({
     searchTerm: v.optional(v.string()),
     category: v.array(supportCategoryValidator),
     assignedId: v.optional(v.id("users")),
+    searchType: v.optional(
+      v.union(v.literal("title"), v.literal("description")),
+    ),
   },
   handler: async (ctx, args) => {
     const searchTerm = args.searchTerm?.trim() ?? "";
 
     let q = ctx.db
       .query("todoKanban")
-      .withSearchIndex("search_by_desc", (q) => {
-        let filter = q.search("description", searchTerm);
+      .withSearchIndex(
+        args.searchType === "title" ? "search_by_title" : "search_by_desc",
+        (q) => {
+          let filter = q.search(
+            args.searchType === "title" ? "title" : "description",
+            searchTerm,
+          );
 
-        if (args.purpose && args.purpose !== "todo") {
-          filter = filter.eq("purpose", args.purpose);
-        }
+          if (args.purpose && args.purpose !== "todo") {
+            filter = filter.eq("purpose", args.purpose);
+          }
 
-        // Use filterField for single category, post-filter for multiple
-        if (args.category.length === 1) {
-          filter = filter.eq("category", args.category[0]);
-        }
+          // Use filterField for single category, post-filter for multiple
+          if (args.category.length === 1) {
+            filter = filter.eq("category", args.category[0]);
+          }
 
-        return filter;
-      });
+          return filter;
+        },
+      );
 
     const results = await q.collect();
     let output = results;

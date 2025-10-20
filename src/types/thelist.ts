@@ -1,9 +1,9 @@
+import { SearchType } from "@/constants/filterConsts";
 import {
   EventCategory,
   EventType,
   PostStatusOptions,
 } from "@/types/eventTypes";
-import { Id } from "~/convex/_generated/dataModel";
 
 type SortBy =
   | "openCall"
@@ -43,8 +43,7 @@ export interface Pagination {
   page?: number;
 }
 
-export interface ArtistEventMetadata {
-  bookmarked: Id<"events">[];
-  hidden: Id<"events">[];
-  applied: Id<"events">[];
-}
+export type SearchParams = {
+  searchTerm?: string;
+  searchType: SearchType;
+};

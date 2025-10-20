@@ -1,6 +1,7 @@
 "use client";
 
 import { MultiSelect } from "@/components/multi-select";
+
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { FlairBadge } from "@/components/ui/flair-badge";
@@ -35,7 +36,12 @@ import {
   PostStatusOptions,
 } from "@/types/eventTypes";
 import { CallFormat, CallType, EligibilityType } from "@/types/openCallTypes";
-import { Continents, Filters, SortOptions } from "@/types/thelist";
+import {
+  Continents,
+  Filters,
+  SearchParams,
+  SortOptions,
+} from "@/types/thelist";
 import {
   ChevronDown,
   ChevronUp,
@@ -59,40 +65,45 @@ import { usePreloadedQuery } from "convex/react";
 
 export interface FilterBaseProps {
   isMobile: boolean;
+  search: SearchParams;
   filters: Filters;
   sortOptions: SortOptions;
   hasActiveFilters: boolean | undefined;
 
   setOpen: Dispatch<SetStateAction<boolean>>;
-  setValue: Dispatch<SetStateAction<string>>;
-  searchType?: SearchType;
+  localValue: string;
+  setLocalValue: Dispatch<SetStateAction<string>>;
+  searchType: SearchType;
   setSearchType: Dispatch<SetStateAction<SearchType>>;
-  value: string;
   shortcut: string;
   hasShortcut: boolean;
   placeholder: string;
   groupedResults?: Record<string, TheListFilterCommandItem[]>;
+  onSearchChange: (newSearch: Partial<SearchParams>) => void;
   onChange: (newFilters: Partial<Filters>) => void;
   onSortChange: (newSort: Partial<SortOptions>) => void;
   onResetFilters: () => void;
+  isLoading: boolean;
   className?: string;
   view: ViewOptions;
 }
 
 export const FilterBase = ({
   isMobile,
+  search,
   filters,
   sortOptions,
   hasActiveFilters,
   setOpen,
-  setValue,
+  localValue,
+  setLocalValue,
   searchType,
   setSearchType,
-  value,
   placeholder,
   onChange,
   onSortChange,
   onResetFilters,
+  // isLoading,
   className,
   shortcut,
   hasShortcut,
@@ -100,6 +111,8 @@ export const FilterBase = ({
   view,
   // user,
 }: FilterBaseProps) => {
+  console.log(view);
+  // const searchTerm = search.searchTerm ?? "";
   const { preloadedSubStatus, preloadedUserData } = useConvexPreload();
   const router = useRouter();
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -172,10 +185,11 @@ export const FilterBase = ({
                   autoFocus={false}
                   onChange={(e) => {
                     setDropdownOpen(true);
-                    setValue(e.target.value);
+                    // onSearchChange({ searchTerm: e.target.value });
+                    setLocalValue(e.target.value);
                   }}
                   placeholder={placeholder}
-                  value={value}
+                  value={search.searchTerm}
                   //   value={value}
                   className="focus:outline-hidden w-full flex-1 bg-transparent text-base placeholder:text-foreground/30"
                 />
@@ -188,12 +202,12 @@ export const FilterBase = ({
                       (items) => items.length === 0,
                     ) ? (
                       <>
-                        {value.length > 0 && (
+                        {localValue?.length > 0 && (
                           <span className="flex flex-col items-center gap-2 text-lg">
                             No results found for
                             <span className="inline-flex items-center gap-[1px] italic">
                               <BiSolidQuoteLeft className="size-1 -translate-y-1" />
-                              {value}
+                              {localValue}
                               <BiSolidQuoteRight className="ml-[2px] size-1 -translate-y-1" />
                             </span>
                           </span>
@@ -271,18 +285,18 @@ export const FilterBase = ({
                 <Select
                   name="searchType"
                   value={searchType}
-                  onValueChange={(value) =>
-                    setSearchType(value as "events" | "loc" | "orgs" | "all")
-                  }
+                  onValueChange={(value) => setSearchType(value as SearchType)}
                 >
                   <SelectTrigger className="w-32 text-center">
                     <SelectValue placeholder="Search Type" />
                   </SelectTrigger>
                   <SelectContent align="end" className="z-top">
-                    <SelectItem value="events">Event Name</SelectItem>
+                    {!orgView && (
+                      <SelectItem value="events">Event Name</SelectItem>
+                    )}
                     <SelectItem value="orgs">Organizers</SelectItem>
                     <SelectItem value="loc">Location</SelectItem>
-                    <SelectItem value="all">All</SelectItem>
+                    {!orgView && <SelectItem value="all">All</SelectItem>}
                   </SelectContent>
                 </Select>
               </section>
@@ -658,46 +672,54 @@ export const FilterBase = ({
       ) : (
         <div className="hidden flex-col gap-5 sm:flex">
           <div className="flex max-w-[90vw] flex-wrap items-center gap-3">
-            <section className="flex flex-col gap-2">
-              <Label htmlFor="list-search" className="flex items-center gap-2">
-                Search:
-              </Label>
-              <div
-                className={cn(
-                  "relative flex w-52 max-w-full items-center rounded-lg border border-foreground px-2 py-1.5 text-sm text-foreground hover:bg-white/30",
-                  className,
-                  !hasShortcut && "w-36",
-                )}
-              >
-                <FiSearch
-                  className="mr-2 size-5 cursor-pointer"
-                  onClick={() => {
-                    setOpen(true);
-                  }}
-                />
-                <input
-                  onFocus={(e) => {
-                    e.target.blur();
-                    setOpen(true);
-                  }}
-                  type="text"
-                  onChange={(e) => setValue(e.target.value)}
-                  placeholder={placeholder}
-                  //   defaultValue={value}
-                  value={value}
+            {view !== "orgView" && (
+              <section className="flex flex-col gap-2">
+                <Label
+                  htmlFor="list-search"
+                  className="flex items-center gap-2"
+                >
+                  Search:
+                </Label>
+                <div
                   className={cn(
-                    "w-full max-w-64 truncate bg-transparent placeholder:text-foreground/30",
-                    hasShortcut && "pr-10",
+                    "relative flex w-52 max-w-full items-center rounded-lg border border-foreground px-2 py-1.5 text-sm text-foreground hover:bg-white/30",
+                    className,
+                    !hasShortcut && "w-36",
                   )}
-                />
+                >
+                  <FiSearch
+                    className="mr-2 size-5 cursor-pointer"
+                    onClick={() => {
+                      setOpen(true);
+                    }}
+                  />
+                  <input
+                    onFocus={(e) => {
+                      e.target.blur();
+                      setOpen(true);
+                    }}
+                    type="text"
+                    onChange={(e) =>
+                      // onSearchChange({ searchTerm: e.target.value })
+                      setLocalValue(e.target.value)
+                    }
+                    placeholder={placeholder}
+                    //   defaultValue={value}
+                    value={localValue}
+                    className={cn(
+                      "w-full max-w-64 truncate bg-transparent placeholder:text-foreground/30",
+                      hasShortcut && "pr-10",
+                    )}
+                  />
 
-                {hasShortcut && (
-                  <span className="absolute right-2 top-1/2 hidden -translate-y-1/2 items-center gap-0.5 rounded bg-transparent p-1 text-sm lg:flex">
-                    <FiCommand /> + {shortcut}
-                  </span>
-                )}
-              </div>
-            </section>
+                  {hasShortcut && (
+                    <span className="absolute right-2 top-1/2 hidden -translate-y-1/2 items-center gap-0.5 rounded bg-transparent p-1 text-sm lg:flex">
+                      <FiCommand /> + {shortcut}
+                    </span>
+                  )}
+                </div>
+              </section>
+            )}
             <section className="flex flex-col gap-2">
               <Label htmlFor="sortBy" className="flex items-center gap-2">
                 Sort by:

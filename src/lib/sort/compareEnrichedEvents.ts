@@ -3,10 +3,11 @@ import { SortOptions } from "@/types/thelist";
 
 import { EventData } from "@/types/eventTypes";
 import { OpenCall, OpenCallStatus } from "@/types/openCallTypes";
+import { EventLookupOrgBase } from "~/convex/schema";
 
 export type EnrichedEventsCardData = EventData & {
-  tabs: { opencall: OpenCall | null };
-  orgName: string | null;
+  tabs: { openCall: OpenCall | null };
+  orgData: EventLookupOrgBase | null;
   hasActiveOpenCall: boolean;
   appFee?: number;
   openCallStatus: OpenCallStatus | null;
@@ -125,9 +126,9 @@ export const compareEnrichedEvents = (
       // now.setHours(0, 0, 0, 0);
 
       const hasOpenCall = item.hasActiveOpenCall;
-      const callType = item.tabs.opencall?.basicInfo?.callType;
-      const ocEndRaw = item.tabs.opencall?.basicInfo?.dates?.ocEnd;
-      const ocState = item.tabs.opencall?.state;
+      const callType = item.tabs.openCall?.basicInfo?.callType;
+      const ocEndRaw = item.tabs.openCall?.basicInfo?.dates?.ocEnd;
+      const ocState = item.tabs.openCall?.state;
       const isPublished = ocState === "published" && item.state === "published";
       const isArchivedOC =
         ocState === "archived" &&
@@ -277,8 +278,8 @@ export const compareEnrichedEvents = (
       : bName.localeCompare(aName);
   }
   if (sortBy === "organizer") {
-    const aOrg = (a.orgName ?? "").toLowerCase();
-    const bOrg = (b.orgName ?? "").toLowerCase();
+    const aOrg = (a.orgData?.orgName ?? "").toLowerCase();
+    const bOrg = (b.orgData?.orgName ?? "").toLowerCase();
 
     return sortDirection === "asc"
       ? aOrg.localeCompare(bOrg)
@@ -315,8 +316,8 @@ export const compareEnrichedEvents = (
   }
   if (sortBy === "recent") {
     const getApprovedAt = (item: EnrichedEventsCardData) => {
-      const ocApproved = item.tabs.opencall?.approvedAt
-        ? new Date(item.tabs.opencall.approvedAt).getTime()
+      const ocApproved = item.tabs.openCall?.approvedAt
+        ? new Date(item.tabs.openCall.approvedAt).getTime()
         : null;
       const evApproved = item.approvedAt
         ? new Date(item.approvedAt).getTime()

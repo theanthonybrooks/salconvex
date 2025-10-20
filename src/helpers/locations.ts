@@ -3,6 +3,7 @@ import {
   EU_COUNTRIES,
   usRegions,
 } from "@/constants/locationConsts";
+import { EventData } from "@/types/eventTypes";
 import { Organizer } from "@/types/organizer";
 import rawCountries, { Country } from "world-countries";
 import { LocationFull } from "~/convex/schema";
@@ -259,13 +260,14 @@ export function getOrganizerLocationString(
   return parts.filter(Boolean).join(", ");
 }
 export function getSearchLocationString(
-  city?: string,
-  countryAbbr?: string,
-  stateAbbr?: string,
+  location: EventData["location"] | OrgLocationProps["location"],
+  full?: boolean,
 ): string {
+  const { locale, city, countryAbbr, stateAbbr } = location;
   const isValidStateAbbr = stateAbbr && /^[A-Za-z]+$/.test(stateAbbr);
 
   const parts = [
+    locale && full && `${locale}`,
     city && `${city}`,
     city && isValidStateAbbr && `${stateAbbr}`,
     countryAbbr === "US" ? "USA" : countryAbbr,
