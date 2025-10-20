@@ -203,7 +203,6 @@ export const ApplyButton = ({
   callType,
   fontSize = "text-sm",
 }: ApplyButtonProps) => {
-  console.log(isBookmarked, isHidden);
   const autoApply = userPref?.autoApply ?? true;
   const updateEventAnalytics = useMutation(
     api.analytics.eventAnalytics.markEventAnalytics,

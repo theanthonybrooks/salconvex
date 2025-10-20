@@ -191,10 +191,6 @@ const EventCardPreview = ({
     !publicView || publicPreview || isUserOrg,
     activeSub && openCall?.state !== "published",
   );
-  if (slug === "fresh-1-5") {
-    console.log(activeSub && openCall?.state !== "published");
-    console.log(!publicView || publicPreview || isUserOrg);
-  }
 
   const { toggleListAction } = useToggleListAction(event._id);
   const updateUserLastActive = useMutation(api.users.updateUserLastActive);
