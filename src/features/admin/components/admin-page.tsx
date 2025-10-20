@@ -19,7 +19,7 @@ export default function AdminScreen() {
   const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
 
   const { data: applicationData, isPending } = useQueryWithStatus(
-    api.organizer.applications.getAllApplications,
+    api.analytics.eventAnalytics.getEventAnalytics,
     isAdmin ? {} : "skip",
   );
 

@@ -24,17 +24,19 @@ export const markEventAnalytics = mutation({
 
 export const getEventAnalytics = query({
   args: {
-    eventId: v.id("events"),
+    eventId: v.optional(v.id("events")),
   },
   handler: async (ctx, args) => {
     const { eventId } = args;
     const userId = await getAuthUserId(ctx);
     if (!userId) return null;
 
-    const interactions = await ctx.db
-      .query("eventAnalytics")
-      .withIndex("by_eventId_action", (q) => q.eq("eventId", eventId))
-      .collect();
+    const interactions = eventId
+      ? await ctx.db
+          .query("eventAnalytics")
+          .withIndex("by_eventId_action", (q) => q.eq("eventId", eventId))
+          .collect()
+      : await ctx.db.query("eventAnalytics").collect();
 
     const totalsByDate = new Map<
       string,
