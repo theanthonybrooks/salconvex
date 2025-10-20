@@ -95,16 +95,17 @@ export const TheListFilters = <T extends TheListFilterCommandItem>({
     };
   }, [localValue, debouncedSearch, search, searchType]);
 
-  useEffect(() => {
-    if (view === "organizer") {
-      setSearchType("orgs");
-    } else if (view === "event" || view === "archive") {
-      setSearchType("events");
-    } else {
-      setSearchType("all");
-    }
-    return;
-  }, [hasActiveSubscription, view]);
+  // useEffect(() => {
+
+  //   if (view === "organizer") {
+  //     setSearchType("orgs");
+  //   } else if (view === "event" || view === "archive") {
+  //     setSearchType("events");
+  //   } else {
+  //     setSearchType("all");
+  //   }
+  //   return;
+  // }, [hasActiveSubscription, view]);
   // useEffect(() => {
   //   const params = new URLSearchParams();
   //   setParamIfNotDefault(params, "term", value, "");

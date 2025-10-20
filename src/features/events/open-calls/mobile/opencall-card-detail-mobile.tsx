@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ApplyButton } from "@/features/events/event-apply-btn";
 import { OpenCallCardProps } from "@/types/openCallTypes";
 
+import { ChartAreaInteractive } from "@/components/ui/charts/area-chart-interactive";
 import { DraftPendingBanner } from "@/components/ui/draft-pending-banner";
 import { EventOrgLogo } from "@/components/ui/event-org-logo";
 import { useToggleListAction } from "@/features/artists/helpers/listActions";
@@ -23,11 +24,14 @@ import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-con
 import { getEventCategoryLabel, getEventTypeLabel } from "@/helpers/eventFns";
 import { getFormattedLocationString } from "@/helpers/locations";
 import { getUserFontSizePref } from "@/helpers/stylingFns";
+import { makeUseQueryWithStatus } from "convex-helpers/react";
+import { useQueries } from "convex-helpers/react/cache";
 import { useMutation, usePreloadedQuery } from "convex/react";
 import { motion } from "framer-motion";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { api } from "~/convex/_generated/api";
+import { Id } from "~/convex/_generated/dataModel";
 
 const tabs = ["opencall", "event", "organizer"];
 
@@ -110,6 +114,7 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
   // const hasOpenCall = openCallStatus === "active";
 
   // console.log("has open call", hasOpenCall)
+  const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
 
   const updateUserLastActive = useMutation(api.users.updateUserLastActive);
   const [activeTab, setActiveTab] = useState("opencall");
@@ -152,6 +157,13 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
       router.replace(`${pathname}?${params.toString()}`);
     }
   }, [tabParam, activeTab, router, pathname, searchParams]);
+
+  const { data: appChartData, isPending: appChartLoading } = useQueryWithStatus(
+    api.organizer.applications.getOpenCallApplications,
+    openCallId && isAdmin && activeTab === "admin"
+      ? { openCallId, ownerId: userData?.userId as Id<"users"> }
+      : "skip",
+  );
 
   return (
     <Card
@@ -292,7 +304,7 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
           defaultValue={activeTab}
           className="flex w-full flex-col justify-center"
         >
-          <TabsList className="relative flex h-12 w-full justify-around rounded-xl bg-white/60">
+          <TabsList className="scrollable justx invis relative flex h-12 w-full justify-around rounded-xl bg-white/60">
             {tabsList.map((tab) => (
               <TabsTrigger
                 key={tab}
@@ -377,10 +389,10 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
           </TabsContent>
           {isAdmin && (
             <TabsContent value="admin">
-              {/* <ChartAreaInteractive
+              <ChartAreaInteractive
                 data={appChartData ?? []}
                 loading={appChartLoading}
-              /> */}
+              />
             </TabsContent>
           )}
         </Tabs>

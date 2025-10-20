@@ -71,7 +71,7 @@ export const ApplyButtonShort = ({
       : publicView && openCall === "active"
         ? "/pricing?type=artist"
         : !publicView && openCall
-          ? `/thelist/event/${slug}/${edition}/call`
+          ? `/thelist/event/${slug}/${edition}/call${openCall === "active" ? "" : "?tab=event"}`
           : `/thelist/event/${slug}/${edition}`;
 
   const buttonText =
@@ -287,7 +287,7 @@ export const ApplyButton = ({
         : publicView && openCall === "active"
           ? "/pricing?type=artist"
           : !publicView && openCall
-            ? `/thelist/event/${slug}/${edition}/call`
+            ? `/thelist/event/${slug}/${edition}/call${openCallState === "published" ? "" : "?tab=event"}`
             : `/thelist/event/${slug}/${edition}`;
   const buttonText =
     openCall === "active"

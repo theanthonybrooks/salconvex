@@ -160,6 +160,25 @@ const ClientEventList = () => {
   const [page, setPage] = useState(Number(searchParams.get("page")) || 1);
   const prevPage = Math.max(page - 1, 1);
 
+  const getDefaultSearchForView = (view: ViewOptions): SearchParams => {
+    if (view === "event" || view === "archive") {
+      return {
+        searchTerm: search?.searchTerm ?? "",
+        searchType: "events",
+      };
+    }
+    if (view === "organizer") {
+      return {
+        searchTerm: search?.searchTerm ?? "",
+        searchType: "orgs",
+      };
+    }
+    return {
+      searchTerm: search?.searchTerm ?? "",
+      searchType: "all",
+    };
+  };
+
   // const queryResult = useFilteredEventsQuery(filters, sortOptions, { page });
   const queryResult = useFilteredEventsQuery(
     filters,
@@ -385,6 +404,7 @@ const ClientEventList = () => {
   const handleViewChange = (newView: ViewOptions) => {
     setView(newView);
     setSortOptions(getDefaultSortForView(newView));
+    setSearch(getDefaultSearchForView(newView));
     setPage(1);
   };
 

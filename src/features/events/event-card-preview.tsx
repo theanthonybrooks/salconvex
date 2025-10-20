@@ -16,6 +16,7 @@ import EventContextMenu from "@/features/events/ui/event-context-menu";
 import { formatOpenCallDeadline } from "@/helpers/dateFns";
 import {
   formatBudgetCurrency,
+  formatEventLink,
   formatRate,
   getEventCategoryLabel,
   getEventTypeLabel,
@@ -180,10 +181,20 @@ const EventCardPreview = ({
 
   // const userCurrency = userPref?.currency ?? ""
 
-  const linkPath =
-    !publicView || publicPreview || isUserOrg
-      ? `/thelist/event/${slug}/${event.dates.edition}${openCallStatus ? "/call" : ""}${openCallStatus === "ended" ? "?tab=event" : null}`
-      : "/pricing?type=artist";
+  // const linkPath =
+  //   !publicView || publicPreview || isUserOrg
+  //     ? `/thelist/event/${slug}/${event.dates.edition}${openCallStatus ? "/call" : ""}${openCallStatus === "ended" ? "?tab=event" : null}`
+  //     : "/pricing?type=artist";
+
+  const linkPath = formatEventLink(
+    event,
+    !publicView || publicPreview || isUserOrg,
+    activeSub && openCall?.state !== "published",
+  );
+  if (slug === "fresh-1-5") {
+    console.log(activeSub && openCall?.state !== "published");
+    console.log(!publicView || publicPreview || isUserOrg);
+  }
 
   const { toggleListAction } = useToggleListAction(event._id);
   const updateUserLastActive = useMutation(api.users.updateUserLastActive);
