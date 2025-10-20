@@ -1,8 +1,9 @@
 import { cn } from "@/helpers/utilsFns";
-import { useQuery } from "convex/react";
+import { makeUseQueryWithStatus } from "convex-helpers/react";
+import { useQueries } from "convex-helpers/react/cache";
 import { Check, CircleCheck, CircleX, Search } from "lucide-react";
 import Image from "next/image";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { api } from "~/convex/_generated/api";
 import { Doc } from "~/convex/_generated/dataModel";
 
@@ -40,6 +41,7 @@ export const OrgSearch = ({
   onLoadClick,
   tabIndex = 0,
 }: OrgSearchProps) => {
+  const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
   const [inputValue, setInputValue] = useState(value || "");
   const [focused, setFocused] = useState(false);
   const [clearHovered, setClearHovered] = useState(false);
@@ -57,16 +59,16 @@ export const OrgSearch = ({
   const rawQuery = inputValue;
   const [debouncedQuery, setDebouncedQuery] = useState(rawQuery);
 
-  const results = useQuery(
+  const { data: results } = useQueryWithStatus(
     api.organizer.organizations.getUserOrganizations,
     hasUserInteracted ? { query: debouncedQuery || "" } : "skip",
   );
 
-  const sortedResults = useMemo(
-    () =>
-      results ? [...results].sort((a, b) => a.name.localeCompare(b.name)) : [],
-    [results],
-  );
+  // const sortedResults = useMemo(
+  //   () =>
+  //     results ? [...results].sort((a, b) => a.name.localeCompare(b.name)) : [],
+  //   [results],
+  // );
 
   const showSuggestions = focused && results && results.length > 0;
 
@@ -120,7 +122,7 @@ export const OrgSearch = ({
       }
     } else if (e.key === "Enter" && selectedIndex >= 0) {
       e.preventDefault();
-      handleSelect(sortedResults[selectedIndex]);
+      handleSelect(results[selectedIndex]);
       setSelectedIndex(-1);
       // setSelectedVal(sortedResults[selectedIndex].organizationName)
     } else if (e.key === "Escape") {
@@ -128,7 +130,7 @@ export const OrgSearch = ({
       setSelectedIndex(-1);
     } else if (e.key === "Tab") {
       if (selectedIndex >= 0) {
-        handleSelect(sortedResults[selectedIndex]);
+        handleSelect(results[selectedIndex]);
         setFocused(false);
         setSelectedIndex(-1);
       }
@@ -151,13 +153,15 @@ export const OrgSearch = ({
 
     if (inputValue.trim() !== "" && inputValue.trim() === selectedVal) {
       if (results && results?.length > 0 && selectedIndex >= 0) {
-        handleSelect(sortedResults[selectedIndex]);
+        handleSelect(results[selectedIndex]);
       }
       setFocused(false);
       setSelectedIndex(-1);
       // console.log("if");
     } else if (inputValue.trim() === "" && selectedVal.trim() !== "") {
-      handleSelect(sortedResults[selectedIndex]);
+      if (results && results?.length > 0) {
+        handleSelect(results[selectedIndex]);
+      }
       setFocused(false);
       setSelectedIndex(-1);
     } else {
@@ -219,18 +223,15 @@ export const OrgSearch = ({
 
   useEffect(() => {
     if (!showSuggestions) return;
-    const selected = sortedResults[selectedIndex];
+    const selected = results[selectedIndex];
     if (selectedIndex >= 0) {
       setSelectedVal(selected.name);
     } else {
-      if (
-        sortedResults.length > 0 &&
-        sortedResults[0].name.trim() === inputValue.trim()
-      ) {
+      if (results?.length > 0 && results[0].name.trim() === inputValue.trim()) {
         setSelectedIndex(0);
       }
     }
-  }, [showSuggestions, selectedIndex, sortedResults, inputValue]);
+  }, [showSuggestions, selectedIndex, results, inputValue]);
 
   return (
     <div className="relative mx-auto w-full lg:max-w-md" ref={containerRef}>
@@ -294,7 +295,7 @@ export const OrgSearch = ({
             ref={listRef}
             className="scrollable mini absolute z-1 mt-1 max-h-[185px] w-full rounded-md border-1.5 bg-white shadow"
           >
-            {sortedResults.map((org, idx) => (
+            {results?.map((org, idx) => (
               <li
                 key={org._id}
                 ref={(el) => {

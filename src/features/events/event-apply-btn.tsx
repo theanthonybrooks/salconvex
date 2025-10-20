@@ -14,6 +14,7 @@ import { TooltipSimple } from "@/components/ui/tooltip";
 import { useArtistApplicationActions } from "@/features/artists/helpers/appActions";
 import { useToggleListAction } from "@/features/artists/helpers/listActions";
 import EventContextMenu from "@/features/events/ui/event-context-menu";
+import { getEventCategoryLabel } from "@/helpers/eventFns";
 import { cn } from "@/helpers/utilsFns";
 import { ApplicationStatus } from "@/types/applications";
 import { EventCategory, EventData } from "@/types/eventTypes";
@@ -39,6 +40,7 @@ import { Id } from "~/convex/_generated/dataModel";
 import { UserPrefsType } from "~/convex/schema";
 
 interface ApplyButtonShortProps {
+  eventId: Id<"events">;
   slug: string;
   edition: number;
   appStatus: ApplicationStatus;
@@ -51,6 +53,7 @@ interface ApplyButtonShortProps {
 }
 
 export const ApplyButtonShort = ({
+  eventId,
   slug,
   edition,
   appStatus,
@@ -61,6 +64,10 @@ export const ApplyButtonShort = ({
   user,
   activeSub,
 }: ApplyButtonShortProps) => {
+  const updateEventAnalytics = useMutation(
+    api.analytics.eventAnalytics.markEventAnalytics,
+  );
+  const isAdmin = user?.role?.includes("admin");
   const isArtist = user?.accountType?.includes("artist");
   const hasValidSub = activeSub && isArtist;
   const currentUrl = window.location.href;
@@ -88,6 +95,13 @@ export const ApplyButtonShort = ({
       <Button
         asChild
         onClick={() => {
+          if (!isAdmin) {
+            updateEventAnalytics({
+              eventId,
+              plan: user?.plan ?? 0,
+              action: "view",
+            });
+          }
           window.history.pushState({}, "", currentUrl);
           // sessionStorage.setItem("previousSalPage", window.location.pathname);
           router.push(href);
@@ -189,8 +203,11 @@ export const ApplyButton = ({
   callType,
   fontSize = "text-sm",
 }: ApplyButtonProps) => {
+  console.log(isBookmarked, isHidden);
   const autoApply = userPref?.autoApply ?? true;
-
+  const updateEventAnalytics = useMutation(
+    api.analytics.eventAnalytics.markEventAnalytics,
+  );
   const updateUserLastActive = useMutation(api.users.updateUserLastActive);
   const isEmail = callType === "Email" || appLinkformat === "mailto:";
   const noSub = !activeSub && (publicPreview || publicView || finalButton);
@@ -263,17 +280,32 @@ export const ApplyButton = ({
       }
     } finally {
       setPending(false);
+      if (isAdmin) return;
+      updateEventAnalytics({
+        eventId: id,
+        plan: user?.plan ?? 0,
+        action: appStatus ? "view" : "apply",
+      });
     }
   };
 
   const onBookmark = async () => {
     if (orgPreview) return;
+    console.log(isBookmarked);
     // setIsBookmarked(!isBookmarked);
     toggleListAction({ bookmarked: !isBookmarked });
+
     try {
       await updateUserLastActive({ email: user?.email ?? "" });
     } catch (error) {
       console.error("Error updating last active:", error);
+    } finally {
+      if (isAdmin || isBookmarked || orgPreview) return;
+      updateEventAnalytics({
+        eventId: id,
+        plan: user?.plan ?? 0,
+        action: "hide",
+      });
     }
   };
   const router = useRouter();
@@ -300,17 +332,17 @@ export const ApplyButton = ({
             : isEmail
               ? "Send Email"
               : nonArtistAdmin
-                ? "Test Link"
+                ? `Edit ${getEventCategoryLabel(eventCategory, true)}`
                 : "Apply"
       : openCall === "ended"
         ? appStatus !== null && hasValidSub
           ? appStatus.slice(0, 1).toUpperCase() +
             appStatus.slice(1).toLowerCase()
           : orgPreview || nonArtistAdmin
-            ? "Test Link"
+            ? `Edit ${getEventCategoryLabel(eventCategory, true)}`
             : "Read More"
         : orgPreview || nonArtistAdmin
-          ? "Test Link"
+          ? `Edit ${getEventCategoryLabel(eventCategory, true)}`
           : "Read More";
   const hasApplied = appStatus !== null && hasValidSub;
 
@@ -326,6 +358,13 @@ export const ApplyButton = ({
       {!finalButton && (
         <Button
           onClick={() => {
+            if (!isAdmin && !orgPreview) {
+              updateEventAnalytics({
+                eventId: id,
+                plan: user?.plan ?? 0,
+                action: "view",
+              });
+            }
             window.history.pushState({}, "", currentUrl);
             router.push(href);
           }}

@@ -201,6 +201,9 @@ const EventCardPreview = ({
   const updateEventPostStatus = useMutation(
     api.events.event.updateEventPostStatus,
   );
+  const updateEventAnalytics = useMutation(
+    api.analytics.eventAnalytics.markEventAnalytics,
+  );
 
   const onBookmark = async () => {
     if (publicView) {
@@ -209,8 +212,15 @@ const EventCardPreview = ({
       toggleListAction({ bookmarked: !bookmarked });
       try {
         await updateUserLastActive({ email: user?.email ?? "" });
+        if (isAdmin) return;
+        updateEventAnalytics({
+          eventId: event._id,
+          plan: user?.plan ?? 0,
+          action: "bookmark",
+        });
       } catch (error) {
         console.error("Error updating last active:", error);
+      } finally {
       }
     }
   };
@@ -222,6 +232,12 @@ const EventCardPreview = ({
       toggleListAction({ hidden: !hidden });
       try {
         await updateUserLastActive({ email: user?.email ?? "" });
+        if (isAdmin) return;
+        updateEventAnalytics({
+          eventId: event._id,
+          plan: user?.plan ?? 0,
+          action: "bookmark",
+        });
       } catch (error) {
         console.error("Error updating last active:", error);
       }
@@ -243,6 +259,13 @@ const EventCardPreview = ({
       <Card className="mb-6 grid w-[90vw] min-w-[340px] max-w-[400px] grid-cols-[75px_minmax(0,auto)_50px] grid-rows-[repeat(3_auto)] gap-x-3 rounded-3xl border-foreground/20 bg-white/40 px-1 py-2 first:mt-6 last:mb-2 lg:hidden">
         <div
           onClick={() => {
+            if (!isAdmin) {
+              updateEventAnalytics({
+                eventId: event._id,
+                plan: user?.plan ?? 0,
+                action: "view",
+              });
+            }
             router.push(linkPath);
           }}
           className="col-span-1 row-start-1 mx-auto pl-2 pt-3 active:scale-95"
@@ -406,6 +429,7 @@ const EventCardPreview = ({
           </div>
           <ApplyButtonShort
             user={user}
+            eventId={event._id}
             activeSub={activeSub}
             slug={slug}
             edition={event.dates.edition}
@@ -544,6 +568,13 @@ const EventCardPreview = ({
           <div className="mb-2 flex flex-col gap-y-1 p-2">
             <div
               onClick={() => {
+                if (!isAdmin) {
+                  updateEventAnalytics({
+                    eventId: event._id,
+                    plan: user?.plan ?? 0,
+                    action: "view",
+                  });
+                }
                 router.push(linkPath);
               }}
               className="group hover:cursor-pointer"
@@ -804,6 +835,7 @@ const EventCardPreview = ({
           )}
 
           <ApplyButtonShort
+            eventId={event._id}
             user={user}
             activeSub={activeSub}
             slug={slug}

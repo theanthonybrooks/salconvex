@@ -617,31 +617,53 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
               fontSize={fontSize}
             />
             <div className="mt-6 flex w-full justify-end xl:hidden">
-              <ApplyButton
-                user={user}
-                isUserOrg={isUserOrg}
-                userPref={userPref}
-                activeSub={hasActiveSubscription}
-                orgPreview={isUserOrg}
-                id={event._id}
-                mainOrgId={event.mainOrgId}
-                event={event}
-                openCallId={openCallId}
-                openCallState={openCallState ?? null}
-                slug={slug}
-                appUrl={outputAppLink}
-                edition={event.dates.edition}
-                openCall={openCallStatus}
-                callType={callType}
-                manualApplied={appStatus}
-                isBookmarked={bookmarked}
-                isHidden={hidden}
-                eventCategory={eventCategory}
-                appFee={basicInfo?.appFee ?? 0}
-                className="mx-auto w-full max-w-52"
-                detailCard
-                finalButton
-              />
+              {((isAdmin && !bothValid) || isUserOrg) && (
+                <>
+                  <ApproveBtn
+                    user={user}
+                    event={event}
+                    eventState={eventState}
+                    eventCategory={eventCategory}
+                    openCallState={openCallState}
+                    eventId={event._id}
+                    openCallId={openCallId}
+                    orgId={event.mainOrgId}
+                    openCallStatus={openCallStatus}
+                    appStatus={appStatus}
+                    appLink={outputAppLink}
+                    isHidden={hidden}
+                    isUserOrg={isUserOrg || isAdmin}
+                    className="mx-auto mt-1 w-full max-w-52"
+                  />
+                </>
+              )}
+              {!isUserOrg && (
+                <ApplyButton
+                  user={user}
+                  isUserOrg={isUserOrg}
+                  userPref={userPref}
+                  activeSub={hasActiveSubscription}
+                  orgPreview={isUserOrg}
+                  id={event._id}
+                  mainOrgId={event.mainOrgId}
+                  event={event}
+                  openCallId={openCallId}
+                  openCallState={openCallState ?? null}
+                  slug={slug}
+                  appUrl={outputAppLink}
+                  edition={event.dates.edition}
+                  openCall={openCallStatus}
+                  callType={callType}
+                  manualApplied={appStatus}
+                  isBookmarked={bookmarked}
+                  isHidden={hidden}
+                  eventCategory={eventCategory}
+                  appFee={basicInfo?.appFee ?? 0}
+                  className="mx-auto w-full max-w-52"
+                  detailCard
+                  finalButton
+                />
+              )}
             </div>
           </div>
           <div id="event">

@@ -69,6 +69,7 @@ const SignInCard = ({ switchFlow, forgotPasswordHandler }: SignInCardProps) => {
 
   const { setTheme } = useTheme();
   const [pending, setPending] = useState(false);
+  const [pendingOAuth, setPendingOAuth] = useState(false);
   const [isLoading, setIsLoading] = useState("");
   const [error, setError] = useState<React.ReactNode | undefined>("");
   const [success, setSuccess] = useState<string | undefined>("");
@@ -177,13 +178,13 @@ const SignInCard = ({ switchFlow, forgotPasswordHandler }: SignInCardProps) => {
 
   const onProviderSignIn = async (value: "github" | "google" | "apple") => {
     setIsLoading(value);
-    setPending(true);
+    setPendingOAuth(true);
     try {
       await signIn(value, { redirectTo: "/auth/sign-in?err=newUser" });
     } catch (error) {
       throw new Error("Error signing in", { cause: error });
     } finally {
-      setPending(false);
+      setPendingOAuth(false);
       setSuccess("Redirecting...");
     }
   };
@@ -283,7 +284,7 @@ const SignInCard = ({ switchFlow, forgotPasswordHandler }: SignInCardProps) => {
           type="button"
           className="w-full min-w-[8.5rem] gap-2 bg-salYellow focus:bg-salYellow/70 focus-visible:translate-x-[3px] focus-visible:translate-y-[-3px] focus-visible:shadow-slg md:bg-white"
           onClick={() => onProviderSignIn("google")}
-          disabled={pending}
+          disabled={pendingOAuth}
           tabIndex={1}
         >
           {isLoading === "google" ? (
@@ -312,7 +313,7 @@ const SignInCard = ({ switchFlow, forgotPasswordHandler }: SignInCardProps) => {
                     <FormLabel className="font-bold">Email</FormLabel>
                     <FormControl>
                       <Input
-                        disabled={pending}
+                        disabled={pending || pendingOAuth}
                         {...field}
                         type="email"
                         inputHeight="default"
@@ -341,7 +342,7 @@ const SignInCard = ({ switchFlow, forgotPasswordHandler }: SignInCardProps) => {
                     </div>
                     <FormControl>
                       <PasswordInput
-                        isPending={pending}
+                        isPending={pending || pendingOAuth}
                         tabIndex={3}
                         visibilityTabIndex={4}
                         field={field}
@@ -357,16 +358,24 @@ const SignInCard = ({ switchFlow, forgotPasswordHandler }: SignInCardProps) => {
               size="lg"
               type="submit"
               variant={
-                !isValid || pending || Boolean(success) || Boolean(error)
+                !isValid ||
+                pending ||
+                Boolean(success) ||
+                Boolean(error) ||
+                pendingOAuth
                   ? "salWithShadowHidden"
                   : "salWithShadowYlw"
               }
               disabled={
-                pending || Boolean(success) || !isValid || Boolean(error)
+                pending ||
+                Boolean(success) ||
+                !isValid ||
+                Boolean(error) ||
+                pendingOAuth
               }
               tabIndex={6}
             >
-              {pending || Boolean(isLoading) ? (
+              {pending ? (
                 <LoaderCircle className="size-5 animate-spin" />
               ) : Boolean(success) ? (
                 "Success!"

@@ -844,11 +844,31 @@ export type UserSubscriptionType = Infer<
   typeof userSubscriptionSchemaValidator
 >;
 
+export const analyticsActionSchema = v.union(
+  v.literal("view"),
+  v.literal("apply"),
+  v.literal("bookmark"),
+  v.literal("hide"),
+);
+
+const eventAnalyticsSchema = {
+  userId: v.union(v.id("users"), v.null()),
+  eventId: v.id("events"),
+  plan: v.number(),
+  action: analyticsActionSchema,
+};
+
 // #endregion
 
 // #region ------------- Table Schemas & Indexes --------------
 export default defineSchema({
   ...authTables, // This includes other auth tables
+  eventAnalytics: defineTable(eventAnalyticsSchema)
+    .index("by_userId", ["userId"])
+    .index("by_eventId", ["eventId"])
+    .index("by_eventId_action", ["eventId", "action"])
+    .index("by_plan", ["plan"])
+    .index("by_action", ["action"]),
   users: defineTable(customUserSchema)
     .index("email", ["email"])
     .index("by_userId", ["userId"])
@@ -936,6 +956,7 @@ export default defineSchema({
         "location.continent",
         "links.instagram",
         "isComplete",
+        "ownerId",
       ],
     })
     .searchIndex("search_by_location", {
@@ -951,10 +972,12 @@ export default defineSchema({
         "isComplete",
       ],
     })
+
     .searchIndex("search_by_handle", {
       searchField: "links.instagram",
     })
     .index("by_name", ["name"])
+    .index("by_name_ownerId", ["name", "ownerId"])
     .index("by_slug", ["slug"])
     .index("by_complete", ["isComplete"])
     .index("by_complete_with_ownerId", ["isComplete", "ownerId"])
@@ -993,6 +1016,7 @@ export default defineSchema({
     })
     .index("by_name", ["name"])
     .index("by_slug", ["slug"])
+    .index("by_slug_edition", ["slug", "dates.edition"])
     .index("by_slug_and_organizerId", ["slug", "organizerId"])
     .index("by_organizerId", ["organizerId"])
     .index("by_mainOrgId", ["mainOrgId"])

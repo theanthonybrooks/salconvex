@@ -4,12 +4,10 @@ import { SearchType, TheListFilterCommandItem } from "@/constants/filterConsts";
 import { ViewOptions } from "@/features/events/event-list-client";
 import { TheListFilterDrawer } from "@/features/thelist/components/filter-drawer";
 import { FilterBase } from "@/features/thelist/components/filters/filter-base";
-import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { cn } from "@/helpers/utilsFns";
 import { MergedEventPreviewData } from "@/types/eventTypes";
 import { Filters, SearchParams, SortOptions } from "@/types/thelist";
 import { User } from "@/types/user";
-import { usePreloadedQuery } from "convex/react";
 import { debounce } from "lodash";
 import { useEffect, useMemo, useState } from "react";
 
@@ -60,9 +58,9 @@ export const TheListFilters = <T extends TheListFilterCommandItem>({
   results,
   isLoading,
 }: ListFilterProps<T>) => {
-  const { preloadedSubStatus } = useConvexPreload();
-  const subData = usePreloadedQuery(preloadedSubStatus);
-  const { hasActiveSubscription } = subData ?? {};
+  // const { preloadedSubStatus } = useConvexPreload();
+  // const subData = usePreloadedQuery(preloadedSubStatus);
+  // const { hasActiveSubscription } = subData ?? {};
 
   const [open, setOpen] = useState(false);
   const [localValue, setLocalValue] = useState(search?.searchTerm ?? "");

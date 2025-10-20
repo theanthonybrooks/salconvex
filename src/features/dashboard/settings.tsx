@@ -218,7 +218,7 @@ export default function SettingsPage() {
     delayError: 300,
   });
 
-  const { getFieldState, watch } = passwordForm;
+  const { getFieldState, watch, reset } = passwordForm;
   const newPassword = watch("newPassword");
   const newRepeatedPassword = watch("repeatNewPassword");
   const currentPasswordState = getFieldState("oldPassword");
@@ -665,7 +665,7 @@ export default function SettingsPage() {
                     <div className="space-y-2">
                       <div className="flex items-center justify-start gap-x-2">
                         <Label htmlFor="name" className={fontSize}>
-                          Artist Name/Preferred Name
+                          {isArtist ? "Artist Name/" : null}Preferred Name
                         </Label>
                         <p className="text-sm font-light italic">(Optional)</p>
                       </div>
@@ -1283,7 +1283,13 @@ export default function SettingsPage() {
                         </p>
                       </div>
                     </div>
-                    <Dialog onOpenChange={setPwOpen} open={pwOpen}>
+                    <Dialog
+                      onOpenChange={() => {
+                        reset();
+                        setPwOpen((prev) => !prev);
+                      }}
+                      open={pwOpen}
+                    >
                       <DialogTrigger asChild>
                         <Button
                           variant="outline"

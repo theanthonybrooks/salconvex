@@ -122,6 +122,9 @@ const EventContextMenu = ({
   const hasActiveSubscription = subData?.hasActiveSubscription || isAdmin;
   const hasValidSub = hasActiveSubscription && isArtist;
 
+  const updateEventAnalytics = useMutation(
+    api.analytics.eventAnalytics.markEventAnalytics,
+  );
   const updateUserLastActive = useMutation(api.users.updateUserLastActive);
 
   const approveEvent = useMutation(api.events.event.approveEvent);
@@ -133,10 +136,22 @@ const EventContextMenu = ({
   const onHide = async () => {
     toggleListAction({ hidden: !isHidden });
     await updateUserLastActive({ email: user?.email ?? "" });
+    if (isHidden || isAdmin) return;
+    await updateEventAnalytics({
+      eventId,
+      plan: user?.plan ?? 0,
+      action: "hide",
+    });
   };
   const onBookmark = async () => {
     toggleListAction({ bookmarked: !isBookmarked || false });
     await updateUserLastActive({ email: user?.email ?? "" });
+    if (isBookmarked || isAdmin) return;
+    await updateEventAnalytics({
+      eventId,
+      plan: user?.plan ?? 0,
+      action: "bookmark",
+    });
   };
   const onApply = async () => {
     if (typeof openCallId !== "string" || openCallId.length < 10) return;
@@ -145,6 +160,12 @@ const EventContextMenu = ({
       manualApplied: appStatus === "applied" ? false : true,
     });
     await updateUserLastActive({ email: user?.email ?? "" });
+    if (appStatus === "applied" || isAdmin) return;
+    await updateEventAnalytics({
+      eventId,
+      plan: user?.plan ?? 0,
+      action: "apply",
+    });
   };
 
   const { data: orgOwnerEmailData } = useQueryWithStatus(

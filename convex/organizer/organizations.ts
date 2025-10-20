@@ -10,7 +10,7 @@ import {
 import { Organizer } from "@/types/organizer";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import slugify from "slugify";
-import { Doc, Id } from "~/convex/_generated/dataModel";
+import { Id } from "~/convex/_generated/dataModel";
 import {
   mutation,
   MutationCtx,
@@ -633,26 +633,38 @@ export const getUserOrganizations = query({
     const userId = await getAuthUserId(ctx);
     if (!userId) return null;
 
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_userId", (q) => q.eq("userId", userId))
-      .unique();
+    const user = await ctx.db.get(userId);
     if (!user) return null;
 
-    const q = args.query.trim().toLowerCase();
-    const filterFn = (org: Doc<"organizations">) =>
-      q === "" || org.name?.toLowerCase().includes(q);
-
     if (user?.role.includes("admin")) {
-      const all = await ctx.db.query("organizations").collect();
-      return all.filter(filterFn);
+      // const all = await ctx.db.query("organizations").collect();
+      // return all.filter(filterFn);
+      const all = await ctx.db
+        .query("organizations")
+        .withSearchIndex("search_by_name", (q) =>
+          q.search("name", args.query.trim().toLowerCase()),
+        )
+        .collect();
+      return all;
+    } else {
+      // const orgs = await ctx.db
+      //   .query("organizations")
+      //   .withIndex("by_name_ownerId", (q) =>
+      //     q.eq("name", args.query.trim().toLowerCase()).eq("ownerId", user._id),
+      //   )
+      //   .order("asc")
+      //   .collect();
+      const orgs = await ctx.db
+        .query("organizations")
+        .withSearchIndex("search_by_name", (q) =>
+          q
+            .search("name", args.query.trim().toLowerCase())
+            .eq("ownerId", user._id),
+        )
+        .collect();
+      const sortedOrgs = orgs.sort((a, b) => a.name.localeCompare(b.name));
+      return sortedOrgs;
     }
-
-    const orgs = await ctx.db
-      .query("organizations")
-      .filter((q) => q.eq(q.field("ownerId"), user._id))
-      .collect();
-    return orgs.filter(filterFn);
   },
 });
 
@@ -661,10 +673,7 @@ export const getUserOrgEvents = query({
     const userId = await getAuthUserId(ctx);
     if (!userId) return null;
 
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_userId", (q) => q.eq("userId", userId))
-      .unique();
+    const user = await ctx.db.get(userId);
     if (!user) return null;
 
     const isOrganizer = user.accountType?.includes("organizer");
@@ -719,36 +728,20 @@ export const isOwnerOrIsNewOrg = query({
 
     if (isAdmin) return "userIsAdmin";
 
-    // const owner = await ctx.db
-    //   .query("organizations")
-    //   .withIndex("by_ownerId", (q) => q.eq("ownerId", user._id))
-    //   .filter((q) => q.eq(q.field("organizationName"), args.organizationName))
-    //   .unique()
-    const owner = await filter(
-      ctx.db
-        .query("organizations")
-        .withIndex("by_ownerId", (q) => q.eq("ownerId", user._id)),
-      (org) => org.name.toLowerCase() === inputName,
-    ).unique();
-
-    // console.log("owner", owner);
+    const owner = await ctx.db
+      .query("organizations")
+      .withSearchIndex("search_by_name", (q) =>
+        q.search("name", args.organizationName).eq("ownerId", user._id),
+      )
+      .first();
 
     if (owner && owner.ownerId === user._id) return "ownedByUser";
     if (owner) throw new ConvexError("Organization already exists");
 
-    // const org = await ctx.db
-    //   .query("organizations")
-    //   .withIndex("by_organizationName", (q) =>
-    //     q.eq("organizationName", args.organizationName)
-    //   )
-    //   .unique()
     const org = await filter(
       ctx.db.query("organizations"),
       (org) => org.name.toLowerCase() === inputName,
     ).unique();
-
-    // console.log("org", org);
-    // console.log("user id", userId);
 
     if (org) throw new ConvexError("Organization already exists");
 
@@ -798,10 +791,7 @@ export const getOrganizerBySlug = query({
       .first();
     // console.log("userId: ", userId);
     if (userId) {
-      const user = await ctx.db
-        .query("users")
-        .withIndex("by_userId", (q) => q.eq("userId", userId))
-        .unique();
+      const user = await ctx.db.get(userId);
 
       if (!user) return null;
 
@@ -822,18 +812,20 @@ export const getOrganizerBySlug = query({
       }
       throw new ConvexError(`No organizer found for ${args.slug}`);
     }
-    const publishedEvents = await ctx.db
-      .query("events")
-      .withIndex("by_mainOrgId_and_state", (q) =>
-        q.eq("mainOrgId", organizer._id).eq("state", "published"),
-      )
-      .collect();
-    const archivedEvents = await ctx.db
-      .query("events")
-      .withIndex("by_mainOrgId_and_state", (q) =>
-        q.eq("mainOrgId", organizer._id).eq("state", "archived"),
-      )
-      .collect();
+    const [publishedEvents, archivedEvents] = await Promise.all([
+      ctx.db
+        .query("events")
+        .withIndex("by_mainOrgId_and_state", (q) =>
+          q.eq("mainOrgId", organizer._id).eq("state", "published"),
+        )
+        .collect(),
+      ctx.db
+        .query("events")
+        .withIndex("by_mainOrgId_and_state", (q) =>
+          q.eq("mainOrgId", organizer._id).eq("state", "archived"),
+        )
+        .collect(),
+    ]);
 
     const rawEvents = [...publishedEvents, ...archivedEvents];
 
@@ -859,17 +851,15 @@ export const checkIfOrgOwner = query({
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) return false;
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_userId", (q) => q.eq("userId", userId))
-      .unique();
+    const user = await ctx.db.get(userId);
 
     if (!user) return false;
 
     const event = await ctx.db
       .query("events")
-      .withIndex("by_slug", (q) => q.eq("slug", args.eventSlug))
-      .filter((q) => q.eq(q.field("dates.edition"), args.edition))
+      .withIndex("by_slug_edition", (q) =>
+        q.eq("slug", args.eventSlug).eq("dates.edition", args.edition),
+      )
       .first();
 
     if (!event) return false;

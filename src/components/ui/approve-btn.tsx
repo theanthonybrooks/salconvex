@@ -29,6 +29,7 @@ interface ApproveBtnProps {
   appStatus: ApplicationStatus | null;
   isHidden: boolean;
   isUserOrg: boolean;
+  className?: string;
 }
 
 export const ApproveBtn = ({
@@ -45,6 +46,7 @@ export const ApproveBtn = ({
   eventCategory,
   isHidden,
   isUserOrg,
+  className,
 }: ApproveBtnProps) => {
   const router = useRouter();
   const eventDraft = eventState === "draft";
@@ -78,7 +80,7 @@ export const ApproveBtn = ({
       <p className="text-sm">
         {isAdmin ? "Admin Only Actions" : "Organization Actions"}
       </p>
-      <div className="flex w-full items-center justify-center">
+      <div className={cn("flex w-full items-center justify-center", className)}>
         {isAdmin && (
           <Button
             variant={
@@ -141,11 +143,11 @@ export const ApproveBtn = ({
                 : "salWithShadowHidden"
             }
             onClick={() => {
-              if (!openCallId && bothPublished && appLink) {
-                //   window.location.href = appLink;
-                // } else {
-                router.push(`/dashboard/organizer/update-event?_id=${eventId}`);
-              }
+              // if (!openCallId && bothPublished && appLink) {
+              //   window.location.href = appLink;
+              // } else {
+              router.push(`/dashboard/organizer/update-event?_id=${eventId}`);
+              // }
             }}
             className={cn("w-full")}
           >
