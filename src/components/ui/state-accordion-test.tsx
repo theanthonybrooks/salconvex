@@ -106,7 +106,7 @@ const AccordionTrigger = React.forwardRef<
             className={cn(
               className,
 
-              hasPreview && "group-data-[state=closed]:block",
+              hasPreview && "w-full group-data-[state=closed]:block",
               hidePreview && "group-data-[state=open]:hidden",
               !hidePreview && "group-data-[state=open]:block",
             )}

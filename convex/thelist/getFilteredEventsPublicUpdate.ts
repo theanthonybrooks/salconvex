@@ -590,10 +590,14 @@ export const getFilteredEventsPublic = query({
       eventIds.map((id) => ctx.db.get(id)),
     );
     events = fetchedEvents.filter((e): e is NonNullable<typeof e> => !!e);
-    if (!filters.showHidden && hiddenIds.length > 0) {
+    if (!filters.showHidden && hiddenIds.length > 0 && view !== "archive") {
       events = events.filter((e) => !hiddenIds.includes(e._id));
     }
-    if (filters.bookmarkedOnly && bookmarkedIds.length > 0) {
+    if (
+      filters.bookmarkedOnly &&
+      bookmarkedIds.length > 0 &&
+      view !== "archive"
+    ) {
       events = events.filter((e) => bookmarkedIds.includes(e._id));
     }
     if (filters.eventCategories?.length) {

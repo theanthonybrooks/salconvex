@@ -127,6 +127,7 @@ export const FilterBase = ({
   const paidUser = isArtist && hasActiveSubscription;
   const limitOpenCalls = view === "event" || view === "orgView";
   const orgView = view === "orgView";
+  const archiveView = view === "archive";
   const notEvent =
     filters.eventCategories?.length !== 0 &&
     !filters.eventCategories?.includes("event");
@@ -631,7 +632,7 @@ export const FilterBase = ({
           )}
 
           <div className="mt-2 flex w-full justify-between">
-            {paidUser && !orgView && (
+            {paidUser && !orgView && !archiveView && (
               <section className="flex flex-col gap-4">
                 <label className="flex cursor-pointer items-center gap-2">
                   <Checkbox
@@ -1083,31 +1084,33 @@ export const FilterBase = ({
                   </section>
                 )}
 
-                <section className="flex flex-col gap-3 self-end">
-                  <label className="flex cursor-pointer items-center gap-2">
-                    <Checkbox
-                      id="bookmarkedOnly"
-                      checked={filters.bookmarkedOnly}
-                      onCheckedChange={(checked) =>
-                        onChange({ bookmarkedOnly: Boolean(checked) })
-                      }
-                    />
-                    <span className="text-sm">Bookmarked Only</span>
-                  </label>
+                {!archiveView && (
+                  <section className="flex flex-col gap-3 self-end">
+                    <label className="flex cursor-pointer items-center gap-2">
+                      <Checkbox
+                        id="bookmarkedOnly"
+                        checked={filters.bookmarkedOnly}
+                        onCheckedChange={(checked) =>
+                          onChange({ bookmarkedOnly: Boolean(checked) })
+                        }
+                      />
+                      <span className="text-sm">Bookmarked Only</span>
+                    </label>
 
-                  <label className="flex cursor-pointer items-center gap-2">
-                    <Checkbox
-                      id="showHidden"
-                      checked={filters.showHidden}
-                      onCheckedChange={(checked) =>
-                        onChange({ showHidden: Boolean(checked) })
-                      }
-                    />
-                    <span className="text-sm">
-                      {filters.showHidden ? "Hide" : "Show"} Hidden
-                    </span>
-                  </label>
-                </section>
+                    <label className="flex cursor-pointer items-center gap-2">
+                      <Checkbox
+                        id="showHidden"
+                        checked={filters.showHidden}
+                        onCheckedChange={(checked) =>
+                          onChange({ showHidden: Boolean(checked) })
+                        }
+                      />
+                      <span className="text-sm">
+                        {filters.showHidden ? "Hide" : "Show"} Hidden
+                      </span>
+                    </label>
+                  </section>
+                )}
               </div>
             </div>
           )}

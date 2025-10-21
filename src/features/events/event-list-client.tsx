@@ -407,6 +407,9 @@ const ClientEventList = () => {
     setView(newView);
     setSortOptions(getDefaultSortForView(newView));
     setSearch(getDefaultSearchForView(newView));
+    if (newView === "archive") {
+      handleResetFilters();
+    }
     setPage(1);
   };
 
