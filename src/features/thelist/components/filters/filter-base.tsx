@@ -191,7 +191,7 @@ export const FilterBase = ({
                     setLocalValue(e.target.value);
                   }}
                   placeholder={placeholder}
-                  value={search.searchTerm}
+                  value={localValue}
                   //   value={value}
                   className="focus:outline-hidden w-full flex-1 bg-transparent text-base placeholder:text-foreground/30"
                 />
