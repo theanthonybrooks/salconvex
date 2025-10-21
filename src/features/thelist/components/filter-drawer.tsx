@@ -490,6 +490,7 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
                 <button
                   onClick={() => {
                     setLocalValue("");
+                    setOpen(false);
                     // onSearchChange({ searchTerm: "" });
                   }}
                   className="rounded p-1 px-2 hover:scale-125 active:scale-110"
@@ -557,10 +558,10 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
                           organizers, or locations.{" "}
                         </span>
                         {view !== "archive" && hasActiveSubscription && (
-                          <p className="mt-2 text-sm text-foreground/50">
+                          <span className="mt-2 text-sm text-foreground/50">
                             To search the full database, including past events
                             and archived open calls, switch to the Archive view
-                          </p>
+                          </span>
                         )}
                       </Command.Empty>
                     )}

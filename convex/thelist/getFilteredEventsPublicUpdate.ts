@@ -464,6 +464,7 @@ export const getFilteredEventsPublic = query({
             index === self.findIndex((t) => t._id === item._id),
         );
       } else {
+        //TODO: Make if loop or ternary check to get queries based on each sort type and filtering out some parts (for example, if archive and open call, it should only be those events with open calls)
         lookupResults = await ctx.db.query("eventLookup").collect();
       }
     } else if (view === "orgView" && userId) {
