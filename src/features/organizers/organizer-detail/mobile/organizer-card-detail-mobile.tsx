@@ -14,13 +14,21 @@ import { formatEventDates } from "@/helpers/dateFns";
 import { getFormattedLocationString } from "@/helpers/locations";
 import { getUserFontSizePref } from "@/helpers/stylingFns";
 import { OrganizerCardProps } from "@/types/organizer";
-import { usePreloadedQuery } from "convex/react";
+import { useMutation, usePreloadedQuery } from "convex/react";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import { api } from "~/convex/_generated/api";
 
 export const OrganizerCardDetailMobile = (props: OrganizerCardProps) => {
-  const { preloadedUserData } = useConvexPreload();
+  const updateEventAnalytics = useMutation(
+    api.analytics.eventAnalytics.markEventAnalytics,
+  );
+  const { preloadedUserData, preloadedSubStatus } = useConvexPreload();
+  const subData = usePreloadedQuery(preloadedSubStatus);
+  const { hasActiveSubscription } = subData ?? {};
   const userData = usePreloadedQuery(preloadedUserData);
+  const user = userData?.user ?? null;
+  const isAdmin = user?.role?.includes("admin");
   const userPref = userData?.userPref ?? null;
   const fontSizePref = getUserFontSizePref(userPref?.fontSize);
   const fontSize = fontSizePref?.body;
@@ -171,7 +179,6 @@ export const OrganizerCardDetailMobile = (props: OrganizerCardProps) => {
                 )}
 
                 <span className="relative z-10">
-               
                   {tab === "events" && "Events/Projects"}
                   {tab === "organizer" && "Organizer"}
                 </span>
@@ -196,6 +203,17 @@ export const OrganizerCardDetailMobile = (props: OrganizerCardProps) => {
                               <Link
                                 href={`/thelist/event/${event.slug}/${event.dates.edition}${validOCVals.includes(event.hasOpenCall) ? "/call" : ""}`}
                                 className={cn(fontSize)}
+                                onClick={async () => {
+                                  if (isAdmin) return;
+                                  await updateEventAnalytics({
+                                    eventId: event._id,
+                                    plan: user?.plan ?? 0,
+                                    action: "view",
+                                    src: "orgPage",
+                                    userType: user?.accountType,
+                                    hasSub: hasActiveSubscription,
+                                  });
+                                }}
                               >
                                 <span>
                                   <p className="font-bold capitalize">

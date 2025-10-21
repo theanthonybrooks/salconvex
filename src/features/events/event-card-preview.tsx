@@ -35,7 +35,7 @@ import {
   EyeOff,
   Info,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { FaRegCheckSquare } from "react-icons/fa";
 import {
   FaBookmark,
@@ -63,6 +63,9 @@ const EventCardPreview = ({
   publicPreview,
   activeSub,
 }: EventCardPreviewProps) => {
+  const pathname = usePathname();
+  const thisWeekPage = pathname.includes("thisweek");
+
   const isAdmin = user?.role?.includes("admin");
   const isArtist = user?.accountType?.includes("artist");
   const hasValidSub = activeSub && isArtist;
@@ -208,11 +211,14 @@ const EventCardPreview = ({
       toggleListAction({ bookmarked: !bookmarked });
       try {
         await updateUserLastActive({ email: user?.email ?? "" });
-        if (isAdmin) return;
+        if (isAdmin || isUserOrg || bookmarked) return;
         updateEventAnalytics({
           eventId: event._id,
           plan: user?.plan ?? 0,
           action: "bookmark",
+          src: thisWeekPage ? "thisWeek" : "theList",
+        userType: user?.accountType,
+          hasSub: activeSub,
         });
       } catch (error) {
         console.error("Error updating last active:", error);
@@ -228,11 +234,14 @@ const EventCardPreview = ({
       toggleListAction({ hidden: !hidden });
       try {
         await updateUserLastActive({ email: user?.email ?? "" });
-        if (isAdmin) return;
+        if (isAdmin || isUserOrg || hidden) return;
         updateEventAnalytics({
           eventId: event._id,
           plan: user?.plan ?? 0,
-          action: "bookmark",
+          action: "hide",
+          src: thisWeekPage ? "thisWeek" : "theList",
+          userType: user?.accountType,
+          hasSub: activeSub,
         });
       } catch (error) {
         console.error("Error updating last active:", error);
@@ -260,6 +269,9 @@ const EventCardPreview = ({
                 eventId: event._id,
                 plan: user?.plan ?? 0,
                 action: "view",
+                src: thisWeekPage ? "thisWeek" : "theList",
+                userType: user?.accountType,
+                hasSub: activeSub,
               });
             }
             router.push(linkPath);
@@ -424,6 +436,8 @@ const EventCardPreview = ({
             </span>
           </div>
           <ApplyButtonShort
+            src={thisWeekPage ? "thisWeek" : "theList"}
+            isUserOrg={isUserOrg}
             user={user}
             eventId={event._id}
             activeSub={activeSub}
@@ -557,6 +571,7 @@ const EventCardPreview = ({
             align="start"
             postStatus={posted}
             postOptions={true}
+            src={thisWeekPage ? "thisWeek" : "theList"}
           />
         </div>
 
@@ -569,6 +584,9 @@ const EventCardPreview = ({
                     eventId: event._id,
                     plan: user?.plan ?? 0,
                     action: "view",
+                    src: thisWeekPage ? "thisWeek" : "theList",
+                    userType: user?.accountType,
+                    hasSub: activeSub,
                   });
                 }
                 router.push(linkPath);
@@ -831,6 +849,8 @@ const EventCardPreview = ({
           )}
 
           <ApplyButtonShort
+            src={thisWeekPage ? "thisWeek" : "theList"}
+            isUserOrg={isUserOrg}
             eventId={event._id}
             user={user}
             activeSub={activeSub}
@@ -844,6 +864,7 @@ const EventCardPreview = ({
           />
 
           <ApplyButton
+            src={thisWeekPage ? "thisWeek" : "theList"}
             user={user}
             id={event._id}
             isUserOrg={isUserOrg}

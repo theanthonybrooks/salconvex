@@ -28,6 +28,9 @@ import React, { useEffect, useState } from "react";
 import { api } from "~/convex/_generated/api";
 
 export const EventCardDetailMobile = (props: EventCardProps) => {
+  const updateEventAnalytics = useMutation(
+    api.analytics.eventAnalytics.markEventAnalytics,
+  );
   const router = useRouter();
   const { preloadedSubStatus, preloadedUserData } = useConvexPreload();
   const subData = usePreloadedQuery(preloadedSubStatus);
@@ -50,6 +53,7 @@ export const EventCardDetailMobile = (props: EventCardProps) => {
   const { event, organizer } = data;
 
   const {
+    isUserOrg,
     logo: eventLogo,
     category: eventCategory,
     type: eventType,
@@ -112,6 +116,16 @@ export const EventCardDetailMobile = (props: EventCardProps) => {
     if (!hasActiveSubscription) {
       router.push("/pricing");
     } else {
+      if (!isAdmin && !bookmarked && !isUserOrg) {
+        updateEventAnalytics({
+          eventId: event._id,
+          plan: user?.plan ?? 0,
+          action: "bookmark",
+          src: "eventPage",
+          userType: user?.accountType,
+          hasSub: true,
+        });
+      }
       toggleListAction({ bookmarked: !bookmarked });
       await updateUserLastActive({ email: user?.email ?? "" });
     }
@@ -121,6 +135,16 @@ export const EventCardDetailMobile = (props: EventCardProps) => {
     if (!hasActiveSubscription) {
       router.push("/pricing");
     } else {
+      if (!isAdmin && !hidden && !isUserOrg) {
+        await updateEventAnalytics({
+          eventId: event._id,
+          plan: user?.plan ?? 0,
+          action: "hide",
+          src: "eventPage",
+          userType: user?.accountType,
+          hasSub: true,
+        });
+      }
       toggleListAction({ hidden: !hidden });
       await updateUserLastActive({ email: user?.email ?? "" });
     }

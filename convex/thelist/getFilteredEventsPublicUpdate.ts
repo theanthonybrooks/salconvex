@@ -172,7 +172,6 @@ export const getFilteredEventsPublic = query({
     let lookupResults = [];
 
     if (view === "openCall" && !thisWeekPg && !nextWeekPg) {
-      console.log("by oc");
       if (!hasActiveSubscription) {
         lookupResults = await ctx.db
           .query("eventLookup")

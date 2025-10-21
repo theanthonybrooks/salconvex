@@ -1,7 +1,8 @@
 import SalHeader from "@/components/ui/headers/sal-header";
 import ClientThisWeekList from "@/features/events/thisweek-list-client";
+import { Metadata } from "next";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "This Week",
   description:
     "See the latest mural open calls and public art opportunities ending this week.",

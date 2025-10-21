@@ -48,6 +48,9 @@ import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
+  const updateEventAnalytics = useMutation(
+    api.analytics.eventAnalytics.markEventAnalytics,
+  );
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const router = useRouter();
@@ -56,11 +59,12 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
   const subData = usePreloadedQuery(preloadedSubStatus);
   const userData = usePreloadedQuery(preloadedUserData);
   const user = userData?.user ?? null;
+
   const userPref = userData?.userPref ?? null;
   const fontSizePref = getUserFontSizePref(userPref?.fontSize);
   const fontSize = fontSizePref?.body;
-
-  const isAdmin = user?.role?.includes("admin") || false;
+  const isAdmin = user?.role?.includes("admin");
+  const isCreator = user?.role?.includes("creator");
   const hasActiveSubscription =
     (subData?.hasActiveSubscription || isAdmin) ?? false;
   const activeArtist =
@@ -135,18 +139,43 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
   );
 
   const locationString = getFormattedLocationString(location);
-
   const onBookmark = async () => {
-    if (!activeArtist) return;
-    toggleListAction({ bookmarked: !bookmarked });
-
-    await updateUserLastActive({ email: user?.email ?? "" });
+    if (!hasActiveSubscription) {
+      router.push("/pricing");
+    } else {
+      if (!isAdmin && !bookmarked && !isUserOrg) {
+        console.log(isAdmin, bookmarked, isUserOrg);
+        updateEventAnalytics({
+          eventId: event._id,
+          plan: user?.plan ?? 0,
+          action: "bookmark",
+          src: "ocPage",
+          userType: user?.accountType,
+          hasSub: true,
+        });
+      }
+      toggleListAction({ bookmarked: !bookmarked });
+      await updateUserLastActive({ email: user?.email ?? "" });
+    }
   };
 
   const onHide = async () => {
-    if (!activeArtist) return;
-    toggleListAction({ hidden: !hidden });
-    await updateUserLastActive({ email: user?.email ?? "" });
+    if (!hasActiveSubscription) {
+      router.push("/pricing");
+    } else {
+      if (!isAdmin && !hidden && !isUserOrg) {
+        updateEventAnalytics({
+          eventId: event._id,
+          plan: user?.plan ?? 0,
+          action: "hide",
+          src: "ocPage",
+          userType: user?.accountType,
+          hasSub: true,
+        });
+      }
+      toggleListAction({ hidden: !hidden });
+      await updateUserLastActive({ email: user?.email ?? "" });
+    }
   };
 
   const tabList = [
@@ -377,9 +406,10 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                 {`$${basicInfo?.appFee}`}
               </p>
             )}
-            {bothValid && (!isUserOrg || isAdmin) && (
+            {bothValid && (!isUserOrg || isCreator) && (
               <>
                 <ApplyButton
+                  src="ocPage"
                   user={user}
                   isUserOrg={isUserOrg}
                   userPref={userPref}
@@ -420,6 +450,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
             )}
             {!bothValid && !isAdmin && !isUserOrg && (
               <ApplyButton
+                src="ocPage"
                 user={user}
                 isUserOrg={isUserOrg}
                 userPref={userPref}
@@ -465,7 +496,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                   appStatus={appStatus}
                   appLink={outputAppLink}
                   isHidden={hidden}
-                  isUserOrg={isUserOrg || isAdmin}
+                  isUserOrg={Boolean(isUserOrg || isAdmin)}
                 />
               </>
             )}
@@ -631,13 +662,14 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                     appStatus={appStatus}
                     appLink={outputAppLink}
                     isHidden={hidden}
-                    isUserOrg={isUserOrg || isAdmin}
+                    isUserOrg={Boolean(isUserOrg || isAdmin)}
                     className="mx-auto mt-1 w-full max-w-52"
                   />
                 </>
               )}
               {!isUserOrg && (
                 <ApplyButton
+                  src="ocPage"
                   user={user}
                   isUserOrg={isUserOrg}
                   userPref={userPref}

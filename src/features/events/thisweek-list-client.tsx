@@ -26,7 +26,7 @@ import { cn } from "@/helpers/utilsFns";
 import { LucideUploadCloud } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 // interface Props {
 
 // }
@@ -67,6 +67,14 @@ const ClientThisWeekList = (
     }),
     [],
   );
+
+  useEffect(() => {
+    const baseUrl = window.location.origin + window.location.pathname;
+    // document.cookie =
+    //   "login_url=/thisweek; path=/; max-age=300; SameSite=Lax; Secure";
+
+    sessionStorage.setItem("previousSalPage", baseUrl);
+  }, []);
 
   // const queryResult = useFilteredEventsQuery(filters, sortOptions, { page });
   const queryResult = useFilteredEventsQuery(

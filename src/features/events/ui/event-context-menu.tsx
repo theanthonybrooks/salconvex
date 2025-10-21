@@ -53,6 +53,7 @@ import { useMutation, usePreloadedQuery } from "convex/react";
 import { FaBookmark, FaRegBookmark, FaRegCopy } from "react-icons/fa6";
 import { api } from "~/convex/_generated/api";
 import { Id } from "~/convex/_generated/dataModel";
+import { AnalyticsSrcType } from "~/convex/schema";
 
 interface EventContextMenuProps {
   // onHide: () => void;
@@ -79,6 +80,7 @@ interface EventContextMenuProps {
   postStatus?: PostStatus;
   postOptions?: boolean;
   type?: "event" | "admin";
+  src?: AnalyticsSrcType;
 }
 
 const EventContextMenu = ({
@@ -107,6 +109,7 @@ const EventContextMenu = ({
   postStatus,
   postOptions = false,
   type = "event",
+  src,
 }: EventContextMenuProps) => {
   // const router = useRouter();
   const { preloadedSubStatus, preloadedUserData } = useConvexPreload();
@@ -132,25 +135,32 @@ const EventContextMenu = ({
   const { toggleAppActions } = useArtistApplicationActions();
   const hasApplied = appStatus !== null;
   // const { slug, dates } = event;
+  const srcType = src ?? (appLink ? "ocPage" : "theList");
 
   const onHide = async () => {
     toggleListAction({ hidden: !isHidden });
     await updateUserLastActive({ email: user?.email ?? "" });
-    if (isHidden || isAdmin) return;
+    if (isHidden || isAdmin || isUserOrg) return;
     await updateEventAnalytics({
       eventId,
       plan: user?.plan ?? 0,
       action: "hide",
+      src: srcType,
+      userType: user?.accountType,
+      hasSub: hasActiveSubscription,
     });
   };
   const onBookmark = async () => {
     toggleListAction({ bookmarked: !isBookmarked || false });
     await updateUserLastActive({ email: user?.email ?? "" });
-    if (isBookmarked || isAdmin) return;
+    if (isBookmarked || isAdmin || isUserOrg) return;
     await updateEventAnalytics({
       eventId,
       plan: user?.plan ?? 0,
       action: "bookmark",
+      src: srcType,
+      userType: user?.accountType,
+      hasSub: hasActiveSubscription,
     });
   };
   const onApply = async () => {
@@ -160,11 +170,14 @@ const EventContextMenu = ({
       manualApplied: appStatus === "applied" ? false : true,
     });
     await updateUserLastActive({ email: user?.email ?? "" });
-    if (appStatus === "applied" || isAdmin) return;
+    if (appStatus === "applied" || isAdmin || isUserOrg) return;
     await updateEventAnalytics({
       eventId,
       plan: user?.plan ?? 0,
       action: "apply",
+      src: srcType,
+      userType: user?.accountType,
+      hasSub: hasActiveSubscription,
     });
   };
 

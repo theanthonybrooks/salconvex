@@ -8,6 +8,8 @@ import { useEffect } from "react";
 export default function WorldMapPage() {
   useEffect(() => {
     sessionStorage.setItem("previousSalPage", "/map");
+    // document.cookie =
+    //   "login_url=/map; path=/; max-age=300; SameSite=Lax; Secure";
   }, []);
 
   return <WorldMapComponent />;

@@ -24,11 +24,15 @@ import { getFormattedLocationString } from "@/helpers/locations";
 import { RichTextDisplay } from "@/helpers/richTextFns";
 import { getUserFontSizePref } from "@/helpers/stylingFns";
 import { OrganizerCardProps } from "@/types/organizer";
-import { usePreloadedQuery } from "convex/react";
+import { useMutation, usePreloadedQuery } from "convex/react";
 import Image from "next/image";
 import { useRef, useState } from "react";
+import { api } from "~/convex/_generated/api";
 
 export const OrganizerCardDetailDesktop = (props: OrganizerCardProps) => {
+  const updateEventAnalytics = useMutation(
+    api.analytics.eventAnalytics.markEventAnalytics,
+  );
   const { preloadedSubStatus, preloadedUserData } = useConvexPreload();
 
   const subData = usePreloadedQuery(preloadedSubStatus);
@@ -263,6 +267,17 @@ export const OrganizerCardDetailDesktop = (props: OrganizerCardProps) => {
                                       ? "lg:text-base"
                                       : fontSize,
                                   )}
+                                  onClick={async () => {
+                                    if (isAdmin) return;
+                                    await updateEventAnalytics({
+                                      eventId: event._id,
+                                      plan: user?.plan ?? 0,
+                                      action: "view",
+                                      src: "orgPage",
+                                      userType: user?.accountType,
+                                      hasSub: hasActiveSubscription,
+                                    });
+                                  }}
                                 >
                                   <span className="font-bold capitalize">
                                     {event.name}

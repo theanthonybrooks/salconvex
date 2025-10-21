@@ -13,7 +13,7 @@ import { cn } from "@/helpers/utilsFns";
 import type { EventApi, EventClickArg, MoreLinkArg } from "@fullcalendar/core";
 
 import { useQuery } from "convex-helpers/react/cache";
-import { usePreloadedQuery } from "convex/react";
+import { useMutation, usePreloadedQuery } from "convex/react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -23,11 +23,15 @@ const CalendarPage = () => {
   // const {isMobile} = useDevice()
   const router = useRouter();
   const { preloadedUserData, preloadedSubStatus } = useConvexPreload();
+  const updateEventAnalytics = useMutation(
+    api.analytics.eventAnalytics.markEventAnalytics,
+  );
   const userData = usePreloadedQuery(preloadedUserData);
   const subStatus = usePreloadedQuery(preloadedSubStatus);
   const hasActiveSubscription = subStatus?.hasActiveSubscription;
   // const userData = useQuery(api.users.getCurrentUser, {});
   const user = userData?.user;
+  const isAdmin = user?.role?.includes("admin");
   const activeArtist =
     user?.accountType?.includes("artist") && hasActiveSubscription;
 
@@ -60,6 +64,8 @@ const CalendarPage = () => {
   const events = eventsData?.events ?? [];
 
   useEffect(() => {
+    // document.cookie =
+    //   "login_url=/calendar; path=/; max-age=300; SameSite=Lax; Secure";
     sessionStorage.setItem("previousSalPage", "/calendar");
   }, []);
 
@@ -121,6 +127,7 @@ const CalendarPage = () => {
                 const locationString = getFormattedLocationString(
                   event.extendedProps.location,
                 );
+                console.log("eventId: ", event.extendedProps.eventId);
                 return (
                   <div
                     className="flex cursor-pointer flex-row items-center gap-4 rounded-md border-1.5 border-foreground/30 bg-white/50 p-3 hover:bg-white/70 hover:shadow-sm"
@@ -137,12 +144,22 @@ const CalendarPage = () => {
                     <div
                       key={event.id || event.title + event.startStr}
                       className="event-card-link w-full"
-                      onClick={() => {
+                      onClick={async () => {
                         // setShowModal(false);
+                        if (!isAdmin) {
+                          await updateEventAnalytics({
+                            eventId: event.extendedProps.eventId,
+                            plan: user?.plan ?? 0,
+                            action: "view",
+                            src: "calendar",
+                            userType: user?.accountType,
+                            hasSub: hasActiveSubscription,
+                          });
+                        }
 
-                        if (event.extendedProps.hasOpenCall && activeArtist) {
+                        if (activeArtist) {
                           router.push(
-                            `/thelist/event/${event.extendedProps.slug}/${event.extendedProps.edition}/call/tab=event`,
+                            `/thelist/event/${event.extendedProps.slug}/${event.extendedProps.edition}/call${!event.extendedProps.hasOpenCall ? "?tab=event" : ""}`,
                           );
                         } else {
                           router.push(

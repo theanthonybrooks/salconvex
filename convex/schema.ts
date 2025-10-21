@@ -851,11 +851,33 @@ export const analyticsActionSchema = v.union(
   v.literal("hide"),
 );
 
+export const analyticsSrcSchema = v.union(
+  v.literal("theList"),
+  v.literal("thisWeek"),
+  v.literal("calendar"),
+  v.literal("map"),
+  v.literal("orgPage"),
+  v.literal("ocPage"),
+  v.literal("eventPage"),
+);
+
+export type AnalyticsSrcType = Infer<typeof analyticsSrcSchema>;
+
+export const analyticsTypeSchema = v.union(
+  v.literal("artist-only"),
+  v.literal("artist-and-organizer"),
+  v.literal("organizer-only"),
+  v.null(),
+);
+
 const eventAnalyticsSchema = {
   userId: v.union(v.id("users"), v.null()),
   eventId: v.id("events"),
   plan: v.number(),
   action: analyticsActionSchema,
+  src: v.optional(analyticsSrcSchema),
+  userType: v.optional(analyticsTypeSchema),
+  hasSub: v.optional(v.boolean()),
 };
 
 // #endregion
@@ -865,6 +887,7 @@ export default defineSchema({
   ...authTables, // This includes other auth tables
   eventAnalytics: defineTable(eventAnalyticsSchema)
     .index("by_userId", ["userId"])
+    .index("by_userId_action", ["userId", "action"])
     .index("by_eventId", ["eventId"])
     .index("by_eventId_action", ["eventId", "action"])
     .index("by_plan", ["plan"])

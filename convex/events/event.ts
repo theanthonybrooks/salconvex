@@ -64,7 +64,7 @@ import {
 //       ? await ctx.db.query("openCalls").collect()
 //       : [];
 
-    //note-to-self: Flagging logic: 0 = none ever, 1 = expired, 2 = active, 3 = future (optional) for now
+//note-to-self: Flagging logic: 0 = none ever, 1 = expired, 2 = active, 3 = future (optional) for now
 
 //     const attachOpenCallStatusFlag = <T extends { _id: Id<"events"> }>(
 //       events: T[],
@@ -1088,18 +1088,20 @@ export const getEventsForCalendar = query({
     const events = await ctx.db
 
       .query("events")
-      .withIndex("by_state", (q) => q.eq("state", "published"))
+      .withIndex("by_state_category", (q) =>
+        q.eq("state", "published").eq("category", "event"),
+      )
       .collect();
 
     const results = await Promise.all(
       events.map(async (event) => {
-        const openCallStatus = await ctx.db
+        const openCall = await ctx.db
           .query("openCalls")
           .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
           .first();
         //todo: update this later to accommodate multiple open calls per event
 
-        if (openCallStatus?.state === "published") {
+        if (openCall?.state === "published") {
           hasOpenCall = true;
         }
         return {
@@ -1108,10 +1110,12 @@ export const getEventsForCalendar = query({
           // start: event.dates.eventDates[0].start,
           // end: event.dates.eventDates[0].end,
           extendedProps: {
+            eventId: event._id,
             logo: event.logo,
             description: event.blurb ?? event.about,
             slug: event.slug,
             hasOpenCall,
+            ocEnd: openCall?.basicInfo?.dates?.ocEnd,
             edition: event.dates.edition,
             location: event.location,
           },

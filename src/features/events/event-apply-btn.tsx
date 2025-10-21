@@ -37,9 +37,10 @@ import { FaBookmark, FaRegBookmark } from "react-icons/fa6";
 import { toast } from "react-toastify";
 import { api } from "~/convex/_generated/api";
 import { Id } from "~/convex/_generated/dataModel";
-import { UserPrefsType } from "~/convex/schema";
+import { AnalyticsSrcType, UserPrefsType } from "~/convex/schema";
 
 interface ApplyButtonShortProps {
+  src: AnalyticsSrcType;
   eventId: Id<"events">;
   slug: string;
   edition: number;
@@ -50,6 +51,7 @@ interface ApplyButtonShortProps {
   className?: string;
   user: User | null;
   activeSub: boolean;
+  isUserOrg: boolean;
 }
 
 export const ApplyButtonShort = ({
@@ -63,6 +65,8 @@ export const ApplyButtonShort = ({
   className,
   user,
   activeSub,
+  isUserOrg,
+  src,
 }: ApplyButtonShortProps) => {
   const updateEventAnalytics = useMutation(
     api.analytics.eventAnalytics.markEventAnalytics,
@@ -95,11 +99,14 @@ export const ApplyButtonShort = ({
       <Button
         asChild
         onClick={() => {
-          if (!isAdmin) {
+          if (!isAdmin && !isUserOrg) {
             updateEventAnalytics({
               eventId,
               plan: user?.plan ?? 0,
               action: "view",
+              src,
+              userType: user?.accountType,
+              hasSub: activeSub,
             });
           }
           window.history.pushState({}, "", currentUrl);
@@ -165,6 +172,7 @@ interface ApplyButtonProps {
   activeSub: boolean;
   callType?: CallType;
   fontSize?: string;
+  src: AnalyticsSrcType;
 }
 
 export const ApplyButton = ({
@@ -202,6 +210,7 @@ export const ApplyButton = ({
   publicPreview,
   callType,
   fontSize = "text-sm",
+  src,
 }: ApplyButtonProps) => {
   const autoApply = userPref?.autoApply ?? true;
   const updateEventAnalytics = useMutation(
@@ -279,11 +288,14 @@ export const ApplyButton = ({
       }
     } finally {
       setPending(false);
-      if (isAdmin) return;
+      if (isAdmin || isUserOrg) return;
       updateEventAnalytics({
         eventId: id,
         plan: user?.plan ?? 0,
         action: appStatus ? "view" : "apply",
+        src: "ocPage",
+        userType: user?.accountType,
+        hasSub: activeSub,
       });
     }
   };
@@ -299,11 +311,14 @@ export const ApplyButton = ({
     } catch (error) {
       console.error("Error updating last active:", error);
     } finally {
-      if (isAdmin || isBookmarked || orgPreview) return;
+      if (isAdmin || isBookmarked || isUserOrg) return;
       updateEventAnalytics({
         eventId: id,
         plan: user?.plan ?? 0,
-        action: "hide",
+        action: "bookmark",
+        src: finalButton ? "ocPage" : "theList",
+        userType: user?.accountType,
+        hasSub: activeSub,
       });
     }
   };
@@ -357,11 +372,14 @@ export const ApplyButton = ({
       {!finalButton && (
         <Button
           onClick={() => {
-            if (!isAdmin && !orgPreview) {
+            if (!isAdmin && !isUserOrg) {
               updateEventAnalytics({
                 eventId: id,
                 plan: user?.plan ?? 0,
                 action: "view",
+                src: src ?? "theList",
+                userType: user?.accountType,
+                hasSub: activeSub,
               });
             }
             window.history.pushState({}, "", currentUrl);

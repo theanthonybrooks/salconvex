@@ -299,6 +299,8 @@ const ClientEventList = () => {
       "previousSalPage",
       baseUrl + (queryString ? `?${queryString}` : ""),
     );
+    // document.cookie =
+    //   "login_url=/thelist; path=/; max-age=300; SameSite=Lax; Secure";
     window.history.replaceState(
       null,
       "",

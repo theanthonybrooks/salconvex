@@ -35,6 +35,9 @@ import { api } from "~/convex/_generated/api";
 const tabs = ["opencall", "event", "organizer"];
 
 export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
+  const updateEventAnalytics = useMutation(
+    api.analytics.eventAnalytics.markEventAnalytics,
+  );
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const router = useRouter();
@@ -127,6 +130,16 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
     if (!hasActiveSubscription) {
       router.push("/pricing");
     } else {
+      if (!isAdmin && !bookmarked && !isUserOrg) {
+        updateEventAnalytics({
+          eventId: event._id,
+          plan: user?.plan ?? 0,
+          action: "bookmark",
+          src: "ocPage",
+          userType: user?.accountType,
+          hasSub: true,
+        });
+      }
       toggleListAction({ bookmarked: !bookmarked });
       await updateUserLastActive({ email: user?.email ?? "" });
     }
@@ -136,6 +149,16 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
     if (!hasActiveSubscription) {
       router.push("/pricing");
     } else {
+      if (!isAdmin && !hidden && !isUserOrg) {
+        updateEventAnalytics({
+          eventId: event._id,
+          plan: user?.plan ?? 0,
+          action: "hide",
+          src: "ocPage",
+          userType: user?.accountType,
+          hasSub: true,
+        });
+      }
       toggleListAction({ hidden: !hidden });
       await updateUserLastActive({ email: user?.email ?? "" });
     }
@@ -347,6 +370,7 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
               fontSize={fontSize}
             />
             <ApplyButton
+              src="ocPage"
               user={user}
               isUserOrg={isUserOrg}
               userPref={userPref}
