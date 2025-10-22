@@ -61,7 +61,7 @@ export default function TheListNavBar(
   //   console.log("Page scroll: ", latest)
   // })
   // const isAdmin = user?.role?.includes("admin");
-  const fullPagePath = pathname;
+  // const fullPagePath = pathname;
   const currentPage = pathname.split("/")[1];
 
   const [isScrolled, setIsScrolled] = useState(false);
@@ -272,6 +272,7 @@ export default function TheListNavBar(
                       </NavigationMenuTrigger>
 
                       <NavigationMenuContent
+                        align="right"
                         onPointerEnter={(event) => event.preventDefault()}
                         onPointerLeave={(event) => event.preventDefault()}
                       >

@@ -344,6 +344,11 @@ body {
   transform: rotate(-90deg);
 }
 
+[data-radix-navigation-menu-viewport] {
+  transition: none !important;
+  transform: none !important;
+}
+
 /**
   * Note: this is needed to prevent the popover from being cut off
   * by the viewport when the popover is nested inside another popover
