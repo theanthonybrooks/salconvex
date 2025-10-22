@@ -56,7 +56,7 @@ const userChartConfig = {
 
 const appChartConfig = {
   viewed: {
-    label: "Visitors",
+    label: "Viewed",
     color: "var(--chart-2)",
   },
   applied: {
@@ -72,21 +72,6 @@ const appChartConfig = {
     color: "var(--chart-4)",
   },
 } satisfies ChartConfig;
-
-const GradientDefs = ({ keys }: { keys: string[] }) => (
-  <defs>
-    {keys.map((key) => (
-      <linearGradient key={key} id={`fill${key}`} x1="0" y1="0" x2="0" y2="1">
-        <stop offset="5%" stopColor={`var(--color-${key})`} stopOpacity={0.8} />
-        <stop
-          offset="95%"
-          stopColor={`var(--color-${key})`}
-          stopOpacity={0.1}
-        />
-      </linearGradient>
-    ))}
-  </defs>
-);
 
 type ChartContainerProps = {
   eventId?: Id<"events">;
@@ -143,7 +128,6 @@ export const ChartWrapper = ({ eventId, className }: ChartContainerProps) => {
     chartType === "application"
       ? (appChartConfig as typeof appChartConfig)
       : (userChartConfig as typeof userChartConfig);
-  const keys = Object.keys(config) as (keyof typeof config)[];
 
   return (
     <Card className={cn("pt-0", className)}>
@@ -179,7 +163,21 @@ export const ChartWrapper = ({ eventId, className }: ChartContainerProps) => {
           className="aspect-auto h-[250px] w-full"
         >
           <AreaChart data={filteredData}>
-            <GradientDefs keys={keys} />
+            <defs>
+              {Object.entries(config).map(([key, { color }]) => (
+                <linearGradient
+                  key={key}
+                  id={`fill-${key}`}
+                  x1="0"
+                  y1="0"
+                  x2="0"
+                  y2="1"
+                >
+                  <stop offset="5%" stopColor={color} stopOpacity={0.8} />
+                  <stop offset="95%" stopColor={color} stopOpacity={0.1} />
+                </linearGradient>
+              ))}
+            </defs>
 
             <CartesianGrid vertical={false} />
             <XAxis
@@ -210,15 +208,14 @@ export const ChartWrapper = ({ eventId, className }: ChartContainerProps) => {
                 />
               }
             />
-            {Object.keys(config).map((key) => (
+
+            {Object.entries(config).map(([key, { color }]) => (
               <Area
                 key={key}
                 dataKey={key}
                 type="natural"
-                fill={`url(#fill${key})`}
-                stroke={
-                  (config as Record<string, { color: string }>)[key].color
-                }
+                fill={`url(#fill-${key})`}
+                stroke={color}
                 stackId="a"
               />
             ))}
