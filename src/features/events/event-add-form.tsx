@@ -774,12 +774,22 @@ export const EventOCForm = ({
         //       i.message !== "Required" &&
         //       i.message !== "Invalid input",
         //   )?.message ?? issues[0]?.message;
+        // const userRelevantIssues = issues.filter(
+        //   (i) =>
+        //     i.message &&
+        //     !["Required", "Invalid input", "invalid_union"].includes(i.message),
+        //   // i.message && !["Required"].includes(i.message),
+        // );
         const userRelevantIssues = issues.filter(
           (i) =>
             i.message &&
-            !["Required", "Invalid input", "invalid_union"].includes(i.message),
-          // i.message && !["Required"].includes(i.message),
+            !(
+              i.message === "Required" ||
+              i.message === "invalid_union" ||
+              i.message.toLowerCase().includes("invalid input")
+            ),
         );
+
         const firstMessage = userRelevantIssues[0]?.message || "";
 
         setErrorMsg(firstMessage || "");
