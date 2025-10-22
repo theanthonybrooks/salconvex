@@ -25,6 +25,7 @@ interface MapComponentProps {
   className?: string;
   containerClassName?: string;
   hasDirections?: boolean;
+  mapType?: "event" | "full";
 }
 
 export default function MapComponent({
@@ -35,6 +36,7 @@ export default function MapComponent({
   className,
   containerClassName,
   hasDirections = false,
+  mapType = "event",
 }: MapComponentProps) {
   const [overlay, setOverlay] = useState(true);
 
@@ -73,7 +75,7 @@ export default function MapComponent({
         )}
         <MapContainer
           center={center as [number, number]}
-          zoom={3}
+          zoom={mapType === "event" ? 6 : 3}
           scrollWheelZoom={false}
           attributionControl={false}
           className={className}

@@ -19,6 +19,28 @@ import { DataModel } from "./_generated/dataModel.js";
 export const migrations = new Migrations<DataModel>(components.migrations);
 export const run = migrations.runner();
 
+export const backfillKanbanCardAssignments = migrations.define({
+  table: "todoKanban",
+  migrateOne: async (ctx, card) => {
+    //check to see if the card already has an assignedId
+    if (card.assignedId) return;
+    //should find the first user with a userRole of creator (the roles are in a field with an array of strings)
+    const creator = await ctx.db
+      .query("userRoles")
+      .withIndex("by_role", (q) => q.eq("role", "creator"))
+      .first();
+    if (!creator) return;
+
+    await ctx.db.patch(card._id, {
+      assignedId: creator.userId,
+    });
+  },
+});
+
+export const runBKAC = migrations.runner(
+  internal.migrations.backfillKanbanCardAssignments,
+);
+
 export const populateEventLookupLoc = migrations.define({
   table: "eventLookup",
   migrateOne: async (ctx, eventLookup) => {

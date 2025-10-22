@@ -150,7 +150,11 @@ const OpenCallSocials = ({ data }: OpenCallSocialsProps) => {
           <div className="group relative">
             <PostMenu items={postMenuItems} loading={loading} />
 
-            <div className={cn("origin-top-left scale-[0.72] sm:scale-100")}>
+            <div
+              className={cn(
+                "origin-top-left scale-[0.72] border-3 sm:scale-100",
+              )}
+            >
               <OpenCallPost data={data} postSettings={postSettings} />
             </div>
 

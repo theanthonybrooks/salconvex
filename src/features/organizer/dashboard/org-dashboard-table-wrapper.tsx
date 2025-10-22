@@ -29,6 +29,7 @@ export function OrganizerDashboardTableWrapper() {
           pageType="dashboard"
           minimalView={!isSidebarCollapsed}
           defaultSort={{ id: "lastEditedAt", desc: true }}
+          pageSize={50}
         />
       </div>
       <div className="flex flex-col items-center justify-center gap-4 py-7 lg:hidden">

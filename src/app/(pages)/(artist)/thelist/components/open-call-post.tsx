@@ -55,7 +55,7 @@ export const OpenCallPost = ({ data, postSettings }: OpenCallPostProps) => {
   return (
     <div
       id="post-root"
-      className={cn("relative flex h-[625px] w-[500px] flex-col border-3")}
+      className={cn("relative flex h-[625px] w-[500px] flex-col")}
       style={{ background: postSettings.bgColor }}
     >
       <section
