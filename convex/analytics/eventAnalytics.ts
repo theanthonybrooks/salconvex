@@ -122,14 +122,26 @@ export const getEventUserAnalytics = query({
           .collect()
       : await ctx.db.query("eventAnalytics").collect();
 
+    // keep only one record per userId per day
+    const uniqueInteractions = [
+      ...new Map(
+        interactions.map((i) => {
+          const day = new Date(i._creationTime).toDateString();
+          const key = i.userId
+            ? `${i.userId}-${day}`
+            : `${Math.random()}-${day}`;
+          return [key, i];
+        }),
+      ).values(),
+    ];
+
     const totalsByDateUsers = new Map<
       string,
       { guest: number; user: number; artist: number; withSub: number }
     >();
 
-    for (const app of interactions) {
+    for (const app of uniqueInteractions) {
       const date = new Date(app._creationTime);
-      // Format: YYYY-MM-DD
       const dateKey = date.toISOString().split("T")[0];
 
       const current = totalsByDateUsers.get(dateKey) ?? {
@@ -140,27 +152,25 @@ export const getEventUserAnalytics = query({
       };
 
       if (!app.userId) current.guest += 1;
-      if (app.userId) current.user += 1;
+      else current.user += 1;
+
       if (
         app.userType === "artist-only" ||
         app.userType === "artist-and-organizer"
       )
         current.artist += 1;
+
       if (app.hasSub === true) current.withSub += 1;
 
       totalsByDateUsers.set(dateKey, current);
     }
 
-    // Convert map to array
-    const appChartData = Array.from(totalsByDateUsers.entries()).map(
-      ([date, counts]) => ({
+    const appChartData = Array.from(totalsByDateUsers.entries())
+      .map(([date, counts]) => ({
         date,
         ...counts,
-      }),
-    );
-
-    // Optional: sort by date
-    appChartData.sort((a, b) => a.date.localeCompare(b.date));
+      }))
+      .sort((a, b) => a.date.localeCompare(b.date));
 
     return appChartData;
   },

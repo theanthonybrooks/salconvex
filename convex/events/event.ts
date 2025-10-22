@@ -562,6 +562,14 @@ export const updateEventLastEditedAt = mutation({
     await ctx.db.patch(event._id, {
       lastEditedAt,
     });
+    const eventLookup = await ctx.db
+      .query("eventLookup")
+      .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
+      .first();
+    if (!eventLookup) return null;
+    await ctx.db.patch(eventLookup._id, {
+      lastEditedAt,
+    });
 
     return { event, lastEditedAt };
   },
@@ -980,8 +988,6 @@ export const updateEdition = mutation({
       );
     }
 
-    console.log("conflict", conflict);
-
     // Update edition
     await ctx.db.patch(event._id, {
       lastEditedAt: Date.now(),
@@ -1018,6 +1024,16 @@ export const updateEventName = mutation({
     await ctx.db.patch(event._id, {
       name: args.name.trim(),
       slug,
+      lastEditedAt: Date.now(),
+    });
+    const eventLookup = await ctx.db
+      .query("eventLookup")
+      .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
+      .first();
+    if (!eventLookup) return null;
+    await ctx.db.patch(eventLookup._id, {
+      eventName: args.name.trim(),
+      eventSlug: slug,
       lastEditedAt: Date.now(),
     });
   },

@@ -1,6 +1,6 @@
 "use client";
 
-import { ChartAreaInteractive } from "@/components/ui/charts/area-chart-interactive";
+import { ApplicationChart } from "@/components/ui/charts/application-chart-interactive";
 import WorldMapComponent from "@/components/ui/map/map-component";
 import ThisweekRecapPost from "@/features/events/thisweek-recap-post";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
@@ -35,10 +35,7 @@ export default function AdminScreen() {
       return <WorldMapComponent />;
     case "/admin/applications":
       return (
-        <ChartAreaInteractive
-          data={applicationData ?? []}
-          loading={isPending}
-        />
+        <ApplicationChart data={applicationData ?? []} loading={isPending} />
       );
     default:
       router.push("/thelist");

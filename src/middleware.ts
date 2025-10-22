@@ -17,12 +17,12 @@ const isSubmitPage = createRouteMatcher(["/submit"]);
 
 export default convexAuthNextjsMiddleware(
   async (request, { convexAuth }) => {
-    const cookies = request.cookies.getAll();
-    console.log("cookies:", cookies);
-    const loginUrl = request.cookies.get("login_url")?.value;
-    if (loginUrl) {
-      console.log("loginUrl:", loginUrl);
-    }
+    // const cookies = request.cookies.getAll();
+    // console.log("cookies:", cookies);
+    // const loginUrl = request.cookies.get("login_url")?.value;
+    // if (loginUrl) {
+    //   console.log("loginUrl:", loginUrl);
+    // }
     const userAgent = request.headers.get("user-agent") || "";
     const ua = new UAParser(userAgent).getResult();
 

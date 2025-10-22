@@ -307,9 +307,9 @@ const locationBaseFields = {
   full: v.optional(v.string()),
   locale: v.optional(v.string()),
   city: v.optional(v.string()),
-  region: v.optional(v.string()),
   state: v.optional(v.string()),
   stateAbbr: v.optional(v.string()),
+  region: v.optional(v.string()),
   country: v.string(), // base check moved to superRefine
   countryAbbr: v.string(),
   continent: v.optional(v.string()),
@@ -322,7 +322,7 @@ const coordinateFields = {
     }),
   ),
 };
-const locationFullFields = {
+export const locationFullFields = {
   ...locationBaseFields,
   ...coordinateFields,
 };

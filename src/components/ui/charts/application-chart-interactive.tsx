@@ -52,7 +52,7 @@ const chartConfig = {
   // },
 } satisfies ChartConfig;
 
-type ChartData = {
+type ApplicationData = {
   date: string;
   applied: number;
   viewed: number;
@@ -60,15 +60,15 @@ type ChartData = {
   hidden: number;
 };
 
-export type ChartAreaInteractiveProps = {
-  data: ChartData[];
+export type ApplicationChartProps = {
+  data: ApplicationData[];
   loading?: boolean;
 };
 
-export function ChartAreaInteractive({
+export function ApplicationChart({
   data,
   loading = true,
-}: ChartAreaInteractiveProps) {
+}: ApplicationChartProps) {
   const [timeRange, setTimeRange] = React.useState("90d");
 
   const filteredData = data.filter((item) => {
@@ -93,12 +93,9 @@ export function ChartAreaInteractive({
     <Card className="pt-0">
       <CardHeader className="flex items-center gap-2 space-y-0 border-b py-5 sm:flex-row">
         <div className="grid flex-1 gap-1">
-          <CardTitle>Applications - Interactive</CardTitle>
+          <CardTitle>Applications</CardTitle>
           <CardDescription>
             Showing total applications for the last 3 months
-            <p className="text-sm">
-              (Will add visitors and other data in the future)
-            </p>
           </CardDescription>
         </div>
         <Select value={timeRange} onValueChange={setTimeRange}>

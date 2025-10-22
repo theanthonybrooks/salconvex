@@ -11,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ApplyButton } from "@/features/events/event-apply-btn";
 import { OpenCallCardProps } from "@/types/openCallTypes";
 
-import { ChartAreaInteractive } from "@/components/ui/charts/area-chart-interactive";
+import { ChartWrapper } from "@/components/ui/charts/chart-wrapper";
 import { DraftPendingBanner } from "@/components/ui/draft-pending-banner";
 import { EventOrgLogo } from "@/components/ui/event-org-logo";
 import { useToggleListAction } from "@/features/artists/helpers/listActions";
@@ -24,8 +24,6 @@ import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-con
 import { getEventCategoryLabel, getEventTypeLabel } from "@/helpers/eventFns";
 import { getFormattedLocationString } from "@/helpers/locations";
 import { getUserFontSizePref } from "@/helpers/stylingFns";
-import { makeUseQueryWithStatus } from "convex-helpers/react";
-import { useQueries } from "convex-helpers/react/cache";
 import { useMutation, usePreloadedQuery } from "convex/react";
 import { motion } from "framer-motion";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -116,7 +114,6 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
   // const hasOpenCall = openCallStatus === "active";
 
   // console.log("has open call", hasOpenCall)
-  const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
 
   const updateUserLastActive = useMutation(api.users.updateUserLastActive);
   const [activeTab, setActiveTab] = useState("opencall");
@@ -179,13 +176,6 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
       router.replace(`${pathname}?${params.toString()}`);
     }
   }, [tabParam, activeTab, router, pathname, searchParams]);
-
-  const { data: appChartData, isPending: appChartLoading } = useQueryWithStatus(
-    api.analytics.eventAnalytics.getEventAnalytics,
-    openCallId && isAdmin && activeTab === "admin"
-      ? { eventId: event._id }
-      : "skip",
-  );
 
   return (
     <Card
@@ -412,10 +402,7 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
           </TabsContent>
           {isAdmin && (
             <TabsContent value="admin">
-              <ChartAreaInteractive
-                data={appChartData ?? []}
-                loading={appChartLoading}
-              />
+              <ChartWrapper eventId={event._id} />
             </TabsContent>
           )}
         </Tabs>

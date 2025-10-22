@@ -15,7 +15,7 @@ import {
 import { useEffect, useRef, useState } from "react";
 
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
-import { useMutation, usePreloadedQuery, useQueries } from "convex/react";
+import { useMutation, usePreloadedQuery } from "convex/react";
 import { CheckCircleIcon, EyeOff, MapPin } from "lucide-react";
 import { FaBookmark, FaRegBookmark } from "react-icons/fa6";
 
@@ -37,14 +37,13 @@ import { cn } from "@/helpers/utilsFns";
 import { api } from "~/convex/_generated/api";
 
 import { ApproveBtn } from "@/components/ui/approve-btn";
-import { ChartAreaInteractive } from "@/components/ui/charts/area-chart-interactive";
+import { ChartWrapper } from "@/components/ui/charts/chart-wrapper";
 import { DraftPendingBanner } from "@/components/ui/draft-pending-banner";
 import { EventOrgLogo } from "@/components/ui/event-org-logo";
 import { Separator } from "@/components/ui/separator";
 import { TooltipSimple } from "@/components/ui/tooltip";
 import { formatApplicationLink } from "@/helpers/applicationFns";
 import { getUserFontSizePref } from "@/helpers/stylingFns";
-import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
@@ -106,7 +105,6 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
     _id: openCallId,
     state: openCallState,
   } = openCall;
-  const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
 
   const validEventState = publicStateValues.includes(eventState ?? "");
   const validOpenCallState = publicStateValues.includes(openCallState ?? "");
@@ -214,13 +212,6 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
       router.replace(`${pathname}?${params.toString()}`);
     }
   }, [tabParam, activeTab, router, pathname, searchParams]);
-
-  const { data: appChartData, isPending: appChartLoading } = useQueryWithStatus(
-    api.analytics.eventAnalytics.getEventAnalytics,
-    openCallId && isAdmin && activeTab === "admin"
-      ? { eventId: event._id }
-      : "skip",
-  );
 
   return (
     <div
@@ -717,10 +708,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
           </div>
           {isAdmin && (
             <div id="admin">
-              <ChartAreaInteractive
-                data={appChartData ?? []}
-                loading={appChartLoading}
-              />
+              <ChartWrapper eventId={event._id} />
             </div>
           )}
         </NavTabs>

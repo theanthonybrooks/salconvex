@@ -91,13 +91,13 @@ export interface FilterBaseProps {
 
 export const FilterBase = ({
   isMobile,
-  search,
+  // search,
   filters,
   sortOptions,
   hasActiveFilters,
   setOpen,
   localValue,
-  setLocalValue,
+setLocalValue,
   searchType,
   setSearchType,
   placeholder,

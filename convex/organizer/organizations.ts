@@ -17,6 +17,7 @@ import {
   query,
   QueryCtx,
 } from "~/convex/_generated/server";
+import { linksValidator, locationFullFields } from "~/convex/schema";
 
 export async function updateOrgOwner(
   ctx: MutationCtx,
@@ -456,21 +457,7 @@ export const updateOrganization = mutation({
     logo: v.optional(v.string()),
     location: v.optional(
       v.object({
-        full: v.optional(v.string()),
-        locale: v.optional(v.string()),
-        city: v.optional(v.string()),
-        state: v.optional(v.string()),
-        stateAbbr: v.optional(v.string()),
-        region: v.optional(v.string()),
-        country: v.string(),
-        countryAbbr: v.string(),
-        continent: v.optional(v.string()),
-        coordinates: v.optional(
-          v.object({
-            latitude: v.number(),
-            longitude: v.number(),
-          }),
-        ),
+        ...locationFullFields,
         currency: v.optional(
           v.object({
             code: v.string(),
@@ -492,22 +479,7 @@ export const updateOrganization = mutation({
         primaryContact: v.string(),
       }),
     ),
-    links: v.optional(
-      v.object({
-        website: v.optional(v.string()),
-        instagram: v.optional(v.string()),
-        facebook: v.optional(v.string()),
-        threads: v.optional(v.string()),
-        email: v.optional(v.string()),
-        vk: v.optional(v.string()),
-        linkedIn: v.optional(v.string()),
-        youTube: v.optional(v.string()),
-        phone: v.optional(v.string()),
-        phoneExt: v.optional(v.string()),
-        linkAggregate: v.optional(v.string()),
-        other: v.optional(v.string()),
-      }),
-    ),
+    links: v.optional(linksValidator),
     lastUpdatedBy: v.optional(v.string()),
     name: v.string(),
     slug: v.string(),
@@ -566,6 +538,23 @@ export const updateOrganization = mutation({
     if (!updatedOrg) {
       throw new ConvexError("Organization not found");
     }
+    const eventLookupOrgEvents = await ctx.db
+      .query("eventLookup")
+      .withIndex("by_mainOrgId", (q) => q.eq("mainOrgId", updatedOrg._id))
+      .collect();
+    const eventLookupOrgIds = eventLookupOrgEvents.map((e) => e._id);
+    await Promise.all(
+      eventLookupOrgIds.map(async (id) => {
+        await ctx.db.patch(id, {
+          mainOrgId: updatedOrg._id,
+          orgName: updatedOrg.name,
+          ownerId: updatedOrg.ownerId,
+          orgSlug: updatedOrg.slug,
+          orgLocation: updatedOrg.location,
+        });
+      }),
+    );
+
     return { orgId: updatedOrg._id, org: updatedOrg };
   },
 });
