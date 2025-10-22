@@ -347,7 +347,7 @@ const Board = ({ purpose: initialPurpose }: KanbanBoardProps) => {
             column={column}
             headingColor={getColumnColor(column)}
             cards={cards.filter((card) => card.column === column)}
-            userRole={userRole}
+            user={user}
             moveCard={moveCard}
             addCard={addCard}
             purpose={purpose}
@@ -367,11 +367,12 @@ const Column = ({
   headingColor,
   column,
   cards,
-  userRole,
+  user,
   deleteCard,
   moveCard,
   addCard,
 }: ColumnProps) => {
+  const userRole = user?.role ?? [];
   const [active, setActive] = useState(false);
 
   const handleDragStart = (
@@ -480,10 +481,10 @@ const Column = ({
           </h3>
           {userRole.includes("admin") && (
             <AddCard
+              user={user}
               purpose={purpose}
               column={column}
               addCard={addCard}
-              userRole={userRole}
             />
           )}
           <span className="rounded pr-4 text-sm text-foreground dark:text-primary-foreground">
@@ -627,6 +628,7 @@ const Card = ({
           <div className="absolute right-0 top-0 flex items-center justify-center gap-x-3 rounded-lg border border-primary bg-card/90 p-3 dark:bg-foreground sm:gap-x-2">
             <TaskDialog
               id={id}
+              user={user}
               purpose={purpose}
               mode="edit"
               isOpen={isEditing}
@@ -709,11 +711,13 @@ const DropIndicator = ({ beforeId, column }: DropIndicatorProps) => {
   );
 };
 
-const AddCard = ({ column, addCard, userRole, purpose }: AddCardProps) => {
+const AddCard = ({ column, addCard, user, purpose }: AddCardProps) => {
+  const userRole = user?.role ?? [];
   if (!userRole.includes("admin")) return null;
 
   return (
     <TaskDialog
+      user={user}
       mode="add"
       purpose={purpose}
       trigger={
@@ -745,6 +749,7 @@ const AddCard = ({ column, addCard, userRole, purpose }: AddCardProps) => {
 };
 
 export const TaskDialog = ({
+  user,
   mode,
   trigger,
   initialValues,
@@ -778,7 +783,7 @@ export const TaskDialog = ({
   const [isPublic, setIsPublic] = useState<boolean>(
     initialValues?.isPublic ?? true,
   );
-  const [assignedUser, setAssignedUser] = useState<User | null>(null);
+  const [assignedUser, setAssignedUser] = useState<User | null>(user);
 
   const assignedUserData = useQuery(
     api.users.getUserById,

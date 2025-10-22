@@ -155,8 +155,8 @@ export interface MoveCardArgs {
 }
 
 export interface AddCardProps {
+  user: User | null;
   column: ColumnType;
-  userRole: string[];
   purpose: KanbanPurpose;
   addCard: (args: AddCardArgs) => void;
 }
@@ -180,11 +180,11 @@ export interface DeleteCardArgs {
 // type ConvexCard = Omit<Card, "id"> & { _id: string }
 
 export interface ColumnProps {
+  user: User | null;
   title: string;
   headingColor: string;
   column: ColumnType;
   cards: CardBase[];
-  userRole: string[];
   purpose: KanbanPurpose;
   activeColumn: string | null;
   setActiveColumn: (col: string | null) => void;
@@ -247,6 +247,7 @@ export type EditTaskDialogProps = {
 
 export type TaskDialogProps = (AddTaskDialogProps | EditTaskDialogProps) & {
   id?: Id<"todoKanban">;
+  user: User | null;
 };
 
 export type DetailsDialogProps = {

@@ -52,7 +52,7 @@ const ClientThisWeekList = (
 
   const user = userData?.user || null;
   const accountType = user?.accountType ?? [];
-  const isAdmin = user?.role?.includes("admin");
+  const isAdmin = user?.role?.includes("admin") || false;
   const isArtist = accountType?.includes("artist");
 
   const publicView = !hasActiveSubscription || !(isArtist || isAdmin);
@@ -79,7 +79,7 @@ const ClientThisWeekList = (
   // const queryResult = useFilteredEventsQuery(filters, sortOptions, { page });
   const queryResult = useFilteredEventsQuery(
     {
-      showHidden: true,
+      showHidden: isAdmin,
       bookmarkedOnly: false,
       limit: 20,
       eventTypes: [],
