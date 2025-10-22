@@ -140,6 +140,7 @@ export default {
         vlga: "0 5px 0 0 rgba(0, 0, 0, 0.7)",
         smd: "-3px 3px 0 0 #000000",
         ssm: "-2px 2px 0 0 #000000",
+        dropdown: "-5px 5px 0 0 #000000",
       },
       zIndex: {
         1: "1",

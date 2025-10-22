@@ -119,7 +119,7 @@ export function UserProfile({
           </Button>
         </DropdownMenuTrigger>
       </TooltipSimple>
-      <DropdownMenuContent className="z-[60] w-56" align="end">
+      <DropdownMenuContent className="z-[60] w-56" thick align="end">
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-row items-center gap-2 overflow-hidden">
             <Avatar className="size-9 rounded-full border border-border">
@@ -157,7 +157,7 @@ export function UserProfile({
                 Dashboard
               </DropdownMenuSubTrigger>
               <DropdownMenuPortal>
-                <DropdownMenuSubContent>
+                <DropdownMenuSubContent className="border-2">
                   {isAdmin && (
                     <Link
                       href={`/dashboard/admin/${pendingEvents > 0 ? "submissions?submissionState=submitted" : "users"}`}

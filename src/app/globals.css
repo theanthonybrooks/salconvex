@@ -339,6 +339,20 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+.group\/trigger[data-state="open"][data-side="right"] .rotate-icon {
+  transform: rotate(-90deg);
+}
+
+/**
+  * Note: this is needed to prevent the popover from being cut off
+  * by the viewport when the popover is nested inside another popover
+  */
+
+/* .group\/trigger[data-state="open"]:not([data-side="balls"]) .rotate-icon {
+  transform: rotate(0deg);
+} */
+
 input:not(:placeholder-shown):not(:valid):not(:read-only):not(:focus),
 .invalid-field {
   @apply border-red-600;

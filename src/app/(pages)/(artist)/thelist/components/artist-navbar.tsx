@@ -6,11 +6,12 @@ import { Link } from "@/components/ui/custom-link";
 import {
   NavigationMenu,
   NavigationMenuContent,
-  // NavigationMenuIndicator,
   NavigationMenuItem,
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
+import { Separator } from "@/components/ui/separator";
+
 import { UserProfile } from "@/components/ui/user-profile";
 import { dashboardNavItems } from "@/constants/links";
 import { theListNavbarMenuLinks as thelistitems } from "@/constants/navbarsLinks";
@@ -261,6 +262,8 @@ export default function TheListNavBar(
                         isCurrent={isActiveTheList}
                         className={cn(
                           "z-0 border-2 border-transparent hover:border-foreground hover:bg-background data-[state=open]:border-foreground data-[state=open]:bg-background",
+                          isActiveTheList &&
+                            "border-foreground/20 bg-backgroundDark/30 hover:border-foreground/40 hover:bg-backgroundDark/50",
                         )}
                         onPointerMove={(event) => event.preventDefault()}
                         onPointerLeave={(event) => event.preventDefault()}
@@ -273,22 +276,55 @@ export default function TheListNavBar(
                         onPointerLeave={(event) => event.preventDefault()}
                       >
                         {/* TODO: put this back to xl:grid-cols-3 when I add more menu items */}
-                        <ul className="grid w-[400px] gap-2 p-4 lg:w-max lg:max-w-[700px] lg:grid-cols-3 xl:grid-cols-3">
-                          {filteredNavbarMenuTheList.map((component) => (
-                            <ListItem
-                              key={component.title}
-                              title={component.title}
-                              href={component.href}
-                              className={cn(
-                                "cursor-pointer text-balance transition-colors duration-200 ease-in-out [&_a]:hover:no-underline",
-                                component.href === fullPagePath &&
-                                  "bg-background",
-                              )}
-                            >
-                              {component.description}
-                            </ListItem>
-                          ))}
-                        </ul>
+                        <div className="flex w-[400px] flex-col gap-1 p-3 lg:w-max xl:max-w-[700px]">
+                          {filteredNavbarMenuTheList
+                            .filter(
+                              (component) =>
+                                !component.title.includes("Old Site"),
+                            )
+                            .map((component) => (
+                              <ListItem
+                                key={component.title}
+                                title={component.title}
+                                href={component.href}
+                                className={cn(
+                                  "cursor-pointer text-balance transition-colors duration-200 ease-in-out",
+                                  component.href.includes(currentPage) &&
+                                    currentPage !== "" &&
+                                    "pointer-events-none bg-background",
+                                )}
+                              >
+                                {/* {component.description} */}
+                              </ListItem>
+                            ))}
+                          <Separator thickness={2} className="" />
+                          <p className="m-0 text-center text-foreground/50">
+                            Old Site
+                          </p>
+                          <Separator thickness={2} className="" />
+                          {filteredNavbarMenuTheList
+                            .filter((component) =>
+                              component.title.includes("Old Site"),
+                            )
+                            .map((component) => (
+                              <ListItem
+                                key={component.title}
+                                title={component.title.replace(
+                                  "- (Old Site)",
+                                  "",
+                                )}
+                                href={component.href}
+                                className={cn(
+                                  "cursor-pointer text-balance transition-colors duration-200 ease-in-out",
+                                  component.href.includes(currentPage) &&
+                                    currentPage !== "" &&
+                                    "bg-background",
+                                )}
+                              >
+                                {/* {component.description} */}
+                              </ListItem>
+                            ))}
+                        </div>
                       </NavigationMenuContent>
                     </NavigationMenuItem>
                   </NavigationMenuList>

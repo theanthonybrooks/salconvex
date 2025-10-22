@@ -47,6 +47,7 @@ import { SocialDropdownMenus } from "@/features/events/components/social-dropdow
 import { ConvexDashboardLink } from "@/features/events/ui/convex-dashboard-link";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { getEventCategoryLabel } from "@/helpers/eventFns";
+import { useMediaQuery } from "@/hooks/use-media-query";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { useQueries } from "convex-helpers/react/cache/hooks";
 import { useMutation, usePreloadedQuery } from "convex/react";
@@ -112,7 +113,10 @@ const EventContextMenu = ({
   src,
 }: EventContextMenuProps) => {
   // const router = useRouter();
-
+  const isLargeScreen = useMediaQuery("(min-width: 2024px)");
+  const isXLargeScreen = useMediaQuery("(min-width: 2560px)");
+  const isXXLargeScreen = useMediaQuery("(min-width: 3024px)");
+  console.log(isLargeScreen, isXLargeScreen, isXXLargeScreen);
   const { preloadedSubStatus, preloadedUserData } = useConvexPreload();
   const subData = usePreloadedQuery(preloadedSubStatus);
   const userData = usePreloadedQuery(preloadedUserData);
@@ -260,7 +264,10 @@ const EventContextMenu = ({
               </DropdownMenuItem>
             )}
             <DropdownMenuSub>
-              <DropdownMenuSubTrigger className="flex items-center gap-x-2">
+              <DropdownMenuSubTrigger
+                className="flex items-center gap-x-2"
+                data-side={buttonTrigger && !isLargeScreen ? "left" : "right"}
+              >
                 <Ellipsis className="size-4" /> More
               </DropdownMenuSubTrigger>
               <DropdownMenuPortal>
@@ -431,7 +438,10 @@ const EventContextMenu = ({
             {/* )} */}
             {postOptions && (
               <DropdownMenuSub>
-                <DropdownMenuSubTrigger className="flex items-center gap-x-2">
+                <DropdownMenuSubTrigger
+                  className="flex items-center gap-x-2"
+                  data-side={buttonTrigger && !isLargeScreen ? "left" : "right"}
+                >
                   <Globe className="size-4" /> Socials
                 </DropdownMenuSubTrigger>
                 <DropdownMenuPortal>
@@ -448,7 +458,10 @@ const EventContextMenu = ({
               </DropdownMenuSub>
             )}
             <DropdownMenuSub>
-              <DropdownMenuSubTrigger className="flex items-center gap-x-2">
+              <DropdownMenuSubTrigger
+                className="flex items-center gap-x-2"
+                data-side={buttonTrigger && !isLargeScreen ? "left" : "right"}
+              >
                 <Ellipsis className="size-4" /> More
               </DropdownMenuSubTrigger>
               <DropdownMenuPortal>

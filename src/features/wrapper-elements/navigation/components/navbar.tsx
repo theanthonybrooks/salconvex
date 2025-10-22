@@ -3,6 +3,7 @@
 import FullPageNav from "@/components/full-page-nav";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/components/ui/custom-link";
+
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -11,6 +12,7 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
+import { Separator } from "@/components/ui/separator";
 import { UserProfile } from "@/components/ui/user-profile";
 import { dashboardNavItems } from "@/constants/links";
 import {
@@ -294,7 +296,7 @@ export default function NavBar(
                           onPointerEnter={(event) => event.preventDefault()}
                           onPointerLeave={(event) => event.preventDefault()}
                         >
-                          <ul className="grid w-[400px] gap-2 p-4 lg:w-[500px] lg:grid-cols-2">
+                          <div className="flex w-[400px] flex-col gap-1 p-3 lg:w-max xl:max-w-[700px]">
                             {filteredNavbarMenuResources.map((component) => (
                               <ListItem
                                 key={component.title}
@@ -304,16 +306,20 @@ export default function NavBar(
                                   "cursor-pointer text-balance transition-colors duration-200 ease-in-out",
                                   component.href.includes(currentPage) &&
                                     fullPagePath === component.href &&
-                                    "bg-background",
+                                    "pointer-events-none bg-background",
                                 )}
                               >
-                                {component.description}
+                                {/* {component.description} */}
                               </ListItem>
                             ))}
-                          </ul>
+                          </div>
                         </NavigationMenuContent>
                       </NavigationMenuItem>
                     )}
+                  </NavigationMenuList>
+                </NavigationMenu>
+                <NavigationMenu delayDuration={Infinity}>
+                  <NavigationMenuList className="gap-2">
                     <NavigationMenuItem>
                       <NavigationMenuTrigger
                         isCurrent={isActiveTheList}
@@ -331,25 +337,61 @@ export default function NavBar(
                         onPointerEnter={(event) => event.preventDefault()}
                         onPointerLeave={(event) => event.preventDefault()}
                       >
-                        <ul className="grid w-[400px] gap-2 p-4 lg:w-max lg:grid-cols-2 xl:max-w-[700px] xl:grid-cols-3">
-                          {filteredNavbarMenuTheList.map((component) => (
-                            <ListItem
-                              key={component.title}
-                              title={component.title}
-                              href={component.href}
-                              className={cn(
-                                "cursor-pointer text-balance transition-colors duration-200 ease-in-out",
-                                component.href.includes(currentPage) &&
-                                  currentPage !== "" &&
-                                  "bg-background",
-                              )}
-                            >
-                              {component.description}
-                            </ListItem>
-                          ))}
-                        </ul>
+                        <div className="flex w-[400px] flex-col gap-1 p-3 lg:w-max xl:max-w-[700px]">
+                          {filteredNavbarMenuTheList
+                            .filter(
+                              (component) =>
+                                !component.title.includes("Old Site"),
+                            )
+                            .map((component) => (
+                              <ListItem
+                                key={component.title}
+                                title={component.title}
+                                href={component.href}
+                                className={cn(
+                                  "cursor-pointer text-balance transition-colors duration-200 ease-in-out",
+                                  component.href.includes(currentPage) &&
+                                    currentPage !== "" &&
+                                    "pointer-events-none bg-background",
+                                )}
+                              >
+                                {/* {component.description} */}
+                              </ListItem>
+                            ))}
+                          <Separator thickness={2} className="" />
+                          <p className="m-0 text-center text-foreground/50">
+                            Old Site
+                          </p>
+                          <Separator thickness={2} className="" />
+                          {filteredNavbarMenuTheList
+                            .filter((component) =>
+                              component.title.includes("Old Site"),
+                            )
+                            .map((component) => (
+                              <ListItem
+                                key={component.title}
+                                title={component.title.replace(
+                                  "- (Old Site)",
+                                  "",
+                                )}
+                                href={component.href}
+                                className={cn(
+                                  "cursor-pointer text-balance transition-colors duration-200 ease-in-out",
+                                  component.href.includes(currentPage) &&
+                                    currentPage !== "" &&
+                                    "pointer-events-none bg-background",
+                                )}
+                              >
+                                {/* {component.description} */}
+                              </ListItem>
+                            ))}
+                        </div>
                       </NavigationMenuContent>
                     </NavigationMenuItem>
+                  </NavigationMenuList>
+                </NavigationMenu>
+                <NavigationMenu delayDuration={Infinity}>
+                  <NavigationMenuList className="gap-2">
                     <NavigationMenuItem>
                       <NavigationMenuTrigger
                         isCurrent={isActiveAbout}
@@ -367,7 +409,8 @@ export default function NavBar(
                         onPointerEnter={(event) => event.preventDefault()}
                         onPointerLeave={(event) => event.preventDefault()}
                       >
-                        <ul className="grid w-[400px] gap-2 p-4 lg:w-max lg:grid-cols-2 xl:max-w-[700px] xl:grid-cols-3">
+                        {/* <ul className="grid w-[400px] gap-2 p-4 lg:w-max lg:grid-cols-2 xl:max-w-[700px] xl:grid-cols-3"> */}
+                        <div className="flex w-[400px] flex-col gap-1 p-3 lg:w-max xl:max-w-[700px]">
                           {filteredNavbarMenuAbout.map((component) => (
                             <ListItem
                               key={component.title}
@@ -377,13 +420,13 @@ export default function NavBar(
                                 "cursor-pointer text-balance transition-colors duration-200 ease-in-out",
                                 component.href.includes(currentPage) &&
                                   currentPage !== "" &&
-                                  "bg-background",
+                                  "pointer-events-none bg-background",
                               )}
                             >
-                              {component.description}
+                              {/* {component.description} */}
                             </ListItem>
                           ))}
-                        </ul>
+                        </div>
                       </NavigationMenuContent>
                     </NavigationMenuItem>
                   </NavigationMenuList>
@@ -465,11 +508,11 @@ export default function NavBar(
 export const ListItem = React.forwardRef<
   React.ComponentRef<"a">,
   React.ComponentPropsWithoutRef<"a"> & { href: string }
->(({ className, title, children, href, ...props }, ref) => {
+>(({ className, title, href, ...props }, ref) => {
   return (
-    <li
+    <div
       className={cn(
-        "rounded-md transition-colors hover:bg-salPink/50",
+        "rounded-md p-2 font-bold decoration-2 underline-offset-4 transition-colors hover:underline active:underline-offset-2",
         className,
       )}
     >
@@ -478,17 +521,17 @@ export const ListItem = React.forwardRef<
           href={href}
           ref={ref}
           className={cn(
-            "outline-hidden block select-none space-y-1 p-3 leading-none no-underline hover:no-underline",
+            "outline-hidden block select-none space-y-1 leading-none no-underline hover:no-underline",
           )}
           {...props}
         >
           <div className="text-base font-medium leading-none">{title}</div>
-          <p className="line-clamp-2 text-sm leading-snug text-foreground">
+          {/* <p className="line-clamp-2 text-sm leading-snug text-foreground">
             {children}
-          </p>
+          </p> */}
         </Link>
       </NavigationMenuLink>
-    </li>
+    </div>
   );
 });
 ListItem.displayName = "ListItem";

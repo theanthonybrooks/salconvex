@@ -33,7 +33,8 @@
     "Map",
     "Convex",
     "Type",
-    "Analytics"
+    "Analytics",
+    "Nav"
   ],
   "typescript.tsdk": "node_modules\\typescript\\lib",
   "python.analysis.autoImportCompletions": true
