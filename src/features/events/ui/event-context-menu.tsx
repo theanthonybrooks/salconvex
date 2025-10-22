@@ -112,6 +112,7 @@ const EventContextMenu = ({
   src,
 }: EventContextMenuProps) => {
   // const router = useRouter();
+
   const { preloadedSubStatus, preloadedUserData } = useConvexPreload();
   const subData = usePreloadedQuery(preloadedSubStatus);
   const userData = usePreloadedQuery(preloadedUserData);
@@ -412,7 +413,8 @@ const EventContextMenu = ({
               </DropdownMenuItem>
             )}
 
-            <DropdownMenuItem>
+            {/* {eventId && ( */}
+            <DropdownMenuItem asChild>
               <Link
                 href={`/dashboard/admin/event?_id=${eventId}&sidebar=false`}
                 target="_blank"
@@ -420,9 +422,13 @@ const EventContextMenu = ({
                 <span className="flex items-center gap-x-2 text-sm">
                   <Pencil className="size-4" />
                   Edit Event
+                  <p
+                    className={cn("sr-only")}
+                  >{`/dashboard/admin/event?_id=${String(eventId)}&sidebar=false`}</p>
                 </span>
               </Link>
             </DropdownMenuItem>
+            {/* )} */}
             {postOptions && (
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger className="flex items-center gap-x-2">

@@ -210,7 +210,7 @@ const linksSchemaStrict = z.object({
 const contactSchema = z.object({
   organizer: z.optional(z.string()),
   organizerTitle: z.optional(z.string()),
-  primaryContact: z.string().min(3, "Primary Contact is required"),
+  primaryContact: z.string().optional(),
 });
 
 const organizationSchema = z.object({
@@ -473,24 +473,33 @@ export const step1Schema = z
     }
   });
 
-export const orgDetailsSchema = z.object({
-  organization: organizationSchema.extend({
-    contact: contactSchema,
-    links: linksSchemaStrict,
-    about: z.optional(z.string()),
-  }),
-});
-// .superRefine((data, ctx) => {
-//   const email = data.organization.links?.email;
+export const orgDetailsSchema = z
+  .object({
+    organization: organizationSchema.extend({
+      contact: contactSchema,
+      links: linksSchemaStrict,
+      about: z.optional(z.string()),
+    }),
+  })
+  .superRefine((data, ctx) => {
+    // const email = data.organization.links?.email;
 
-//   if (!email || email.trim() === "") {
-//     ctx.addIssue({
-//       code: "custom",
-//       message: "Email is required",
-//       path: ["organization", "links", "email"],
-//     });
-//   }
-// });
+    // if (!email || email.trim() === "") {
+    //   ctx.addIssue({
+    //     code: "custom",
+    //     message: "Email is required",
+    //     path: ["organization", "links", "email"],
+    //   });
+    // }
+    const primaryContact = data.organization.contact?.primaryContact;
+    if (!primaryContact || primaryContact.trim().length < 3) {
+      ctx.addIssue({
+        code: "custom",
+        message: "Primary Contact is required",
+        path: ["organization", "contact", "primaryContact"],
+      });
+    }
+  });
 
 export const eventOnlySchema = z.object({
   organization: organizationSchema,

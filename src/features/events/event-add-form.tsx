@@ -166,6 +166,9 @@ export const EventOCForm = ({
         name: "",
         logo: "",
         location: undefined,
+        contact: {
+          primaryContact: "",
+        },
       },
       event: {
         formType,
@@ -853,6 +856,7 @@ export const EventOCForm = ({
               organizationName: orgData.name?.trim(),
               logoStorageId: orgLogoStorageId,
               // logo,
+
               location: {
                 full: orgData.location.full,
                 locale: orgData.location.locale,
@@ -893,6 +897,9 @@ export const EventOCForm = ({
                   continent: orgData.location?.continent ?? "",
                   timezone,
                   timezoneOffset,
+                },
+                contact: {
+                  primaryContact: orgData.contact?.primaryContact || "",
                 },
               });
             }

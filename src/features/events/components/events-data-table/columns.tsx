@@ -453,7 +453,7 @@ export const getColumns = (isAdmin: boolean): ColumnDef<Event>[] => {
                         <GoToEvent
                           slug={slug}
                           edition={edition}
-                          hasOpenCall={false}
+                          hasOpenCall={hasOC}
                           category={eventCategory}
                           general={true}
                         />

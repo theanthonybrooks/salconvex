@@ -248,21 +248,7 @@ export const createNewOrg = mutation({
     logo: v.optional(v.string()),
     location: v.optional(
       v.object({
-        full: v.optional(v.string()),
-        locale: v.optional(v.string()),
-        city: v.optional(v.string()),
-        state: v.optional(v.string()),
-        stateAbbr: v.optional(v.string()),
-        region: v.optional(v.string()),
-        country: v.string(),
-        countryAbbr: v.string(),
-        continent: v.string(),
-        coordinates: v.optional(
-          v.object({
-            latitude: v.number(),
-            longitude: v.number(),
-          }),
-        ),
+        ...locationFullFields,
         currency: v.optional(
           v.object({
             code: v.string(),
