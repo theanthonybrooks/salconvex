@@ -50,6 +50,7 @@ import {
   ColumnProps,
   ColumnType,
   ColumnTypeOptions,
+  columnViewLimitMap,
   DetailsDialogProps,
   DropIndicatorProps,
   KanbanBoardProps,
@@ -374,6 +375,8 @@ const Column = ({
 }: ColumnProps) => {
   const userRole = user?.role ?? [];
   const [active, setActive] = useState(false);
+  const [viewFull, setViewFull] = useState(false);
+  const limit = columnViewLimitMap[column] ?? columnViewLimitMap.default;
 
   const handleDragStart = (
     e: React.DragEvent<HTMLDivElement>,
@@ -507,15 +510,46 @@ const Column = ({
           "mask-fade-top-bottom",
         )}
       >
-        {cards.map((c) => (
-          <Card
-            key={c.id}
-            {...c}
-            deleteCard={deleteCard}
-            handleDragStart={handleDragStart}
-            handleDragEnd={handleDragEnd}
-          />
-        ))}
+        {cards
+          // .filter((c) => {
+          //   // keep everything except limit "done" and "notPlanned"
+          //   if (["done", "notPlanned"].includes(c.column) && !viewFull) {
+          //     const sameColumn = cards.filter((x) => x.column === c.column);
+          //     const indexInColumn = sameColumn.findIndex((x) => x.id === c.id);
+          //     return indexInColumn < 5; // only first 10 for that column
+          //   }
+          //   return true;
+          // })
+          .filter((_, i) => viewFull || i < limit)
+          .map((c) => (
+            <Card
+              key={c.id}
+              {...c}
+              deleteCard={deleteCard}
+              handleDragStart={handleDragStart}
+              handleDragEnd={handleDragEnd}
+            />
+          ))}
+        {cards.length > limit && (
+          <div className="flex items-center justify-center gap-x-2 bg-background/50 px-2 py-1 text-xs font-semibold text-foreground/50">
+            {viewFull ? (
+              <p>Showing full list</p>
+            ) : (
+              <p className="text-balance">
+                Showing first {limit} of {cards.length} cards
+              </p>
+            )}
+            <button
+              onClick={() => setViewFull((prev) => !prev)}
+              className={cn(
+                "rounded p-1 px-2 hover:scale-105",
+                viewFull ? "bg-background/50" : "bg-background",
+              )}
+            >
+              {viewFull ? "Show Less" : "Show More"}
+            </button>
+          </div>
+        )}
 
         <DropIndicator beforeId={undefined} column={column} />
       </div>

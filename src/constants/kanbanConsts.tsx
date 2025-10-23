@@ -80,6 +80,16 @@ export const CATEGORY_CONFIG: Record<
   },
 };
 
+export const columnViewLimitMap: Record<string, number> = {
+  proposed: 20,
+  backlog: 15,
+  todo: 20,
+  doing: 15,
+  done: 5,
+  notPlanned: 5,
+  default: 30,
+};
+
 export const ColumnTypeOptions = [
   { label: "Proposed", value: "proposed" },
   { label: "Considering", value: "backlog" },

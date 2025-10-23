@@ -104,7 +104,7 @@ export function UserProfile({
               >
                 <Bell className="size-6" />
                 {isAdmin && totalPending > 0 && (
-                  <div className="absolute -bottom-1 -left-2 flex size-5 items-center justify-center rounded-full border-1.5 border-foreground bg-background text-2xs font-bold hover:scale-105 hover:cursor-pointer">
+                  <div className="absolute -bottom-1 -left-2 flex size-5 items-center justify-center rounded-full border-1.5 border-foreground bg-card text-2xs font-bold hover:scale-105 hover:cursor-pointer">
                     {totalPending}
                   </div>
                 )}

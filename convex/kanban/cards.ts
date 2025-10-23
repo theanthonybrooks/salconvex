@@ -66,6 +66,7 @@ export const getCards = query({
   args: {
     purpose: v.optional(kanbanPurposeValidator),
     category: v.array(supportCategoryValidator),
+    full: v.optional(v.boolean()),
     userRole: userRoleArrayValidator,
     userId: v.optional(v.id("users")),
   },
@@ -102,11 +103,20 @@ export const getCards = query({
         let orderedQuery: OrderedQuery<DataModel["todoKanban"]> = indexedQuery;
 
         const results = await orderedQuery.collect();
+
         let filteredResults = results;
         if (args.userId) {
-          filteredResults = results.filter(
+          const userResults = results.filter(
             (card) => card.assignedId === args.userId,
           );
+          const completeCards = userResults.filter(
+            (card) => card.column === "done",
+          );
+          const otherCards = userResults.filter(
+            (card) => !["done", "notPlanned"].includes(card.column),
+          );
+          const limitedResults = [...completeCards, ...otherCards];
+          filteredResults = limitedResults;
         }
         return filteredResults;
       }
