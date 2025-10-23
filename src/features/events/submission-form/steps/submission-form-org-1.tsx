@@ -392,7 +392,7 @@ const SubmissionFormOrgStep = ({
                 type: false,
                 category: false,
                 lastEditedAt: false,
-                submissionState: false,
+
                 // dates_edition: false,
                 state: false,
                 openCallState: false,
@@ -436,7 +436,7 @@ const SubmissionFormOrgStep = ({
               adminActions={{ isAdmin }}
               defaultVisibility={{
                 _id: false,
-                submissionState: false,
+
                 lastEditedAt: sidebarCollapsed,
                 category: sidebarCollapsed,
                 type: sidebarCollapsed,
@@ -453,7 +453,7 @@ const SubmissionFormOrgStep = ({
               selectedRow={selectedRow}
               defaultVisibility={{
                 _id: false,
-                submissionState: false,
+
                 category: !firstColVisible && sidebarCollapsed,
                 type: !firstColVisible && sidebarCollapsed,
                 lastEditedAt: !firstColVisible && sidebarCollapsed,

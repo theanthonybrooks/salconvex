@@ -83,7 +83,6 @@ export function AdminDashboardTableWrapper({
               defaultVisibility={{
                 category: isSidebarCollapsed,
                 dates_edition: true,
-                submissionState: false,
                 type: false,
                 _id: false,
               }}
@@ -103,7 +102,6 @@ export function AdminDashboardTableWrapper({
                 category: false,
                 lastEditedAt: false,
                 dates_edition: false,
-                submissionState: false,
                 _id: false,
               }}
               adminActions={adminActions}

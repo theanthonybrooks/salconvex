@@ -152,15 +152,17 @@ export default function Dashboard() {
           <div className="col-span-full flex flex-col gap-4">
             <h3 className="underline underline-offset-2">Admin Dashboard:</h3>
             <div className="scrollable justx flex flex-col flex-wrap gap-4 sm:flex-row">
-              <PreviewCard
-                fontSize={fontSize}
-                card={{
-                  icon: LucideCircleFadingPlus,
-                  title: "New Submissions",
-                  total: totalPending,
-                  path: "/dashboard/admin/submissions?submissionState=submitted",
-                }}
-              />
+              {totalPending > 0 && (
+                <PreviewCard
+                  fontSize={fontSize}
+                  card={{
+                    icon: LucideCircleFadingPlus,
+                    title: "New Submissions",
+                    total: totalPending,
+                    path: "/dashboard/admin/submissions?state=submitted",
+                  }}
+                />
+              )}
               <PreviewCard
                 fontSize={fontSize}
                 card={{

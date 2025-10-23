@@ -29,8 +29,6 @@ export function DataTablePagination<TData>({
   const formType = table.options.meta?.pageType === "form";
   const minimalView = table.options.meta?.minimalView;
 
-  console.log(tablePageIndex);
-  console.log(tablePageSize);
   const currentStartingPgResultsNumber =
     tablePageIndex === 0 ? 1 : tablePageSize + 1;
   const currentEndingPgResultsNumber =
