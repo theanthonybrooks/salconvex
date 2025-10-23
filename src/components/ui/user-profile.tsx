@@ -81,216 +81,421 @@ export function UserProfile({
   const totalPending = pendingOpenCalls + pendingEvents;
 
   return (
-    <DropdownMenu
-      onOpenChange={(val) => {
-        setOpen(val);
-        if (!val) {
-          setTooltipDisabled(true);
-          setTimeout(() => setTooltipDisabled(false), 250);
-        }
-      }}
-    >
-      <TooltipSimple
-        content="Open Profile Menu"
-        side="bottom"
-        disabled={open || tooltipDisabled}
-      >
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            className={cn("relative size-12.5 rounded-full", className)}
+    <div className={cn("flex items-center gap-4")}>
+      {isAdmin && (
+        <DropdownMenu
+          onOpenChange={(val) => {
+            setOpen(val);
+            if (!val) {
+              setTooltipDisabled(true);
+              setTimeout(() => setTooltipDisabled(false), 250);
+            }
+          }}
+        >
+          <TooltipSimple
+            content="Open Profile Menu"
+            side="bottom"
+            disabled={open || tooltipDisabled}
           >
-            <Avatar className={cn(className)}>
-              <AvatarImage
-                src={user?.image}
-                alt={user?.name || "User Profile"}
-              />
-
-              <AvatarFallback>
-                {user?.firstName?.[0].toUpperCase()}
-                {user?.lastName?.[0].toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
-            {isAdmin && totalPending > 0 && (
-              <div className="absolute -bottom-1 -left-2 flex size-5 items-center justify-center rounded-full border-1.5 border-foreground bg-background text-xs font-bold hover:scale-105 hover:cursor-pointer">
-                {totalPending}
-              </div>
-            )}
-          </Button>
-        </DropdownMenuTrigger>
-      </TooltipSimple>
-      <DropdownMenuContent className="z-[60] w-56" thick align="end">
-        <DropdownMenuLabel className="font-normal">
-          <div className="flex flex-row items-center gap-2 overflow-hidden">
-            <Avatar className="size-9 rounded-full border border-border">
-              <AvatarImage
-                src={user?.image}
-                // src="/1.jpg"
-                alt={user?.name || "User Profile"}
-              />
-
-              <AvatarFallback
-                className={cn(
-                  "border-1.5 border-border bg-userIcon font-bold text-foreground",
-                )}
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                className={cn("relative size-12.5 rounded-full", className)}
               >
-                <FaUserNinja className="size-5" />
-              </AvatarFallback>
-            </Avatar>
+                <Bell className="size-6 w-full" />
+                {isAdmin && totalPending > 0 && (
+                  <div className="absolute -bottom-1 -left-2 flex size-5 items-center justify-center rounded-full border-1.5 border-foreground bg-background text-xs font-bold hover:scale-105 hover:cursor-pointer">
+                    {totalPending}
+                  </div>
+                )}
+              </Button>
+            </DropdownMenuTrigger>
+          </TooltipSimple>
+          <DropdownMenuContent className="z-[60] w-56" thick align="end">
+            <DropdownMenuLabel className="font-normal">
+              <div className="flex flex-row items-center gap-2 overflow-hidden">
+                <Avatar className="size-9 rounded-full border border-border">
+                  <AvatarImage
+                    src={user?.image}
+                    // src="/1.jpg"
+                    alt={user?.name || "User Profile"}
+                  />
 
-            <div className="flex flex-col space-y-1 overflow-hidden">
-              <p className="truncate text-sm font-medium leading-none">
-                {user?.name}
-              </p>
-              <p className="truncate text-xs leading-none text-muted-foreground">
-                {user?.email}
-              </p>
+                  <AvatarFallback
+                    className={cn(
+                      "border-1.5 border-border bg-userIcon font-bold text-foreground",
+                    )}
+                  >
+                    <FaUserNinja className="size-5" />
+                  </AvatarFallback>
+                </Avatar>
+
+                <div className="flex flex-col space-y-1 overflow-hidden">
+                  <p className="truncate text-sm font-medium leading-none">
+                    {user?.name}
+                  </p>
+                  <p className="truncate text-xs leading-none text-muted-foreground">
+                    {user?.email}
+                  </p>
+                </div>
+              </div>
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              {(hasActiveSub || isOrganizer) && (
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger>
+                    <LucideLayoutDashboard className="mr-2 size-4" />
+                    Dashboard
+                  </DropdownMenuSubTrigger>
+                  <DropdownMenuPortal>
+                    <DropdownMenuSubContent className="border-2">
+                      {isAdmin && (
+                        <Link
+                          href={`/dashboard/admin/${pendingEvents > 0 ? "submissions?submissionState=submitted" : "users"}`}
+                          className="underline-offset-2 hover:cursor-pointer hover:underline"
+                        >
+                          <DropdownMenuItem className="focus:bg-salYellow/50">
+                            {totalPending > 0 ? (
+                              <div className="flex size-5 items-center justify-center rounded-full border-1.5 border-foreground bg-background text-xs font-bold hover:no-underline">
+                                {totalPending}
+                              </div>
+                            ) : (
+                              <Squirrel className="mr-2 size-4" />
+                            )}
+                            <span>Admin</span>
+                          </DropdownMenuItem>
+                        </Link>
+                      )}
+
+                      {hasActiveSub && (
+                        <Link
+                          href="/dashboard/"
+                          className="underline-offset-2 hover:cursor-pointer hover:underline"
+                        >
+                          <DropdownMenuItem className="focus:bg-salYellow/50">
+                            <PaintRoller className="mr-2 size-4" />
+                            <span>{isAdmin ? "User" : "Artist"}</span>
+                          </DropdownMenuItem>
+                        </Link>
+                      )}
+                      {isOrganizer && (
+                        <Link
+                          href="/dashboard/organizer/events"
+                          className="underline-offset-2 hover:cursor-pointer hover:underline"
+                        >
+                          <DropdownMenuItem className="focus:bg-salYellow/50">
+                            <Users2 className="mr-2 size-4" />
+                            <span>Organizer</span>
+                          </DropdownMenuItem>
+                        </Link>
+                      )}
+                    </DropdownMenuSubContent>
+                  </DropdownMenuPortal>
+                </DropdownMenuSub>
+              )}
+
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>
+                  <Settings className="mr-2 size-4" />
+                  Settings
+                </DropdownMenuSubTrigger>
+                <DropdownMenuPortal>
+                  <DropdownMenuSubContent>
+                    <Link
+                      href="/dashboard/settings/account"
+                      className="underline-offset-2 hover:cursor-pointer hover:underline"
+                    >
+                      <DropdownMenuItem className="focus:bg-salYellow/50">
+                        <User className="mr-2 size-4" />
+                        <span>Account</span>
+                      </DropdownMenuItem>
+                    </Link>
+                    <Link
+                      href="/dashboard/settings/notifications"
+                      className="underline-offset-2 hover:cursor-pointer hover:underline"
+                    >
+                      <DropdownMenuItem className="focus:bg-salYellow/50">
+                        <Bell className="mr-2 size-4" />
+                        <span>Notifications</span>
+                      </DropdownMenuItem>
+                    </Link>
+                    <Link
+                      href="/dashboard/settings/appearance"
+                      className="underline-offset-2 hover:cursor-pointer hover:underline"
+                    >
+                      <DropdownMenuItem className="focus:bg-salYellow/50">
+                        <Sparkles className="mr-2 size-4" />
+                        <span>Appearance</span>
+                      </DropdownMenuItem>
+                    </Link>
+                    <Link
+                      href="/dashboard/settings/security"
+                      className="underline-offset-2 hover:cursor-pointer hover:underline"
+                    >
+                      <DropdownMenuItem className="focus:bg-salYellow/50">
+                        <Lock className="mr-2 size-4" />
+                        <span>Security</span>
+                      </DropdownMenuItem>
+                    </Link>
+                  </DropdownMenuSubContent>
+                </DropdownMenuPortal>
+              </DropdownMenuSub>
+              {hasActiveSub && subStatus !== "canceled" && (
+                <Link
+                  href="/dashboard/billing"
+                  className="underline-offset-2 hover:cursor-pointer hover:underline"
+                >
+                  <DropdownMenuItem className="focus:bg-salYellow/50">
+                    <PiPiggyBank className="mr-2 size-4" />
+                    <span>Manage Membership</span>
+                  </DropdownMenuItem>
+                </Link>
+              )}
+
+              {subStatus === "canceled" && isArtist && (
+                <Link
+                  href="/pricing?type=artist"
+                  className="underline-offset-2 hover:cursor-pointer hover:underline"
+                >
+                  <DropdownMenuItem className="focus:bg-salYellow/50">
+                    <PiPiggyBank className="mr-2 size-4" />
+                    <span>Renew Membership</span>
+                  </DropdownMenuItem>
+                </Link>
+              )}
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <Link
+              href="/support"
+              className="underline-offset-2 hover:cursor-pointer hover:underline"
+            >
+              <DropdownMenuItem className="focus:bg-salYellow/50">
+                <HelpCircle className="mr-2 size-4" />
+                <span>Help & Support</span>
+              </DropdownMenuItem>
+            </Link>
+            <DropdownMenuSeparator />
+            <SignOutBtn email={user?.email}>
+              <DropdownMenuItem className="focus:bg-salPink/50">
+                <LogOut className="mr-2 size-4" />
+                <span>Log out</span>
+              </DropdownMenuItem>
+            </SignOutBtn>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )}
+      <DropdownMenu
+        onOpenChange={(val) => {
+          setOpen(val);
+          if (!val) {
+            setTooltipDisabled(true);
+            setTimeout(() => setTooltipDisabled(false), 250);
+          }
+        }}
+      >
+        <TooltipSimple
+          content="Open Profile Menu"
+          side="bottom"
+          disabled={open || tooltipDisabled}
+        >
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              className={cn("relative size-12.5 rounded-full", className)}
+            >
+              <Avatar className={cn(className)}>
+                <AvatarImage
+                  src={user?.image}
+                  alt={user?.name || "User Profile"}
+                />
+
+                <AvatarFallback>
+                  {user?.firstName?.[0].toUpperCase()}
+                  {user?.lastName?.[0].toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+              {isAdmin && totalPending > 0 && (
+                <div className="absolute -bottom-1 -left-2 flex size-5 items-center justify-center rounded-full border-1.5 border-foreground bg-background text-xs font-bold hover:scale-105 hover:cursor-pointer">
+                  {totalPending}
+                </div>
+              )}
+            </Button>
+          </DropdownMenuTrigger>
+        </TooltipSimple>
+        <DropdownMenuContent className="z-[60] w-56" thick align="end">
+          <DropdownMenuLabel className="font-normal">
+            <div className="flex flex-row items-center gap-2 overflow-hidden">
+              <Avatar className="size-9 rounded-full border border-border">
+                <AvatarImage
+                  src={user?.image}
+                  // src="/1.jpg"
+                  alt={user?.name || "User Profile"}
+                />
+
+                <AvatarFallback
+                  className={cn(
+                    "border-1.5 border-border bg-userIcon font-bold text-foreground",
+                  )}
+                >
+                  <FaUserNinja className="size-5" />
+                </AvatarFallback>
+              </Avatar>
+
+              <div className="flex flex-col space-y-1 overflow-hidden">
+                <p className="truncate text-sm font-medium leading-none">
+                  {user?.name}
+                </p>
+                <p className="truncate text-xs leading-none text-muted-foreground">
+                  {user?.email}
+                </p>
+              </div>
             </div>
-          </div>
-        </DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          {(hasActiveSub || isOrganizer) && (
+          </DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuGroup>
+            {(hasActiveSub || isOrganizer) && (
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>
+                  <LucideLayoutDashboard className="mr-2 size-4" />
+                  Dashboard
+                </DropdownMenuSubTrigger>
+                <DropdownMenuPortal>
+                  <DropdownMenuSubContent className="border-2">
+                    {isAdmin && (
+                      <Link
+                        href={`/dashboard/admin/${pendingEvents > 0 ? "submissions?submissionState=submitted" : "users"}`}
+                        className="underline-offset-2 hover:cursor-pointer hover:underline"
+                      >
+                        <DropdownMenuItem className="focus:bg-salYellow/50">
+                          {totalPending > 0 ? (
+                            <div className="flex size-5 items-center justify-center rounded-full border-1.5 border-foreground bg-background text-xs font-bold hover:no-underline">
+                              {totalPending}
+                            </div>
+                          ) : (
+                            <Squirrel className="mr-2 size-4" />
+                          )}
+                          <span>Admin</span>
+                        </DropdownMenuItem>
+                      </Link>
+                    )}
+
+                    {hasActiveSub && (
+                      <Link
+                        href="/dashboard/"
+                        className="underline-offset-2 hover:cursor-pointer hover:underline"
+                      >
+                        <DropdownMenuItem className="focus:bg-salYellow/50">
+                          <PaintRoller className="mr-2 size-4" />
+                          <span>{isAdmin ? "User" : "Artist"}</span>
+                        </DropdownMenuItem>
+                      </Link>
+                    )}
+                    {isOrganizer && (
+                      <Link
+                        href="/dashboard/organizer/events"
+                        className="underline-offset-2 hover:cursor-pointer hover:underline"
+                      >
+                        <DropdownMenuItem className="focus:bg-salYellow/50">
+                          <Users2 className="mr-2 size-4" />
+                          <span>Organizer</span>
+                        </DropdownMenuItem>
+                      </Link>
+                    )}
+                  </DropdownMenuSubContent>
+                </DropdownMenuPortal>
+              </DropdownMenuSub>
+            )}
+
             <DropdownMenuSub>
               <DropdownMenuSubTrigger>
-                <LucideLayoutDashboard className="mr-2 size-4" />
-                Dashboard
+                <Settings className="mr-2 size-4" />
+                Settings
               </DropdownMenuSubTrigger>
               <DropdownMenuPortal>
-                <DropdownMenuSubContent className="border-2">
-                  {isAdmin && (
-                    <Link
-                      href={`/dashboard/admin/${pendingEvents > 0 ? "submissions?submissionState=submitted" : "users"}`}
-                      className="underline-offset-2 hover:cursor-pointer hover:underline"
-                    >
-                      <DropdownMenuItem className="focus:bg-salYellow/50">
-                        {totalPending > 0 ? (
-                          <div className="flex size-5 items-center justify-center rounded-full border-1.5 border-foreground bg-background text-xs font-bold hover:no-underline">
-                            {totalPending}
-                          </div>
-                        ) : (
-                          <Squirrel className="mr-2 size-4" />
-                        )}
-                        <span>Admin</span>
-                      </DropdownMenuItem>
-                    </Link>
-                  )}
-
-                  {hasActiveSub && (
-                    <Link
-                      href="/dashboard/"
-                      className="underline-offset-2 hover:cursor-pointer hover:underline"
-                    >
-                      <DropdownMenuItem className="focus:bg-salYellow/50">
-                        <PaintRoller className="mr-2 size-4" />
-                        <span>{isAdmin ? "User" : "Artist"}</span>
-                      </DropdownMenuItem>
-                    </Link>
-                  )}
-                  {isOrganizer && (
-                    <Link
-                      href="/dashboard/organizer/events"
-                      className="underline-offset-2 hover:cursor-pointer hover:underline"
-                    >
-                      <DropdownMenuItem className="focus:bg-salYellow/50">
-                        <Users2 className="mr-2 size-4" />
-                        <span>Organizer</span>
-                      </DropdownMenuItem>
-                    </Link>
-                  )}
+                <DropdownMenuSubContent>
+                  <Link
+                    href="/dashboard/settings/account"
+                    className="underline-offset-2 hover:cursor-pointer hover:underline"
+                  >
+                    <DropdownMenuItem className="focus:bg-salYellow/50">
+                      <User className="mr-2 size-4" />
+                      <span>Account</span>
+                    </DropdownMenuItem>
+                  </Link>
+                  <Link
+                    href="/dashboard/settings/notifications"
+                    className="underline-offset-2 hover:cursor-pointer hover:underline"
+                  >
+                    <DropdownMenuItem className="focus:bg-salYellow/50">
+                      <Bell className="mr-2 size-4" />
+                      <span>Notifications</span>
+                    </DropdownMenuItem>
+                  </Link>
+                  <Link
+                    href="/dashboard/settings/appearance"
+                    className="underline-offset-2 hover:cursor-pointer hover:underline"
+                  >
+                    <DropdownMenuItem className="focus:bg-salYellow/50">
+                      <Sparkles className="mr-2 size-4" />
+                      <span>Appearance</span>
+                    </DropdownMenuItem>
+                  </Link>
+                  <Link
+                    href="/dashboard/settings/security"
+                    className="underline-offset-2 hover:cursor-pointer hover:underline"
+                  >
+                    <DropdownMenuItem className="focus:bg-salYellow/50">
+                      <Lock className="mr-2 size-4" />
+                      <span>Security</span>
+                    </DropdownMenuItem>
+                  </Link>
                 </DropdownMenuSubContent>
               </DropdownMenuPortal>
             </DropdownMenuSub>
-          )}
+            {hasActiveSub && subStatus !== "canceled" && (
+              <Link
+                href="/dashboard/billing"
+                className="underline-offset-2 hover:cursor-pointer hover:underline"
+              >
+                <DropdownMenuItem className="focus:bg-salYellow/50">
+                  <PiPiggyBank className="mr-2 size-4" />
+                  <span>Manage Membership</span>
+                </DropdownMenuItem>
+              </Link>
+            )}
 
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger>
-              <Settings className="mr-2 size-4" />
-              Settings
-            </DropdownMenuSubTrigger>
-            <DropdownMenuPortal>
-              <DropdownMenuSubContent>
-                <Link
-                  href="/dashboard/settings/account"
-                  className="underline-offset-2 hover:cursor-pointer hover:underline"
-                >
-                  <DropdownMenuItem className="focus:bg-salYellow/50">
-                    <User className="mr-2 size-4" />
-                    <span>Account</span>
-                  </DropdownMenuItem>
-                </Link>
-                <Link
-                  href="/dashboard/settings/notifications"
-                  className="underline-offset-2 hover:cursor-pointer hover:underline"
-                >
-                  <DropdownMenuItem className="focus:bg-salYellow/50">
-                    <Bell className="mr-2 size-4" />
-                    <span>Notifications</span>
-                  </DropdownMenuItem>
-                </Link>
-                <Link
-                  href="/dashboard/settings/appearance"
-                  className="underline-offset-2 hover:cursor-pointer hover:underline"
-                >
-                  <DropdownMenuItem className="focus:bg-salYellow/50">
-                    <Sparkles className="mr-2 size-4" />
-                    <span>Appearance</span>
-                  </DropdownMenuItem>
-                </Link>
-                <Link
-                  href="/dashboard/settings/security"
-                  className="underline-offset-2 hover:cursor-pointer hover:underline"
-                >
-                  <DropdownMenuItem className="focus:bg-salYellow/50">
-                    <Lock className="mr-2 size-4" />
-                    <span>Security</span>
-                  </DropdownMenuItem>
-                </Link>
-              </DropdownMenuSubContent>
-            </DropdownMenuPortal>
-          </DropdownMenuSub>
-          {hasActiveSub && subStatus !== "canceled" && (
-            <Link
-              href="/dashboard/billing"
-              className="underline-offset-2 hover:cursor-pointer hover:underline"
-            >
-              <DropdownMenuItem className="focus:bg-salYellow/50">
-                <PiPiggyBank className="mr-2 size-4" />
-                <span>Manage Membership</span>
-              </DropdownMenuItem>
-            </Link>
-          )}
-
-          {subStatus === "canceled" && isArtist && (
-            <Link
-              href="/pricing?type=artist"
-              className="underline-offset-2 hover:cursor-pointer hover:underline"
-            >
-              <DropdownMenuItem className="focus:bg-salYellow/50">
-                <PiPiggyBank className="mr-2 size-4" />
-                <span>Renew Membership</span>
-              </DropdownMenuItem>
-            </Link>
-          )}
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <Link
-          href="/support"
-          className="underline-offset-2 hover:cursor-pointer hover:underline"
-        >
-          <DropdownMenuItem className="focus:bg-salYellow/50">
-            <HelpCircle className="mr-2 size-4" />
-            <span>Help & Support</span>
-          </DropdownMenuItem>
-        </Link>
-        <DropdownMenuSeparator />
-        <SignOutBtn email={user?.email}>
-          <DropdownMenuItem className="focus:bg-salPink/50">
-            <LogOut className="mr-2 size-4" />
-            <span>Log out</span>
-          </DropdownMenuItem>
-        </SignOutBtn>
-      </DropdownMenuContent>
-    </DropdownMenu>
+            {subStatus === "canceled" && isArtist && (
+              <Link
+                href="/pricing?type=artist"
+                className="underline-offset-2 hover:cursor-pointer hover:underline"
+              >
+                <DropdownMenuItem className="focus:bg-salYellow/50">
+                  <PiPiggyBank className="mr-2 size-4" />
+                  <span>Renew Membership</span>
+                </DropdownMenuItem>
+              </Link>
+            )}
+          </DropdownMenuGroup>
+          <DropdownMenuSeparator />
+          <Link
+            href="/support"
+            className="underline-offset-2 hover:cursor-pointer hover:underline"
+          >
+            <DropdownMenuItem className="focus:bg-salYellow/50">
+              <HelpCircle className="mr-2 size-4" />
+              <span>Help & Support</span>
+            </DropdownMenuItem>
+          </Link>
+          <DropdownMenuSeparator />
+          <SignOutBtn email={user?.email}>
+            <DropdownMenuItem className="focus:bg-salPink/50">
+              <LogOut className="mr-2 size-4" />
+              <span>Log out</span>
+            </DropdownMenuItem>
+          </SignOutBtn>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
   );
 }

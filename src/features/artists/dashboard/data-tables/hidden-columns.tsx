@@ -130,8 +130,8 @@ export const hiddenColumns: ColumnDef<hiddenColumnsProps>[] = [
       const types = row.getValue("type") as EventType[];
 
       return (
-        <div className="flex flex-col items-center gap-1">
-          <span className="min-w-20 max-w-sm truncate font-medium capitalize">
+        <div className="flex max-w-40 sm:max-w-full md:justify-center">
+          <span className="truncate font-medium capitalize">
             {Array.isArray(types) && types.length > 0
               ? types.map((type) => getEventTypeLabel(type)).join(" | ")
               : "-"}
@@ -144,7 +144,8 @@ export const hiddenColumns: ColumnDef<hiddenColumnsProps>[] = [
     accessorKey: "hiddenStatus",
     id: "hiddenStatus",
     minSize: 120,
-    maxSize: 120,
+    maxSize: 180,
+
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Status" />
     ),

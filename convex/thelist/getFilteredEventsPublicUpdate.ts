@@ -184,7 +184,6 @@ export const getFilteredEventsPublic = query({
           .take(10);
       } else {
         if (searchType === "all" && searchTerm) {
-          console.log("by all");
           const [
             events,
             eventLocs,

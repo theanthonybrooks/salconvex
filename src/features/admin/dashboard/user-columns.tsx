@@ -45,6 +45,7 @@ export const userColumnLabels: Record<string, string> = {
   lastActive: "Last Active",
   accountType: "Account Type",
   createdAt: "Created",
+  lastUpdated: "Last Updated",
   role: "Role",
   source: "Source",
   organizationNames: "Organizations",
@@ -67,6 +68,7 @@ interface UserColumnsProps {
   cancelReason?: string;
   canceledAt?: number;
   lastActive?: number;
+  lastUpdated?: number;
   accountType: AccountType;
   createdAt: number;
   role: UserRole;
@@ -158,10 +160,13 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
             bananaSubs.includes(subscription ?? "") &&
               "border border-orange-500 bg-orange-100 text-orange-800",
 
-            !subscription && "italic text-muted-foreground",
+            subscription === "4. none" && "text-muted-foreground",
           )}
         >
-          <p className="text-center capitalize"> {subscription || "none"}</p>
+          <p className={cn("text-center capitalize")}>
+            {" "}
+            {subscription || "none"}
+          </p>
         </div>
       );
     },
@@ -196,7 +201,12 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
             !subStatus && "italic text-muted-foreground",
           )}
         >
-          <p className="flex items-center justify-center gap-1 text-center capitalize">
+          <p
+            className={cn(
+              "flex items-center justify-center gap-1 text-center capitalize",
+              !subStatus && "text-muted-foreground",
+            )}
+          >
             {subStatus || "none"}
             {cancelReason ? (
               systemCancel ? (
@@ -329,6 +339,24 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
         >
           {lastActive ? new Date(lastActive).toLocaleString() : "-"}
         </div>
+      );
+    },
+    enableMultiSort: true,
+  },
+  {
+    accessorKey: "lastUpdated",
+    id: "lastUpdated",
+    minSize: 120,
+    maxSize: 180,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Last Updated" />
+    ),
+    cell: ({ row }) => {
+      const { lastUpdated } = row.original;
+      return (
+        <span className="text-sm text-muted-foreground">
+          {lastUpdated ? new Date(lastUpdated).toLocaleString() : "-"}
+        </span>
       );
     },
     enableMultiSort: true,
@@ -514,13 +542,14 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
     cell: ({ row }) => {
       const { createdAt: value } = row.original;
       return (
-        <span className="text-sm">
+        <span className="text-sm text-muted-foreground">
           {value ? new Date(value).toLocaleString() : "-"}
         </span>
       );
     },
     enableMultiSort: true,
   },
+
   {
     accessorKey: "source",
     id: "source",
@@ -533,7 +562,12 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
       const value = row.getValue("source") as string | undefined;
       return (
         <TooltipSimple content={value}>
-          <p className={cn("truncate text-sm", !value && "text-center")}>
+          <p
+            className={cn(
+              "truncate text-sm text-muted-foreground",
+              !value && "text-center",
+            )}
+          >
             {value ? value : "-"}
           </p>
         </TooltipSimple>

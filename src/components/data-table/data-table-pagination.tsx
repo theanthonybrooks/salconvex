@@ -23,9 +23,26 @@ interface DataTablePaginationProps<TData> {
 export function DataTablePagination<TData>({
   table,
 }: DataTablePaginationProps<TData>) {
+  const totalResults = table.getFilteredRowModel().rows.length;
   const tablePageSize = table.getState().pagination.pageSize;
+  const tablePageIndex = table.getState().pagination.pageIndex;
   const formType = table.options.meta?.pageType === "form";
   const minimalView = table.options.meta?.minimalView;
+
+  console.log(tablePageIndex);
+  console.log(tablePageSize);
+  const currentStartingPgResultsNumber =
+    tablePageIndex === 0 ? 1 : tablePageSize + 1;
+  const currentEndingPgResultsNumber =
+    tablePageSize > totalResults
+      ? totalResults
+      : tablePageIndex === 0
+        ? tablePageSize
+        : totalResults - tablePageIndex * tablePageSize + tablePageSize;
+  const hasSelectColumn = table
+    .getAllColumns()
+    .some((col) => col.id === "select");
+
   // const tableType = table.options.meta?.tableType;
   // const forEvents = tableType === "events";
   // console.log(table.nextPage());
@@ -35,15 +52,23 @@ export function DataTablePagination<TData>({
   if (table.options.data.length <= 10 && formType) return;
   return (
     <div className="flex flex-col items-center justify-between gap-y-2 px-2 sm:flex-row">
-      <div
-        className={cn(
-          "flex-1 text-sm text-muted-foreground",
-          minimalView && "invisible",
-        )}
-      >
-        {table.getFilteredSelectedRowModel().rows.length} of{" "}
-        {table.getFilteredRowModel().rows.length} row(s) selected.
-      </div>
+      {hasSelectColumn && (
+        <div
+          className={cn(
+            "flex-1 text-sm text-muted-foreground",
+            minimalView && "invisible",
+          )}
+        >
+          {table.getFilteredSelectedRowModel().rows.length} of{" "}
+          {table.getFilteredRowModel().rows.length} row(s) selected.
+        </div>
+      )}
+      {!hasSelectColumn && (
+        <div className={cn("flex-1 text-sm text-muted-foreground")}>
+          {currentStartingPgResultsNumber}-{currentEndingPgResultsNumber} of{" "}
+          {table.getFilteredRowModel().rows.length} results
+        </div>
+      )}
 
       <div className="flex items-center space-x-6 lg:space-x-8">
         <div className="hidden items-center space-x-2 sm:flex">

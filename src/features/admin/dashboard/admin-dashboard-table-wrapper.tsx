@@ -248,7 +248,6 @@ export function AdminDashboardTableWrapper({
               adminActions={adminActions}
               tableType="artists"
               pageType="dashboard"
-              minimalView={true}
               collapsedSidebar={isSidebarCollapsed}
               defaultSort={{ id: `createdAt`, desc: true }}
               pageSize={50}
@@ -273,7 +272,6 @@ export function AdminDashboardTableWrapper({
               adminActions={adminActions}
               tableType="artists"
               pageType="dashboard"
-              minimalView={true}
               collapsedSidebar={isSidebarCollapsed}
               className="mx-auto w-full max-w-[80dvw] overflow-x-auto sm:max-w-[90vw]"
               outerContainerClassName={cn("lg:hidden")}

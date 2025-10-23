@@ -709,7 +709,12 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
 
         const userRelevantIssues = issues.filter(
           (i) =>
-            i.message && !["Required", "Invalid input"].includes(i.message),
+            i.message &&
+            !(
+              i.message === "Required" ||
+              i.message === "invalid_union" ||
+              i.message.toLowerCase().includes("invalid input")
+            ),
         );
 
         const firstMessage = userRelevantIssues[0]?.message || "";

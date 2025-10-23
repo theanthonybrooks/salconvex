@@ -94,7 +94,6 @@ const SubmissionFormOrgStep = ({
   const scrollTrigger = orgDataValid && existingOrg && furthestStep === 0;
   const { scrollRef } = useStepper();
   const sidebarCollapsed = !!isSidebarCollapsed;
-  console.log(isSidebarCollapsed, sidebarCollapsed);
 
   useEffect(() => {
     if (scrollTrigger && scrollRef.current) {

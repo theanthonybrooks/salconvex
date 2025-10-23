@@ -121,7 +121,7 @@ export const usersWithSubscriptions = query({
           .query("artists")
           .withIndex("by_artistId", (q) => q.eq("artistId", user._id))
           .first();
-
+        const lastUpdated = subscription?.lastEditedAt;
         const activeSub =
           subscription?.status === "active" ||
           subscription?.status === "trialing";
@@ -237,6 +237,7 @@ export const usersWithSubscriptions = query({
           role: user.role ?? ["user"],
           organizationNames: orgNames ?? [],
           createdAt: user.createdAt,
+          lastUpdated,
           source: user.source,
         };
       }),
@@ -288,7 +289,7 @@ export const currentUser = query({
     return await ctx.db.get(userId);
   },
 });
-
+//TODO: Make this assign a random string to each user when they view the site (not logged in) that will be used to identify them in the analytics. Something clearly identifiable from the convex ids.
 export const getCurrentUser = query({
   args: {
     token: v.optional(v.string()),
