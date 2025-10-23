@@ -589,7 +589,11 @@ const EventCardPreview = ({
                     hasSub: activeSub,
                   });
                 }
-                router.push(linkPath);
+                if (!publicPreview) {
+                  router.push("/pricing");
+                } else {
+                  router.push(linkPath);
+                }
               }}
               className="group hover:cursor-pointer"
             >

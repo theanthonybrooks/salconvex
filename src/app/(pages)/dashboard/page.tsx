@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/card";
 import { ChartWrapper } from "@/components/ui/charts/chart-wrapper";
 import { Link } from "@/components/ui/custom-link";
-import { PreviewCard } from "@/components/ui/dashboard/preview-card";
+import { PreviewCard } from "@/components/ui/dashboard/dashboard-preview-card";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { countApplicationsByTimeRange } from "@/helpers/applicationFns";
 import { getEventCategoryLabel } from "@/helpers/eventFns";

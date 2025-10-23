@@ -270,7 +270,7 @@ export default function TheListNavBar(
                         <NavigationMenuTrigger
                           isCurrent={isActiveTheList}
                           className={cn(
-                            "z-0 border-2 border-transparent hover:border-foreground data-[state=open]:border-foreground data-[state=open]:bg-background",
+                            "z-0 border-2 border-transparent hover:border-foreground data-[state=open]:border-foreground",
                             isActiveTheList && activeMainItemClasses,
                           )}
                           onPointerMove={(event) => event.preventDefault()}
