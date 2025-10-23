@@ -1,5 +1,14 @@
 //TODO: Replace current loading/reloading logic with queries first, then using that data in the default values. Reset when the search param is changed. perhaps also just combine multiple forms rather than one giant one. I don't know why I went that approach anyways?
 
+import { validOCVals } from "@/constants/openCallConsts";
+
+import { EnrichedEvent, EventCategory } from "@/types/eventTypes";
+import { OpenCallState } from "@/types/openCallTypes";
+import { User } from "@/types/user";
+
+import { getExternalRedirectHtml } from "@/utils/loading-page-html";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { debounce, merge } from "lodash";
 import {
   Dispatch,
   ReactNode,
@@ -10,18 +19,6 @@ import {
   useRef,
   useState,
 } from "react";
-import { EnrichedEvent, EventCategory } from "@/types/eventTypes";
-import { OpenCallState } from "@/types/openCallTypes";
-import { User } from "@/types/user";
-import { getExternalRedirectHtml } from "@/utils/loading-page-html";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { api } from "~/convex/_generated/api";
-import { Doc, Id } from "~/convex/_generated/dataModel";
-import { makeUseQueryWithStatus } from "convex-helpers/react";
-import { useQuery } from "convex-helpers/react/cache";
-import { useQueries } from "convex-helpers/react/cache/hooks";
-import { useAction, useMutation } from "convex/react";
-import { debounce, merge } from "lodash";
 import { FormProvider, Path, useForm, useWatch } from "react-hook-form";
 import { toast } from "react-toastify";
 import slugify from "slugify";
@@ -63,9 +60,15 @@ import { toSeason, toYear, toYearMonth } from "@/helpers/dateFns";
 import { getEventCategoryLabel } from "@/helpers/eventFns";
 import { getOcPricing } from "@/helpers/pricingFns";
 import { cn } from "@/helpers/utilsFns";
-import { validOCVals } from "@/constants/openCallConsts";
 import { handleFileUrl, handleOrgFileUrl } from "@/lib/fileUploadFns";
 import { useDevice } from "@/providers/device-provider";
+
+import { makeUseQueryWithStatus } from "convex-helpers/react";
+import { useQuery } from "convex-helpers/react/cache";
+import { useQueries } from "convex-helpers/react/cache/hooks";
+import { useAction, useMutation } from "convex/react";
+import { api } from "~/convex/_generated/api";
+import { Doc, Id } from "~/convex/_generated/dataModel";
 
 export const getSteps = (isAdmin: boolean = false) => [
   {
@@ -222,9 +225,7 @@ export const EventOCForm = ({
   const createNewOpenCall = useMutation(
     api.openCalls.openCall.createNewOpenCall,
   );
-  const updateOpenCall = useMutation(
-    api.openCalls.openCall.createOrUpdateOpenCall,
-  );
+  const updateOpenCall = useMutation(api.openCalls.openCall.updateOpenCall);
   const changeOCStatus = useMutation(api.openCalls.openCall.changeOCStatus);
   const updateEventLookup = useMutation(
     api.events.eventLookup.eventLookupUpdateHelper,
@@ -1621,6 +1622,7 @@ export const EventOCForm = ({
           setPending(false);
         }
         if (isAdmin && publish) {
+          console.log(publish)
           toast.success("Published!");
           setTimeout(() => {
             window.location.href = `/thelist/event/${submissionUrl}`;

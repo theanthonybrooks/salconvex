@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
+
 import { Check, ChevronDown, Circle } from "lucide-react";
 
 import { cn } from "@/helpers/utilsFns";
@@ -70,7 +71,7 @@ const DropdownMenuSubTrigger = React.forwardRef<
   >
     {children}
 
-    <ChevronDown className="group-data- rotate-icon fixed right-3 ml-auto size-3 transition-all duration-200 group-data-[state=open]/trigger:rotate-90" />
+    <ChevronDown className="rotate-icon fixed right-3 ml-auto size-3 transition-all duration-200 group-data-[state=open]/trigger:rotate-90" />
   </DropdownMenuPrimitive.SubTrigger>
 ));
 DropdownMenuSubTrigger.displayName =

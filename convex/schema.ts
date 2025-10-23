@@ -1329,6 +1329,13 @@ export default defineSchema({
     .index("type", ["type"])
     .index("stripeEventId", ["stripeEventId"]),
 
+  stripeRefunds: defineTable({
+    userId: v.id("users"),
+    paymentIntentId: v.string(),
+    refundId: v.string(),
+    reason: v.string(),
+  }),
+
   userPreferences: defineTable({
     userId: v.id("users"),
     autoApply: v.optional(v.boolean()),

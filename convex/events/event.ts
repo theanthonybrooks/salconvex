@@ -1,6 +1,5 @@
 import { COUNTRIES_REQUIRING_STATE } from "@/constants/locationConsts";
 
-import { sortByOcStatus } from "@/lib/openCallFns";
 import {
   EventCategory,
   EventFormat,
@@ -9,11 +8,20 @@ import {
 } from "@/types/eventTypes";
 import { OpenCall, OpenCallApplication } from "@/types/openCallTypes";
 import { Organizer } from "@/types/organizer";
-import { getAuthUserId } from "@convex-dev/auth/server";
-import { ConvexError, v } from "convex/values";
+
 import slugify from "slugify";
+
+import { sortByLocation } from "@/helpers/locations";
+import { sortByOcStatus } from "@/lib/openCallFns";
+
+import { getAuthUserId } from "@convex-dev/auth/server";
+import { internal } from "~/convex/_generated/api";
 import { Id } from "~/convex/_generated/dataModel";
 import { mutation, MutationCtx, query } from "~/convex/_generated/server";
+import {
+  eventsAggregate,
+  openCallsAggregate,
+} from "~/convex/aggregates/eventAggregates";
 import {
   eventFormatValidator,
   eventSchema,
@@ -21,13 +29,7 @@ import {
   linksFields,
   prodFormatValidator,
 } from "~/convex/schema";
-
-import { sortByLocation } from "@/helpers/locations";
-import { internal } from "~/convex/_generated/api";
-import {
-  eventsAggregate,
-  openCallsAggregate,
-} from "~/convex/aggregates/eventAggregates";
+import { ConvexError, v } from "convex/values";
 
 // export const globalSearch = query({
 //   args: {
@@ -1717,10 +1719,10 @@ export const reactivateEvent = mutation({
         lastUpdatedBy: userId,
       });
       const newOC = await ctx.db.get(oc._id);
-      if (newOC) await openCallsAggregate.replace(ctx, oc, newOC);
+      if (newOC) await openCallsAggregate.replaceOrInsert(ctx, oc, newOC);
     }
     const newDoc = await ctx.db.get(event._id);
-    if (newDoc) await eventsAggregate.replace(ctx, oldDoc, newDoc);
+    if (newDoc) await eventsAggregate.replaceOrInsert(ctx, oldDoc, newDoc);
 
     await ctx.runMutation(internal.events.eventLookup.addUpdateEventLookup, {
       eventId: args.eventId,

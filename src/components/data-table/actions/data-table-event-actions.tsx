@@ -1,8 +1,9 @@
-import { useState } from "react";
 import { EventCategory, SubmissionFormState } from "@/types/eventTypes";
-import { api } from "~/convex/_generated/api";
-import { Id } from "~/convex/_generated/dataModel";
-import { useMutation } from "convex/react";
+
+import { useState } from "react";
+import { toast } from "react-toastify";
+
+import { FaRegCopy, FaRegTrashCan } from "react-icons/fa6";
 import {
   Eye,
   Image as ImageIcon,
@@ -10,12 +11,14 @@ import {
   LucideFolderClock,
   LucideFolderInput,
 } from "lucide-react";
-import { FaRegCopy, FaRegTrashCan } from "react-icons/fa6";
-import { toast } from "react-toastify";
 
 import { useConfirmAction } from "@/components/ui/confirmation-dialog-context";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { getEventCategoryLabel } from "@/helpers/eventFns";
+
+import { api } from "~/convex/_generated/api";
+import { Id } from "~/convex/_generated/dataModel";
+import { useMutation } from "convex/react";
 
 export interface EventActionProps {
   eventId: string;
@@ -165,7 +168,11 @@ export const ReactivateEvent = ({ eventId, state }: SubmittedActionProps) => {
   const handleReactivate = async () => {
     try {
       await activateEvent({ eventId: eventId as Id<"events"> });
-      toast.success("Event reactivated!");
+      if (state === "published") {
+        toast.success("Event changed to Submitted!");
+      } else {
+        toast.success("Event reactivated!");
+      }
     } catch (error) {
       console.error("Failed to reactivate event:", error);
       toast.error("Failed to reactivate event");

@@ -1,12 +1,10 @@
 "use client";
 
+import { TableTypes } from "@/types/tanstack-table";
+
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useDashboard } from "@/app/(pages)/dashboard/_components/dashboard-context";
-import { TableTypes } from "@/types/tanstack-table";
-import { api } from "~/convex/_generated/api";
-import { useQuery } from "convex-helpers/react/cache";
-import { usePreloadedQuery } from "convex/react";
 
 import { DataTable } from "@/components/data-table/data-table";
 import { applicationColumns } from "@/features/artists/applications/components/events-data-table/application-columns";
@@ -14,6 +12,10 @@ import { bookmarkColumns } from "@/features/artists/dashboard/data-tables/bookma
 import { hiddenColumns } from "@/features/artists/dashboard/data-tables/hidden-columns";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { cn } from "@/helpers/utilsFns";
+
+import { api } from "~/convex/_generated/api";
+import { useQuery } from "convex-helpers/react/cache";
+import { usePreloadedQuery } from "convex/react";
 
 interface ArtistDashboardTableWrapperProps {
   page: TableTypes;
@@ -58,7 +60,8 @@ export function ArtistDashboardTableWrapper({
     <>
       {appsPage && (
         <>
-          <div className="hidden max-h-full w-full px-10 py-10 lg:block">
+          <div className="hidden max-h-full w-full px-10 pb-10 pt-7 lg:block">
+            <h3 className="mb-3 text-xl">My Applications</h3>
             <DataTable
               columns={applicationColumns}
               data={applicationData ?? []}
@@ -103,7 +106,8 @@ export function ArtistDashboardTableWrapper({
       )}
       {bookmarksPage && (
         <>
-          <div className="hidden max-h-full w-full px-10 py-10 lg:block">
+          <div className="hidden max-h-full w-full px-10 pb-10 pt-7 lg:block">
+            <h3 className="mb-3 text-xl">My Bookmarks</h3>
             <DataTable
               columns={bookmarkColumns}
               data={bookmarkData ?? []}
@@ -148,7 +152,8 @@ export function ArtistDashboardTableWrapper({
       )}
       {hiddenPage && (
         <>
-          <div className="hidden max-h-full w-full px-10 py-10 lg:block">
+          <div className="hidden max-h-full w-full px-10 pb-10 pt-7 lg:block">
+            <h3 className="mb-3 text-xl">Things I&apos;ve Hidden</h3>
             <DataTable
               columns={hiddenColumns}
               data={hiddenData ?? []}

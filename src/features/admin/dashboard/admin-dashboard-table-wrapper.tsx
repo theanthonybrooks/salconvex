@@ -76,7 +76,8 @@ export function AdminDashboardTableWrapper({
     <>
       {submissionsPage && (
         <>
-          <div className="hidden max-h-full w-full px-10 py-10 lg:block">
+          <div className="hidden max-h-full w-full px-10 pb-10 pt-7 lg:block">
+            <h3 className="mb-3 text-xl">Submitted Events & Open Calls</h3>
             <DataTable
               columns={getColumns(isAdmin)}
               data={eventsData}
@@ -119,7 +120,8 @@ export function AdminDashboardTableWrapper({
       )}
       {newsletterPage && (
         <>
-          <div className="hidden max-h-full w-full px-10 py-10 lg:block">
+          <div className="hidden max-h-full w-full px-10 pb-10 pt-7 lg:block">
+            <h3 className="mb-3 text-xl">Newsletter Subscriptions</h3>
             <DataTable
               columns={newsletterColumns}
               data={newsletterData?.subscribers ?? []}
@@ -163,7 +165,8 @@ export function AdminDashboardTableWrapper({
       )}
       {usersPage && (
         <>
-          <div className="hidden max-h-full w-full px-10 py-10 lg:block">
+          <div className="hidden max-h-full w-full px-10 pb-10 pt-7 lg:block">
+            <h3 className="mb-3 text-xl">Site Users</h3>
             <DataTable
               columns={userColumns}
               data={usersData?.users ?? []}
@@ -228,7 +231,8 @@ export function AdminDashboardTableWrapper({
       )}
       {artistsPage && (
         <>
-          <div className="hidden max-h-full w-full px-10 py-10 lg:block">
+          <div className="hidden max-h-full w-full px-10 pb-10 pt-7 lg:block">
+            <h3 className="mb-3 text-xl">Artists</h3>
             <DataTable
               columns={artistColumns}
               data={(artistsData ?? []) as ArtistColumnProps[]}
@@ -282,7 +286,8 @@ export function AdminDashboardTableWrapper({
       )}
       {appsPage && (
         <>
-          <div className="hidden max-h-full w-full px-10 py-10 lg:block">
+          <div className="hidden max-h-full w-full px-10 pb-10 pt-7 lg:block">
+            <h3 className="mb-3 text-xl">Applications</h3>
             <DataTable
               columns={applicationColumns}
               data={applicationData ?? []}

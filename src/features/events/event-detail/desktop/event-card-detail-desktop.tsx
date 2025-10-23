@@ -1,12 +1,12 @@
 "use client";
 
+import { EventCardProps } from "@/types/eventTypes";
+
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { EventCardProps } from "@/types/eventTypes";
-import { api } from "~/convex/_generated/api";
-import { useMutation, usePreloadedQuery } from "convex/react";
-import { Eye, EyeOff, MapPin } from "lucide-react";
+
 import { FaBookmark, FaRegBookmark } from "react-icons/fa6";
+import { Eye, EyeOff, MapPin } from "lucide-react";
 
 import { ApproveBtn } from "@/components/ui/approve-btn";
 import { Card } from "@/components/ui/card";
@@ -39,6 +39,9 @@ import { getFormattedLocationString } from "@/helpers/locations";
 import { RichTextDisplay } from "@/helpers/richTextFns";
 import { getUserFontSizePref } from "@/helpers/stylingFns";
 import { cn } from "@/helpers/utilsFns";
+
+import { api } from "~/convex/_generated/api";
+import { useMutation, usePreloadedQuery } from "convex/react";
 
 export const EventCardDetailDesktop = (props: EventCardProps) => {
   const updateEventAnalytics = useMutation(
@@ -269,13 +272,12 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
               />
               {(isAdmin || isUserOrg) && (
                 <>
-                  {isAdmin && (
-                    <Separator
-                      orientation="horizontal"
-                      thickness={2}
-                      className="col-span-full mx-auto mb-2 mt-3"
-                    />
-                  )}
+                  <Separator
+                    orientation="horizontal"
+                    thickness={2}
+                    className="col-span-full mx-auto mb-2 mt-3"
+                  />
+
                   <ApproveBtn
                     user={user}
                     event={event}

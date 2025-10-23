@@ -2,24 +2,23 @@
 
 "use client";
 
+import { validOCVals } from "@/constants/openCallConsts";
+
+import { EnrichedEvent, EventCategory } from "@/types/eventTypes";
+import { User } from "@/types/user";
+
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useDashboard } from "@/app/(pages)/dashboard/_components/dashboard-context";
-import { EnrichedEvent, EventCategory } from "@/types/eventTypes";
-import { User } from "@/types/user";
 import { getExternalRedirectHtml } from "@/utils/loading-page-html";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { api } from "~/convex/_generated/api";
-import { Doc, Id } from "~/convex/_generated/dataModel";
-import { makeUseQueryWithStatus } from "convex-helpers/react";
-import { useQueries, useQuery } from "convex-helpers/react/cache/hooks";
-import { useAction, useMutation } from "convex/react";
 import { debounce, merge } from "lodash";
 import { FormProvider, Path, useForm, useWatch } from "react-hook-form";
-import { LuBadge, LuBadgeCheck, LuBadgeDollarSign } from "react-icons/lu";
 import { toast } from "react-toastify";
 import slugify from "slugify";
 import { z } from "zod";
+
+import { LuBadge, LuBadgeCheck, LuBadgeDollarSign } from "react-icons/lu";
 
 // import { eventDefaultValues } from "@/features/events/data/eventDefaultData"
 
@@ -48,9 +47,14 @@ import { eventWithOCSchema } from "@/features/organizers/schemas/event-add-schem
 import { toSeason, toYearMonth } from "@/helpers/dateFns";
 import { getEventCategoryLabel } from "@/helpers/eventFns";
 import { getOcPricing } from "@/helpers/pricingFns";
-import { validOCVals } from "@/constants/openCallConsts";
 import { handleFileUrl, handleOrgFileUrl } from "@/lib/fileUploadFns";
 import { useDevice } from "@/providers/device-provider";
+
+import { api } from "~/convex/_generated/api";
+import { Doc, Id } from "~/convex/_generated/dataModel";
+import { makeUseQueryWithStatus } from "convex-helpers/react";
+import { useQueries, useQuery } from "convex-helpers/react/cache/hooks";
+import { useAction, useMutation } from "convex/react";
 
 const formTypeOptions = [
   { value: 1, Icon: LuBadge },
@@ -147,9 +151,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   const createNewOpenCall = useMutation(
     api.openCalls.openCall.createNewOpenCall,
   );
-  const updateOpenCall = useMutation(
-    api.openCalls.openCall.createOrUpdateOpenCall,
-  );
+  const updateOpenCall = useMutation(api.openCalls.openCall.updateOpenCall);
   const updateEventLastEditedAt = useMutation(
     api.events.event.updateEventLastEditedAt,
   );
@@ -1525,7 +1527,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
         if (latestSaveId.current === saveId) {
           setPending(false);
         }
-        if (isAdmin && finalStep) {
+        if (isAdmin && publish) {
           toast.success("Published!");
           setTimeout(() => {
             window.location.href = `/thelist/event/${submissionUrl}`;

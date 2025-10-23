@@ -7,7 +7,9 @@ import {
 } from "@/types/eventTypes";
 import { OpenCallState } from "@/types/openCallTypes";
 import { OrgEventData } from "@/types/organizer";
+
 import { ColumnDef } from "@tanstack/react-table";
+
 import { Clipboard, MoreHorizontal } from "lucide-react";
 
 import {
@@ -415,12 +417,18 @@ export const orgColumns: ColumnDef<OrgEventData>[] = [
                   <ReactivateEvent eventId={event._id} state={state} />
                 )}
 
-                <DropdownMenuSeparator />
-                <OrgDuplicateEvent
-                  eventId={event._id}
-                  category={eventCategory}
-                />
-                {openCallId && <OrgDuplicateOC openCallId={openCallId} />}
+                {event.approvedAt && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <OrgDuplicateEvent
+                      eventId={event._id}
+                      category={eventCategory}
+                    />
+                    {openCallId && ocApproved && (
+                      <OrgDuplicateOC openCallId={openCallId} />
+                    )}
+                  </>
+                )}
                 <DropdownMenuSeparator />
                 <DropdownMenuLabel>{"Support"}</DropdownMenuLabel>
                 <DropdownMenuItem>

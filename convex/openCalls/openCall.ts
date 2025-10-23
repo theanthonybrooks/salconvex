@@ -6,8 +6,8 @@ import {
   OpenCallState,
   RateUnit,
 } from "@/types/openCallTypes";
+
 import { getAuthUserId } from "@convex-dev/auth/server";
-import { ConvexError, v } from "convex/values";
 import { internal } from "~/convex/_generated/api";
 import { internalMutation, mutation, query } from "~/convex/_generated/server";
 import {
@@ -20,6 +20,7 @@ import {
   ocStateValidator,
   openCallSchema,
 } from "~/convex/schema";
+import { ConvexError, v } from "convex/values";
 
 export const getTotalNumberOfOpenCalls = query({
   handler: async (ctx) => {
@@ -177,23 +178,6 @@ export const archiveExpiredOpenCalls = internalMutation({
   },
 });
 
-export const lookupOpenCall = query({
-  args: {
-    eventId: v.union(v.id("events"), v.null()),
-  },
-  handler: async (ctx, args) => {
-    const { eventId } = args;
-    if (!eventId) return null;
-
-    const openCall = await ctx.db
-      .query("eventOpenCalls")
-      .withIndex("by_eventId", (q) => q.eq("eventId", eventId))
-      .unique();
-
-    return openCall;
-  },
-});
-
 export const createNewOpenCall = mutation({
   args: {
     orgId: v.id("organizations"),
@@ -251,38 +235,39 @@ export const createNewOpenCall = mutation({
     };
 
     //TODO: update this later to account for multiple open calls per event. For now, just one is allowed/used.
-    const lookup = await ctx.db
-      .query("eventOpenCalls")
+
+    const existingOpenCall = await ctx.db
+      .query("openCalls")
       .withIndex("by_eventId", (q) => q.eq("eventId", args.eventId))
       .unique();
 
-    if (lookup) {
+    if (existingOpenCall) {
       //TODO: determine whether I should throw an error here or just update and return the existing call. Probably just update/return?
-      await ctx.db.patch(lookup.openCallId, openCallData);
-      await ctx.db.patch(lookup._id, {
-        edition: args.edition,
-        state: openCallData.state,
-        lastEdited: Date.now(),
-      });
-      return lookup.openCallId;
+      await ctx.db.patch(existingOpenCall._id, openCallData);
+      // await ctx.db.patch(existingOpenCall._id, {
+      //   edition: args.edition,
+      //   state: openCallData.state,
+      //   lastEdited: Date.now(),
+      // });
+      return existingOpenCall._id;
     }
 
     const newId = await ctx.db.insert("openCalls", openCallData);
     const newOC = await ctx.db.get(newId);
     if (newOC) await openCallsAggregate.insert(ctx, newOC);
 
-    await ctx.db.insert("eventOpenCalls", {
-      eventId: args.eventId,
-      openCallId: newId,
-      edition: args.edition,
-      state: openCallData.state,
-    });
+    // await ctx.db.insert("eventOpenCalls", {
+    //   eventId: args.eventId,
+    //   openCallId: newId,
+    //   edition: args.edition,
+    //   state: openCallData.state,
+    // });
 
     return newId;
   },
 });
 
-export const createOrUpdateOpenCall = mutation({
+export const updateOpenCall = mutation({
   args: {
     // orgId: v.id("organizations"),
     ...openCallSchema,
@@ -301,10 +286,16 @@ export const createOrUpdateOpenCall = mutation({
       .withIndex("by_userId", (q) => q.eq("userId", userId))
       .unique();
     if (!user) throw new ConvexError("User not found");
-    let existingOpenCall = null;
-    if (args.openCallId) {
-      existingOpenCall = await ctx.db.get(args.openCallId);
-    }
+
+    const existingOpenCall = args.openCallId
+      ? await ctx.db.get(args.openCallId)
+      : args.eventId
+        ? await ctx.db
+            .query("openCalls")
+            .withIndex("by_eventId", (q) => q.eq("eventId", args.eventId))
+            .first()
+        : null;
+    if (!existingOpenCall) throw new ConvexError("Open call not found");
 
     const allDocs = [
       ...(existingOpenCall?.documents ?? []),
@@ -327,7 +318,9 @@ export const createOrUpdateOpenCall = mutation({
     //TODO: think about this logic and if it needs to be here or if it's better decided in the form per step (with the approved flag)
     const openCallState = isAdmin
       ? args.finalStep
-        ? "published"
+        ? args.approved
+          ? "published"
+          : "submitted"
         : ocApproved
           ? "editing"
           : "draft"
@@ -364,29 +357,50 @@ export const createOrUpdateOpenCall = mutation({
       ...(args.approved ? { approvedBy: userId, approvedAt: Date.now() } : {}),
     };
 
-    // Step 1: Lookup already exists — update both openCall and lookup
-    const lookup = await ctx.db
-      .query("eventOpenCalls")
-      .withIndex("by_eventId", (q) => q.eq("eventId", args.eventId))
-      .unique();
+    // // Step 1: Lookup already exists — update both openCall and lookup
+    // const lookup = await ctx.db
+    //   .query("eventOpenCalls")
+    //   .withIndex("by_eventId", (q) => q.eq("eventId", args.eventId))
+    //   .unique();
 
-    // console.log("ocId", args.openCallId);
-    // console.log("lookup", lookup);
+    // // console.log("ocId", args.openCallId);
+    // // console.log("lookup", lookup);
 
-    if (lookup) {
-      const prevOC = await ctx.db.get(lookup.openCallId);
-      await ctx.db.patch(lookup.openCallId, openCallData);
-      const newOC = await ctx.db.get(lookup.openCallId);
-      await ctx.db.patch(lookup._id, {
-        edition: args.basicInfo.dates.edition,
-        state: openCallState,
-        lastEdited: Date.now(),
-        ...(args.openCallId && { openCallId: args.openCallId }),
-      });
-      // console.log("prev lookup: ", prevOc?._id, "new lookup: ", newOC?._id);
-      console.log("is it me");
-      if (prevOC && newOC)
-        await openCallsAggregate.replaceOrInsert(ctx, prevOC, newOC);
+    // if (lookup) {
+    //   const prevOC = await ctx.db.get(lookup.openCallId);
+    //   await ctx.db.patch(lookup.openCallId, openCallData);
+    //   const newOC = await ctx.db.get(lookup.openCallId);
+    //   await ctx.db.patch(lookup._id, {
+    //     edition: args.basicInfo.dates.edition,
+    //     state: openCallState,
+    //     lastEdited: Date.now(),
+    //     ...(args.openCallId && { openCallId: args.openCallId }),
+    //   });
+    //   // console.log("prev lookup: ", prevOc?._id, "new lookup: ", newOC?._id);
+    //   console.log("is it me");
+    //!! TODO:  if (prevOC && newOC)
+    //     await openCallsAggregate.replaceOrInsert(ctx, prevOC, newOC);
+    //   if (newOC?.approvedAt) {
+    //     await ctx.runMutation(
+    //       internal.events.eventLookup.addUpdateEventLookup,
+    //       {
+    //         eventId: newOC.eventId,
+    //         openCallId: newOC._id,
+    //       },
+    //     );
+    //   }
+    //   // console.log("lookup updated", lookup, openCallData);
+    //   return openCallData;
+    // }
+
+    // Step 2: If user provided openCallId, validate and use it
+
+    await ctx.db.patch(existingOpenCall._id, openCallData);
+
+    const newOC = await ctx.db.get(existingOpenCall._id);
+
+    if (newOC) {
+      await openCallsAggregate.replaceOrInsert(ctx, existingOpenCall, newOC);
       if (newOC?.approvedAt) {
         await ctx.runMutation(
           internal.events.eventLookup.addUpdateEventLookup,
@@ -396,51 +410,8 @@ export const createOrUpdateOpenCall = mutation({
           },
         );
       }
-      // console.log("lookup updated", lookup, openCallData);
-      return openCallData;
     }
 
-    // Step 2: If user provided openCallId, validate and use it
-    if (args.openCallId) {
-      // console.log("args.openCallId", args.openCallId);
-      const existing = await ctx.db.get(args.openCallId);
-      // console.log("existing", existing);
-      if (existing) {
-        await ctx.db.patch(args.openCallId, openCallData);
-
-        await ctx.db.insert("eventOpenCalls", {
-          eventId: args.eventId,
-          openCallId: args.openCallId,
-          edition: args.basicInfo.dates.edition,
-          state: openCallState,
-        });
-        const newOC = await ctx.db.get(args.openCallId);
-        // console.log("prev: ", existing?._id, "new: ", newOC?._id);
-
-        if (newOC)
-          await openCallsAggregate.replaceOrInsert(ctx, existing, newOC);
-
-        // console.log("existing updated", existing, openCallData);
-        return openCallData;
-      } else {
-      }
-
-      throw new ConvexError("Provided openCallId does not exist.");
-    }
-
-    // Step 3: Create new openCall and lookup
-    const newId = await ctx.db.insert("openCalls", openCallData);
-    const newOC = await ctx.db.get(newId);
-    if (newOC) await openCallsAggregate.insert(ctx, newOC);
-
-    await ctx.db.insert("eventOpenCalls", {
-      eventId: args.eventId,
-      openCallId: newId,
-      edition: args.basicInfo.dates.edition,
-      state: openCallState,
-    });
-
-    // console.log(openCallData);
     return openCallData;
   },
 });
@@ -462,18 +433,18 @@ export const getOpenCallByOrgId = query({
   },
 });
 
-export const getOpenCallLookupByOCId = query({
-  args: {
-    openCallId: v.id("openCalls"),
-  },
-  handler: async (ctx, args) => {
-    const ocLookup = await ctx.db
-      .query("eventOpenCalls")
-      .withIndex("by_openCallId", (q) => q.eq("openCallId", args.openCallId))
-      .first();
-    return ocLookup;
-  },
-});
+// export const getOpenCallLookupByOCId = query({
+//   args: {
+//     openCallId: v.id("openCalls"),
+//   },
+//   handler: async (ctx, args) => {
+//     const ocLookup = await ctx.db
+//       .query("eventOpenCalls")
+//       .withIndex("by_openCallId", (q) => q.eq("openCallId", args.openCallId))
+//       .first();
+//     return ocLookup;
+//   },
+// });
 
 export const getPublishedOpenCalls = query({
   handler: async (ctx) => {
@@ -655,15 +626,10 @@ export const deleteOC = mutation({
     const isAdmin = user?.role?.includes("admin");
     const openCall = await ctx.db.get(args.openCallId);
     if (!openCall) return null;
-    if (openCall.state !== "draft" && !args.isAdmin)
+    if ((openCall.state !== "draft" || openCall.approvedAt) && !isAdmin)
       throw new ConvexError("Active open calls cannot be deleted");
     const organization = await ctx.db.get(openCall.mainOrgId);
     if (!organization) throw new ConvexError("Organization not found");
-    const ocLookup = await ctx.db
-      .query("eventOpenCalls")
-      .withIndex("by_openCallId", (q) => q.eq("openCallId", args.openCallId))
-      .first();
-    if (ocLookup) await ctx.db.delete(ocLookup._id);
     if (openCall.approvedAt && isAdmin) {
       await ctx.runMutation(internal.events.eventLookup.deleteEventLookup, {
         eventId: openCall.eventId,

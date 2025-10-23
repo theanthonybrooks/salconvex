@@ -1,13 +1,17 @@
 import { Feedback } from "@/constants/stripe";
-import { getAuthUserId } from "@convex-dev/auth/server";
-import { ConvexError, v } from "convex/values";
+
 import Stripe from "stripe";
+
+import { getAuthUserId } from "@convex-dev/auth/server";
 import { Id } from "~/convex/_generated/dataModel";
 import { updateUserNewsletter } from "~/convex/newsletter/subscriber";
+import { ConvexError, v } from "convex/values";
 import { api, internal } from "./_generated/api";
 import {
   action,
   httpAction,
+  internalAction,
+  internalMutation,
   internalQuery,
   mutation,
   query,
@@ -586,23 +590,36 @@ export const subscriptionStoreWebhook = mutation({
             // await ctx.db.patch(existingUser._id, {
             //   subscription: `Organizer-${metadata.interval}`,
             // });
-            await ctx.db.patch(metadata.openCallId, {
-              paid: paymentStatus === "paid" ? true : false,
-              paidAt: createdAt,
-              state: paymentStatus === "paid" ? "submitted" : "pending",
-            });
+            // await ctx.db.patch(metadata.openCallId, {
+            //   paid: paymentStatus === "paid" ? true : false,
+            //   paidAt: createdAt,
+            //   state: paymentStatus === "paid" ? "submitted" : "pending",
+            // });
             if (paymentStatus === "paid") {
-              const ocLookup = await ctx.runQuery(
-                api.openCalls.openCall.getOpenCallLookupByOCId,
-                {
-                  openCallId: metadata.openCallId,
-                },
+              const existingOpenCall = await ctx.db.get(
+                metadata.openCallId as Id<"openCalls">,
               );
-              if (ocLookup) {
-                await ctx.db.patch(ocLookup._id, {
-                  lastEdited: createdAt,
-                  state: "submitted",
+              if (existingOpenCall) {
+                await ctx.db.patch(existingOpenCall._id, {
+                  lastUpdatedAt: createdAt,
+                  paid: paymentStatus === "paid" ? true : false,
+                  paidAt: createdAt,
+                  state: paymentStatus === "paid" ? "submitted" : "pending",
                 });
+              } else {
+                console.error(
+                  "No existing open call found — refunding payment.",
+                );
+                const paymentIntentId = baseObject.payment_intent;
+                await ctx.scheduler.runAfter(
+                  0,
+                  internal.stripeSubscriptions.processRefund,
+                  {
+                    userId: existingUser._id,
+                    paymentIntentId,
+                    reason: "No open call found. Refuned to organizer.",
+                  },
+                );
               }
             }
           } else if (metadata?.accountType === "artist") {
@@ -1342,5 +1359,51 @@ export const cancelSubscription = action({
     }
 
     return { success: true };
+  },
+});
+
+export const processRefund = internalAction({
+  args: {
+    userId: v.id("users"),
+    paymentIntentId: v.string(),
+    reason: v.string(),
+  },
+  handler: async (ctx, args) => {
+    try {
+      const refund = await stripe.refunds.create({
+        payment_intent: args.paymentIntentId,
+        reason: "requested_by_customer",
+      });
+
+      console.log("Refunded successfully: ", refund);
+
+      if (refund.id) {
+        await ctx.runMutation(internal.stripeSubscriptions.recordRefund, {
+          userId: args.userId,
+          paymentIntentId: args.paymentIntentId,
+          refundId: refund.id,
+          reason: args.reason,
+        });
+      }
+    } catch (error) {
+      console.error("Error refunding payment: ", error);
+    }
+  },
+});
+
+export const recordRefund = internalMutation({
+  args: {
+    userId: v.id("users"),
+    paymentIntentId: v.string(),
+    refundId: v.string(),
+    reason: v.string(),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.insert("stripeRefunds", {
+      userId: args.userId,
+      paymentIntentId: args.paymentIntentId,
+      refundId: args.refundId,
+      reason: args.reason,
+    });
   },
 });

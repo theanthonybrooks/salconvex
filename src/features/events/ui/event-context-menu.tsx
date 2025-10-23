@@ -1,7 +1,5 @@
 "use client";
 
-import Link from "next/link";
-import { useMediaQuery } from "@/hooks/use-media-query";
 import { ApplicationStatus } from "@/types/applications";
 import {
   EventCategory,
@@ -10,12 +8,12 @@ import {
   PostStatus,
 } from "@/types/eventTypes";
 import { OpenCallState, OpenCallStatus } from "@/types/openCallTypes";
-import { api } from "~/convex/_generated/api";
-import { Id } from "~/convex/_generated/dataModel";
-import { AnalyticsSrcType } from "~/convex/schema";
-import { makeUseQueryWithStatus } from "convex-helpers/react";
-import { useQueries } from "convex-helpers/react/cache/hooks";
-import { useMutation, usePreloadedQuery } from "convex/react";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useMediaQuery } from "@/hooks/use-media-query";
+
+import { FaBookmark, FaRegBookmark, FaRegCopy } from "react-icons/fa6";
 import {
   ArrowRightCircle,
   ArrowRightCircleIcon,
@@ -29,7 +27,6 @@ import {
   Mail,
   Pencil,
 } from "lucide-react";
-import { FaBookmark, FaRegBookmark, FaRegCopy } from "react-icons/fa6";
 
 import { Button } from "@/components/ui/button";
 import { CopyableItem } from "@/components/ui/copyable-item";
@@ -54,6 +51,14 @@ import { ConvexDashboardLink } from "@/features/events/ui/convex-dashboard-link"
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { getEventCategoryLabel } from "@/helpers/eventFns";
 import { capitalize, cn } from "@/helpers/utilsFns";
+import { useDevice } from "@/providers/device-provider";
+
+import { api } from "~/convex/_generated/api";
+import { Id } from "~/convex/_generated/dataModel";
+import { AnalyticsSrcType } from "~/convex/schema";
+import { makeUseQueryWithStatus } from "convex-helpers/react";
+import { useQueries } from "convex-helpers/react/cache/hooks";
+import { useMutation, usePreloadedQuery } from "convex/react";
 
 interface EventContextMenuProps {
   // onHide: () => void;
@@ -112,17 +117,18 @@ const EventContextMenu = ({
   src,
 }: EventContextMenuProps) => {
   // const router = useRouter();
+  const pathname = usePathname();
+  const { isMobile } = useDevice();
+  const eventPage = pathname?.includes("/event");
   const isLargeScreen = useMediaQuery("(min-width: 2024px)");
-  const isXLargeScreen = useMediaQuery("(min-width: 2560px)");
-  const isXXLargeScreen = useMediaQuery("(min-width: 3024px)");
-  console.log(isLargeScreen, isXLargeScreen, isXXLargeScreen);
+
   const { preloadedSubStatus, preloadedUserData } = useConvexPreload();
   const subData = usePreloadedQuery(preloadedSubStatus);
   const userData = usePreloadedQuery(preloadedUserData);
   const user = userData?.user ?? null;
   const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
   // const userPref = userData?.userPref ?? null;
-  // const fontSize = userPref?.fontSize === "large" ? "text-base" : "text-sm";
+  // const fontSize = userPref?.fontSize === "large" ? "text-base" : "sm:text-sm";
   const isAdmin = user?.role?.includes("admin");
   const isArtist = user?.accountType?.includes("artist");
 
@@ -228,7 +234,7 @@ const EventContextMenu = ({
         </DropdownMenuTrigger>
       </TooltipSimple>
       <DropdownMenuContent
-        className="z-[19] w-max min-w-44 text-sm"
+        className="z-[19] w-max min-w-44 sm:text-sm"
         align={align}
       >
         <DropdownMenuLabel>More options</DropdownMenuLabel>
@@ -265,7 +271,12 @@ const EventContextMenu = ({
             <DropdownMenuSub>
               <DropdownMenuSubTrigger
                 className="flex items-center gap-x-2"
-                data-side={buttonTrigger && !isLargeScreen ? "left" : "right"}
+                data-side={
+                  (buttonTrigger && !eventPage && !isLargeScreen) ||
+                  (buttonTrigger && eventPage && isMobile)
+                    ? "left"
+                    : "right"
+                }
               >
                 <Ellipsis className="size-4" /> More
               </DropdownMenuSubTrigger>
@@ -336,7 +347,7 @@ const EventContextMenu = ({
                 <DropdownMenuItem
                   onClick={onApply}
                   className={cn(
-                    // "cursor-pointer rounded px-4 py-2 text-sm hover:bg-salPinkLtHover",
+                    // "cursor-pointer rounded px-4 py-2 sm:text-sm hover:bg-salPinkLtHover",
                     nonAdminPublicView && "hidden",
                     appStatus
                       ? "text-black/80 hover:text-emerald-700"
@@ -344,12 +355,12 @@ const EventContextMenu = ({
                   )}
                 >
                   {appStatus ? (
-                    <span className="flex items-center gap-x-2 text-sm">
+                    <span className="flex items-center gap-x-2 sm:text-sm">
                       <CircleX className="size-4" />
                       Mark as Not Applied
                     </span>
                   ) : (
-                    <span className="flex items-center gap-x-2 text-sm">
+                    <span className="flex items-center gap-x-2 sm:text-sm">
                       <CheckCircle className="size-4" />
                       Mark as Applied
                     </span>
@@ -360,17 +371,17 @@ const EventContextMenu = ({
               <DropdownMenuItem
                 onClick={onBookmark}
                 className={cn(
-                  // "cursor-pointer rounded px-4 py-2 text-sm hover:bg-salPinkLtHover",
+                  // "cursor-pointer rounded px-4 py-2 sm:text-sm hover:bg-salPinkLtHover",
                   nonAdminPublicView && "hidden",
                 )}
               >
                 {isBookmarked ? (
-                  <span className="flex items-center gap-x-2 text-sm">
+                  <span className="flex items-center gap-x-2 sm:text-sm">
                     <FaBookmark className="size-4 text-red-500" />
                     Remove Bookmark
                   </span>
                 ) : (
-                  <span className="flex items-center gap-x-2 text-sm">
+                  <span className="flex items-center gap-x-2 sm:text-sm">
                     <FaRegBookmark className="size-4" />
                     Bookmark Event
                   </span>
@@ -397,7 +408,7 @@ const EventContextMenu = ({
               openCallState === "submitted" &&
               eventState === "submitted" && (
                 <DropdownMenuItem
-                  className="flex items-center gap-x-2 text-sm"
+                  className="flex items-center gap-x-2 sm:text-sm"
                   onClick={() =>
                     approveEvent({ eventId: eventId as Id<"events"> })
                   }
@@ -425,7 +436,7 @@ const EventContextMenu = ({
                 href={`/dashboard/admin/event?_id=${eventId}&sidebar=false`}
                 target="_blank"
               >
-                <span className="flex items-center gap-x-2 text-sm">
+                <span className="flex items-center gap-x-2 sm:text-sm">
                   <Pencil className="size-4" />
                   Edit Event
                   <p
@@ -439,7 +450,11 @@ const EventContextMenu = ({
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger
                   className="flex items-center gap-x-2"
-                  data-side={buttonTrigger && !isLargeScreen ? "left" : "right"}
+                  data-side={
+                    buttonTrigger && !eventPage && !isLargeScreen
+                      ? "left"
+                      : "right"
+                  }
                 >
                   <Globe className="size-4" /> Socials
                 </DropdownMenuSubTrigger>
@@ -459,7 +474,11 @@ const EventContextMenu = ({
             <DropdownMenuSub>
               <DropdownMenuSubTrigger
                 className="flex items-center gap-x-2"
-                data-side={buttonTrigger && !isLargeScreen ? "left" : "right"}
+                data-side={
+                  buttonTrigger && !eventPage && !isLargeScreen
+                    ? "left"
+                    : "right"
+                }
               >
                 <Ellipsis className="size-4" /> More
               </DropdownMenuSubTrigger>
@@ -471,7 +490,7 @@ const EventContextMenu = ({
                         <ConvexDashboardLink
                           table="openCalls"
                           id={openCallId}
-                          className="flex items-center gap-x-2 text-sm"
+                          className="flex items-center gap-x-2 sm:text-sm"
                         >
                           <ArrowRightCircleIcon className="size-4" />
                           Go to Convex
@@ -520,7 +539,7 @@ const EventContextMenu = ({
               <DropdownMenuItem>
                 <Link
                   href={`mailto:${orgOwnerEmail}?subject=${capitalize(eventName ?? "")} submission`}
-                  className="flex items-center gap-x-2 px-4 py-2 text-sm hover:bg-salPinkLtHover"
+                  className="flex items-center gap-x-2 px-4 py-2 hover:bg-salPinkLtHover sm:text-sm"
                 >
                   <Mail className="size-4" />
                   Contact Org
