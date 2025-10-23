@@ -1,3 +1,10 @@
+import { User } from "@/types/user";
+import { api } from "~/convex/_generated/api";
+import { Id } from "~/convex/_generated/dataModel";
+import { useQuery } from "convex-helpers/react/cache/hooks";
+import { useMutation } from "convex/react";
+import { CheckIcon } from "lucide-react";
+
 import { AvatarSimple } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -5,12 +12,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { User } from "@/types/user";
-import { useQuery } from "convex-helpers/react/cache/hooks";
-import { useMutation } from "convex/react";
-import { CheckIcon } from "lucide-react";
-import { api } from "~/convex/_generated/api";
-import { Id } from "~/convex/_generated/dataModel";
 
 interface UserSelectorProps {
   type: "staff" | "user" | "organization" | "openCall"; //todo: use later when this is implemented elsewhere

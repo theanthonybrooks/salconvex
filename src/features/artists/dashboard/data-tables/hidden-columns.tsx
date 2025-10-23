@@ -1,13 +1,14 @@
 "use client";
 
+import { EventCategory, EventType } from "@/types/eventTypes";
+import { ColumnDef } from "@tanstack/react-table";
+import { Id } from "~/convex/_generated/dataModel";
+
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 import { Link } from "@/components/ui/custom-link";
 import { ListActionSelector } from "@/features/artists/dashboard/data-tables/bookmark-hidden-selector";
 import { getEventCategoryLabel, getEventTypeLabel } from "@/helpers/eventFns";
 import { cn } from "@/helpers/utilsFns";
-import { EventCategory, EventType } from "@/types/eventTypes";
-import { ColumnDef } from "@tanstack/react-table";
-import { Id } from "~/convex/_generated/dataModel";
 
 export const hiddenColumnLabels: Record<string, string> = {
   name: "Event Name",

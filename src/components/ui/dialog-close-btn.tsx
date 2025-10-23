@@ -1,3 +1,6 @@
+import { useEffect, useRef, useState } from "react";
+import { X } from "lucide-react";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,8 +16,6 @@ import {
 import { Button, ButtonSize, ButtonVariant } from "@/components/ui/button";
 import { findScrollableParent } from "@/helpers/scrollFns";
 import { cn } from "@/helpers/utilsFns";
-import { X } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
 
 interface DialogCloseBtnProps {
   open?: boolean;

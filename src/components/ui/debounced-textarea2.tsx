@@ -1,6 +1,7 @@
-import { cn } from "@/helpers/utilsFns";
-import debounce from "lodash/debounce";
 import { useEffect, useMemo, useRef, useState } from "react";
+import debounce from "lodash/debounce";
+
+import { cn } from "@/helpers/utilsFns";
 
 interface DebouncedTextareaProps {
   value: string;

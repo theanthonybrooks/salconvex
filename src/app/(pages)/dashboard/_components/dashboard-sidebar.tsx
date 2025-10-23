@@ -1,28 +1,27 @@
 "use client";
 
+import { Fragment, useEffect, useMemo } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useDashboard } from "@/app/(pages)/dashboard/_components/dashboard-context";
-import { TooltipSimple } from "@/components/ui/tooltip";
-import {
-  dashboardNavItems,
-  dashboardNavItems as navItems,
-} from "@/constants/links";
-import { Search } from "@/features/Sidebar/Search";
-import { getUserFontSizePref } from "@/helpers/stylingFns";
-import { cn } from "@/helpers/utilsFns";
 import { User } from "@/types/user";
-
+import { api } from "~/convex/_generated/api";
+import { UserPrefsType } from "~/convex/schema";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { useQueries } from "convex-helpers/react/cache";
 import { AnimatePresence, motion, Variants } from "framer-motion";
 import { ChevronDown, ChevronRight } from "lucide-react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Fragment, useEffect, useMemo } from "react";
 import { MdChevronRight } from "react-icons/md";
 import { RiExpandLeftRightLine } from "react-icons/ri";
 
-import { api } from "~/convex/_generated/api";
-import { UserPrefsType } from "~/convex/schema";
+import { TooltipSimple } from "@/components/ui/tooltip";
+import { Search } from "@/features/Sidebar/Search";
+import { getUserFontSizePref } from "@/helpers/stylingFns";
+import { cn } from "@/helpers/utilsFns";
+import {
+  dashboardNavItems,
+  dashboardNavItems as navItems,
+} from "@/constants/links";
 
 const sectionVariants: Variants = {
   collapsed: {

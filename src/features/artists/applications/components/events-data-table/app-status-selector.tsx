@@ -1,3 +1,9 @@
+import { useState } from "react";
+import { ArtistStatus, artistStatusOptions } from "@/types/applications";
+import { api } from "~/convex/_generated/api";
+import { Id } from "~/convex/_generated/dataModel";
+import { useMutation } from "convex/react";
+
 import { ConfirmDialog } from "@/components/ui/confirmation-dialog";
 import {
   Select,
@@ -8,11 +14,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/helpers/utilsFns";
-import { ArtistStatus, artistStatusOptions } from "@/types/applications";
-import { useMutation } from "convex/react";
-import { useState } from "react";
-import { api } from "~/convex/_generated/api";
-import { Id } from "~/convex/_generated/dataModel";
 
 interface AppStatusSelectorProps {
   applicationId: Id<"applications">;

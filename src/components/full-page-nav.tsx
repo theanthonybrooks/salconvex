@@ -1,21 +1,23 @@
 "use client";
 
-import MenuToggle from "@/components/ui/hamburger-icon";
-import SocialsRow from "@/components/ui/socials";
-import ThemeToggle from "@/components/ui/theme-toggle";
-import { DeviceOptions, mainMenuItems } from "@/constants/menuLinks";
-import { footerCRText } from "@/constants/text";
-import SignOutBtn from "@/features/auth/components/sign-out-btn";
-import { cn } from "@/helpers/utilsFns";
-import { User } from "@/types/user";
-import { Authenticated, Unauthenticated } from "convex/react";
-import { AnimatePresence, motion, Variants } from "framer-motion";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
-import { PiHeartBold } from "react-icons/pi";
+import { User } from "@/types/user";
+import { DotFilledIcon } from "@radix-ui/react-icons";
 import { UserPrefsType } from "~/convex/schema";
+import { Authenticated, Unauthenticated } from "convex/react";
+import { AnimatePresence, motion, Variants } from "framer-motion";
+import { PiHeartBold } from "react-icons/pi";
+
+import MenuToggle from "@/components/ui/hamburger-icon";
+import SocialsRow from "@/components/ui/socials";
+import ThemeToggle from "@/components/ui/theme-toggle";
+import SignOutBtn from "@/features/auth/components/sign-out-btn";
+import { cn } from "@/helpers/utilsFns";
+import { DeviceOptions, mainMenuItems } from "@/constants/menuLinks";
+import { footerCRText } from "@/constants/text";
 
 interface FullPageNavProps {
   // userId?: string | undefined
@@ -748,6 +750,17 @@ const FullPageNav = ({
                           "select-none font-tanker lowercase",
                         )}
                       >
+                        {pathname !== "/" && (
+                          <Link onClick={onHandleLinkClick} href={"/"}>
+                            <p
+                              className={cn(
+                                "cursor-pointer transition-transform duration-300 ease-in-out hover:translate-x-3 active:scale-95",
+                              )}
+                            >
+                              Home
+                            </p>
+                          </Link>
+                        )}
                         {mainMenuItems.map((section) => {
                           const filteredItems = section.items.filter((item) => {
                             const itemUserType = item?.userType;
@@ -917,12 +930,16 @@ const FullPageNav = ({
                                 <Link
                                   onClick={onHandleLinkClick}
                                   href={item.path}
+                                  className="flex items-center gap-x-1"
                                 >
+                                  {pathname === item.path && (
+                                    <DotFilledIcon className="size-10 text-foreground" />
+                                  )}
                                   <p
                                     className={cn(
-                                      "cursor-pointer",
+                                      "decoration-6 cursor-pointer underline-offset-2 hover:underline hover:underline-offset-4",
                                       pathname === item.path &&
-                                        "decoration-6 translate-x-2 text-foreground underline underline-offset-4 active:scale-95",
+                                        "decoration-6 text-foreground underline underline-offset-4 active:scale-95",
                                       // item.path.includes("dashboard") &&
                                       //   "text-salPink"
                                     )}

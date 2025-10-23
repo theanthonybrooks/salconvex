@@ -1,8 +1,15 @@
 "use client";
+
+import { useEffect } from "react";
+import { usePathname } from "next/navigation";
+import { CookiePref } from "@/types/user";
+import { api } from "~/convex/_generated/api";
+import { useMutation, usePreloadedQuery } from "convex/react";
+import Cookies from "js-cookie";
+import { CookieIcon, ExternalLink } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { Link } from "@/components/ui/custom-link";
-import Cookies from "js-cookie";
-
 import {
   Dialog,
   DialogClose,
@@ -14,12 +21,6 @@ import {
 } from "@/components/ui/dialog";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { cn } from "@/helpers/utilsFns";
-import { CookiePref } from "@/types/user";
-import { useMutation, usePreloadedQuery } from "convex/react";
-import { CookieIcon, ExternalLink } from "lucide-react";
-import { usePathname } from "next/navigation";
-import { useEffect } from "react";
-import { api } from "~/convex/_generated/api";
 
 interface CookieBannerProps {
   localCookiePrefs: CookiePref | null;

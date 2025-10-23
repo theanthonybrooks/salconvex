@@ -1,3 +1,13 @@
+import { useEffect, useRef, useState } from "react";
+import { EventCategory } from "@/types/eventTypes";
+import { User } from "@/types/user";
+import { api } from "~/convex/_generated/api";
+import { Doc } from "~/convex/_generated/dataModel";
+import { makeUseQueryWithStatus } from "convex-helpers/react";
+import { useQueries } from "convex-helpers/react/cache/hooks";
+import { ConvexError } from "convex/values";
+import { Controller, useFormContext } from "react-hook-form";
+
 import { MultiSelect } from "@/components/multi-select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DebouncedFormTextarea } from "@/components/ui/debounced-form-textarea";
@@ -9,25 +19,16 @@ import { MapboxInputFull } from "@/components/ui/mapbox-search";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { SelectSimple } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import { EventNameSearch } from "@/features/events/components/event-search";
+import { EventOCFormValues } from "@/features/events/event-add-form";
+import { getEventCategoryLabel } from "@/helpers/eventFns";
+import { cn } from "@/helpers/utilsFns";
 import {
   eventCategoryOptions,
   eventTypeOptions,
   noEventCategories,
   prodOnlyCategories,
 } from "@/constants/eventConsts";
-import { EventNameSearch } from "@/features/events/components/event-search";
-import { EventOCFormValues } from "@/features/events/event-add-form";
-import { getEventCategoryLabel } from "@/helpers/eventFns";
-import { cn } from "@/helpers/utilsFns";
-import { EventCategory } from "@/types/eventTypes";
-import { User } from "@/types/user";
-import { makeUseQueryWithStatus } from "convex-helpers/react";
-import { useQueries } from "convex-helpers/react/cache/hooks";
-import { ConvexError } from "convex/values";
-import { useEffect, useRef, useState } from "react";
-import { Controller, useFormContext } from "react-hook-form";
-import { api } from "~/convex/_generated/api";
-import { Doc } from "~/convex/_generated/dataModel";
 
 interface SubmissionFormEventStep1Props {
   user: User | undefined;
@@ -375,7 +376,7 @@ const SubmissionFormEventStep1 = ({
                         placeholder="Event Location (if different from organization)..."
                         className="mb-3 w-full lg:mb-0"
                         inputClassName={cn(
-                          "rounded-lg border-foreground disabled:opacity-50 bg-card",
+                          "rounded-lg border-foreground bg-card disabled:opacity-50",
                           errors.event?.location && "invalid-field",
                         )}
                       />

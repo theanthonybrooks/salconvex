@@ -1,7 +1,8 @@
+import { useEffect, useRef, useState } from "react";
+import { debounce } from "lodash";
+
 import { Input } from "@/components/ui/input";
 import { cn } from "@/helpers/utilsFns";
-import { debounce } from "lodash";
-import { useEffect, useRef, useState } from "react";
 
 interface DebouncedInputProps extends React.ComponentPropsWithoutRef<"input"> {
   value?: string;

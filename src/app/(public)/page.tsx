@@ -1,5 +1,17 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import Image from "next/image";
+import { useSearchParams } from "next/navigation";
+import { api } from "~/convex/_generated/api";
+import { makeUseQueryWithStatus } from "convex-helpers/react";
+import { useQueries } from "convex-helpers/react/cache";
+import { usePreloadedQuery } from "convex/react";
+import { motion } from "framer-motion";
+import { Plus } from "lucide-react";
+import { useTheme } from "next-themes";
+import { FaEnvelope, FaFacebook, FaGlobe, FaInstagram } from "react-icons/fa6";
+
 import { AnimatedCounter } from "@/components/ui/animate-counter";
 import {
   Carousel,
@@ -19,17 +31,6 @@ import Pricing from "@/features/homepage/pricing";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { cn } from "@/helpers/utilsFns";
 import { useDevice } from "@/providers/device-provider";
-import { makeUseQueryWithStatus } from "convex-helpers/react";
-import { useQueries } from "convex-helpers/react/cache";
-import { usePreloadedQuery } from "convex/react";
-import { motion } from "framer-motion";
-import { Plus } from "lucide-react";
-import { useTheme } from "next-themes";
-import Image from "next/image";
-import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
-import { FaEnvelope, FaFacebook, FaGlobe, FaInstagram } from "react-icons/fa6";
-import { api } from "~/convex/_generated/api";
 
 // const font = Poppins({ subsets: ["latin"], weight: "600" })
 

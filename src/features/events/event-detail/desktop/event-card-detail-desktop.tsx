@@ -1,23 +1,25 @@
 "use client";
 
-import { Card } from "@/components/ui/card";
-import { cn } from "@/helpers/utilsFns";
+import { useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { EventCardProps } from "@/types/eventTypes";
+import { api } from "~/convex/_generated/api";
+import { useMutation, usePreloadedQuery } from "convex/react";
 import { Eye, EyeOff, MapPin } from "lucide-react";
+import { FaBookmark, FaRegBookmark } from "react-icons/fa6";
 
+import { ApproveBtn } from "@/components/ui/approve-btn";
+import { Card } from "@/components/ui/card";
+import { DraftPendingBanner } from "@/components/ui/draft-pending-banner";
+import { EventOrgLogo } from "@/components/ui/event-org-logo";
+import NavTabs from "@/components/ui/nav-tabs";
+import { Separator } from "@/components/ui/separator";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/state-accordion-test";
-
-import { FaBookmark, FaRegBookmark } from "react-icons/fa6";
-
-import { ApproveBtn } from "@/components/ui/approve-btn";
-import { DraftPendingBanner } from "@/components/ui/draft-pending-banner";
-import { EventOrgLogo } from "@/components/ui/event-org-logo";
-import NavTabs from "@/components/ui/nav-tabs";
-import { Separator } from "@/components/ui/separator";
 import {
   Tooltip,
   TooltipContent,
@@ -36,11 +38,7 @@ import { getEventCategoryLabel, getEventTypeLabel } from "@/helpers/eventFns";
 import { getFormattedLocationString } from "@/helpers/locations";
 import { RichTextDisplay } from "@/helpers/richTextFns";
 import { getUserFontSizePref } from "@/helpers/stylingFns";
-import { EventCardProps } from "@/types/eventTypes";
-import { useMutation, usePreloadedQuery } from "convex/react";
-import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
-import { api } from "~/convex/_generated/api";
+import { cn } from "@/helpers/utilsFns";
 
 export const EventCardDetailDesktop = (props: EventCardProps) => {
   const updateEventAnalytics = useMutation(

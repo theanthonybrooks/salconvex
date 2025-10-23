@@ -1,9 +1,10 @@
-import { AdminPreloadContextProvider } from "@/features/admin/admin-preload-context";
-import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
-import { fetchQuery, preloadQuery } from "convex/nextjs";
-import { redirect } from "next/navigation";
 import { ReactNode } from "react";
+import { redirect } from "next/navigation";
+import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
 import { api } from "~/convex/_generated/api";
+import { fetchQuery, preloadQuery } from "convex/nextjs";
+
+import { AdminPreloadContextProvider } from "@/features/admin/admin-preload-context";
 
 interface DashboardLayoutProps {
   children: ReactNode;

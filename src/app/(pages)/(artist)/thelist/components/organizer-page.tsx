@@ -1,21 +1,20 @@
 "use client";
 
-import { Skeleton } from "@/components/ui/skeleton";
-import { OrganizerCardDetailDesktop } from "@/features/organizers/organizer-detail/desktop/organizer-card-detail-desktop";
-import { OrganizerCardDetailMobile } from "@/features/organizers/organizer-detail/mobile/organizer-card-detail-mobile";
-
+import { useParams, useRouter } from "next/navigation";
+import { api } from "~/convex/_generated/api";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { useQuery } from "convex-helpers/react/cache";
 import { useQueries } from "convex-helpers/react/cache/hooks";
-
-import { Link } from "@/components/ui/custom-link";
-import { supportEmail } from "@/constants/siteInfo";
-import { SalBackNavigation } from "@/features/events/components/sal-back-navigation";
-import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { usePreloadedQuery } from "convex/react";
 import { ConvexError } from "convex/values";
-import { useParams, useRouter } from "next/navigation";
-import { api } from "~/convex/_generated/api";
+
+import { Link } from "@/components/ui/custom-link";
+import { Skeleton } from "@/components/ui/skeleton";
+import { SalBackNavigation } from "@/features/events/components/sal-back-navigation";
+import { OrganizerCardDetailDesktop } from "@/features/organizers/organizer-detail/desktop/organizer-card-detail-desktop";
+import { OrganizerCardDetailMobile } from "@/features/organizers/organizer-detail/mobile/organizer-card-detail-mobile";
+import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
+import { supportEmail } from "@/constants/siteInfo";
 
 const OrganizerDetail = () => {
   const { preloadedSubStatus, preloadedUserData } = useConvexPreload();

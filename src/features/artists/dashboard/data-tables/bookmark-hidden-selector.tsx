@@ -1,3 +1,8 @@
+import { useState } from "react";
+import { api } from "~/convex/_generated/api";
+import { Id } from "~/convex/_generated/dataModel";
+import { useMutation } from "convex/react";
+
 import {
   Select,
   SelectContent,
@@ -6,10 +11,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/helpers/utilsFns";
-import { useMutation } from "convex/react";
-import { useState } from "react";
-import { api } from "~/convex/_generated/api";
-import { Id } from "~/convex/_generated/dataModel";
 
 interface ListActionSelectorProps {
   eventId: Id<"events">;

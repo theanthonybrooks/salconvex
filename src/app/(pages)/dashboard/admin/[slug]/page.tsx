@@ -1,11 +1,12 @@
+import { redirect } from "next/navigation";
+import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
+import { api } from "~/convex/_generated/api";
+import { fetchQuery } from "convex/nextjs";
+
 import { KanbanBoard } from "@/components/ui/kanban/kanban-board";
 import { AdminDashboardTableWrapper } from "@/features/admin/dashboard/admin-dashboard-table-wrapper";
 import AnalyticsPage from "@/features/dashboard/posthog-analytics";
 import { AdminEventForm } from "@/features/events/submission-form/admin-organizer-form";
-import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
-import { fetchQuery } from "convex/nextjs";
-import { redirect } from "next/navigation";
-import { api } from "~/convex/_generated/api";
 
 export default async function AdminPage({
   params,

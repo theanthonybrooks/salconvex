@@ -1,7 +1,38 @@
 "use client";
 
-import { MultiSelect } from "@/components/multi-select";
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import {
+  EventCategory,
+  EventType,
+  PostStatus,
+  PostStatusOptions,
+} from "@/types/eventTypes";
+import { CallFormat, CallType, EligibilityType } from "@/types/openCallTypes";
+import {
+  Continents,
+  Filters,
+  SearchParams,
+  SortOptions,
+} from "@/types/thelist";
+import { usePreloadedQuery } from "convex/react";
+import {
+  ChevronDown,
+  ChevronUp,
+  LucideFilter,
+  LucideFilterX,
+  X,
+} from "lucide-react";
+import { BiSolidQuoteLeft, BiSolidQuoteRight } from "react-icons/bi";
+import { FiCommand, FiSearch } from "react-icons/fi";
+import {
+  LiaSortAlphaDownAltSolid,
+  LiaSortAlphaDownSolid,
+  LiaSortNumericDownAltSolid,
+  LiaSortNumericDownSolid,
+} from "react-icons/lia";
 
+import { MultiSelect } from "@/components/multi-select";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { FlairBadge } from "@/components/ui/flair-badge";
@@ -16,53 +47,20 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { ViewOptions } from "@/features/events/event-list-client";
-
+import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
+import { cn } from "@/helpers/utilsFns";
 import {
   eventCategoryOptions,
   eventTypeOptions,
   PostStatusOptionValues,
 } from "@/constants/eventConsts";
+import { SearchType, TheListFilterCommandItem } from "@/constants/filterConsts";
 import { select_continents } from "@/constants/locationConsts";
 import {
   callFormat_option_values,
   callType_option_values,
   eligibilityOptionValues,
 } from "@/constants/openCallConsts";
-import { cn } from "@/helpers/utilsFns";
-import {
-  EventCategory,
-  EventType,
-  PostStatus,
-  PostStatusOptions,
-} from "@/types/eventTypes";
-import { CallFormat, CallType, EligibilityType } from "@/types/openCallTypes";
-import {
-  Continents,
-  Filters,
-  SearchParams,
-  SortOptions,
-} from "@/types/thelist";
-import {
-  ChevronDown,
-  ChevronUp,
-  LucideFilter,
-  LucideFilterX,
-  X,
-} from "lucide-react";
-import { useRouter } from "next/navigation";
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
-import { BiSolidQuoteLeft, BiSolidQuoteRight } from "react-icons/bi";
-import { FiCommand, FiSearch } from "react-icons/fi";
-import {
-  LiaSortAlphaDownAltSolid,
-  LiaSortAlphaDownSolid,
-  LiaSortNumericDownAltSolid,
-  LiaSortNumericDownSolid,
-} from "react-icons/lia";
-
-import { SearchType, TheListFilterCommandItem } from "@/constants/filterConsts";
-import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
-import { usePreloadedQuery } from "convex/react";
 
 export interface FilterBaseProps {
   isMobile: boolean;
@@ -97,7 +95,7 @@ export const FilterBase = ({
   hasActiveFilters,
   setOpen,
   localValue,
-setLocalValue,
+  setLocalValue,
   searchType,
   setSearchType,
   placeholder,

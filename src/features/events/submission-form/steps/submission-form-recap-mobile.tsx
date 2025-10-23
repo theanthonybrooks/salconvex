@@ -1,6 +1,14 @@
 // TODO: Add the terms of service checkboxes
 
 "use client";
+
+import { useEffect, useState } from "react";
+import Image from "next/image";
+import { EligibilityType } from "@/types/openCallTypes";
+import { Id } from "~/convex/_generated/dataModel";
+import { motion } from "framer-motion";
+import { useFormContext } from "react-hook-form";
+
 import { Checkbox } from "@/components/ui/checkbox";
 import { Link } from "@/components/ui/custom-link";
 import { LinkList } from "@/components/ui/link-list";
@@ -11,7 +19,6 @@ import {
   AccordionTrigger,
 } from "@/components/ui/state-accordion-test";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
 import EventDates from "@/features/events/components/event-dates";
 import { EventOCFormValues } from "@/features/events/event-add-form";
 import { EligibilityLabel } from "@/features/events/open-calls/components/eligibility-label-client";
@@ -33,12 +40,6 @@ import {
 import { RichTextDisplay } from "@/helpers/richTextFns";
 import { cn } from "@/helpers/utilsFns";
 import { getCallFormatLabel } from "@/lib/openCallFns";
-import { EligibilityType } from "@/types/openCallTypes";
-import { motion } from "framer-motion";
-import Image from "next/image";
-import { useEffect, useState } from "react";
-import { useFormContext } from "react-hook-form";
-import { Id } from "~/convex/_generated/dataModel";
 
 interface SubmissionFormRecapMobileProps {
   formType: number;

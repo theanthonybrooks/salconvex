@@ -1,3 +1,6 @@
+import React from "react";
+import Link from "next/link";
+
 import {
   Card,
   CardContent,
@@ -7,8 +10,6 @@ import {
 import { Header } from "@/features/auth/components/header";
 import { Social } from "@/features/auth/components/social";
 import { cn } from "@/helpers/utilsFns";
-import Link from "next/link";
-import React from "react";
 
 type CardWrapperProps = {
   children: React.ReactNode;

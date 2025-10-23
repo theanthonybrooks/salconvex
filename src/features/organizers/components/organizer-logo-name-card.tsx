@@ -1,11 +1,12 @@
+import React from "react";
+import { Organizer } from "@/types/organizer";
+import slugify from "slugify";
+
 import { Card } from "@/components/ui/card";
 import { Link } from "@/components/ui/custom-link";
 import { EventOrgLogo } from "@/components/ui/event-org-logo";
 import { getOrganizerLocationString } from "@/helpers/locations";
 import { cn } from "@/helpers/utilsFns";
-import { Organizer } from "@/types/organizer";
-import React from "react";
-import slugify from "slugify";
 
 type MinimalOrgCardProps = Pick<Organizer, "logo" | "name" | "location">;
 

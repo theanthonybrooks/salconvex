@@ -1,8 +1,9 @@
-import SettingsPage from "@/features/dashboard/settings";
-import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
-import { fetchQuery } from "convex/nextjs";
 import { redirect } from "next/navigation";
+import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
 import { api } from "~/convex/_generated/api";
+import { fetchQuery } from "convex/nextjs";
+
+import SettingsPage from "@/features/dashboard/settings";
 
 export default async function AccountPage({
   params,

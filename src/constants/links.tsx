@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import {
   Banana,
   Bookmark,
@@ -28,10 +29,8 @@ import {
   Star,
   User,
 } from "lucide-react";
-import { BsPersonVcard } from "react-icons/bs";
-
-import { JSX } from "react";
 import { IconType } from "react-icons";
+import { BsPersonVcard } from "react-icons/bs";
 import { FaFacebookF, FaInstagram, FaThreads } from "react-icons/fa6";
 import { PiGraph } from "react-icons/pi";
 

@@ -1,9 +1,8 @@
-import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
-import { TooltipSimple } from "@/components/ui/tooltip";
-import { getEventCategoryLabel } from "@/helpers/eventFns";
-import { cn } from "@/helpers/utilsFns";
+import { useRouter } from "next/navigation";
 import { EventCategory, SubmissionFormState } from "@/types/eventTypes";
 import { OpenCallState } from "@/types/openCallTypes";
+import { api } from "~/convex/_generated/api";
+import { Id } from "~/convex/_generated/dataModel";
 import { useMutation } from "convex/react";
 import { ConvexError } from "convex/values";
 import {
@@ -14,11 +13,14 @@ import {
   LucidePencil,
   Pencil,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { FaRegCopy, FaRegFloppyDisk } from "react-icons/fa6";
 import { toast } from "react-toastify";
-import { api } from "~/convex/_generated/api";
-import { Id } from "~/convex/_generated/dataModel";
+
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import { TooltipSimple } from "@/components/ui/tooltip";
+import { getEventCategoryLabel } from "@/helpers/eventFns";
+import { cn } from "@/helpers/utilsFns";
+
 interface EventActionProps {
   eventId: string;
 }

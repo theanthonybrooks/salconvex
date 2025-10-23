@@ -1,10 +1,10 @@
 //List the page titles, descriptions, seo, meta tags, and other social media metadata here. Favicons as well. TBD
 
+import { formatDatePlain } from "@/helpers/dateFns";
 import {
   lastUpdatedPrivacyRaw,
   lastUpdatedTermsRaw,
 } from "@/constants/siteInfo";
-import { formatDatePlain } from "@/helpers/dateFns";
 
 export function getPageMeta(pathname: string | null) {
   if (!pathname) return pageTitles[0];

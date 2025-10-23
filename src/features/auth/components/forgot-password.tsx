@@ -1,3 +1,17 @@
+import { ReactNode, useEffect, useRef, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { ForgotPasswordSchema, ResetPasswordSchema } from "@/schemas/auth";
+import { useAuthActions } from "@convex-dev/auth/react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { api } from "~/convex/_generated/api";
+import { useConvex, useMutation } from "convex/react";
+import { REGEXP_ONLY_DIGITS } from "input-otp";
+import { InfoIcon, LoaderCircle } from "lucide-react";
+import { Controller, useForm } from "react-hook-form";
+import { z } from "zod";
+
 import { FormError } from "@/components/form-error";
 import ResendTimer from "@/components/resend-timer";
 import { Button } from "@/components/ui/button";
@@ -26,19 +40,6 @@ import { Label } from "@/components/ui/label";
 import { PasswordInput } from "@/components/ui/password-input";
 import { Separator } from "@/components/ui/separator";
 import { supportEmail } from "@/constants/siteInfo";
-import { ForgotPasswordSchema, ResetPasswordSchema } from "@/schemas/auth";
-import { useAuthActions } from "@convex-dev/auth/react";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useConvex, useMutation } from "convex/react";
-import { REGEXP_ONLY_DIGITS } from "input-otp";
-import { InfoIcon, LoaderCircle } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { ReactNode, useEffect, useRef, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
-import { z } from "zod";
-import { api } from "~/convex/_generated/api";
 
 interface ForgotPasswordProps {
   switchFlow: () => void;

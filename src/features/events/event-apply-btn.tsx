@@ -1,3 +1,27 @@
+import type { ApplicationStatus } from "@/types/applications";
+import type { EventCategory, EventData } from "@/types/eventTypes";
+import type {
+  CallType,
+  OpenCallState,
+  OpenCallStatus,
+} from "@/types/openCallTypes";
+import type { User } from "@/types/user";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import {
+  getExternalErrorHtml,
+  getExternalRedirectHtml,
+} from "@/utils/loading-page-html";
+import {
+  CheckCircleIcon,
+  CircleDollarSignIcon,
+  LoaderCircle,
+  X,
+} from "lucide-react";
+import { FaBookmark, FaRegBookmark } from "react-icons/fa6";
+import { toast } from "react-toastify";
+
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -16,28 +40,11 @@ import { useToggleListAction } from "@/features/artists/helpers/listActions";
 import EventContextMenu from "@/features/events/ui/event-context-menu";
 import { getEventCategoryLabel } from "@/helpers/eventFns";
 import { cn } from "@/helpers/utilsFns";
-import { ApplicationStatus } from "@/types/applications";
-import { EventCategory, EventData } from "@/types/eventTypes";
-import { CallType, OpenCallState, OpenCallStatus } from "@/types/openCallTypes";
-import { User } from "@/types/user";
-import {
-  getExternalErrorHtml,
-  getExternalRedirectHtml,
-} from "@/utils/loading-page-html";
-import { useMutation } from "convex/react";
-import {
-  CheckCircleIcon,
-  CircleDollarSignIcon,
-  LoaderCircle,
-  X,
-} from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { FaBookmark, FaRegBookmark } from "react-icons/fa6";
-import { toast } from "react-toastify";
+
 import { api } from "~/convex/_generated/api";
 import { Id } from "~/convex/_generated/dataModel";
 import { AnalyticsSrcType, UserPrefsType } from "~/convex/schema";
+import { useMutation } from "convex/react";
 
 interface ApplyButtonShortProps {
   src: AnalyticsSrcType;

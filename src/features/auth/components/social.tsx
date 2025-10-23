@@ -1,8 +1,9 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { FaApple } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
+
+import { Button } from "@/components/ui/button";
 
 export const Social = () => {
   return (

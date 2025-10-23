@@ -1,9 +1,10 @@
+import { ReactNode, useState } from "react";
+import { Check, LucideIcon } from "lucide-react";
+import { toast } from "react-toastify";
+
 import IconComponent from "@/components/ui/icon-component";
 import { TooltipSimple } from "@/components/ui/tooltip";
 import { cn } from "@/helpers/utilsFns";
-import { Check, LucideIcon } from "lucide-react";
-import { ReactNode, useState } from "react";
-import { toast } from "react-toastify";
 
 interface CopyableItemProps {
   children: string | number;

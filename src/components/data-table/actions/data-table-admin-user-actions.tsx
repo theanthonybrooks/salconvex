@@ -1,11 +1,10 @@
-import { useConfirmAction } from "@/components/ui/confirmation-dialog-context";
-import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
-
-import { useMutation } from "convex/react";
 import { api } from "~/convex/_generated/api";
 import { Id } from "~/convex/_generated/dataModel";
-
+import { useMutation } from "convex/react";
 import { FaUserSlash } from "react-icons/fa6";
+
+import { useConfirmAction } from "@/components/ui/confirmation-dialog-context";
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 
 export interface UserActionProps {
   userId: string;

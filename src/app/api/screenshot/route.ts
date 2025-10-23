@@ -1,5 +1,5 @@
-import chromium from "@sparticuz/chromium";
 import { NextRequest, NextResponse } from "next/server";
+import chromium from "@sparticuz/chromium";
 
 export const dynamic = "force-dynamic";
 

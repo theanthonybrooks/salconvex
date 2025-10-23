@@ -1,10 +1,11 @@
 "use client";
 
+import * as React from "react";
+import { useEffect } from "react";
+import { PageTypes, TableTypes } from "@/types/tanstack-table";
 import {
   ColumnDef,
   ColumnFiltersState,
-  SortingState,
-  VisibilityState,
   flexRender,
   getCoreRowModel,
   getFacetedRowModel,
@@ -12,10 +13,12 @@ import {
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
+  SortingState,
   useReactTable,
+  VisibilityState,
 } from "@tanstack/react-table";
-import * as React from "react";
 
+import { DataTablePagination } from "@/components/data-table/data-table-pagination";
 import {
   Table,
   TableBody,
@@ -24,12 +27,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
-import { DataTablePagination } from "@/components/data-table/data-table-pagination";
 import { DataTableToolbar } from "@/features/artists/applications/components/events-data-table/apps-data-table-toolbar";
 import { cn } from "@/helpers/utilsFns";
-import { PageTypes, TableTypes } from "@/types/tanstack-table";
-import { useEffect } from "react";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -159,7 +158,7 @@ export function DataTable<TData, TValue>({
       <div className={cn("rounded-md border", className)}>
         <Table
           containerClassname={cn(
-            "rounded-md h-fit max-h-[calc(85dvh-13rem)]  sm:max-h-[calc(85dvh-10rem)] 3xl:max-h-[calc(85dvh-7rem)] scrollable,",
+            "scrollable, h-fit max-h-[calc(85dvh-13rem)] rounded-md sm:max-h-[calc(85dvh-10rem)] 3xl:max-h-[calc(85dvh-7rem)]",
             tableClassName,
           )}
         >

@@ -24,14 +24,14 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
   {
     title: "The List",
     items: [
-      {
-        title: "Home",
-        path: "/",
-        category: "thelist",
-        public: true,
-        userType: ["public"],
-        deviceType: ["all"],
-      },
+      // {
+      //   title: "Home",
+      //   path: "/",
+      //   category: "thelist",
+      //   public: true,
+      //   userType: ["public"],
+      //   deviceType: ["all"],
+      // },
       {
         title: "The List",
         path: "/thelist",
@@ -56,17 +56,17 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
         userType: ["public"],
         deviceType: ["all"],
       },
+      // {
+      //   title: "Archive",
+      //   // path: "/archive",
+      //   path: "https://thestreetartlist.helioho.st/archive",
+      //   category: "thelist",
+      //   public: true,
+      //   userType: ["public"],
+      //   deviceType: ["all"],
+      // },
       {
-        title: "Archive",
-        // path: "/archive",
-        path: "https://thestreetartlist.helioho.st/archive",
-        category: "thelist",
-        public: true,
-        userType: ["public"],
-        deviceType: ["all"],
-      },
-      {
-        title: "Map",
+        title: "World Map",
         path: "https://thestreetartlist.helioho.st/map",
         category: "thelist",
         public: true,

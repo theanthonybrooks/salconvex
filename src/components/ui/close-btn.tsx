@@ -1,7 +1,8 @@
+import { ReactNode } from "react";
+import { X } from "lucide-react";
+
 import { Button, ButtonSize, ButtonVariant } from "@/components/ui/button";
 import { cn } from "@/helpers/utilsFns";
-import { X } from "lucide-react";
-import { ReactNode } from "react";
 
 interface CloseBtnProps {
   type?: "icon" | "button";

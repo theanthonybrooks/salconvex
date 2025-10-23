@@ -1,6 +1,7 @@
+import { Metadata } from "next";
+
 import SalHeader from "@/components/ui/headers/sal-header";
 import ClientEventList from "@/features/events/event-list-client";
-import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "The List",

@@ -1,11 +1,12 @@
 "use client";
 
 import { useDashboard } from "@/app/(pages)/dashboard/_components/dashboard-context";
+import { api } from "~/convex/_generated/api";
+import { useQuery } from "convex-helpers/react/cache";
+
 import { DataTable } from "@/components/data-table/data-table";
 import { orgColumns } from "@/features/organizers/dashboard/data-tables/organizer-columns";
 import { cn } from "@/helpers/utilsFns";
-import { useQuery } from "convex-helpers/react/cache";
-import { api } from "~/convex/_generated/api";
 
 export function OrganizerDashboardTableWrapper() {
   const { isSidebarCollapsed } = useDashboard();

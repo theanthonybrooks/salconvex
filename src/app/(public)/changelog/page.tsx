@@ -1,15 +1,16 @@
 "use client";
 
-import { iconClosedClass, iconOpenClass } from "@/constants/accordions";
-import { AccordionComponent } from "@/features/homepage/accordion-component";
-import { cn } from "@/helpers/utilsFns";
+import { api } from "~/convex/_generated/api";
 import { useQuery } from "convex-helpers/react/cache";
 // import { useQuery } from "convex-helpers/react/cache"
 // import { useQuery } from "convex/react"
 import { motion } from "framer-motion";
 import { Minus, Plus } from "lucide-react";
 import GitHubCalendar from "react-github-calendar";
-import { api } from "~/convex/_generated/api";
+
+import { AccordionComponent } from "@/features/homepage/accordion-component";
+import { cn } from "@/helpers/utilsFns";
+import { iconClosedClass, iconOpenClass } from "@/constants/accordions";
 
 export default function Changelog() {
   const changelogTasks = useQuery(

@@ -1,12 +1,12 @@
 "use client";
 
-import { Input } from "@/components/ui/input";
-
-import { cn } from "@/helpers/utilsFns";
-import { useDebounce } from "@/hooks/use-debounce";
 import { useEffect, useRef, useState } from "react";
+import { useDebounce } from "@/hooks/use-debounce";
 import { FaRemoveFormat } from "react-icons/fa";
 import { titleCase } from "title-case";
+
+import { Input } from "@/components/ui/input";
+import { cn } from "@/helpers/utilsFns";
 
 interface EventNameSearchProps {
   value: string;

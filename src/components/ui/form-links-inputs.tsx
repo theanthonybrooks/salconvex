@@ -1,19 +1,3 @@
-import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  autoHttps,
-  formatFacebookInput,
-  formatHandleInput,
-  PlatformType,
-} from "@/helpers/linkFns";
-import { cn } from "@/helpers/utilsFns";
-import { HiArrowTurnRightDown } from "react-icons/hi2";
-
-import { DebouncedControllerInput } from "@/components/ui/debounced-form-input";
-import { EventOCFormValues } from "@/features/events/event-add-form";
-import { ValidLinkPath } from "@/features/organizers/schemas/event-add-schema";
-import { useDevice } from "@/providers/device-provider";
 import { Control, Controller, useFormContext, useWatch } from "react-hook-form";
 import {
   FaEnvelope,
@@ -28,7 +12,24 @@ import {
   FaVk,
   FaYoutube,
 } from "react-icons/fa6";
+import { HiArrowTurnRightDown } from "react-icons/hi2";
 import PhoneInput, { Country } from "react-phone-number-input";
+
+import { Checkbox } from "@/components/ui/checkbox";
+import { DebouncedControllerInput } from "@/components/ui/debounced-form-input";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { EventOCFormValues } from "@/features/events/event-add-form";
+import { ValidLinkPath } from "@/features/organizers/schemas/event-add-schema";
+import {
+  autoHttps,
+  formatFacebookInput,
+  formatHandleInput,
+  PlatformType,
+} from "@/helpers/linkFns";
+import { cn } from "@/helpers/utilsFns";
+import { useDevice } from "@/providers/device-provider";
+
 import "react-phone-number-input/style.css";
 
 type FormLinksInputProps = {

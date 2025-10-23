@@ -1,4 +1,5 @@
-import { formatDisplayUrl } from "@/helpers/linkFns";
+import React from "react";
+import { Organizer } from "@/types/organizer";
 import { Globe, Phone } from "lucide-react";
 import {
   FaFacebookF,
@@ -8,6 +9,9 @@ import {
   FaVk,
 } from "react-icons/fa6";
 import { formatPhoneNumberIntl } from "react-phone-number-input";
+
+import { formatDisplayUrl } from "@/helpers/linkFns";
+import { cn } from "@/helpers/utilsFns";
 
 const contactIcons: Record<string, React.ReactNode> = {
   email: <FaRegEnvelope />,
@@ -48,10 +52,6 @@ const contactLabel = (type: string, value: string) => {
       return value;
   }
 };
-
-import { cn } from "@/helpers/utilsFns";
-import { Organizer } from "@/types/organizer";
-import React from "react";
 
 export type OrgContactProps = Pick<Organizer, "contact" | "links">;
 interface OrganizerMainContactProps {

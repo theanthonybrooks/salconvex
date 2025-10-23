@@ -1,5 +1,11 @@
 "use client";
 
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import { User } from "@/types/user";
+import { usePreloadedQuery } from "convex/react";
+import { isBefore } from "date-fns";
+
 import {
   Dialog,
   DialogContent,
@@ -8,16 +14,10 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { DialogCloseBtn } from "@/components/ui/dialog-close-btn";
-
 import { ArtistProfileForm } from "@/features/artists/artist-profile-form-dialog";
 import { EventOCForm } from "@/features/events/event-add-form";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { cn } from "@/helpers/utilsFns";
-import { User } from "@/types/user";
-import { usePreloadedQuery } from "convex/react";
-import { isBefore } from "date-fns";
-import { useRouter } from "next/navigation";
-import React, { useState } from "react";
 
 // type BaseTaskValues = {
 //   title: string

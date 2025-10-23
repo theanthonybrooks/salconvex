@@ -1,8 +1,6 @@
-import { TooltipSimple } from "@/components/ui/tooltip";
-import { cn } from "@/helpers/utilsFns";
+import React from "react";
 import { Organizer } from "@/types/organizer";
 import { Globe, Phone } from "lucide-react";
-import React from "react";
 import {
   FaFacebookF,
   FaInstagram,
@@ -13,6 +11,9 @@ import {
   FaVk,
   FaYoutube,
 } from "react-icons/fa6";
+
+import { TooltipSimple } from "@/components/ui/tooltip";
+import { cn } from "@/helpers/utilsFns";
 
 const iconSize = "size-5";
 

@@ -1,10 +1,14 @@
 "use client";
-//TODO: once map page is built, connect the mapPin icons to that. Should have an organizer view on the map page.
 
-import { Card } from "@/components/ui/card";
-import { cn } from "@/helpers/utilsFns";
+//TODO: once map page is built, connect the mapPin icons to that. Should have an organizer view on the map page.
+import { useRef, useState } from "react";
+import Image from "next/image";
+import { OrganizerCardProps } from "@/types/organizer";
+import { api } from "~/convex/_generated/api";
+import { useMutation, usePreloadedQuery } from "convex/react";
 import { ExternalLink } from "lucide-react";
 
+import { Card } from "@/components/ui/card";
 import { Link } from "@/components/ui/custom-link";
 import NavTabs from "@/components/ui/nav-tabs";
 import { Separator } from "@/components/ui/separator";
@@ -14,7 +18,6 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/state-accordion-test";
-import { validOCVals } from "@/constants/openCallConsts";
 import { SalBackNavigation } from "@/features/events/components/sal-back-navigation";
 import { ConvexDashboardLink } from "@/features/events/ui/convex-dashboard-link";
 import { OrganizerCard } from "@/features/organizers/components/organizer-card";
@@ -23,11 +26,8 @@ import { formatEventDates } from "@/helpers/dateFns";
 import { getFormattedLocationString } from "@/helpers/locations";
 import { RichTextDisplay } from "@/helpers/richTextFns";
 import { getUserFontSizePref } from "@/helpers/stylingFns";
-import { OrganizerCardProps } from "@/types/organizer";
-import { useMutation, usePreloadedQuery } from "convex/react";
-import Image from "next/image";
-import { useRef, useState } from "react";
-import { api } from "~/convex/_generated/api";
+import { cn } from "@/helpers/utilsFns";
+import { validOCVals } from "@/constants/openCallConsts";
 
 export const OrganizerCardDetailDesktop = (props: OrganizerCardProps) => {
   const updateEventAnalytics = useMutation(

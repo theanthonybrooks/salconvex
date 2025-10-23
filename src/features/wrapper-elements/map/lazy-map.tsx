@@ -1,7 +1,8 @@
 "use client";
 
-import { Skeleton } from "@/components/ui/skeleton";
 import dynamic from "next/dynamic";
+
+import { Skeleton } from "@/components/ui/skeleton";
 
 const FallbackSkeleton = (
   <Skeleton className="relative min-h-[200px] w-full rounded-xl bg-black/20 sm:min-h-[400px]">

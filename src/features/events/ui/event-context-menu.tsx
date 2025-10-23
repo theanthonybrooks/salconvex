@@ -1,19 +1,21 @@
 "use client";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuPortal,
-  DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 
-import { capitalize, cn } from "@/helpers/utilsFns";
+import Link from "next/link";
+import { useMediaQuery } from "@/hooks/use-media-query";
+import { ApplicationStatus } from "@/types/applications";
+import {
+  EventCategory,
+  EventData,
+  SubmissionFormState as EventState,
+  PostStatus,
+} from "@/types/eventTypes";
+import { OpenCallState, OpenCallStatus } from "@/types/openCallTypes";
+import { api } from "~/convex/_generated/api";
+import { Id } from "~/convex/_generated/dataModel";
+import { AnalyticsSrcType } from "~/convex/schema";
+import { makeUseQueryWithStatus } from "convex-helpers/react";
+import { useQueries } from "convex-helpers/react/cache/hooks";
+import { useMutation, usePreloadedQuery } from "convex/react";
 import {
   ArrowRightCircle,
   ArrowRightCircleIcon,
@@ -27,19 +29,23 @@ import {
   Mail,
   Pencil,
 } from "lucide-react";
-import Link from "next/link";
+import { FaBookmark, FaRegBookmark, FaRegCopy } from "react-icons/fa6";
 
 import { Button } from "@/components/ui/button";
-import { ApplicationStatus } from "@/types/applications";
-import {
-  EventCategory,
-  EventData,
-  SubmissionFormState as EventState,
-  PostStatus,
-} from "@/types/eventTypes";
-import { OpenCallState, OpenCallStatus } from "@/types/openCallTypes";
-
 import { CopyableItem } from "@/components/ui/copyable-item";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuPortal,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { TooltipSimple } from "@/components/ui/tooltip";
 import { useArtistApplicationActions } from "@/features/artists/helpers/appActions";
 import { useToggleListAction } from "@/features/artists/helpers/listActions";
@@ -47,14 +53,7 @@ import { SocialDropdownMenus } from "@/features/events/components/social-dropdow
 import { ConvexDashboardLink } from "@/features/events/ui/convex-dashboard-link";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { getEventCategoryLabel } from "@/helpers/eventFns";
-import { useMediaQuery } from "@/hooks/use-media-query";
-import { makeUseQueryWithStatus } from "convex-helpers/react";
-import { useQueries } from "convex-helpers/react/cache/hooks";
-import { useMutation, usePreloadedQuery } from "convex/react";
-import { FaBookmark, FaRegBookmark, FaRegCopy } from "react-icons/fa6";
-import { api } from "~/convex/_generated/api";
-import { Id } from "~/convex/_generated/dataModel";
-import { AnalyticsSrcType } from "~/convex/schema";
+import { capitalize, cn } from "@/helpers/utilsFns";
 
 interface EventContextMenuProps {
   // onHide: () => void;

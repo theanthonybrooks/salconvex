@@ -1,5 +1,11 @@
 "use client";
 
+import { useRef, useState } from "react";
+import { api } from "~/convex/_generated/api";
+import Color from "color";
+import { html } from "common-tags";
+import { useQuery } from "convex-helpers/react/cache";
+import { useMutation } from "convex/react";
 import {
   Check,
   ChevronLeft,
@@ -10,17 +16,10 @@ import {
   Plus,
   SwatchBook,
 } from "lucide-react";
-import { useRef, useState } from "react";
+import { BiColor } from "react-icons/bi";
+import slugify from "slugify";
 
 import { Button } from "@/components/ui/button";
-import { SelectSimple } from "@/components/ui/select";
-import { TooltipSimple } from "@/components/ui/tooltip";
-import { cn } from "@/helpers/utilsFns";
-import { useQuery } from "convex-helpers/react/cache";
-import { useMutation } from "convex/react";
-import slugify from "slugify";
-import { api } from "~/convex/_generated/api";
-
 import {
   Dialog,
   DialogContent,
@@ -30,10 +29,10 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { SelectSimple } from "@/components/ui/select";
+import { TooltipSimple } from "@/components/ui/tooltip";
+import { cn } from "@/helpers/utilsFns";
 import { ColorMode, colorModes } from "@/constants/colorConsts";
-import Color from "color";
-import { html } from "common-tags";
-import { BiColor } from "react-icons/bi";
 
 type Color = { value: string; gradient?: boolean };
 

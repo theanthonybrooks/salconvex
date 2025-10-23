@@ -1,20 +1,19 @@
-import { cn } from "@/helpers/utilsFns";
+import { ArtistFull } from "@/types/artist";
+import { EventData } from "@/types/eventTypes";
+import { OpenCall } from "@/types/openCallTypes";
+import { UserPrefsType } from "~/convex/schema";
 import { CalendarClockIcon, CheckIcon, X } from "lucide-react";
 
+import { Card } from "@/components/ui/card";
+import { Link } from "@/components/ui/custom-link";
+import { LightboxGallery } from "@/components/ui/lightbox-gallery";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/state-accordion-test";
-
-import { OpenCall } from "@/types/openCallTypes";
-
-import { Card } from "@/components/ui/card";
-import { Link } from "@/components/ui/custom-link";
-import { LightboxGallery } from "@/components/ui/lightbox-gallery";
 import { TooltipSimple } from "@/components/ui/tooltip";
-import { DOC_TYPES, IMAGE_TYPES } from "@/constants/fileConsts";
 import { EligibilityLabel } from "@/features/events/open-calls/components/eligibility-label-client";
 import {
   OpenCallProvided,
@@ -28,9 +27,8 @@ import { formatBudgetCurrency, formatRate } from "@/helpers/eventFns";
 import { getMimeTypeFromHref } from "@/helpers/fileFns";
 import { getFormattedLocationString } from "@/helpers/locations";
 import { RichTextDisplay } from "@/helpers/richTextFns";
-import { ArtistFull } from "@/types/artist";
-import { EventData } from "@/types/eventTypes";
-import { UserPrefsType } from "~/convex/schema";
+import { cn } from "@/helpers/utilsFns";
+import { DOC_TYPES, IMAGE_TYPES } from "@/constants/fileConsts";
 
 interface OpenCallCardProps {
   artist?: ArtistFull | null;

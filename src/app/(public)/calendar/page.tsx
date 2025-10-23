@@ -1,5 +1,13 @@
 "use client";
 
+import type { EventApi, EventClickArg, MoreLinkArg } from "@fullcalendar/core";
+import { useEffect, useState } from "react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { api } from "~/convex/_generated/api";
+import { useQuery } from "convex-helpers/react/cache";
+import { useMutation, usePreloadedQuery } from "convex/react";
+
 import {
   Dialog,
   DialogContent,
@@ -10,14 +18,6 @@ import { LazyCalendar } from "@/features/calendar/lazy-calendar";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { getFormattedLocationString } from "@/helpers/locations";
 import { cn } from "@/helpers/utilsFns";
-import type { EventApi, EventClickArg, MoreLinkArg } from "@fullcalendar/core";
-
-import { useQuery } from "convex-helpers/react/cache";
-import { useMutation, usePreloadedQuery } from "convex/react";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { api } from "~/convex/_generated/api";
 
 const CalendarPage = () => {
   // const {isMobile} = useDevice()

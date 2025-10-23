@@ -1,18 +1,19 @@
 "use client";
 
-import { Skeleton } from "@/components/ui/skeleton";
-import { SalBackNavigation } from "@/features/events/components/sal-back-navigation";
-import { OpenCallCardDetailDesktop } from "@/features/events/open-calls/desktop/opencall-card-detail-desktop";
-import { OpenCallCardDetailMobile } from "@/features/events/open-calls/mobile/opencall-card-detail-mobile";
-import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
+import { useEffect, useRef } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { api } from "~/convex/_generated/api";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { useQuery } from "convex-helpers/react/cache";
 import { useQueries } from "convex-helpers/react/cache/hooks";
 import { usePreloadedQuery } from "convex/react";
 import { ConvexError } from "convex/values";
-import { useParams, useRouter } from "next/navigation";
-import { useEffect, useRef } from "react";
-import { api } from "~/convex/_generated/api";
+
+import { Skeleton } from "@/components/ui/skeleton";
+import { SalBackNavigation } from "@/features/events/components/sal-back-navigation";
+import { OpenCallCardDetailDesktop } from "@/features/events/open-calls/desktop/opencall-card-detail-desktop";
+import { OpenCallCardDetailMobile } from "@/features/events/open-calls/mobile/opencall-card-detail-mobile";
+import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 
 const OpenCallDetail = () => {
   const hasRedirected = useRef(false);

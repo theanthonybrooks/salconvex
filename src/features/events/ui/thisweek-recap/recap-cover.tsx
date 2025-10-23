@@ -1,7 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
 
-import { cn } from "@/helpers/utilsFns";
 import { forwardRef } from "react";
+
+import { cn } from "@/helpers/utilsFns";
 
 interface RecapCoverProps {
   dateRange: string;

@@ -1,10 +1,10 @@
-import { useMutation } from "convex/react";
 import { api } from "~/convex/_generated/api";
 import { Id } from "~/convex/_generated/dataModel";
+import { useMutation } from "convex/react";
+import { Check, X } from "lucide-react";
 
 import { SelectSimple } from "@/components/ui/select";
 import { cn } from "@/helpers/utilsFns";
-import { Check, X } from "lucide-react";
 
 export interface ArtistActionProps {
   artistId: Id<"artists">;

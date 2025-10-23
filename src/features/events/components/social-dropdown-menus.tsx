@@ -1,10 +1,11 @@
-import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
-import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { EventData, PostStatus } from "@/types/eventTypes";
+import { api } from "~/convex/_generated/api";
 import { useMutation, usePreloadedQuery } from "convex/react";
 import { X } from "lucide-react";
 import { MdPhoto } from "react-icons/md";
-import { api } from "~/convex/_generated/api";
+
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 
 type SocialsEvent = {
   _id: EventData["_id"];

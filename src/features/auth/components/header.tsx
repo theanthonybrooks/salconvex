@@ -1,6 +1,7 @@
-import { cn } from "@/helpers/utilsFns";
 import { Poppins } from "next/font/google";
 import Link from "next/link";
+
+import { cn } from "@/helpers/utilsFns";
 
 const font = Poppins({ subsets: ["latin"], weight: "600" });
 

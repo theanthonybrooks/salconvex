@@ -1,5 +1,15 @@
 "use client";
 
+import { ColumnDef } from "@tanstack/react-table";
+import { Id } from "~/convex/_generated/dataModel";
+import {
+  CheckCircle2,
+  LucideClipboardCopy,
+  MoreHorizontal,
+  X,
+} from "lucide-react";
+import { FaEnvelope } from "react-icons/fa6";
+
 import { DeleteNewsletterSubscription } from "@/components/data-table/actions/data-table-admin-user-actions";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 import { Button } from "@/components/ui/button";
@@ -13,20 +23,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { cn } from "@/helpers/utilsFns";
 import {
   NewsletterFrequency,
   NewsletterType,
 } from "@/constants/newsletterConsts";
-import { cn } from "@/helpers/utilsFns";
-import { ColumnDef } from "@tanstack/react-table";
-import {
-  CheckCircle2,
-  LucideClipboardCopy,
-  MoreHorizontal,
-  X,
-} from "lucide-react";
-import { FaEnvelope } from "react-icons/fa6";
-import { Id } from "~/convex/_generated/dataModel";
 
 export const newsletterColumnLabels: Record<string, string> = {
   name: "Name",

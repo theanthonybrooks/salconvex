@@ -1,6 +1,7 @@
-import { capitalize, cn } from "@/helpers/utilsFns";
-import Image from "next/image";
 import { useState } from "react";
+import Image from "next/image";
+
+import { capitalize, cn } from "@/helpers/utilsFns";
 
 interface EventOrgLogoProps {
   imgSrc: string;

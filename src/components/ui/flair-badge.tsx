@@ -1,5 +1,6 @@
-import { cn } from "@/helpers/utilsFns";
 import React from "react";
+
+import { cn } from "@/helpers/utilsFns";
 
 interface FlairBadgeProps {
   children: React.ReactNode;

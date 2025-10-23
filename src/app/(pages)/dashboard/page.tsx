@@ -1,23 +1,7 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { CanceledBanner } from "@/components/ui/canceled-banner";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { ChartWrapper } from "@/components/ui/charts/chart-wrapper";
-import { Link } from "@/components/ui/custom-link";
-import { PreviewCard } from "@/components/ui/dashboard/dashboard-preview-card";
-import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
-import { countApplicationsByTimeRange } from "@/helpers/applicationFns";
-import { getEventCategoryLabel } from "@/helpers/eventFns";
-import { getUserFontSizePref } from "@/helpers/stylingFns";
-import { cn } from "@/helpers/utilsFns";
+import { useRouter } from "next/navigation";
+import { api } from "~/convex/_generated/api";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { useQueries } from "convex-helpers/react/cache";
 import { usePreloadedQuery } from "convex/react";
@@ -37,10 +21,27 @@ import {
   TrendingUp,
   Users,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { FaGear, FaRegBookmark } from "react-icons/fa6";
 import { PiPiggyBank } from "react-icons/pi";
-import { api } from "~/convex/_generated/api";
+
+import { Button } from "@/components/ui/button";
+import { CanceledBanner } from "@/components/ui/canceled-banner";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { ChartWrapper } from "@/components/ui/charts/chart-wrapper";
+import { Link } from "@/components/ui/custom-link";
+import { PreviewCard } from "@/components/ui/dashboard/dashboard-preview-card";
+import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
+import { countApplicationsByTimeRange } from "@/helpers/applicationFns";
+import { getEventCategoryLabel } from "@/helpers/eventFns";
+import { getUserFontSizePref } from "@/helpers/stylingFns";
+import { cn } from "@/helpers/utilsFns";
 
 export default function Dashboard() {
   const router = useRouter();

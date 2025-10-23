@@ -1,14 +1,15 @@
+import { forwardRef } from "react";
+import Image from "next/image";
+import { PublicEventPreviewData } from "@/types/eventTypes";
+import { PiSkullBold } from "react-icons/pi";
+import { TiMinus } from "react-icons/ti";
+
 import EventDates from "@/features/events/components/event-dates";
 import { EligibilityLabel } from "@/features/events/open-calls/components/eligibility-label-client";
 import { formatOpenCallDeadline } from "@/helpers/dateFns";
 import { formatBudgetCurrency } from "@/helpers/eventFns";
 import { getFormattedLocationString } from "@/helpers/locations";
 import { cn } from "@/helpers/utilsFns";
-import { PublicEventPreviewData } from "@/types/eventTypes";
-import Image from "next/image";
-import { forwardRef } from "react";
-import { PiSkullBold } from "react-icons/pi";
-import { TiMinus } from "react-icons/ti";
 
 interface RecapPostProps {
   event: PublicEventPreviewData;

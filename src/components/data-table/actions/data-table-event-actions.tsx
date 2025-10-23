@@ -1,12 +1,8 @@
-import { useConfirmAction } from "@/components/ui/confirmation-dialog-context";
-import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import { useState } from "react";
 import { EventCategory, SubmissionFormState } from "@/types/eventTypes";
-
-import { useMutation } from "convex/react";
 import { api } from "~/convex/_generated/api";
 import { Id } from "~/convex/_generated/dataModel";
-
-import { getEventCategoryLabel } from "@/helpers/eventFns";
+import { useMutation } from "convex/react";
 import {
   Eye,
   Image as ImageIcon,
@@ -14,9 +10,12 @@ import {
   LucideFolderClock,
   LucideFolderInput,
 } from "lucide-react";
-import { useState } from "react";
 import { FaRegCopy, FaRegTrashCan } from "react-icons/fa6";
 import { toast } from "react-toastify";
+
+import { useConfirmAction } from "@/components/ui/confirmation-dialog-context";
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import { getEventCategoryLabel } from "@/helpers/eventFns";
 
 export interface EventActionProps {
   eventId: string;

@@ -1,12 +1,14 @@
 "use client";
+
+import { ReactNode } from "react";
+import Image from "next/image";
+import { api } from "~/convex/_generated/api";
+import { useQuery } from "convex-helpers/react/cache/hooks";
+
 import { Link } from "@/components/ui/custom-link";
 import { PopoverSimple } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/helpers/utilsFns";
-import { useQuery } from "convex-helpers/react/cache/hooks";
-import Image from "next/image";
-import { ReactNode } from "react";
-import { api } from "~/convex/_generated/api";
 
 const AboutPage = () => {
   const fatCapUsers = useQuery(api.users.getFatcapUsers);

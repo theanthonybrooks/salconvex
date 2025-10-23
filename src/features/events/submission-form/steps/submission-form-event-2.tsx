@@ -1,3 +1,8 @@
+import { User } from "@/types/user";
+import { Doc } from "~/convex/_generated/dataModel";
+import { Controller, useFormContext } from "react-hook-form";
+import { HiArrowTurnLeftDown } from "react-icons/hi2";
+
 import { FormLinksInput } from "@/components/ui/form-links-inputs";
 import { Label } from "@/components/ui/label";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
@@ -12,14 +17,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { noEventCategories, prodOnlyCategories } from "@/constants/eventConsts";
 import { EventOCFormValues } from "@/features/events/event-add-form";
 import { getEventCategoryLabel } from "@/helpers/eventFns";
 import { cn } from "@/helpers/utilsFns";
-import { User } from "@/types/user";
-import { Controller, useFormContext } from "react-hook-form";
-import { HiArrowTurnLeftDown } from "react-icons/hi2";
-import { Doc } from "~/convex/_generated/dataModel";
+import { noEventCategories, prodOnlyCategories } from "@/constants/eventConsts";
 
 interface SubmissionFormEventStep2Props {
   user: User | undefined;

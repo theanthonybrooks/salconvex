@@ -1,15 +1,16 @@
 "use client";
 
-import { SearchType, TheListFilterCommandItem } from "@/constants/filterConsts";
-import { ViewOptions } from "@/features/events/event-list-client";
-import { TheListFilterDrawer } from "@/features/thelist/components/filter-drawer";
-import { FilterBase } from "@/features/thelist/components/filters/filter-base";
-import { cn } from "@/helpers/utilsFns";
+import { useEffect, useMemo, useState } from "react";
 import { MergedEventPreviewData } from "@/types/eventTypes";
 import { Filters, SearchParams, SortOptions } from "@/types/thelist";
 import { User } from "@/types/user";
 import { debounce } from "lodash";
-import { useEffect, useMemo, useState } from "react";
+
+import { ViewOptions } from "@/features/events/event-list-client";
+import { TheListFilterDrawer } from "@/features/thelist/components/filter-drawer";
+import { FilterBase } from "@/features/thelist/components/filters/filter-base";
+import { cn } from "@/helpers/utilsFns";
+import { SearchType, TheListFilterCommandItem } from "@/constants/filterConsts";
 
 interface ListFilterProps<T extends TheListFilterCommandItem> {
   title: string;

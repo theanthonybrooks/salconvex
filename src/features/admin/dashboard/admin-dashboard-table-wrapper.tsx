@@ -1,9 +1,9 @@
 "use client";
 
-import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
-import { usePreloadedQuery } from "convex/react";
+import { TableTypes } from "@/types/tanstack-table";
 
 import { useDashboard } from "@/app/(pages)/dashboard/_components/dashboard-context";
+
 import { DataTable } from "@/components/data-table/data-table";
 import { useAdminPreload } from "@/features/admin/admin-preload-context";
 import {
@@ -14,10 +14,13 @@ import { newsletterColumns } from "@/features/admin/dashboard/newsletter-columns
 import { userColumns } from "@/features/admin/dashboard/user-columns";
 import { applicationColumns } from "@/features/artists/applications/components/events-data-table/application-columns";
 import { getColumns } from "@/features/events/components/events-data-table/columns";
+import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { cn } from "@/helpers/utilsFns";
-import { TableTypes } from "@/types/tanstack-table";
-import { useQuery } from "convex-helpers/react/cache";
+
 import { api } from "~/convex/_generated/api";
+import { useQuery } from "convex-helpers/react/cache";
+import { usePreloadedQuery } from "convex/react";
+
 interface AdminDashboardTableWrapperProps {
   page: TableTypes;
 }

@@ -1,8 +1,9 @@
+import Image from "next/image";
+
 import Force404Url from "@/components/force404url";
 import ClientAuthWrapper from "@/features/auth/wrappers/auth-wrapper";
 import Footer from "@/features/wrapper-elements/navigation/components/footer";
 import { NavbarWrapper } from "@/features/wrapper-elements/navigation/components/navbar-wrapper";
-import Image from "next/image";
 
 export async function generateMetadata() {
   return { title: "Page Not Found" };

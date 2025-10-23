@@ -1,10 +1,10 @@
-import { cn } from "@/helpers/utilsFns";
-import { useAuthActions } from "@convex-dev/auth/react";
-import { useMutation } from "convex/react";
-import { useRouter } from "next/navigation";
-
 import React from "react";
+import { useRouter } from "next/navigation";
+import { useAuthActions } from "@convex-dev/auth/react";
 import { api } from "~/convex/_generated/api";
+import { useMutation } from "convex/react";
+
+import { cn } from "@/helpers/utilsFns";
 
 interface SignOutBtnProps {
   children?: React.ReactNode;

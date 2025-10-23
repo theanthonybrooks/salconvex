@@ -1,6 +1,5 @@
 "use client";
 
-import { useDevice } from "@/providers/device-provider";
 import type {
   EventClickArg,
   EventInput,
@@ -10,6 +9,8 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import listPlugin from "@fullcalendar/list";
 import FullCalendar from "@fullcalendar/react";
+
+import { useDevice } from "@/providers/device-provider";
 
 type Props = {
   events: EventInput[];

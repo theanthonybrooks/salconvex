@@ -1,10 +1,11 @@
 "use client";
 
 import { Table } from "@tanstack/react-table";
+import { api } from "~/convex/_generated/api";
+import { Id } from "~/convex/_generated/dataModel";
+import { useMutation } from "convex/react";
 import { X } from "lucide-react";
-
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { toast } from "react-toastify";
 
 import {
   eventCategories,
@@ -12,11 +13,9 @@ import {
 } from "@/components/data-table/data-table-constants";
 import { DataTableFacetedFilter } from "@/components/data-table/data-table-faceted-filter";
 import { DataTableViewOptions } from "@/components/data-table/data-table-view-options";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { cn } from "@/helpers/utilsFns";
-import { useMutation } from "convex/react";
-import { toast } from "react-toastify";
-import { api } from "~/convex/_generated/api";
-import { Id } from "~/convex/_generated/dataModel";
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;

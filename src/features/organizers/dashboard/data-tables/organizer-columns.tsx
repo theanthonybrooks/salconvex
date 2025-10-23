@@ -1,6 +1,14 @@
 "use client";
 
+import {
+  EventCategory,
+  EventType,
+  SubmissionFormState,
+} from "@/types/eventTypes";
+import { OpenCallState } from "@/types/openCallTypes";
+import { OrgEventData } from "@/types/organizer";
 import { ColumnDef } from "@tanstack/react-table";
+import { Clipboard, MoreHorizontal } from "lucide-react";
 
 import {
   DataTableAdminOrgActions,
@@ -29,14 +37,6 @@ import {
 import { OrgEventActions } from "@/features/organizers/dashboard/data-tables/orgEventActions";
 import { getEventCategoryLabel, getEventTypeLabel } from "@/helpers/eventFns";
 import { cn } from "@/helpers/utilsFns";
-import {
-  EventCategory,
-  EventType,
-  SubmissionFormState,
-} from "@/types/eventTypes";
-import { OpenCallState } from "@/types/openCallTypes";
-import { OrgEventData } from "@/types/organizer";
-import { Clipboard, MoreHorizontal } from "lucide-react";
 
 export const orgEventColumnLabels: Record<string, string> = {
   orgName: "Org Name",

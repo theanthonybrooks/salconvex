@@ -1,23 +1,23 @@
-import { DialogTitle } from "@/components/ui/dialog";
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { DashIcon } from "@radix-ui/react-icons";
 import { Command } from "cmdk";
+import { usePreloadedQuery } from "convex/react";
 import { AnimatePresence, motion } from "framer-motion";
 import { CircleX, X } from "lucide-react";
-import Link from "next/link";
 import { IoSearch } from "react-icons/io5";
 
+import { DialogTitle } from "@/components/ui/dialog";
 import {
   Drawer,
   DrawerContent,
   DrawerHeader,
   DrawerTitle,
 } from "@/components/ui/drawer";
-import { searchDialogVariants } from "@/constants/dialogConsts";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { cn } from "@/helpers/utilsFns";
-import { usePreloadedQuery } from "convex/react";
-import { useRouter } from "next/navigation";
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
+import { searchDialogVariants } from "@/constants/dialogConsts";
 
 export interface CommandItem {
   label?: string;
@@ -309,10 +309,7 @@ export const CommandMenuCustom = <T extends CommandItem>({
                       setOpen(false);
                     }
                   }}
-                  placeholder={cn(
-                    placeholder,
-                    !isMobile && "  (Hint: Ctrl + /)",
-                  )}
+                  placeholder={cn(placeholder, !isMobile && "(Hint: Ctrl + /)")}
                   className="focus:outline-hidden relative z-10 w-full bg-card p-3 text-lg selection:italic selection:text-stone-400 placeholder:text-stone-400"
                 />
               </div>

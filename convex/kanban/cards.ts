@@ -1,7 +1,6 @@
-import { ColumnType } from "@/constants/kanbanConsts";
+import type { ColumnType } from "@/constants/kanbanConsts";
+
 import { getAuthUserId } from "@convex-dev/auth/server";
-import { OrderedQuery, Query, QueryInitializer } from "convex/server";
-import { ConvexError, v } from "convex/values";
 import { DataModel } from "~/convex/_generated/dataModel";
 import {
   kanbanColumnValidator,
@@ -9,6 +8,8 @@ import {
   supportCategoryValidator,
   userRoleArrayValidator,
 } from "~/convex/schema";
+import { OrderedQuery, Query, QueryInitializer } from "convex/server";
+import { ConvexError, v } from "convex/values";
 import { mutation, query } from "../_generated/server";
 
 export const searchCards = query({

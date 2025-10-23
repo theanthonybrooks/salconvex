@@ -1,5 +1,19 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import Image from "next/image";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useManageSubscription } from "@/hooks/use-manage-subscription";
+import { User } from "@/types/user";
+import { api } from "~/convex/_generated/api";
+import { Doc } from "~/convex/_generated/dataModel";
+import { AccountTypeBase } from "~/convex/schema";
+import { useQuery } from "convex-helpers/react/cache";
+import { useAction, usePreloadedQuery } from "convex/react";
+import { motion } from "framer-motion";
+import { CheckCircle2, CircleX } from "lucide-react";
+import { toast } from "react-toastify";
+
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -9,30 +23,16 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { cn } from "@/helpers/utilsFns";
-import { useAction, usePreloadedQuery } from "convex/react";
-
 import { Link } from "@/components/ui/custom-link";
 import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   AccountSubscribeForm,
   ModeType,
 } from "@/features/account/account-profile-form";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { getUserFontSizePref } from "@/helpers/stylingFns";
-import { useManageSubscription } from "@/hooks/use-manage-subscription";
-import { User } from "@/types/user";
-import { useQuery } from "convex-helpers/react/cache";
-import { motion } from "framer-motion";
-import { CheckCircle2, CircleX } from "lucide-react";
-import Image from "next/image";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
-import { toast } from "react-toastify";
-import { api } from "~/convex/_generated/api";
-import { Doc } from "~/convex/_generated/dataModel";
-import { AccountTypeBase } from "~/convex/schema";
+import { cn } from "@/helpers/utilsFns";
 
 type SwitchProps = {
   onSwitchAction: (value: string) => void;

@@ -1,18 +1,20 @@
 "use client";
 
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useDashboard } from "@/app/(pages)/dashboard/_components/dashboard-context";
+import { TableTypes } from "@/types/tanstack-table";
+import { api } from "~/convex/_generated/api";
+import { useQuery } from "convex-helpers/react/cache";
+import { usePreloadedQuery } from "convex/react";
+
 import { DataTable } from "@/components/data-table/data-table";
 import { applicationColumns } from "@/features/artists/applications/components/events-data-table/application-columns";
 import { bookmarkColumns } from "@/features/artists/dashboard/data-tables/bookmark-columns";
 import { hiddenColumns } from "@/features/artists/dashboard/data-tables/hidden-columns";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { cn } from "@/helpers/utilsFns";
-import { TableTypes } from "@/types/tanstack-table";
-import { useQuery } from "convex-helpers/react/cache";
-import { usePreloadedQuery } from "convex/react";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
-import { api } from "~/convex/_generated/api";
+
 interface ArtistDashboardTableWrapperProps {
   page: TableTypes;
 }

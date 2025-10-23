@@ -1,5 +1,13 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
+import { EventCategory } from "@/types/eventTypes";
+import { api } from "~/convex/_generated/api";
+import { useMutation } from "convex/react";
+import { ConvexError } from "convex/values";
+import { BiRename } from "react-icons/bi";
+import { toast } from "react-toastify";
+
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -13,13 +21,6 @@ import { Input } from "@/components/ui/input";
 import { Event } from "@/features/events/components/events-data-table/columns";
 import { getEventCategoryLabel } from "@/helpers/eventFns";
 import { cn } from "@/helpers/utilsFns";
-import { EventCategory } from "@/types/eventTypes";
-import { useMutation } from "convex/react";
-import { ConvexError } from "convex/values";
-import { useEffect, useRef, useState } from "react";
-import { BiRename } from "react-icons/bi";
-import { toast } from "react-toastify";
-import { api } from "~/convex/_generated/api";
 
 interface EventNameProps {
   event: Event;

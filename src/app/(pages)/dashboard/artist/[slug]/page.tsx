@@ -1,8 +1,9 @@
-import { ArtistDashboardTableWrapper } from "@/features/artists/dashboard/artist-dashboard-wrapper";
-import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
-import { fetchQuery } from "convex/nextjs";
 import { redirect } from "next/navigation";
+import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
 import { api } from "~/convex/_generated/api";
+import { fetchQuery } from "convex/nextjs";
+
+import { ArtistDashboardTableWrapper } from "@/features/artists/dashboard/artist-dashboard-wrapper";
 
 export default async function ArtistPage({
   params,

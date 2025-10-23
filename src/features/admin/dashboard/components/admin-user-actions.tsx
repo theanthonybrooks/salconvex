@@ -1,11 +1,12 @@
 "use client";
 
-import { MultiSelect } from "@/components/multi-select";
 import { accountTypeOptions, userRoleOptions } from "@/types/user";
-import { useMutation } from "convex/react";
 import { api } from "~/convex/_generated/api";
 import { Id } from "~/convex/_generated/dataModel";
 import { AccountType, UserRole } from "~/convex/schema";
+import { useMutation } from "convex/react";
+
+import { MultiSelect } from "@/components/multi-select";
 
 interface AdminUserActionsProps {
   userId: Id<"users">;

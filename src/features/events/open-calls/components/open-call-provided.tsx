@@ -1,8 +1,3 @@
-import { TooltipSimple } from "@/components/ui/tooltip";
-import { openCallCategoryFields } from "@/constants/openCallConsts";
-import { siteUrl } from "@/constants/siteInfo";
-import { formatCurrency } from "@/helpers/currencyFns";
-import { cn } from "@/helpers/utilsFns";
 import { OpenCall } from "@/types/openCallTypes";
 import { X } from "lucide-react";
 import { FaPaintRoller, FaUserCheck } from "react-icons/fa6";
@@ -13,6 +8,12 @@ import {
   PiPencilLineFill,
 } from "react-icons/pi";
 import { TbStairs } from "react-icons/tb";
+
+import { TooltipSimple } from "@/components/ui/tooltip";
+import { formatCurrency } from "@/helpers/currencyFns";
+import { cn } from "@/helpers/utilsFns";
+import { openCallCategoryFields } from "@/constants/openCallConsts";
+import { siteUrl } from "@/constants/siteInfo";
 
 interface OpenCallProvidedProps {
   categories?: OpenCall["compensation"]["categories"];

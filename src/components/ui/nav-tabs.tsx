@@ -1,13 +1,14 @@
 "use client";
 
-import { cn } from "@/helpers/utilsFns";
 import {
   Children,
+  isValidElement,
   ReactElement,
   ReactNode,
-  isValidElement,
   useState,
 } from "react";
+
+import { cn } from "@/helpers/utilsFns";
 
 export interface NavTab {
   id: string;

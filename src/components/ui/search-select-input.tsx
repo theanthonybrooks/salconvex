@@ -1,5 +1,6 @@
-import { cn } from "@/helpers/utilsFns";
 import React, { useState } from "react";
+
+import { cn } from "@/helpers/utilsFns";
 
 export interface SuggestionItem<T = unknown> {
   id: string;

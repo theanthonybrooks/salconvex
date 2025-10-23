@@ -1,10 +1,10 @@
-import { DashboardWrapper } from "@/app/(pages)/dashboard/_components/dashboard-wrapper";
-import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
-import { fetchQuery } from "convex/nextjs";
+import { ReactNode } from "react";
 import { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { ReactNode } from "react";
+import { DashboardWrapper } from "@/app/(pages)/dashboard/_components/dashboard-wrapper";
+import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
 import { api } from "~/convex/_generated/api";
+import { fetchQuery } from "convex/nextjs";
 
 interface DashboardLayoutProps {
   children: ReactNode;

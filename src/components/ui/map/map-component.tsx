@@ -2,11 +2,12 @@
 
 "use client";
 
-import { LazyMap } from "@/features/wrapper-elements/map/lazy-map";
-import { makeUseQueryWithStatus } from "convex-helpers/react";
-import { useQueries } from "convex-helpers/react/cache/hooks";
 import { useEffect } from "react";
 import { api } from "~/convex/_generated/api";
+import { makeUseQueryWithStatus } from "convex-helpers/react";
+import { useQueries } from "convex-helpers/react/cache/hooks";
+
+import { LazyMap } from "@/features/wrapper-elements/map/lazy-map";
 
 export default function WorldMapComponent() {
   useEffect(() => {

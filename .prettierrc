@@ -1,3 +1,36 @@
 {
-  "plugins": ["prettier-plugin-tailwindcss"]
+  "plugins": [
+    "@ianvs/prettier-plugin-sort-imports",
+    "prettier-plugin-tailwindcss"
+  ],
+  "importOrder": [
+    "^@/constants/(.*)$",
+    "",
+    "",
+    "<TYPES>",
+    "^@/types/(.*)$",
+    "",
+    "",
+    "^(react/(.*)$)|^(react$)",
+    "^(next/(.*)$)|^(next$)",
+    "<THIRD_PARTY_MODULES>",
+    "",
+    "",
+    "<TYPES>^[.|..|~]",
+    "^@/components/(.*)$",
+    "^@/features/(.*)$",
+    "^@/helpers/(.*)$",
+    "^@/lib/(.*)$",
+    "^@/providers/(.*)$",
+    "",
+    "",
+    "^@convex-dev/(.*)$",
+    "^~/convex/(.*)$",
+    "^convex(.*)$",
+    "^../_generated/(.*)$",
+    "^[./]"
+  ],
+  "importOrderSeparation": true,
+  "importOrderSortSpecifiers": true,
+  "tailwindFunctions": ["clsx", "cn", "cva"]
 }

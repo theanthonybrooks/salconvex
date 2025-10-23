@@ -1,10 +1,11 @@
 "use client";
 
-import { cn } from "@/helpers/utilsFns";
 import { User } from "@/types/user";
+import { UserPrefsType } from "~/convex/schema";
 import { motion as m, Variants } from "framer-motion";
 import { useTheme } from "next-themes";
-import { UserPrefsType } from "~/convex/schema";
+
+import { cn } from "@/helpers/utilsFns";
 
 interface ThemeToggleProps {
   className?: string;

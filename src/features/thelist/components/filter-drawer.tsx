@@ -1,4 +1,14 @@
 "use client";
+
+import { useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
+import { Command } from "cmdk";
+import { usePreloadedQuery } from "convex/react";
+import { AnimatePresence, motion } from "framer-motion";
+import { LoaderCircle, X } from "lucide-react";
+import { BiSolidQuoteLeft, BiSolidQuoteRight } from "react-icons/bi";
+import { IoSearch } from "react-icons/io5";
+
 import { Link } from "@/components/ui/custom-link";
 import { DialogTitle } from "@/components/ui/dialog";
 import {
@@ -10,6 +20,11 @@ import {
 import { FlairBadge } from "@/components/ui/flair-badge";
 import { Input } from "@/components/ui/input";
 import { SelectSimple } from "@/components/ui/select";
+import { FilterBase } from "@/features/thelist/components/filters/filter-base";
+import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
+import { formatEventLink, getOpenCallStatusLabel } from "@/helpers/eventFns";
+import { getSearchLocationString } from "@/helpers/locations";
+import { cn } from "@/helpers/utilsFns";
 import { searchDialogVariants } from "@/constants/dialogConsts";
 import {
   FilterDrawerProps,
@@ -17,19 +32,6 @@ import {
   searchTypeOptions,
   TheListFilterCommandItem,
 } from "@/constants/filterConsts";
-import { FilterBase } from "@/features/thelist/components/filters/filter-base";
-import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
-import { formatEventLink, getOpenCallStatusLabel } from "@/helpers/eventFns";
-import { getSearchLocationString } from "@/helpers/locations";
-import { cn } from "@/helpers/utilsFns";
-import { Command } from "cmdk";
-import { usePreloadedQuery } from "convex/react";
-import { AnimatePresence, motion } from "framer-motion";
-import { LoaderCircle, X } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useEffect, useRef } from "react";
-import { BiSolidQuoteLeft, BiSolidQuoteRight } from "react-icons/bi";
-import { IoSearch } from "react-icons/io5";
 
 export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
   open,

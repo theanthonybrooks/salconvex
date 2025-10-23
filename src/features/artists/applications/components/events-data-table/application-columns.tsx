@@ -1,13 +1,14 @@
 "use client";
 
+import { ApplicationStatus } from "@/types/applications";
+import { ColumnDef } from "@tanstack/react-table";
+import { Id } from "~/convex/_generated/dataModel";
+
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 import { Link } from "@/components/ui/custom-link";
 import { AppNotesInput } from "@/features/artists/applications/components/events-data-table/app-notes-input";
 import { AppStatusSelector } from "@/features/artists/applications/components/events-data-table/app-status-selector";
 import { cn } from "@/helpers/utilsFns";
-import { ApplicationStatus } from "@/types/applications";
-import { ColumnDef } from "@tanstack/react-table";
-import { Id } from "~/convex/_generated/dataModel";
 
 export const applicationColumnLabels: Record<string, string> = {
   name: "Event Name",

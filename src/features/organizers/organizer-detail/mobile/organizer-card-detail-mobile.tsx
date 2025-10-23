@@ -1,23 +1,22 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { OrganizerCardProps } from "@/types/organizer";
+import { api } from "~/convex/_generated/api";
+import { useMutation, usePreloadedQuery } from "convex/react";
+import { motion } from "framer-motion";
+
 import { Card } from "@/components/ui/card";
-import { cn } from "@/helpers/utilsFns";
-
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
 import { Link } from "@/components/ui/custom-link";
 import { EventOrgLogo } from "@/components/ui/event-org-logo";
-import { validOCVals } from "@/constants/openCallConsts";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { OrganizerCard } from "@/features/organizers/components/organizer-card";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { formatEventDates } from "@/helpers/dateFns";
 import { getFormattedLocationString } from "@/helpers/locations";
 import { getUserFontSizePref } from "@/helpers/stylingFns";
-import { OrganizerCardProps } from "@/types/organizer";
-import { useMutation, usePreloadedQuery } from "convex/react";
-import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
-import { api } from "~/convex/_generated/api";
+import { cn } from "@/helpers/utilsFns";
+import { validOCVals } from "@/constants/openCallConsts";
 
 export const OrganizerCardDetailMobile = (props: OrganizerCardProps) => {
   const updateEventAnalytics = useMutation(

@@ -1,5 +1,13 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
+import { User } from "@/types/user";
+import { usePreloadedQuery } from "convex/react";
+// import { useQuery } from "convex-helpers/react/cache"
+import { motion, useMotionValueEvent, useScroll } from "framer-motion";
+import { ArrowUpIcon } from "lucide-react";
+
 import FullPageNav from "@/components/full-page-nav";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/components/ui/custom-link";
@@ -11,28 +19,18 @@ import {
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
 import { Separator } from "@/components/ui/separator";
-
 import { UserProfile } from "@/components/ui/user-profile";
-import { dashboardNavItems } from "@/constants/links";
-import {
-  landingPageNavbarMenuLinksAbout as aboutItems,
-  theListNavbarMenuLinks as thelistitems,
-} from "@/constants/navbarsLinks";
 import { Search } from "@/features/Sidebar/Search";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { ListItem } from "@/features/wrapper-elements/navigation/components/navbar";
 import { NavbarSigninSection } from "@/features/wrapper-elements/navigation/components/navbar-signin-section";
 import { cn } from "@/helpers/utilsFns";
+import { dashboardNavItems } from "@/constants/links";
+import {
+  landingPageNavbarMenuLinksAbout as aboutItems,
+  theListNavbarMenuLinks as thelistitems,
+} from "@/constants/navbarsLinks";
 import { useDevice } from "@/providers/device-provider";
-import { User } from "@/types/user";
-import { usePreloadedQuery } from "convex/react";
-
-// import { useQuery } from "convex-helpers/react/cache"
-import { motion, useMotionValueEvent, useScroll } from "framer-motion";
-import { ArrowUpIcon } from "lucide-react";
-
-import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
 
 interface TheListNavBarProps {
   userId?: string | undefined;
@@ -59,6 +57,7 @@ export default function TheListNavBar(
   const { scrollY, scrollYProgress } = useScroll();
   const [canGoToTop, setCanGoToTop] = useState(false);
 
+  const isAdmin = user?.role?.includes("admin");
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   // useMotionValueEvent(scrollY, "change", (latest) => {
   //   console.log("Page scroll: ", latest)
@@ -262,7 +261,12 @@ export default function TheListNavBar(
                   Submit
                 </Button>
               </Link>
-              <div className="hidden items-center gap-8 pr-5 lg:flex">
+              <div
+                className={cn(
+                  "hidden items-center gap-8 pr-5 lg:flex",
+                  isAdmin && "gap-4",
+                )}
+              >
                 <div className="z-0 flex items-center gap-2">
                   <NavigationMenu delayDuration={Infinity} align="right">
                     <NavigationMenuList className="gap-2">
@@ -338,7 +342,10 @@ export default function TheListNavBar(
                       </NavigationMenuItem>
                     </NavigationMenuList>
                   </NavigationMenu>
-                  <NavigationMenu delayDuration={Infinity}>
+                  <NavigationMenu
+                    delayDuration={Infinity}
+                    className="hidden xl:flex"
+                  >
                     <NavigationMenuList className="gap-2">
                       <NavigationMenuItem>
                         <NavigationMenuTrigger

@@ -1,8 +1,9 @@
-import SocialsRow from "@/components/ui/socials";
-import { cn } from "@/helpers/utilsFns";
-import { Source } from "@/hooks/use-filtered-events-query";
 import Image from "next/image";
 import Link from "next/link";
+import { Source } from "@/hooks/use-filtered-events-query";
+
+import SocialsRow from "@/components/ui/socials";
+import { cn } from "@/helpers/utilsFns";
 
 interface SalHeaderProps {
   source: Source;

@@ -4,6 +4,30 @@
 
 //note-to-self: is the "Editable" toggle useful for this? Perhaps it could be used to show/hide text. I already have something that displays it, though, so I'm not really sure.
 
+import { useCallback, useEffect, useRef, useState } from "react";
+import CharacterCount from "@tiptap/extension-character-count";
+import Link from "@tiptap/extension-link";
+import Placeholder from "@tiptap/extension-placeholder";
+import TaskItem from "@tiptap/extension-task-item";
+import TaskList from "@tiptap/extension-task-list";
+import Underline from "@tiptap/extension-underline";
+import { EditorContent, useEditor } from "@tiptap/react";
+import { BubbleMenu } from "@tiptap/react/menus";
+import StarterKit from "@tiptap/starter-kit";
+import { Check, CheckIcon, LoaderCircle, Pencil } from "lucide-react";
+import { FaRemoveFormat, FaUnlink } from "react-icons/fa";
+import {
+  FaBold,
+  FaItalic,
+  FaLink,
+  FaListCheck,
+  FaListOl,
+  FaListUl,
+  FaStrikethrough,
+  FaUnderline,
+} from "react-icons/fa6";
+import { toast } from "react-toastify";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,32 +48,6 @@ import {
   trimTrailingEmptyParagraphs,
 } from "@/helpers/richTextFns";
 import { cn } from "@/helpers/utilsFns";
-import CharacterCount from "@tiptap/extension-character-count";
-import Link from "@tiptap/extension-link";
-import Placeholder from "@tiptap/extension-placeholder";
-import TaskItem from "@tiptap/extension-task-item";
-import TaskList from "@tiptap/extension-task-list";
-import Underline from "@tiptap/extension-underline";
-import { EditorContent, useEditor } from "@tiptap/react";
-
-import { BubbleMenu } from "@tiptap/react/menus";
-
-import StarterKit from "@tiptap/starter-kit";
-import { Check, CheckIcon, LoaderCircle, Pencil } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { FaRemoveFormat, FaUnlink } from "react-icons/fa";
-
-import {
-  FaBold,
-  FaItalic,
-  FaLink,
-  FaListCheck,
-  FaListOl,
-  FaListUl,
-  FaStrikethrough,
-  FaUnderline,
-} from "react-icons/fa6";
-import { toast } from "react-toastify";
 
 interface Props {
   value: string;
@@ -417,13 +415,13 @@ export const RichTextEditor = ({
   if (!editor) return null;
   const buttonClass = cn(
     asModal &&
-      "p-3 transition-all duration:300 ease-in-out hover:-translate-y-1 ",
-    "active:scale-95 text-foreground/60",
-    readOnly && "pointer-events-none opacity-50 cursor-default",
+      "duration:300 p-3 transition-all ease-in-out hover:-translate-y-1",
+    "text-foreground/60 active:scale-95",
+    readOnly && "pointer-events-none cursor-default opacity-50",
   );
 
   const activeButtonClass = cn(
-    " bg-salYellow/20 font-bold text-black border-b-2 border-foreground",
+    "border-b-2 border-foreground bg-salYellow/20 font-bold text-black",
   );
 
   const disabledButtonClass = cn(

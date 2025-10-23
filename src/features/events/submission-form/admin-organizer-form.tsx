@@ -2,13 +2,24 @@
 
 "use client";
 
-import { Button } from "@/components/ui/button";
-
-import HorizontalLinearStepper from "@/components/ui/stepper";
-import { User } from "@/types/user";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { FormProvider, useForm, useWatch } from "react-hook-form";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useDashboard } from "@/app/(pages)/dashboard/_components/dashboard-context";
+import { EnrichedEvent, EventCategory } from "@/types/eventTypes";
+import { User } from "@/types/user";
+import { getExternalRedirectHtml } from "@/utils/loading-page-html";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { api } from "~/convex/_generated/api";
+import { Doc, Id } from "~/convex/_generated/dataModel";
+import { makeUseQueryWithStatus } from "convex-helpers/react";
+import { useQueries, useQuery } from "convex-helpers/react/cache/hooks";
+import { useAction, useMutation } from "convex/react";
+import { debounce, merge } from "lodash";
+import { FormProvider, Path, useForm, useWatch } from "react-hook-form";
+import { LuBadge, LuBadgeCheck, LuBadgeDollarSign } from "react-icons/lu";
 import { toast } from "react-toastify";
+import slugify from "slugify";
+import { z } from "zod";
 
 // import { eventDefaultValues } from "@/features/events/data/eventDefaultData"
 
@@ -22,9 +33,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { eventWithOCSchema } from "@/features/organizers/schemas/event-add-schema";
-
-import { validOCVals } from "@/constants/openCallConsts";
+import { Button } from "@/components/ui/button";
+import HorizontalLinearStepper from "@/components/ui/stepper";
+import { getSteps } from "@/features/events/event-add-form";
 import SubmissionFormEventStep1 from "@/features/events/submission-form/steps/submission-form-event-1";
 import SubmissionFormEventStep2 from "@/features/events/submission-form/steps/submission-form-event-2";
 import SubmissionFormOC1 from "@/features/events/submission-form/steps/submission-form-oc-1";
@@ -33,28 +44,13 @@ import SubmissionFormOrgStep from "@/features/events/submission-form/steps/submi
 import SubmissionFormOrgStep2 from "@/features/events/submission-form/steps/submission-form-org-2";
 import { SubmissionFormRecapDesktop } from "@/features/events/submission-form/steps/submission-form-recap-desktop";
 import { SubmissionFormRecapMobile } from "@/features/events/submission-form/steps/submission-form-recap-mobile";
+import { eventWithOCSchema } from "@/features/organizers/schemas/event-add-schema";
 import { toSeason, toYearMonth } from "@/helpers/dateFns";
-import { getOcPricing } from "@/helpers/pricingFns";
-import { handleFileUrl, handleOrgFileUrl } from "@/lib/fileUploadFns";
-import { EnrichedEvent, EventCategory } from "@/types/eventTypes";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { makeUseQueryWithStatus } from "convex-helpers/react";
-import { useQueries, useQuery } from "convex-helpers/react/cache/hooks";
-import { useAction, useMutation } from "convex/react";
-import { debounce, merge } from "lodash";
-import { useRouter, useSearchParams } from "next/navigation";
-import { Path } from "react-hook-form";
-import slugify from "slugify";
-import { z } from "zod";
-import { api } from "~/convex/_generated/api";
-import { Doc, Id } from "~/convex/_generated/dataModel";
-
-import { useDashboard } from "@/app/(pages)/dashboard/_components/dashboard-context";
-import { getSteps } from "@/features/events/event-add-form";
 import { getEventCategoryLabel } from "@/helpers/eventFns";
+import { getOcPricing } from "@/helpers/pricingFns";
+import { validOCVals } from "@/constants/openCallConsts";
+import { handleFileUrl, handleOrgFileUrl } from "@/lib/fileUploadFns";
 import { useDevice } from "@/providers/device-provider";
-import { getExternalRedirectHtml } from "@/utils/loading-page-html";
-import { LuBadge, LuBadgeCheck, LuBadgeDollarSign } from "react-icons/lu";
 
 const formTypeOptions = [
   { value: 1, Icon: LuBadge },

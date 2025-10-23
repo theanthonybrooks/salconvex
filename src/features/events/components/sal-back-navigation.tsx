@@ -1,8 +1,9 @@
-import { cn } from "@/helpers/utilsFns";
+import { useRouter } from "next/navigation";
 import { useSalBackNavigation } from "@/hooks/use-back-navigation";
 import { User } from "@/types/user";
-import { useRouter } from "next/navigation";
 import { IoIosArrowRoundBack } from "react-icons/io";
+
+import { cn } from "@/helpers/utilsFns";
 
 interface SalBackNavigationProps {
   className?: string;

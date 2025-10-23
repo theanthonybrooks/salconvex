@@ -1,18 +1,21 @@
 "use client";
 
-import { cn } from "@/helpers/utilsFns";
-import { cva, type VariantProps } from "class-variance-authority";
-import Link from "next/link";
+import type { VariantProps } from "class-variance-authority";
 import { type ComponentPropsWithRef } from "react";
+import Link from "next/link";
+import { cva } from "class-variance-authority";
+
+import { cn } from "@/helpers/utilsFns";
+
 const linkVariants = cva(
-  "transition-colors duration-200 ease-in-out text-base lg:text-sm [&_button]:active:scale-95 [&_button]:hover:no-underline",
+  "text-base transition-colors duration-200 ease-in-out lg:text-sm [&_button]:hover:no-underline [&_button]:active:scale-95",
   {
     variants: {
       variant: {
-        default: "hover:underline underline-offset-2",
+        default: "underline-offset-2 hover:underline",
         subtle: "text-muted-foreground hover:text-foreground",
         subtleUnderline:
-          "text-muted-foreground hover:underline hover:text-foreground underline-offset-2 decoration-foreground",
+          "text-muted-foreground decoration-foreground underline-offset-2 hover:text-foreground hover:underline",
         bold: "font-semibold underline",
         standard: "",
       },

@@ -5,15 +5,6 @@ import {
   spaceMono,
   tankerReg,
 } from "@/assets/fonts";
-import { ConvexClientProvider } from "@/components/convex-client-provider";
-import { siteUrl } from "@/constants/siteInfo";
-import { CookieBanner } from "@/features/auth/components/cookie-banner";
-import { ConvexPreloadContextProvider } from "@/features/wrapper-elements/convex-preload-context";
-import { isAppleUA } from "@/helpers/appleFns";
-import { cn } from "@/helpers/utilsFns";
-import { DeviceProvider } from "@/providers/device-provider";
-import { PostHogProvider } from "@/providers/posthog-provider";
-import { ThemedProvider } from "@/providers/themed-provider";
 import { CookiePref } from "@/types/user";
 import {
   ConvexAuthNextjsServerProvider,
@@ -22,13 +13,28 @@ import {
 import { ConvexQueryCacheProvider } from "convex-helpers/react/cache/provider";
 import { preloadQuery } from "convex/nextjs";
 import { GeistSans } from "geist/font/sans";
+
+import { ConvexClientProvider } from "@/components/convex-client-provider";
+import { CookieBanner } from "@/features/auth/components/cookie-banner";
+import { ConvexPreloadContextProvider } from "@/features/wrapper-elements/convex-preload-context";
+import { isAppleUA } from "@/helpers/appleFns";
+import { cn } from "@/helpers/utilsFns";
+import { siteUrl } from "@/constants/siteInfo";
+import { DeviceProvider } from "@/providers/device-provider";
+import { PostHogProvider } from "@/providers/posthog-provider";
+import { ThemedProvider } from "@/providers/themed-provider";
+
 import "leaflet/dist/leaflet.css";
+
 import type { Metadata } from "next";
-import { cookies, headers } from "next/headers";
 import { ReactNode } from "react";
+import { cookies, headers } from "next/headers";
+
 import "react-datepicker/dist/react-datepicker.css";
-import { ToastContainer } from "react-toastify";
+
 import { api } from "~/convex/_generated/api";
+import { ToastContainer } from "react-toastify";
+
 import "./globals.css";
 
 export const metadata: Metadata = {

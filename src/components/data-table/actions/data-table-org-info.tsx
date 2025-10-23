@@ -1,8 +1,9 @@
-import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
-import { useQuery } from "convex-helpers/react/cache";
-import { LucideClipboardCopy } from "lucide-react";
 import { api } from "~/convex/_generated/api";
 import { Id } from "~/convex/_generated/dataModel";
+import { useQuery } from "convex-helpers/react/cache";
+import { LucideClipboardCopy } from "lucide-react";
+
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 
 interface DataTableOrgInfoProps {
   orgId: Id<"organizations">;

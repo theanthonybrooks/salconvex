@@ -1,6 +1,6 @@
-import { useMutation } from "convex/react";
 import { api } from "~/convex/_generated/api";
 import { Id } from "~/convex/_generated/dataModel";
+import { useMutation } from "convex/react";
 
 export function useToggleListAction(eventId: Id<"events">) {
   const listActions = useMutation(api.artists.artistActions.artistListActions);

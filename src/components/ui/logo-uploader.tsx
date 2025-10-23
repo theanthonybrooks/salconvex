@@ -1,13 +1,14 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
+import { LoaderCircle, PlusIcon } from "lucide-react";
+import { toast } from "react-toastify";
+
 import { Button } from "@/components/ui/button";
 import { CropModal } from "@/components/ui/crop-modal";
 import { cn } from "@/helpers/utilsFns";
 import { fetchImageAsObjectURL } from "@/lib/imageFns";
-import { LoaderCircle, PlusIcon } from "lucide-react";
-import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
-import { toast } from "react-toastify";
 
 type LogoUploaderProps = {
   // onChange: (base64Image: string) => void;

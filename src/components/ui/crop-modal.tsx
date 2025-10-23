@@ -1,12 +1,13 @@
-import { Button } from "@/components/ui/button";
-import DiscreteSlider from "@/components/ui/slider";
-import { cn } from "@/helpers/utilsFns";
-import { createImage, getCroppedImg, padImageToSquare } from "@/lib/imageFns";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Cropper, { Area } from "react-easy-crop";
 import { BiColorFill } from "react-icons/bi";
 import { PiResize } from "react-icons/pi";
 import { TbZoomInArea, TbZoomOutArea } from "react-icons/tb";
+
+import { Button } from "@/components/ui/button";
+import DiscreteSlider from "@/components/ui/slider";
+import { cn } from "@/helpers/utilsFns";
+import { createImage, getCroppedImg, padImageToSquare } from "@/lib/imageFns";
 
 type CropModalProps = {
   imageSrc: string;

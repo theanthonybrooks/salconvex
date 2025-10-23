@@ -1,11 +1,12 @@
-import { cn } from "@/helpers/utilsFns";
+import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
+import { api } from "~/convex/_generated/api";
+import { Doc } from "~/convex/_generated/dataModel";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { useQueries } from "convex-helpers/react/cache";
 import { Check, CircleCheck, CircleX, Search } from "lucide-react";
-import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
-import { api } from "~/convex/_generated/api";
-import { Doc } from "~/convex/_generated/dataModel";
+
+import { cn } from "@/helpers/utilsFns";
 
 interface OrgSearchProps {
   id: string;

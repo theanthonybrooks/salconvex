@@ -1,5 +1,7 @@
 import { SupportCategory } from "@/constants/supportConsts";
+
 import { User } from "@/types/user";
+import { Id } from "~/convex/_generated/dataModel";
 import {
   Calendar,
   Circle,
@@ -18,7 +20,6 @@ import {
   FcMediumPriority,
 } from "react-icons/fc";
 import { MdOutlineDesignServices } from "react-icons/md";
-import { Id } from "~/convex/_generated/dataModel";
 
 export const PRIORITY_CONFIG: Record<
   "high" | "medium" | "low",
@@ -144,7 +145,7 @@ export interface Column {
   description?: string;
 }
 
-export interface CardBase {
+export type CardBase = {
   title: string;
   description: string;
   id: Id<"todoKanban">;
@@ -155,23 +156,23 @@ export interface CardBase {
   isPublic: boolean;
   purpose: KanbanPurpose;
   assignedId?: Id<"users">;
-}
+};
 
-export interface MoveCardArgs {
+export type MoveCardArgs = {
   id: Id<"todoKanban">;
   column: ColumnType;
   beforeId?: Id<"todoKanban">;
   purpose: KanbanPurpose;
-}
+};
 
-export interface AddCardProps {
+export type AddCardProps = {
   user: User | null;
   column: ColumnType;
   purpose: KanbanPurpose;
   addCard: (args: AddCardArgs) => void;
-}
+};
 
-export interface AddCardArgs {
+export type AddCardArgs = {
   title: string;
   description: string;
   column: ColumnType;
@@ -181,15 +182,15 @@ export interface AddCardArgs {
   category: SupportCategory;
   isPublic: boolean;
   purpose: KanbanPurpose;
-}
+};
 
-export interface DeleteCardArgs {
+export type DeleteCardArgs = {
   id: Id<"todoKanban">;
-}
+};
 
 // type ConvexCard = Omit<Card, "id"> & { _id: string }
 
-export interface ColumnProps {
+export type ColumnProps = {
   user: User | null;
   title: string;
   headingColor: string;
@@ -201,26 +202,27 @@ export interface ColumnProps {
   moveCard: (args: MoveCardArgs) => void;
   addCard: (args: AddCardArgs) => void;
   deleteCard: (args: DeleteCardArgs) => void;
-}
+};
 
 export interface CardProps extends CardBase {
+  user: User | null;
   handleDragStart: (e: React.DragEvent<HTMLDivElement>, card: CardBase) => void;
   handleDragEnd: (e: React.DragEvent<HTMLDivElement>, card: CardBase) => void;
   deleteCard: (args: DeleteCardArgs) => void;
 }
 
-export interface DropIndicatorProps {
+export type DropIndicatorProps = {
   beforeId: string | undefined;
   column: ColumnType;
-}
+};
 
 // interface BurnBarrelProps {
 //   userRole: string
 // }
 
-export interface KanbanBoardProps {
+export type KanbanBoardProps = {
   purpose: KanbanPurpose;
-}
+};
 
 export type BaseTaskValues = {
   title: string;

@@ -1,13 +1,14 @@
+import { RefObject } from "react";
+import { Organizer } from "@/types/organizer";
+import { TiArrowRight } from "react-icons/ti";
+import slugify from "slugify";
+
 import { Card } from "@/components/ui/card";
 import { OrganizerLinks } from "@/features/organizers/components/organizer-links";
 import { OrganizerCardLogoName } from "@/features/organizers/components/organizer-logo-name-card";
 import { OrganizerMainContact } from "@/features/organizers/components/organizer-main-contact";
 import { RichTextDisplay } from "@/helpers/richTextFns";
 import { cn } from "@/helpers/utilsFns";
-import { Organizer } from "@/types/organizer";
-import { RefObject } from "react";
-import { TiArrowRight } from "react-icons/ti";
-import slugify from "slugify";
 
 interface OrganizerCardProps {
   organizer: Organizer;

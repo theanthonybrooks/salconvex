@@ -1,12 +1,8 @@
 "use client";
 
-import { PostPropertiesDashboard } from "@/components/ui/post-properties-dashboard";
-import { cn } from "@/helpers/utilsFns";
-import { OpenCallData } from "@/types/openCallTypes";
-
+import { ComponentType, useEffect, useState } from "react";
 import { OpenCallPost } from "@/app/(pages)/(artist)/thelist/components/open-call-post";
-import { Link } from "@/components/ui/custom-link";
-import { PostCaptionDialog } from "@/components/ui/post-caption-dialog";
+import { OpenCallData } from "@/types/openCallTypes";
 import {
   ArrowLeft,
   LetterText,
@@ -14,9 +10,13 @@ import {
   LucideIcon,
   Settings2,
 } from "lucide-react";
-import { ComponentType, useEffect, useState } from "react";
 import { BiPhotoAlbum } from "react-icons/bi";
 import { toast } from "react-toastify";
+
+import { Link } from "@/components/ui/custom-link";
+import { PostCaptionDialog } from "@/components/ui/post-caption-dialog";
+import { PostPropertiesDashboard } from "@/components/ui/post-properties-dashboard";
+import { cn } from "@/helpers/utilsFns";
 
 interface OpenCallSocialsProps {
   data: OpenCallData | null;

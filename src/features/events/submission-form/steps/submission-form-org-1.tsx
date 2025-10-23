@@ -1,3 +1,10 @@
+import { useEffect, useRef, useState } from "react";
+import { EnrichedEvent } from "@/types/eventTypes";
+import { Doc } from "~/convex/_generated/dataModel";
+import { AnimatePresence, motion } from "framer-motion";
+import { LucideChevronLeft, LucideChevronRight } from "lucide-react";
+import { Controller, useFormContext } from "react-hook-form";
+
 import { DataTable } from "@/components/data-table/data-table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Link } from "@/components/ui/custom-link";
@@ -7,7 +14,6 @@ import { MapboxInputFull } from "@/components/ui/mapbox-search";
 import { Separator } from "@/components/ui/separator";
 import { useStepper } from "@/components/ui/stepper";
 import { TooltipSimple } from "@/components/ui/tooltip";
-import { supportEmail } from "@/constants/siteInfo";
 import {
   Event as EventType,
   getColumns,
@@ -15,12 +21,7 @@ import {
 import { EventOCFormValues } from "@/features/events/event-add-form";
 import { OrgSearch } from "@/features/organizers/components/org-search";
 import { cn } from "@/helpers/utilsFns";
-import { EnrichedEvent } from "@/types/eventTypes";
-import { AnimatePresence, motion } from "framer-motion";
-import { LucideChevronLeft, LucideChevronRight } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
-import { Controller, useFormContext } from "react-hook-form";
-import { Doc } from "~/convex/_generated/dataModel";
+import { supportEmail } from "@/constants/siteInfo";
 
 interface SubmissionFormOrgStepProps {
   isAdmin: boolean;
@@ -427,7 +428,7 @@ const SubmissionFormOrgStep = ({
               className="flex w-full max-w-[90vw] overflow-x-auto"
               tableClassName="sm:max-h-52"
               outerContainerClassName={cn(
-                "hidden lg:block xl:hidden  ",
+                "hidden lg:block xl:hidden",
                 newOrgEvent && "opacity-80",
               )}
               tableType="events"
@@ -464,7 +465,7 @@ const SubmissionFormOrgStep = ({
               )}
               tableClassName="sm:max-h-52"
               outerContainerClassName={cn(
-                "hidden xl:block ",
+                "hidden xl:block",
                 newOrgEvent && "opacity-80",
               )}
               tableType="events"

@@ -1,9 +1,14 @@
 "use client";
 
+import { EventStateType } from "~/convex/schema";
 import {
+  ArrowDown,
+  ArrowRight,
+  ArrowUp,
   Banana,
   Calendar,
   CalendarHeart,
+  CheckCircle,
   CircleCheck,
   Clock,
   DollarSign,
@@ -27,11 +32,7 @@ import {
   Users,
   X,
 } from "lucide-react";
-
-import { ArrowDown, ArrowRight, ArrowUp, CheckCircle } from "lucide-react";
-
 import { FaMoneyBill } from "react-icons/fa6";
-import { EventStateType } from "~/convex/schema";
 
 // interface DataTableRowActionsProps<TData> {
 //   row: Row<TData>;

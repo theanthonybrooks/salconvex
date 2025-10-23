@@ -1,10 +1,10 @@
 import { Link } from "@/components/ui/custom-link";
+import { DateWrapper } from "@/helpers/dateFns";
 import {
   infoEmail,
   lastUpdatedTermsRaw,
   supportEmail,
 } from "@/constants/siteInfo";
-import { DateWrapper } from "@/helpers/dateFns";
 
 export default function TermsPage() {
   return (

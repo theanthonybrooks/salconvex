@@ -1,3 +1,8 @@
+import { JSX } from "react";
+import { PublicEventPreviewData } from "@/types/eventTypes";
+import { DateTime } from "luxon";
+import { FaQuoteLeft, FaQuoteRight } from "react-icons/fa6";
+
 import { ViewOptions } from "@/features/events/event-list-client";
 import {
   getFourCharMonthFromLuxon,
@@ -5,12 +10,6 @@ import {
   isValidIsoDate,
   seasonalTerms,
 } from "@/helpers/dateFns";
-
-import { PublicEventPreviewData } from "@/types/eventTypes";
-
-import { DateTime } from "luxon";
-import { JSX } from "react";
-import { FaQuoteLeft, FaQuoteRight } from "react-icons/fa6";
 
 export function getGroupKeyFromEvent(
   event: PublicEventPreviewData,

@@ -1,6 +1,7 @@
-import { cn } from "@/helpers/utilsFns";
 import { ReactNode } from "react";
 import { FaCheckCircle } from "react-icons/fa";
+
+import { cn } from "@/helpers/utilsFns";
 
 interface FormSuccessProps {
   message?: ReactNode;

@@ -1,22 +1,23 @@
 "use client";
 
-import { Card } from "@/components/ui/card";
-import { cn } from "@/helpers/utilsFns";
+import React, { useEffect, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { OpenCallCardProps } from "@/types/openCallTypes";
+import { api } from "~/convex/_generated/api";
+import { useMutation, usePreloadedQuery } from "convex/react";
+import { motion } from "framer-motion";
 import { CheckCircleIcon, EyeOff, MapPin } from "lucide-react";
-
 import { FaBookmark, FaRegBookmark } from "react-icons/fa6";
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
-import { ApplyButton } from "@/features/events/event-apply-btn";
-import { OpenCallCardProps } from "@/types/openCallTypes";
-
+import { Card } from "@/components/ui/card";
 import { ChartWrapper } from "@/components/ui/charts/chart-wrapper";
 import { DraftPendingBanner } from "@/components/ui/draft-pending-banner";
 import { EventOrgLogo } from "@/components/ui/event-org-logo";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToggleListAction } from "@/features/artists/helpers/listActions";
 import EventDates from "@/features/events/components/event-dates";
 import { EventCard } from "@/features/events/components/events-card";
+import { ApplyButton } from "@/features/events/event-apply-btn";
 import OpenCallCard from "@/features/events/open-calls/components/open-call-card";
 import { getOpenCallStatus } from "@/features/events/open-calls/helpers/openCallStatus";
 import { OrganizerCard } from "@/features/organizers/components/organizer-card";
@@ -24,11 +25,7 @@ import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-con
 import { getEventCategoryLabel, getEventTypeLabel } from "@/helpers/eventFns";
 import { getFormattedLocationString } from "@/helpers/locations";
 import { getUserFontSizePref } from "@/helpers/stylingFns";
-import { useMutation, usePreloadedQuery } from "convex/react";
-import { motion } from "framer-motion";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import React, { useEffect, useState } from "react";
-import { api } from "~/convex/_generated/api";
+import { cn } from "@/helpers/utilsFns";
 
 const tabs = ["opencall", "event", "organizer"];
 

@@ -1,10 +1,13 @@
 "use client";
 
+import { EventCategory, EventType } from "@/types/eventTypes";
+
 import LeafletMapIcon from "@/components/ui/map-icon";
 import ClickToZoom from "@/features/wrapper-elements/map/clickToZoom";
 import { cn } from "@/helpers/utilsFns";
-import { EventCategory, EventType } from "@/types/eventTypes";
+
 import "leaflet/dist/leaflet.css";
+
 import { useMemo, useState } from "react";
 import { FaMapLocationDot } from "react-icons/fa6";
 import { MapContainer, TileLayer } from "react-leaflet";

@@ -1,11 +1,27 @@
 "use client";
 
+import { ReactNode, useCallback, useEffect, useRef, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { RegisterSchema } from "@/schemas/auth";
+import { accountTypeOptions } from "@/types/user";
+import { useAuthActions } from "@convex-dev/auth/react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { api } from "~/convex/_generated/api";
+import { AccountType } from "~/convex/schema";
+import { useConvex, useMutation } from "convex/react";
+import { ConvexError } from "convex/values";
+import { AnimatePresence, motion } from "framer-motion";
+import { REGEXP_ONLY_DIGITS } from "input-otp";
+import { ExternalLink, LoaderCircle } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { v4 as uuidv4 } from "uuid";
+import { z } from "zod";
+
 import { FormError } from "@/components/form-error";
 import { FormSuccess } from "@/components/form-success";
 import { MultiSelect } from "@/components/multi-select";
-import { useAuthActions } from "@convex-dev/auth/react";
-import { AnimatePresence, motion } from "framer-motion";
-
 import ResendTimer from "@/components/resend-timer";
 import { Button } from "@/components/ui/button";
 import {
@@ -31,27 +47,10 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
-
 import { PasswordInput } from "@/components/ui/password-input";
 import SmileySvg from "@/features/auth/components/smiley-svg";
 import SpeechBubble from "@/features/auth/components/speech-bubble";
 import { onEmailChange } from "@/helpers/privacyFns";
-import { RegisterSchema } from "@/schemas/auth";
-import { accountTypeOptions } from "@/types/user";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useConvex, useMutation } from "convex/react";
-import { ConvexError } from "convex/values";
-import { REGEXP_ONLY_DIGITS } from "input-otp";
-import { ExternalLink, LoaderCircle } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { ReactNode, useCallback, useEffect, useRef, useState } from "react";
-import { useForm } from "react-hook-form";
-import { v4 as uuidv4 } from "uuid";
-import { z } from "zod";
-import { api } from "~/convex/_generated/api";
-import { AccountType } from "~/convex/schema";
 
 interface RegisterFormProps {
   // setState: (state: SignInFlow) => void

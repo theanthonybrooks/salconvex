@@ -1,5 +1,10 @@
 "use client";
 
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import Image from "next/image";
+import { motion } from "framer-motion";
+import { TiArrowLeftOutline, TiArrowRightOutline } from "react-icons/ti";
+
 import {
   Select,
   SelectContent,
@@ -9,10 +14,7 @@ import {
 } from "@/components/ui/select";
 import { ViewOptions } from "@/features/events/event-list-client";
 import { cn } from "@/helpers/utilsFns";
-import { motion } from "framer-motion";
-import Image from "next/image";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { TiArrowLeftOutline, TiArrowRightOutline } from "react-icons/ti";
+
 interface BasicPaginationProps {
   page: number;
   totalPages: number;

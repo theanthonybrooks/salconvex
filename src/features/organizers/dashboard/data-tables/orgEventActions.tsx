@@ -1,9 +1,10 @@
 "use client";
 
-import { validOCVals } from "@/constants/openCallConsts";
-import { OrgEventData } from "@/types/organizer";
 import { useRouter } from "next/navigation";
+import { OrgEventData } from "@/types/organizer";
 import slugify from "slugify";
+
+import { validOCVals } from "@/constants/openCallConsts";
 
 interface OrgEventActionsProps {
   event: OrgEventData;

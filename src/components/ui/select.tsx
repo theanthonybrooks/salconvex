@@ -1,6 +1,7 @@
 "use client";
-//TODO: Add the userPref check to this component (and others) to ensure that the fontSize is set to the user's preference
 
+//TODO: Add the userPref check to this component (and others) to ensure that the fontSize is set to the user's preference
+import * as React from "react";
 import * as SelectPrimitive from "@radix-ui/react-select";
 import {
   Check,
@@ -9,10 +10,9 @@ import {
   DollarSign,
   LucideIcon,
 } from "lucide-react";
-import * as React from "react";
+import { IconType } from "react-icons";
 
 import { cn } from "@/helpers/utilsFns";
-import { IconType } from "react-icons";
 
 const Select = SelectPrimitive.Root;
 

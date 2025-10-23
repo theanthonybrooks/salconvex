@@ -1,7 +1,8 @@
 "use client";
 
-import { Skeleton } from "@/components/ui/skeleton";
 import dynamic from "next/dynamic";
+
+import { Skeleton } from "@/components/ui/skeleton";
 
 // Custom fallback skeleton
 const CalendarSkeleton = (

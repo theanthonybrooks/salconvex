@@ -1,11 +1,12 @@
 "use client";
 
 import { useDashboard } from "@/app/(pages)/dashboard/_components/dashboard-context";
+import { LucideIcon } from "lucide-react";
+import { IconType } from "react-icons";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "@/components/ui/custom-link";
 import { cn } from "@/helpers/utilsFns";
-import { LucideIcon } from "lucide-react";
-import { IconType } from "react-icons";
 
 type PreviewCardProps = {
   fontSize?: string;

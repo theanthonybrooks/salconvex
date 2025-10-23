@@ -1,10 +1,10 @@
 "use client";
 
-import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
 import * as React from "react";
+import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
+import { FaCheck } from "react-icons/fa";
 
 import { cn } from "@/helpers/utilsFns";
-import { FaCheck } from "react-icons/fa";
 
 const Checkbox = React.forwardRef<
   React.ComponentRef<typeof CheckboxPrimitive.Root>,

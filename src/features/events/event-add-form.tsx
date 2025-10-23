@@ -1,7 +1,5 @@
 //TODO: Replace current loading/reloading logic with queries first, then using that data in the default values. Reset when the search param is changed. perhaps also just combine multiple forms rather than one giant one. I don't know why I went that approach anyways?
 
-import HorizontalLinearStepper from "@/components/ui/stepper";
-import { User } from "@/types/user";
 import {
   Dispatch,
   ReactNode,
@@ -12,8 +10,22 @@ import {
   useRef,
   useState,
 } from "react";
-import { FormProvider, useForm, useWatch } from "react-hook-form";
+import { EnrichedEvent, EventCategory } from "@/types/eventTypes";
+import { OpenCallState } from "@/types/openCallTypes";
+import { User } from "@/types/user";
+import { getExternalRedirectHtml } from "@/utils/loading-page-html";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { api } from "~/convex/_generated/api";
+import { Doc, Id } from "~/convex/_generated/dataModel";
+import { makeUseQueryWithStatus } from "convex-helpers/react";
+import { useQuery } from "convex-helpers/react/cache";
+import { useQueries } from "convex-helpers/react/cache/hooks";
+import { useAction, useMutation } from "convex/react";
+import { debounce, merge } from "lodash";
+import { FormProvider, Path, useForm, useWatch } from "react-hook-form";
 import { toast } from "react-toastify";
+import slugify from "slugify";
+import { z } from "zod";
 
 // import { eventDefaultValues } from "@/features/events/data/eventDefaultData"
 
@@ -27,6 +39,16 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { DialogCloseBtn } from "@/components/ui/dialog-close-btn";
+import HorizontalLinearStepper from "@/components/ui/stepper";
+import SubmissionFormEventStep1 from "@/features/events/submission-form/steps/submission-form-event-1";
+import SubmissionFormEventStep2 from "@/features/events/submission-form/steps/submission-form-event-2";
+import SubmissionFormOC1 from "@/features/events/submission-form/steps/submission-form-oc-1";
+import SubmissionFormOC2 from "@/features/events/submission-form/steps/submission-form-oc-2";
+import SubmissionFormOrgStep from "@/features/events/submission-form/steps/submission-form-org-1";
+import SubmissionFormOrgStep2 from "@/features/events/submission-form/steps/submission-form-org-2";
+import { SubmissionFormRecapDesktop } from "@/features/events/submission-form/steps/submission-form-recap-desktop";
+import { SubmissionFormRecapMobile } from "@/features/events/submission-form/steps/submission-form-recap-mobile";
 import {
   eventWithOCSchema,
   getEventDetailsSchema,
@@ -37,37 +59,14 @@ import {
   orgDetailsSchema,
   step1Schema,
 } from "@/features/organizers/schemas/event-add-schema";
-
-import { DialogCloseBtn } from "@/components/ui/dialog-close-btn";
-import { validOCVals } from "@/constants/openCallConsts";
-import SubmissionFormEventStep1 from "@/features/events/submission-form/steps/submission-form-event-1";
-import SubmissionFormEventStep2 from "@/features/events/submission-form/steps/submission-form-event-2";
-import SubmissionFormOC1 from "@/features/events/submission-form/steps/submission-form-oc-1";
-import SubmissionFormOC2 from "@/features/events/submission-form/steps/submission-form-oc-2";
-import SubmissionFormOrgStep from "@/features/events/submission-form/steps/submission-form-org-1";
-import SubmissionFormOrgStep2 from "@/features/events/submission-form/steps/submission-form-org-2";
-import { SubmissionFormRecapDesktop } from "@/features/events/submission-form/steps/submission-form-recap-desktop";
-import { SubmissionFormRecapMobile } from "@/features/events/submission-form/steps/submission-form-recap-mobile";
 import { toSeason, toYear, toYearMonth } from "@/helpers/dateFns";
 import { getEventCategoryLabel } from "@/helpers/eventFns";
 import { getOcPricing } from "@/helpers/pricingFns";
 import { cn } from "@/helpers/utilsFns";
+import { validOCVals } from "@/constants/openCallConsts";
 import { handleFileUrl, handleOrgFileUrl } from "@/lib/fileUploadFns";
 import { useDevice } from "@/providers/device-provider";
-import { EnrichedEvent, EventCategory } from "@/types/eventTypes";
-import { OpenCallState } from "@/types/openCallTypes";
-import { getExternalRedirectHtml } from "@/utils/loading-page-html";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { makeUseQueryWithStatus } from "convex-helpers/react";
-import { useQuery } from "convex-helpers/react/cache";
-import { useQueries } from "convex-helpers/react/cache/hooks";
-import { useAction, useMutation } from "convex/react";
-import { debounce, merge } from "lodash";
-import { Path } from "react-hook-form";
-import slugify from "slugify";
-import { z } from "zod";
-import { api } from "~/convex/_generated/api";
-import { Doc, Id } from "~/convex/_generated/dataModel";
+
 export const getSteps = (isAdmin: boolean = false) => [
   {
     id: 1,

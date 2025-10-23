@@ -1,10 +1,10 @@
 import { Link } from "@/components/ui/custom-link";
+import { DateWrapper } from "@/helpers/dateFns";
 import {
   infoEmail,
   lastUpdatedPrivacyRaw,
   siteUrl,
 } from "@/constants/siteInfo";
-import { DateWrapper } from "@/helpers/dateFns";
 
 export default function PrivacyPage() {
   return (

@@ -1,4 +1,16 @@
+import { useEffect, useRef, useState } from "react";
 import { currencies, Currency } from "@/app/data/currencies";
+import { OpenCallCategoryKey } from "@/types/openCallTypes";
+import { User } from "@/types/user";
+import FilePondPluginFileValidateSize from "filepond-plugin-file-validate-size";
+import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type";
+import { ArrowRight } from "lucide-react";
+import { registerPlugin } from "react-filepond";
+import { Controller, useFormContext } from "react-hook-form";
+
+import { MultiSelect } from "@/components/multi-select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { DebouncedControllerNumInput } from "@/components/ui/debounced-form-num-input";
 import { Label } from "@/components/ui/label";
 import { SearchMappedSelect } from "@/components/ui/mapped-select";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
@@ -11,25 +23,14 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { EventOCFormValues } from "@/features/events/event-add-form";
+import { getCurrencySymbol } from "@/helpers/currencyFns";
 import { cn } from "@/helpers/utilsFns";
-import { User } from "@/types/user";
-import FilePondPluginFileValidateSize from "filepond-plugin-file-validate-size";
-import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type";
-import { ArrowRight } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
-import { registerPlugin } from "react-filepond";
-import { Controller, useFormContext } from "react-hook-form";
-
-registerPlugin(FilePondPluginFileValidateSize, FilePondPluginFileValidateType);
-
-import { MultiSelect } from "@/components/multi-select";
-import { Checkbox } from "@/components/ui/checkbox";
-import { DebouncedControllerNumInput } from "@/components/ui/debounced-form-num-input";
 import { openCallCategoryFields } from "@/constants/openCallConsts";
 import { siteUrl } from "@/constants/siteInfo";
-import { getCurrencySymbol } from "@/helpers/currencyFns";
-import { OpenCallCategoryKey } from "@/types/openCallTypes";
+
 import "filepond/dist/filepond.min.css";
+
+registerPlugin(FilePondPluginFileValidateSize, FilePondPluginFileValidateType);
 
 interface SubmissionFormOC2Props {
   user: User | undefined;

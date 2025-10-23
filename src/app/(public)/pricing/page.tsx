@@ -1,12 +1,13 @@
 "use client";
 
+import { usePreloadedQuery } from "convex/react";
+
 import { Separator } from "@/components/ui/separator";
-import { pricingFaqs } from "@/constants/accordions";
 import { AccordionComponent } from "@/features/homepage/accordion-component";
 import Pricing from "@/features/homepage/pricing";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { getUserFontSizePref } from "@/helpers/stylingFns";
-import { usePreloadedQuery } from "convex/react";
+import { pricingFaqs } from "@/constants/accordions";
 
 export default function PricingPage() {
   const { preloadedUserData } = useConvexPreload();

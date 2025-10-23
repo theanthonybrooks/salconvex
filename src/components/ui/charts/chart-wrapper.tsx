@@ -1,9 +1,10 @@
-import { makeUseQueryWithStatus } from "convex-helpers/react";
-import { useQueries } from "convex-helpers/react/cache/hooks";
 import { useState } from "react";
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 import { api } from "~/convex/_generated/api";
 import { Id } from "~/convex/_generated/dataModel";
+import { makeUseQueryWithStatus } from "convex-helpers/react";
+import { useQueries } from "convex-helpers/react/cache/hooks";
+import { LoaderCircle } from "lucide-react";
+import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 
 import {
   Card,
@@ -22,7 +23,6 @@ import {
 } from "@/components/ui/chart";
 import { SelectSimple } from "@/components/ui/select";
 import { cn } from "@/helpers/utilsFns";
-import { LoaderCircle } from "lucide-react";
 
 export const chartTimeOptions = [
   { value: "90d", label: "Last 3 months" },

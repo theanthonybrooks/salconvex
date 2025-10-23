@@ -1,8 +1,8 @@
 // app/(pages)/dashboard/_components/dashboard-context.tsx
 "use client";
 
-import { useSearchParams } from "next/navigation";
 import React, { createContext, useContext, useState } from "react";
+import { useSearchParams } from "next/navigation";
 
 type DashboardContextType = {
   isSidebarCollapsed: boolean;

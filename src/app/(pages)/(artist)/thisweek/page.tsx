@@ -1,6 +1,7 @@
+import { Metadata } from "next";
+
 import SalHeader from "@/components/ui/headers/sal-header";
 import ClientThisWeekList from "@/features/events/thisweek-list-client";
-import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "This Week",

@@ -1,5 +1,4 @@
-import { formatDisplayUrl } from "@/helpers/linkFns";
-import { cn } from "@/helpers/utilsFns";
+import { LinksType } from "~/convex/schema";
 import { Globe, Phone } from "lucide-react";
 import {
   FaFacebookF,
@@ -14,7 +13,9 @@ import {
 } from "react-icons/fa6";
 import { formatPhoneNumberIntl } from "react-phone-number-input";
 import truncateMiddle from "truncate-middle";
-import { LinksType } from "~/convex/schema";
+
+import { formatDisplayUrl } from "@/helpers/linkFns";
+import { cn } from "@/helpers/utilsFns";
 
 type EventLinks = LinksType & {
   sameAsOrganizer?: boolean;

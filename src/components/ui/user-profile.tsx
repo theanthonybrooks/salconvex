@@ -1,5 +1,28 @@
 "use client";
 
+import { useState } from "react";
+import Link from "next/link";
+import { api } from "~/convex/_generated/api";
+// import { SignOutButton, useUser } from "@clerk/nextjs";
+import { makeUseQueryWithStatus } from "convex-helpers/react";
+import { useQueries } from "convex-helpers/react/cache";
+import { usePreloadedQuery } from "convex/react";
+import {
+  Bell,
+  HelpCircle,
+  Lock,
+  LogOut,
+  LucideLayoutDashboard,
+  PaintRoller,
+  Settings,
+  Sparkles,
+  Squirrel,
+  User,
+  Users2,
+} from "lucide-react";
+import { FaUserNinja } from "react-icons/fa6";
+import { PiPiggyBank } from "react-icons/pi";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,28 +42,6 @@ import { TooltipSimple } from "@/components/ui/tooltip";
 import SignOutBtn from "@/features/auth/components/sign-out-btn";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { cn } from "@/helpers/utilsFns";
-import { usePreloadedQuery } from "convex/react";
-// import { SignOutButton, useUser } from "@clerk/nextjs";
-import { makeUseQueryWithStatus } from "convex-helpers/react";
-import { useQueries } from "convex-helpers/react/cache";
-import {
-  Bell,
-  HelpCircle,
-  Lock,
-  LogOut,
-  LucideLayoutDashboard,
-  PaintRoller,
-  Settings,
-  Sparkles,
-  Squirrel,
-  User,
-  Users2,
-} from "lucide-react";
-import Link from "next/link";
-import { useState } from "react";
-import { FaUserNinja } from "react-icons/fa6";
-import { PiPiggyBank } from "react-icons/pi";
-import { api } from "~/convex/_generated/api";
 
 interface UserProfileProps {
   // user: UserType;
@@ -104,7 +105,7 @@ export function UserProfile({
               >
                 <Bell className="size-6" />
                 {isAdmin && totalPending > 0 && (
-                  <div className="absolute -bottom-1 -left-2 flex size-5 items-center justify-center rounded-full border-1.5 border-foreground bg-card text-2xs font-bold hover:scale-105 hover:cursor-pointer">
+                  <div className="absolute -bottom-[0.05rem] -left-1 flex size-5 items-center justify-center rounded-full border-1.5 border-foreground bg-card text-2xs font-bold hover:scale-105 hover:cursor-pointer">
                     {totalPending}
                   </div>
                 )}
@@ -141,7 +142,6 @@ export function UserProfile({
               )}
               {!pendingEvents && !pendingOpenCalls && (
                 <DropdownMenuItem className="w-full">
-                  {" "}
                   No New Notifications
                 </DropdownMenuItem>
               )}

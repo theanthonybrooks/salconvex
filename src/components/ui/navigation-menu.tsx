@@ -1,10 +1,10 @@
+import * as React from "react";
 import * as NavigationMenuPrimitive from "@radix-ui/react-navigation-menu";
 import { cva } from "class-variance-authority";
-import * as React from "react";
+import { FaChevronDown } from "react-icons/fa";
 import { TiArrowSortedDown } from "react-icons/ti";
 
 import { cn } from "@/helpers/utilsFns";
-import { FaChevronDown } from "react-icons/fa";
 
 interface NavigationMenuProps
   extends React.ComponentPropsWithoutRef<typeof NavigationMenuPrimitive.Root> {
@@ -47,7 +47,7 @@ NavigationMenuList.displayName = NavigationMenuPrimitive.List.displayName;
 const NavigationMenuItem = NavigationMenuPrimitive.Item;
 
 const navigationMenuTriggerStyle = cva(
-  "group inline-flex h-11 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-base  font-semibold transition-colors hover:bg-card/30 hover:text-foreground focus-visible:border-black/10 focus:text-foreground focus:outline-hidden disabled:pointer-events-none disabled:opacity-50 data-active:bg-accent/50 data-[state=open]:bg-salYellowLt light:data-[state=open]:bg-dashboardBgLt ",
+  "focus:outline-hidden data-active:bg-accent/50 group inline-flex h-11 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-base font-semibold transition-colors hover:bg-card/30 hover:text-foreground focus:text-foreground focus-visible:border-black/10 disabled:pointer-events-none disabled:opacity-50 data-[state=open]:bg-salYellowLt light:data-[state=open]:bg-dashboardBgLt",
 );
 
 type NavigationMenuTriggerProps = React.ComponentPropsWithoutRef<
@@ -132,7 +132,7 @@ const NavigationMenuViewport = React.forwardRef<
   >
     <NavigationMenuPrimitive.Viewport
       className={cn(
-        "shadow-slga2 relative mt-1.5 h-[var(--radix-navigation-menu-viewport-height)] w-full origin-top rounded-md border-2 bg-popover text-popover-foreground " +
+        "relative mt-1.5 h-[var(--radix-navigation-menu-viewport-height)] w-full origin-top rounded-md border-2 bg-popover text-popover-foreground shadow-slga2 " +
           "data-[state=open]:animate-in data-[state=closed]:animate-out" +
           "data-[state=closed]:slide-out-to-top-2 data-[state=open]:slide-in-from-top-2",
         className,

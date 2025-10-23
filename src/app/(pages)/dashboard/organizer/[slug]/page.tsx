@@ -1,10 +1,10 @@
-import { AdminEventForm } from "@/features/events/submission-form/admin-organizer-form";
-import { OrganizerDashboardTableWrapper } from "@/features/organizer/dashboard/org-dashboard-table-wrapper";
+import { redirect } from "next/navigation";
 import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
+import { api } from "~/convex/_generated/api";
 import { fetchQuery } from "convex/nextjs";
 
-import { redirect } from "next/navigation";
-import { api } from "~/convex/_generated/api";
+import { AdminEventForm } from "@/features/events/submission-form/admin-organizer-form";
+import { OrganizerDashboardTableWrapper } from "@/features/organizer/dashboard/org-dashboard-table-wrapper";
 
 export default async function OrganizerPage({
   params,

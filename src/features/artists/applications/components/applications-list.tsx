@@ -1,9 +1,9 @@
 "use client";
 
-import { SubPage } from "@/types/artist";
-import { useQuery } from "convex-helpers/react/cache";
 import Link from "next/link";
+import { SubPage } from "@/types/artist";
 import { api } from "~/convex/_generated/api";
+import { useQuery } from "convex-helpers/react/cache";
 
 interface ApplicationsListProps {
   pageType: SubPage;

@@ -1,8 +1,3 @@
-import { Button } from "@/components/ui/button";
-import { cn } from "@/helpers/utilsFns";
-import Typography from "@mui/material/Typography";
-import { motion } from "framer-motion";
-import { Check, CheckCircle2, LoaderCircle } from "lucide-react";
 import {
   createContext,
   Dispatch,
@@ -13,9 +8,14 @@ import {
   useEffect,
   useRef,
 } from "react";
+import Typography from "@mui/material/Typography";
+import { motion } from "framer-motion";
+import { Check, CheckCircle2, LoaderCircle } from "lucide-react";
 import { FaCheckDouble } from "react-icons/fa6";
-
 import { z } from "zod";
+
+import { Button } from "@/components/ui/button";
+import { cn } from "@/helpers/utilsFns";
 
 interface StepperContextValue {
   scrollRef: React.RefObject<HTMLDivElement | null>;

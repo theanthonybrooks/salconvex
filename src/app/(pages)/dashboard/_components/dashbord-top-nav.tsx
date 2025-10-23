@@ -1,18 +1,19 @@
 "use client";
 
+import { useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { User } from "@/types/user";
+import { UserPrefsType } from "~/convex/schema";
+import { Unauthenticated } from "convex/react";
+import { motion, useMotionValueEvent, useScroll } from "framer-motion";
+
 import FullPageNav from "@/components/full-page-nav";
 import { Button } from "@/components/ui/button";
 import { UserProfile } from "@/components/ui/user-profile";
-import { dashboardNavItems } from "@/constants/links";
 import { Search } from "@/features/Sidebar/Search";
+import { dashboardNavItems } from "@/constants/links";
 import { useDevice } from "@/providers/device-provider";
-import { User } from "@/types/user";
-import { Unauthenticated } from "convex/react";
-import { motion, useMotionValueEvent, useScroll } from "framer-motion";
-import Image from "next/image";
-import Link from "next/link";
-import { useState } from "react";
-import { UserPrefsType } from "~/convex/schema";
 
 interface NavBarProps {
   userId: string | undefined;

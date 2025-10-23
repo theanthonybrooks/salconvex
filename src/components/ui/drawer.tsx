@@ -1,10 +1,10 @@
 "use client";
 
 import * as React from "react";
+import { X } from "lucide-react";
 import { Drawer as DrawerPrimitive } from "vaul";
 
 import { cn } from "@/helpers/utilsFns";
-import { X } from "lucide-react";
 
 interface DrawerContentProps
   extends React.ComponentPropsWithoutRef<typeof DrawerPrimitive.Content> {

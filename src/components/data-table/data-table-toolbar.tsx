@@ -1,10 +1,15 @@
 "use client";
 
-import { Table } from "@tanstack/react-table";
-
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { TableTypes } from "@/types/tanstack-table";
+import { Table } from "@tanstack/react-table";
+import { api } from "~/convex/_generated/api";
+import { Id } from "~/convex/_generated/dataModel";
+import { useMutation } from "convex/react";
+import { X } from "lucide-react";
+import { TbFilterX } from "react-icons/tb";
+import { toast } from "react-toastify";
 
 import {
   accountTypeOptions,
@@ -18,18 +23,13 @@ import {
 } from "@/components/data-table/data-table-constants";
 import { DataTableViewOptions } from "@/components/data-table/data-table-view-options";
 import { AlertDialogSimple } from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { TooltipSimple } from "@/components/ui/tooltip";
-import { eventTypeOptions } from "@/constants/eventConsts";
 import { cn } from "@/helpers/utilsFns";
+import { eventTypeOptions } from "@/constants/eventConsts";
 import { useDevice } from "@/providers/device-provider";
-import { TableTypes } from "@/types/tanstack-table";
-import { useMutation } from "convex/react";
-import { X } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { TbFilterX } from "react-icons/tb";
-import { toast } from "react-toastify";
-import { api } from "~/convex/_generated/api";
-import { Id } from "~/convex/_generated/dataModel";
+
 import { DataTableFacetedFilter } from "./data-table-faceted-filter";
 
 interface DataTableToolbarProps<TData> {

@@ -1,13 +1,14 @@
 "use client";
 
-import { Separator } from "@/components/ui/separator";
-import { dashboardNavItems } from "@/constants/links";
-import { ViewOptions } from "@/features/events/event-list-client";
-import { TheListFilters } from "@/features/thelist/components/filters/the-list-filters";
 import { MergedEventPreviewData } from "@/types/eventTypes";
 import { Filters, SearchParams, SortOptions } from "@/types/thelist";
 import { User } from "@/types/user";
 import { UserPrefsType } from "~/convex/schema";
+
+import { Separator } from "@/components/ui/separator";
+import { ViewOptions } from "@/features/events/event-list-client";
+import { TheListFilters } from "@/features/thelist/components/filters/the-list-filters";
+import { dashboardNavItems } from "@/constants/links";
 
 interface Props {
   user: User | null;

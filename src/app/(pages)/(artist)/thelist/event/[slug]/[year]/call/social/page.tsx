@@ -1,12 +1,12 @@
-import OpenCallSocials from "@/app/(pages)/(artist)/thelist/components/open-call-socials";
-import { capitalize } from "@/helpers/utilsFns";
-import { OpenCallData } from "@/types/openCallTypes";
-import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
-
-import { fetchQuery } from "convex/nextjs";
 import { Metadata } from "next";
 import { redirect } from "next/navigation";
+import OpenCallSocials from "@/app/(pages)/(artist)/thelist/components/open-call-socials";
+import { OpenCallData } from "@/types/openCallTypes";
+import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
 import { api } from "~/convex/_generated/api";
+import { fetchQuery } from "convex/nextjs";
+
+import { capitalize } from "@/helpers/utilsFns";
 
 type Props = {
   params: Promise<{ slug: string; year: string }>;

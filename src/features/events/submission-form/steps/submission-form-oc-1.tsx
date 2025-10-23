@@ -1,7 +1,22 @@
+import { useEffect, useState } from "react";
 import { currencies, Currency } from "@/app/data/currencies";
+import {
+  CallFormat,
+  EligibilityType,
+  openCallFileType,
+} from "@/types/openCallTypes";
+import { User } from "@/types/user";
+import FilePondPluginFileValidateSize from "filepond-plugin-file-validate-size";
+import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type";
+import { ArrowRight } from "lucide-react";
+import { registerPlugin } from "react-filepond";
+import { Controller, useFormContext } from "react-hook-form";
+import { Country } from "world-countries";
+
 import { Link } from "@/components/ui/custom-link";
 import { OcCustomDatePicker } from "@/components/ui/date-picker/oc-date-picker";
 import { DebouncedControllerInput } from "@/components/ui/debounced-form-input";
+import { DebouncedControllerNumInput } from "@/components/ui/debounced-form-num-input";
 import { Label } from "@/components/ui/label";
 import { SearchMappedSelect } from "@/components/ui/mapped-select";
 import { SearchMappedMultiSelect } from "@/components/ui/mapped-select-multi";
@@ -15,39 +30,26 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import {
-  eligibilityOptionValues,
-  openCallLinkFormatOptions,
-} from "@/constants/openCallConsts";
-import { siteUrl } from "@/constants/siteInfo";
 import { EventOCFormValues } from "@/features/events/event-add-form";
-import { enhancedGroupedCountries } from "@/helpers/locations";
-import { cn } from "@/helpers/utilsFns";
-import {
-  CallFormat,
-  EligibilityType,
-  openCallFileType,
-} from "@/types/openCallTypes";
-import { User } from "@/types/user";
-import FilePondPluginFileValidateSize from "filepond-plugin-file-validate-size";
-import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type";
-import { ArrowRight } from "lucide-react";
-import { useEffect, useState } from "react";
-import { registerPlugin } from "react-filepond";
-import { Controller, useFormContext } from "react-hook-form";
-import { Country } from "world-countries";
-
-registerPlugin(FilePondPluginFileValidateSize, FilePondPluginFileValidateType);
-
-import { DebouncedControllerNumInput } from "@/components/ui/debounced-form-num-input";
 import { ExternalLinksInput } from "@/features/events/open-calls/components/external-links-input";
 import { FilePondInput } from "@/features/files/filepond";
 import { hasId, OpenCallFilesTable } from "@/features/files/form-file-list";
 import { OpenCallStep1 } from "@/features/organizers/schemas/event-add-schema";
 import { autoHttps } from "@/helpers/linkFns";
+import { enhancedGroupedCountries } from "@/helpers/locations";
+import { cn } from "@/helpers/utilsFns";
+import {
+  eligibilityOptionValues,
+  openCallLinkFormatOptions,
+} from "@/constants/openCallConsts";
+import { siteUrl } from "@/constants/siteInfo";
+
 import "filepond/dist/filepond.min.css";
-import { DateTime } from "luxon";
+
 import { Id } from "~/convex/_generated/dataModel";
+import { DateTime } from "luxon";
+
+registerPlugin(FilePondPluginFileValidateSize, FilePondPluginFileValidateType);
 
 interface SubmissionFormOC1Props {
   user: User | undefined;

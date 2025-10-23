@@ -1,5 +1,7 @@
-import { Column } from "@tanstack/react-table";
 import * as React from "react";
+import { Column } from "@tanstack/react-table";
+import { FaCheck } from "react-icons/fa";
+import { TbFilterPlus } from "react-icons/tb";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -19,8 +21,6 @@ import {
 } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/helpers/utilsFns";
-import { FaCheck } from "react-icons/fa";
-import { TbFilterPlus } from "react-icons/tb";
 
 interface DataTableFacetedFilterProps<TData, TValue> {
   className?: string;

@@ -1,5 +1,25 @@
 "use client";
 
+import { usePathname, useRouter } from "next/navigation";
+import { MergedEventPreviewData, PostStatus } from "@/types/eventTypes";
+import { User } from "@/types/user";
+import { api } from "~/convex/_generated/api";
+import { UserPrefsType } from "~/convex/schema";
+import { useMutation } from "convex/react";
+import {
+  CheckCircleIcon,
+  CircleDollarSignIcon,
+  EyeOff,
+  Info,
+} from "lucide-react";
+import { FaRegCheckSquare } from "react-icons/fa";
+import {
+  FaBookmark,
+  FaMapLocationDot,
+  FaRegBookmark,
+  FaRegSquare,
+} from "react-icons/fa6";
+
 import { Card } from "@/components/ui/card";
 import { EventOrgLogo } from "@/components/ui/event-org-logo";
 import { LinkList } from "@/components/ui/link-list";
@@ -22,29 +42,9 @@ import {
   getEventTypeLabel,
 } from "@/helpers/eventFns";
 import { RichTextDisplay } from "@/helpers/richTextFns";
-import { getCallFormatLabel } from "@/lib/openCallFns";
-
 import { getUserFontSizePref } from "@/helpers/stylingFns";
 import { cn } from "@/helpers/utilsFns";
-import { MergedEventPreviewData, PostStatus } from "@/types/eventTypes";
-import { User } from "@/types/user";
-import { useMutation } from "convex/react";
-import {
-  CheckCircleIcon,
-  CircleDollarSignIcon,
-  EyeOff,
-  Info,
-} from "lucide-react";
-import { usePathname, useRouter } from "next/navigation";
-import { FaRegCheckSquare } from "react-icons/fa";
-import {
-  FaBookmark,
-  FaMapLocationDot,
-  FaRegBookmark,
-  FaRegSquare,
-} from "react-icons/fa6";
-import { api } from "~/convex/_generated/api";
-import { UserPrefsType } from "~/convex/schema";
+import { getCallFormatLabel } from "@/lib/openCallFns";
 
 export interface EventCardPreviewProps {
   event: MergedEventPreviewData;

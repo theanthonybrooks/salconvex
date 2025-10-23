@@ -1,4 +1,7 @@
+import { z } from "zod";
+
 import { eventStateValues } from "@/components/data-table/data-table-constants";
+import { cleanHtml } from "@/helpers/richTextFns";
 import {
   eventCategoryValues,
   eventFormatValues,
@@ -10,7 +13,6 @@ import {
   callTypeValues,
   validOCVals,
 } from "@/constants/openCallConsts";
-import { cleanHtml } from "@/helpers/richTextFns";
 import {
   domainRegex,
   isValidFacebook,
@@ -20,7 +22,6 @@ import {
   isValidVK,
   toMutableEnum,
 } from "@/lib/zodFns";
-import { z } from "zod";
 
 const locationBase = z.object({
   full: z.string().min(3, "Location is required"),

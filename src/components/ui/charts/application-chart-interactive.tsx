@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { LoaderCircle } from "lucide-react";
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 
 import {
@@ -25,7 +26,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { LoaderCircle } from "lucide-react";
 
 export const description = "An interactive area chart";
 

@@ -1,18 +1,8 @@
-import {
-  RecapCover,
-  RecapEndCover,
-  RecapLastPage,
-} from "@/features/events/ui/thisweek-recap/recap-cover";
-import RecapPost from "@/features/events/ui/thisweek-recap/recap-post";
-import { formatCondensedDateRange } from "@/helpers/dateFns";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useFilteredEventsQuery } from "@/hooks/use-filtered-events-query";
 import { SortOptions } from "@/types/thelist";
-import { useEffect, useMemo } from "react";
-
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { cn } from "@/helpers/utilsFns";
-import { waitForImagesToLoad } from "@/lib/imageFns";
+import { api } from "~/convex/_generated/api";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { useQueries } from "convex-helpers/react/cache";
 import { formatInTimeZone } from "date-fns-tz";
@@ -28,9 +18,18 @@ import {
   Image as ImageIcon,
   X,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
-import { api } from "~/convex/_generated/api";
+
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  RecapCover,
+  RecapEndCover,
+  RecapLastPage,
+} from "@/features/events/ui/thisweek-recap/recap-cover";
+import RecapPost from "@/features/events/ui/thisweek-recap/recap-post";
+import { formatCondensedDateRange } from "@/helpers/dateFns";
+import { cn } from "@/helpers/utilsFns";
+import { waitForImagesToLoad } from "@/lib/imageFns";
 
 interface ThisweekRecapPostProps {
   source: "thisweek" | "nextweek";

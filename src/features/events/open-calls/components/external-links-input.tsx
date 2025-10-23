@@ -1,6 +1,7 @@
-import { Trash2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { Trash2 } from "lucide-react";
 import { Controller, useFieldArray, useFormContext } from "react-hook-form";
+import { BiExpandVertical } from "react-icons/bi";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -11,7 +12,6 @@ import {
 import { DebouncedControllerInput } from "@/components/ui/debounced-form-input";
 import { autoHttps } from "@/helpers/linkFns";
 import { cn } from "@/helpers/utilsFns";
-import { BiExpandVertical } from "react-icons/bi";
 
 interface ExternalLinksInputProps {
   name: `openCall.requirements.links`;

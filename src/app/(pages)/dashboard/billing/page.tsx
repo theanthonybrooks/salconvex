@@ -1,8 +1,9 @@
-import BillingPage from "@/features/dashboard/billing";
-import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
-import { fetchQuery } from "convex/nextjs";
 import { redirect } from "next/navigation";
+import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
 import { api } from "~/convex/_generated/api";
+import { fetchQuery } from "convex/nextjs";
+
+import BillingPage from "@/features/dashboard/billing";
 
 export default async function AccountPage() {
   const token = await convexAuthNextjsToken();

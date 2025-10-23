@@ -1,7 +1,8 @@
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { ArrowLeft, ArrowRight } from "lucide-react";
-import Image from "next/image";
 import { useEffect, useState } from "react";
+import Image from "next/image";
+import { ArrowLeft, ArrowRight } from "lucide-react";
+
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 
 export function LightboxGallery({
   images,

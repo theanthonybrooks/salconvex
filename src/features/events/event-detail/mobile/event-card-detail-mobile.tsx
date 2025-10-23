@@ -1,15 +1,18 @@
 "use client";
 
-import { Card } from "@/components/ui/card";
-import { cn } from "@/helpers/utilsFns";
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { EventCardProps } from "@/types/eventTypes";
+import { api } from "~/convex/_generated/api";
+import { useMutation, usePreloadedQuery } from "convex/react";
+import { motion } from "framer-motion";
 import { CalendarClockIcon, EyeOff, MapPin } from "lucide-react";
-
 import { FaBookmark, FaRegBookmark } from "react-icons/fa6";
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
+import { Card } from "@/components/ui/card";
 import { DraftPendingBanner } from "@/components/ui/draft-pending-banner";
 import { EventOrgLogo } from "@/components/ui/event-org-logo";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToggleListAction } from "@/features/artists/helpers/listActions";
 import EventDates from "@/features/events/components/event-dates";
 import { EventCard } from "@/features/events/components/events-card";
@@ -20,12 +23,7 @@ import { isValidIsoDate } from "@/helpers/dateFns";
 import { getEventCategoryLabel, getEventTypeLabel } from "@/helpers/eventFns";
 import { getFormattedLocationString } from "@/helpers/locations";
 import { getUserFontSizePref } from "@/helpers/stylingFns";
-import { EventCardProps } from "@/types/eventTypes";
-import { useMutation, usePreloadedQuery } from "convex/react";
-import { motion } from "framer-motion";
-import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
-import { api } from "~/convex/_generated/api";
+import { cn } from "@/helpers/utilsFns";
 
 export const EventCardDetailMobile = (props: EventCardProps) => {
   const updateEventAnalytics = useMutation(

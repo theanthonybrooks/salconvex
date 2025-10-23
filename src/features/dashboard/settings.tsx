@@ -1,7 +1,66 @@
 "use client";
+
+import { useEffect, useState } from "react";
+import { useParams, usePathname, useRouter } from "next/navigation";
+import {
+  formatGmtOffsetSimple,
+  Timezone,
+  timezones,
+} from "@/app/data/timezones";
+import { useManageSubscription } from "@/hooks/use-manage-subscription";
+import {
+  UpdatePasswordSchema,
+  UpdatePasswordSchemaValues,
+  UpdateUserSchema,
+  UpdateUserSchemaValues,
+} from "@/schemas/auth";
+import { CookiePref } from "@/types/user";
+import { useAuthActions } from "@convex-dev/auth/react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { AlertDialogTitle } from "@radix-ui/react-alert-dialog";
+import { FontSizeIcon } from "@radix-ui/react-icons";
+import { api } from "~/convex/_generated/api";
+import { Id } from "~/convex/_generated/dataModel";
+import { FontSizeType, UserPrefsType } from "~/convex/schema";
+import {
+  useAction,
+  useMutation,
+  usePreloadedQuery,
+  useQuery,
+} from "convex/react";
+import { ConvexError } from "convex/values";
+import {
+  Clock,
+  Cookie,
+  Globe,
+  Info,
+  LoaderCircle,
+  Mail,
+  Mailbox,
+  MailSearch,
+  Palette,
+  Shield,
+} from "lucide-react";
+import { useTheme } from "next-themes";
+import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
+import { z } from "zod";
+
 import { FormError } from "@/components/form-error";
 import { FormSuccess } from "@/components/form-success";
+import { MultiSelect } from "@/components/multi-select";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import { CanceledBanner } from "@/components/ui/canceled-banner";
 import {
   Card,
   CardContent,
@@ -9,6 +68,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Link } from "@/components/ui/custom-link";
 import {
   Dialog,
   DialogContent,
@@ -26,19 +86,12 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import LogoUploader from "@/components/ui/logo-uploader";
+import { SearchMappedSelect } from "@/components/ui/mapped-select";
+import { PasswordChecklist } from "@/components/ui/password-checklist";
+import { PasswordInput } from "@/components/ui/password-input";
 import {
   Select,
   SelectContent,
@@ -47,69 +100,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  UpdatePasswordSchema,
-  UpdatePasswordSchemaValues,
-  UpdateUserSchema,
-  UpdateUserSchemaValues,
-} from "@/schemas/auth";
-import { useAuthActions } from "@convex-dev/auth/react";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useAction, useMutation, useQuery } from "convex/react";
-import { ConvexError } from "convex/values";
-import {
-  Clock,
-  Cookie,
-  Globe,
-  Info,
-  LoaderCircle,
-  Mail,
-  Mailbox,
-  MailSearch,
-  Palette,
-  Shield,
-} from "lucide-react";
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-
-import {
-  formatGmtOffsetSimple,
-  Timezone,
-  timezones,
-} from "@/app/data/timezones";
-import { MultiSelect } from "@/components/multi-select";
-import { CanceledBanner } from "@/components/ui/canceled-banner";
-import { Link } from "@/components/ui/custom-link";
-import LogoUploader from "@/components/ui/logo-uploader";
-import { SearchMappedSelect } from "@/components/ui/mapped-select";
-import { PasswordChecklist } from "@/components/ui/password-checklist";
-import { PasswordInput } from "@/components/ui/password-input";
+import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
+import { getUserFontSizePref } from "@/helpers/stylingFns";
+import { cn } from "@/helpers/utilsFns";
 import {
   NewsletterFrequency,
   newsletterFrequencyOptions,
   NewsletterType,
   newsletterTypeOptions,
 } from "@/constants/newsletterConsts";
-import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
-import { getUserFontSizePref } from "@/helpers/stylingFns";
-import { cn } from "@/helpers/utilsFns";
-import { useManageSubscription } from "@/hooks/use-manage-subscription";
 import { useDevice } from "@/providers/device-provider";
-import { CookiePref } from "@/types/user";
-import { AlertDialogTitle } from "@radix-ui/react-alert-dialog";
-import { FontSizeIcon } from "@radix-ui/react-icons";
-import { usePreloadedQuery } from "convex/react";
-import { useTheme } from "next-themes";
-import { useParams, usePathname, useRouter } from "next/navigation";
-import { toast } from "react-toastify";
-import { api } from "~/convex/_generated/api";
-import { Id } from "~/convex/_generated/dataModel";
-import { FontSizeType, UserPrefsType } from "~/convex/schema";
 
 export default function SettingsPage() {
   const pathname = usePathname();

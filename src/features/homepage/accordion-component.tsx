@@ -1,15 +1,17 @@
 "use client";
+
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import slugify from "slugify";
+
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/mapped-accordion";
-import { AccordionSection } from "@/constants/accordions";
 import { cn } from "@/helpers/utilsFns";
-import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
-import slugify from "slugify";
+import { AccordionSection } from "@/constants/accordions";
 
 interface AccordionComponentProps {
   src: AccordionSection;

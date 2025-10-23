@@ -1,10 +1,10 @@
+import { useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
+import { ControllerRenderProps, FieldPath, FieldValues } from "react-hook-form";
+
 import { Input, InputProps } from "@/components/ui/input";
 import { PasswordChecklist } from "@/components/ui/password-checklist";
 import { cn } from "@/helpers/utilsFns";
-import { Eye, EyeOff } from "lucide-react";
-import { useState } from "react";
-
-import { ControllerRenderProps, FieldPath, FieldValues } from "react-hook-form";
 
 export interface PasswordInputProps<
   TFieldValues extends FieldValues = FieldValues,

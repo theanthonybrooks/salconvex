@@ -1,6 +1,8 @@
+import { Dispatch, SetStateAction } from "react";
+
 import { TooltipSimple } from "@/components/ui/tooltip";
 import { cn } from "@/helpers/utilsFns";
-import { Dispatch, SetStateAction } from "react";
+
 import styles from "./hamburger-icon.module.css";
 
 interface MenuToggleProps {

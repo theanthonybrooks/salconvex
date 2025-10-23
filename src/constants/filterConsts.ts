@@ -1,11 +1,12 @@
-import { ViewOptions } from "@/features/events/event-list-client";
+import { Dispatch, SetStateAction } from "react";
 import {
   EventCategory,
   EventType,
   MergedEventPreviewData,
 } from "@/types/eventTypes";
 import { Filters, SearchParams, SortOptions } from "@/types/thelist";
-import { Dispatch, SetStateAction } from "react";
+
+import { ViewOptions } from "@/features/events/event-list-client";
 
 export const searchTypeOptions = [
   { value: "all", label: "All" },

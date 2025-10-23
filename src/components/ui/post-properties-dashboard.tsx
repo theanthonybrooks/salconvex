@@ -1,5 +1,7 @@
 "use client";
 
+import { Dispatch, SetStateAction } from "react";
+
 import { ColorPicker } from "@/components/ui/color-picker";
 import {
   Dialog,
@@ -9,7 +11,6 @@ import {
 } from "@/components/ui/dialog";
 import { SelectSimple } from "@/components/ui/select";
 import { cn } from "@/helpers/utilsFns";
-import { Dispatch, SetStateAction } from "react";
 
 interface PostPropertiesDashboardProps {
   fontSize: number;

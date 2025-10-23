@@ -1,20 +1,10 @@
 "use client";
+
 //TODO: Add view sync to the params. Otherwise when you refresh or go back, it resets to the default view.
-import { Button } from "@/components/ui/button";
-import { BasicPagination } from "@/components/ui/pagination2";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { SearchType } from "@/constants/filterConsts";
-import EventCardPreview from "@/features/events/event-card-preview";
-import { EventFilters } from "@/features/events/event-list-filters";
-import { getGroupKeyFromEvent } from "@/features/events/helpers/groupHeadings";
-import Pricing from "@/features/homepage/pricing";
-import { useArtistPreload } from "@/features/wrapper-elements/artist-preload-context";
-import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
-import { generateSkeletonGroups } from "@/helpers/skeletonFns";
-import { cn, setParamIfNotDefault } from "@/helpers/utilsFns";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import Image from "next/image";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useFilteredEventsQuery } from "@/hooks/use-filtered-events-query";
-import { useDevice } from "@/providers/device-provider";
 import {
   EventCategory,
   EventType,
@@ -28,10 +18,21 @@ import {
 } from "@/types/thelist";
 import { usePreloadedQuery } from "convex/react";
 import { motion } from "framer-motion";
-import Image from "next/image";
-import { useRouter, useSearchParams } from "next/navigation";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { BasicPagination } from "@/components/ui/pagination2";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import EventCardPreview from "@/features/events/event-card-preview";
+import { EventFilters } from "@/features/events/event-list-filters";
+import { getGroupKeyFromEvent } from "@/features/events/helpers/groupHeadings";
+import Pricing from "@/features/homepage/pricing";
+import { useArtistPreload } from "@/features/wrapper-elements/artist-preload-context";
+import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
+import { generateSkeletonGroups } from "@/helpers/skeletonFns";
+import { cn, setParamIfNotDefault } from "@/helpers/utilsFns";
+import { SearchType } from "@/constants/filterConsts";
+import { useDevice } from "@/providers/device-provider";
 
 export const viewOptionValues = [
   { value: "openCall", label: "Open Calls" },

@@ -1,19 +1,18 @@
 "use client";
 
-import { Skeleton } from "@/components/ui/skeleton";
-import { EventCardDetailDesktop } from "@/features/events/event-detail/desktop/event-card-detail-desktop";
-import { EventCardDetailMobile } from "@/features/events/event-detail/mobile/event-card-detail-mobile";
-
+import { useEffect } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { api } from "~/convex/_generated/api";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { useQuery } from "convex-helpers/react/cache";
 import { useQueries } from "convex-helpers/react/cache/hooks";
-
-import { SalBackNavigation } from "@/features/events/components/sal-back-navigation";
-import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { usePreloadedQuery } from "convex/react";
-import { useParams, useRouter } from "next/navigation";
-import { useEffect } from "react";
-import { api } from "~/convex/_generated/api";
+
+import { Skeleton } from "@/components/ui/skeleton";
+import { SalBackNavigation } from "@/features/events/components/sal-back-navigation";
+import { EventCardDetailDesktop } from "@/features/events/event-detail/desktop/event-card-detail-desktop";
+import { EventCardDetailMobile } from "@/features/events/event-detail/mobile/event-card-detail-mobile";
+import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 
 const EventDetail = () => {
   const { preloadedSubStatus, preloadedUserData } = useConvexPreload();

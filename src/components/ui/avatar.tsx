@@ -1,11 +1,11 @@
 "use client";
 
-import * as AvatarPrimitive from "@radix-ui/react-avatar";
 import * as React from "react";
+import { User } from "@/types/user";
+import * as AvatarPrimitive from "@radix-ui/react-avatar";
+import { User as UserIcon } from "lucide-react";
 
 import { cn } from "@/helpers/utilsFns";
-import { User } from "@/types/user";
-import { User as UserIcon } from "lucide-react";
 
 const Avatar = React.forwardRef<
   React.ComponentRef<typeof AvatarPrimitive.Root>,

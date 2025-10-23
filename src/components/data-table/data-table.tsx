@@ -1,5 +1,15 @@
 "use client";
 
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import {
+  ApplicationStatus,
+  NonNullApplicationStatus,
+  positiveApplicationStatuses,
+  statusBgColorMap,
+  statusColorMap,
+} from "@/types/applications";
+import { PageTypes, TableTypes } from "@/types/tanstack-table";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -15,7 +25,6 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
-import { useEffect, useMemo, useRef, useState } from "react";
 
 import {
   Table,
@@ -25,18 +34,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
 import { AdminToolbar } from "@/features/admin/dashboard/user-admin-toolbar";
 import { cn } from "@/helpers/utilsFns";
-import {
-  ApplicationStatus,
-  NonNullApplicationStatus,
-  positiveApplicationStatuses,
-  statusBgColorMap,
-  statusColorMap,
-} from "@/types/applications";
-import { PageTypes, TableTypes } from "@/types/tanstack-table";
-import { useSearchParams } from "next/navigation";
+
 import { DataTablePagination } from "./data-table-pagination";
 import { DataTableToolbar } from "./data-table-toolbar";
 
@@ -310,7 +310,7 @@ export function DataTable<TData, TValue>({
       <div className={cn("rounded-md border", className)}>
         <Table
           containerClassname={cn(
-            " rounded-md h-fit max-h-[calc(85dvh-13rem)]  sm:max-h-[calc(85dvh-10rem)] 3xl:max-h-[calc(85dvh-7rem)] scrollable, short-screen",
+            "scrollable, short-screen h-fit max-h-[calc(85dvh-13rem)] rounded-md sm:max-h-[calc(85dvh-10rem)] 3xl:max-h-[calc(85dvh-7rem)]",
             tableClassName,
           )}
           className={cn(hasRows && "table-fixed")}

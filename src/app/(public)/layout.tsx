@@ -1,3 +1,9 @@
+import { Metadata } from "next";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
+
+import Footer from "@/features/wrapper-elements/navigation/components/footer";
+import { NavbarWrapper } from "@/features/wrapper-elements/navigation/components/navbar-wrapper";
 import {
   DEFAULT_DESCRIPTION,
   DEFAULT_ICON,
@@ -5,11 +11,6 @@ import {
   getPageMeta,
 } from "@/constants/pageTitles";
 import { siteUrl } from "@/constants/siteInfo";
-import Footer from "@/features/wrapper-elements/navigation/components/footer";
-import { NavbarWrapper } from "@/features/wrapper-elements/navigation/components/navbar-wrapper";
-import { Metadata } from "next";
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
 
 export async function generateMetadata(): Promise<Metadata> {
   const headersList = await headers();

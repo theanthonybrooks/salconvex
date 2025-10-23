@@ -1,5 +1,6 @@
-import { ConfirmDialog } from "@/components/ui/confirmation-dialog";
 import { createContext, useContext, useState } from "react";
+
+import { ConfirmDialog } from "@/components/ui/confirmation-dialog";
 
 type ConfirmAction = {
   label: string;

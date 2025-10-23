@@ -1,8 +1,23 @@
-import { Button } from "@/components/ui/button";
-import { DialogClose, DialogFooter } from "@/components/ui/dialog";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { UpdateArtistSchema, UpdateArtistSchemaValues } from "@/schemas/artist";
+import { User } from "@/types/user";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { api } from "~/convex/_generated/api";
+import { Id } from "~/convex/_generated/dataModel";
+import { useAction, useMutation, useQuery } from "convex/react";
+import { FunctionReturnType } from "convex/server";
+import { formatDate, isBefore } from "date-fns";
+import { LoaderCircle } from "lucide-react";
+import { Controller, useForm } from "react-hook-form";
+import { IoMdArrowRoundForward } from "react-icons/io";
+import { toast } from "react-toastify";
+import { Country } from "world-countries";
 
+import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DebouncedControllerInput } from "@/components/ui/debounced-form-input";
+import { DialogClose, DialogFooter } from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -20,22 +35,6 @@ import { Separator } from "@/components/ui/separator";
 import { autoHttps, formatHandleInput } from "@/helpers/linkFns";
 import { sortedGroupedCountries } from "@/helpers/locations";
 import { cn } from "@/helpers/utilsFns";
-
-import { UpdateArtistSchema, UpdateArtistSchemaValues } from "@/schemas/artist";
-import { User } from "@/types/user";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useAction, useMutation, useQuery } from "convex/react";
-import { FunctionReturnType } from "convex/server";
-import { formatDate, isBefore } from "date-fns";
-import { LoaderCircle } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
-import { IoMdArrowRoundForward } from "react-icons/io";
-import { toast } from "react-toastify";
-import { Country } from "world-countries";
-import { api } from "~/convex/_generated/api";
-import { Id } from "~/convex/_generated/dataModel";
 
 interface ArtistProfileFormProps {
   className?: string;

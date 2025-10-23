@@ -1,4 +1,18 @@
 "use client";
+
+import { useRef, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { ContactFormValues, contactSchema } from "@/schemas/public";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { api } from "~/convex/_generated/api";
+import { makeUseQueryWithStatus } from "convex-helpers/react";
+import { useQueries } from "convex-helpers/react/cache";
+import { useAction, usePreloadedQuery } from "convex/react";
+import { ConvexError } from "convex/values";
+import { capitalize } from "lodash";
+import { LoaderCircle } from "lucide-react";
+import { useForm } from "react-hook-form";
+
 import { FormError } from "@/components/form-error";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/components/ui/custom-link";
@@ -14,23 +28,11 @@ import { Input } from "@/components/ui/input";
 import { SelectSimple } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
-import { infoEmail } from "@/constants/siteInfo";
-import { supportCategoryOptions } from "@/constants/supportConsts";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { cn } from "@/helpers/utilsFns";
+import { infoEmail } from "@/constants/siteInfo";
+import { supportCategoryOptions } from "@/constants/supportConsts";
 import { useDevice } from "@/providers/device-provider";
-import { ContactFormValues, contactSchema } from "@/schemas/public";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { makeUseQueryWithStatus } from "convex-helpers/react";
-import { useQueries } from "convex-helpers/react/cache";
-import { useAction, usePreloadedQuery } from "convex/react";
-import { ConvexError } from "convex/values";
-import { capitalize } from "lodash";
-import { LoaderCircle } from "lucide-react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useRef, useState } from "react";
-import { useForm } from "react-hook-form";
-import { api } from "~/convex/_generated/api";
 
 const SupportPage = () => {
   const useQueryWithStatus = makeUseQueryWithStatus(useQueries);

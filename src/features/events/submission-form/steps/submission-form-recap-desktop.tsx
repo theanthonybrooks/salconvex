@@ -1,6 +1,13 @@
 // TODO: Add the terms of service checkboxes
 
 "use client";
+
+import { useState } from "react";
+import { EligibilityType } from "@/types/openCallTypes";
+import { Id } from "~/convex/_generated/dataModel";
+import { capitalize } from "lodash";
+import { useFormContext } from "react-hook-form";
+
 import { Checkbox } from "@/components/ui/checkbox";
 import { Link } from "@/components/ui/custom-link";
 import { EventOrgLogo } from "@/components/ui/event-org-logo";
@@ -29,11 +36,6 @@ import {
 import { RichTextDisplay } from "@/helpers/richTextFns";
 import { cn } from "@/helpers/utilsFns";
 import { getCallFormatLabel } from "@/lib/openCallFns";
-import { EligibilityType } from "@/types/openCallTypes";
-import { capitalize } from "lodash";
-import { useState } from "react";
-import { useFormContext } from "react-hook-form";
-import { Id } from "~/convex/_generated/dataModel";
 
 interface SubmissionFormRecapDesktopProps {
   formType: number;

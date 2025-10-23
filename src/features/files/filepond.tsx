@@ -3,17 +3,18 @@ import { FilePond, registerPlugin } from "react-filepond";
 
 import "filepond/dist/filepond.min.css";
 
+import { useCallback, useEffect, useRef } from "react";
+import FilePondPluginFileMetadata from "filepond-plugin-file-metadata";
+import FilePondPluginFileRename from "filepond-plugin-file-rename";
+import FilePondPluginFileValidateSize from "filepond-plugin-file-validate-size";
+import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type";
+import { toast } from "react-toastify";
+
 import {
   BOTH_TYPES,
   DOC_TYPES,
   FILE_TYPE_LABELS,
 } from "@/constants/fileConsts";
-import FilePondPluginFileMetadata from "filepond-plugin-file-metadata";
-import FilePondPluginFileRename from "filepond-plugin-file-rename";
-import FilePondPluginFileValidateSize from "filepond-plugin-file-validate-size";
-import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type";
-import { useCallback, useEffect, useRef } from "react";
-import { toast } from "react-toastify";
 
 registerPlugin(
   FilePondPluginFileValidateType,

@@ -1,8 +1,9 @@
-import { Link } from "@/components/ui/custom-link";
-import { supportEmail } from "@/constants/siteInfo";
-import { cn } from "@/helpers/utilsFns";
-import { Minus, Plus } from "lucide-react";
 import { JSX } from "react";
+import { Minus, Plus } from "lucide-react";
+
+import { Link } from "@/components/ui/custom-link";
+import { cn } from "@/helpers/utilsFns";
+import { supportEmail } from "@/constants/siteInfo";
 
 // Define the types
 interface AccordionItem {

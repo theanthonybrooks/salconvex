@@ -1,6 +1,7 @@
-import { cn } from "@/helpers/utilsFns";
 import { Eye, EyeOff } from "lucide-react";
 import styled from "styled-components";
+
+import { cn } from "@/helpers/utilsFns";
 
 const PublicToggle = ({
   checked,

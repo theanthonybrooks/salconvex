@@ -1,6 +1,6 @@
+import { useEffect, useState } from "react";
 import { passwordRules } from "@/schemas/auth";
 import { Check, X } from "lucide-react";
-import { useEffect, useState } from "react";
 
 interface PasswordChecklistProps {
   password: string;

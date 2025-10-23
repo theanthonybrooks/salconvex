@@ -1,32 +1,31 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useFilteredEventsQuery } from "@/hooks/use-filtered-events-query";
+// import { getFourCharMonth } from "@/lib/dateFns"
+import { MergedEventPreviewData } from "@/types/eventTypes";
+import { SortOptions } from "@/types/thelist";
+import { usePreloadedQuery } from "convex/react";
+import { LucideUploadCloud } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import { Link } from "@/components/ui/custom-link";
+import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import EventCardPreview from "@/features/events/event-card-preview";
 import { getGroupKeyFromEvent } from "@/features/events/helpers/groupHeadings";
 import Pricing from "@/features/homepage/pricing";
-import { generateSkeletonGroups } from "@/helpers/skeletonFns";
-// import { getFourCharMonth } from "@/lib/dateFns"
-import { MergedEventPreviewData } from "@/types/eventTypes";
-import { SortOptions } from "@/types/thelist";
 // import { format } from "date-fns"
 // import { MergedEventPreviewData } from "@/types/event";
 
 import { useArtistPreload } from "@/features/wrapper-elements/artist-preload-context";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
-import { useFilteredEventsQuery } from "@/hooks/use-filtered-events-query";
-
-import { usePreloadedQuery } from "convex/react";
-
-import { Button } from "@/components/ui/button";
-import { Link } from "@/components/ui/custom-link";
-import { Separator } from "@/components/ui/separator";
-
 import { formatCondensedDateRange } from "@/helpers/dateFns";
+import { generateSkeletonGroups } from "@/helpers/skeletonFns";
 import { cn } from "@/helpers/utilsFns";
-import { LucideUploadCloud } from "lucide-react";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+
 // interface Props {
 
 // }

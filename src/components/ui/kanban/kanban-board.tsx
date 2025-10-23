@@ -1,23 +1,55 @@
 "use client";
 
-// TODO: Add the ability for users to suggest a task to the board. This will go into the proposed column. The user will be able to add a title, category, and the priority will default to medium (I'll update it to high or low later as I see fit). I also need to add the ability to vote on the suggestion by other users. Should be pretty simple. Use the purpose prop to determine whether to show the voting buttons or not (as well as the priority toggle/display). Or maybe just disable the changing of priority for non-admins?
+// TODO:
+// [x] Add the ability for users to suggest a task to the board. This will go into the proposed column. The user will be able to add a title, category, and the priority will default to medium (I'll update it to high or low later as I see fit).
+// [] I also need to add the ability to vote on the suggestion by other users. Should be pretty simple. Use the purpose prop to determine whether to show the voting buttons or not (as well as the priority toggle/display). Or maybe just disable the changing of priority for non-admins?
+import {
+  CATEGORY_CONFIG,
+  ColumnTypeOptions,
+  columnViewLimitMap,
+  KanbanPurposeOptions,
+  PRIORITY_CONFIG,
+  priorityOptions,
+} from "@/constants/kanbanConsts";
+import {
+  getSupportCategoryLabel,
+  supportCategoryOptions,
+} from "@/constants/supportConsts";
+
+import type {
+  AddCardProps,
+  CardBase,
+  CardProps,
+  ColumnProps,
+  ColumnType,
+  DetailsDialogProps,
+  DropIndicatorProps,
+  KanbanBoardProps,
+  KanbanPurpose,
+  Priority,
+  TaskDialogProps,
+  Voter,
+} from "@/constants/kanbanConsts";
+import type { SupportCategory } from "@/constants/supportConsts";
+import type { User } from "@/types/user";
+
+import { useEffect, useRef, useState } from "react";
+import { api } from "~/convex/_generated/api";
+import { useQuery } from "convex-helpers/react/cache";
 import { Id } from "convex/_generated/dataModel";
 import { useMutation, usePreloadedQuery } from "convex/react";
 import { motion } from "framer-motion";
+import { capitalize, debounce } from "lodash";
 import {
   Eye,
   Filter,
   FilterX,
   LucideThumbsDown,
   LucideThumbsUp,
+  Pencil,
   X,
 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
 import { FiPlus } from "react-icons/fi";
-import { api } from "~/convex/_generated/api";
-
-import { cn } from "@/helpers/utilsFns";
-import { Pencil } from "lucide-react";
 
 import { MultiSelect } from "@/components/multi-select";
 import { StaffUserSelector } from "@/components/ui/admin/userSelector";
@@ -42,37 +74,10 @@ import { SelectSimple } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { TooltipSimple } from "@/components/ui/tooltip";
-import {
-  AddCardProps,
-  CardBase,
-  CardProps,
-  CATEGORY_CONFIG,
-  ColumnProps,
-  ColumnType,
-  ColumnTypeOptions,
-  columnViewLimitMap,
-  DetailsDialogProps,
-  DropIndicatorProps,
-  KanbanBoardProps,
-  KanbanPurpose,
-  KanbanPurposeOptions,
-  Priority,
-  PRIORITY_CONFIG,
-  priorityOptions,
-  TaskDialogProps,
-  Voter,
-} from "@/constants/kanbanConsts";
-import {
-  getSupportCategoryLabel,
-  SupportCategory,
-  supportCategoryOptions,
-} from "@/constants/supportConsts";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { RichTextDisplay } from "@/helpers/richTextFns";
+import { cn } from "@/helpers/utilsFns";
 import { useDevice } from "@/providers/device-provider";
-import { User } from "@/types/user";
-import { useQuery } from "convex-helpers/react/cache";
-import { capitalize, debounce } from "lodash";
 
 export const KanbanBoard = ({ purpose = "todo" }: KanbanBoardProps) => {
   return <Board purpose={purpose} />;
@@ -103,9 +108,7 @@ const Board = ({ purpose: initialPurpose }: KanbanBoardProps) => {
   const [activeColumn, setActiveColumn] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [category, setCategory] = useState<SupportCategory[]>([]);
-  const [userFilter, setUserFilter] = useState<User | null>(
-    initialPurpose !== "todo" ? user : null,
-  );
+  const [userFilter, setUserFilter] = useState<User | null>(user);
 
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [purpose, setPurpose] = useState<KanbanPurpose>(
@@ -525,15 +528,16 @@ const Column = ({
             <Card
               key={c.id}
               {...c}
+              user={user}
               deleteCard={deleteCard}
               handleDragStart={handleDragStart}
               handleDragEnd={handleDragEnd}
             />
           ))}
         {cards.length > limit && (
-          <div className="flex items-center justify-center gap-x-2 bg-background/50 px-2 py-1 text-xs font-semibold text-foreground/50">
+          <div className="flex items-center justify-between gap-x-2 px-2 py-1 text-xs font-semibold text-foreground/50">
             {viewFull ? (
-              <p>Showing full list</p>
+              <p>...The End...</p>
             ) : (
               <p className="text-balance">
                 Showing first {limit} of {cards.length} cards
@@ -542,7 +546,7 @@ const Column = ({
             <button
               onClick={() => setViewFull((prev) => !prev)}
               className={cn(
-                "rounded p-1 px-2 hover:scale-105",
+                "rounded border border-foreground/20 p-1 px-2 hover:scale-105 active:scale-95",
                 viewFull ? "bg-background/50" : "bg-background",
               )}
             >
@@ -558,6 +562,7 @@ const Column = ({
 };
 
 const Card = ({
+  user,
   title,
   description,
   id,
@@ -578,8 +583,6 @@ const Card = ({
   const [isEditing, setIsEditing] = useState(false);
   const [isPreviewing, setIsPreviewing] = useState(false);
   // const [hasChanges, setHasChanges] = useState(false);
-  const userData = useQuery(api.users.getCurrentUser, {});
-  const user = userData?.user ?? null;
   const isAdmin = user?.role?.includes("admin");
 
   const editCard = useMutation(api.kanban.cards.editCard);

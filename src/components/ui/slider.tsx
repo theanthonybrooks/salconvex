@@ -1,8 +1,9 @@
 "use client";
 
-import { cn } from "@/helpers/utilsFns";
 import Box from "@mui/material/Box";
 import Slider from "@mui/material/Slider";
+
+import { cn } from "@/helpers/utilsFns";
 
 type DiscreteSliderProps = {
   value: number;

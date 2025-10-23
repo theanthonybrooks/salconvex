@@ -1,6 +1,7 @@
-// src/components/multi-select.tsx
-
-import { cva, type VariantProps } from "class-variance-authority";
+import type { VariantProps } from "class-variance-authority";
+import * as React from "react";
+import { useCallback, useEffect } from "react";
+import { cva } from "class-variance-authority";
 import {
   ChevronDown,
   ChevronUp,
@@ -10,7 +11,7 @@ import {
   XCircle,
   XIcon,
 } from "lucide-react";
-import * as React from "react";
+import { FaCheck } from "react-icons/fa";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -30,8 +31,8 @@ import {
 } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/helpers/utilsFns";
-import { useCallback, useEffect } from "react";
-import { FaCheck } from "react-icons/fa";
+
+// src/components/multi-select.tsx
 
 interface BaseOption<T extends string = string> {
   full?: string;
@@ -48,11 +49,11 @@ interface BaseOption<T extends string = string> {
  * Variants for the multi-select component to handle different styles.
  * Uses class-variance-authority (cva) to define different styles based on "variant" prop.
  */
-const multiSelectVariants = cva("mx-[2px] ", {
+const multiSelectVariants = cva("mx-[2px]", {
   variants: {
     variant: {
-      basic: " border-[1.5px] text-foreground bg-white  hover:bg-white",
-      default: "border-foreground/10 text-foreground bg-card  hover:bg-card",
+      basic: "border-[1.5px] bg-white text-foreground hover:bg-white",
+      default: "border-foreground/10 bg-card text-foreground hover:bg-card",
       secondary:
         "border-foreground/10 bg-secondary text-secondary-foreground hover:bg-secondary/80",
       destructive:

@@ -1,7 +1,8 @@
-import { Link } from "@/components/ui/custom-link";
-import { cn } from "@/helpers/utilsFns";
 import { format } from "date-fns";
 import { FaExclamationTriangle } from "react-icons/fa";
+
+import { Link } from "@/components/ui/custom-link";
+import { cn } from "@/helpers/utilsFns";
 
 interface CanceledBannerProps {
   activeSub: boolean;

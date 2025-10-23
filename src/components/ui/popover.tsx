@@ -1,12 +1,12 @@
 "use client";
 
-import * as PopoverPrimitive from "@radix-ui/react-popover";
 import * as React from "react";
 import { useRef } from "react";
+import { useState } from "react";
+import * as PopoverPrimitive from "@radix-ui/react-popover";
+import { X } from "lucide-react";
 
 import { cn } from "@/helpers/utilsFns";
-import { X } from "lucide-react";
-import { useState } from "react";
 
 const Popover = PopoverPrimitive.Root;
 

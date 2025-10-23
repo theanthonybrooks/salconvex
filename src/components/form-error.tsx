@@ -1,6 +1,7 @@
-import { cn } from "@/helpers/utilsFns";
 import { ReactNode } from "react";
 import { FaExclamationTriangle } from "react-icons/fa";
+
+import { cn } from "@/helpers/utilsFns";
 
 interface FormErrorProps {
   message?: ReactNode;

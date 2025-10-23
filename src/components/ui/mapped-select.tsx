@@ -1,3 +1,6 @@
+import { useState } from "react";
+import { Check, ChevronDown, ChevronUp, X } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -21,8 +24,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/helpers/utilsFns";
-import { Check, ChevronDown, ChevronUp, X } from "lucide-react";
-import { useState } from "react";
 
 interface MappedSelectProps<T> {
   value: string;

@@ -1,8 +1,8 @@
 "use client";
 
-import { Preloaded } from "convex/react";
 import { createContext, ReactNode, useContext } from "react";
 import { api } from "~/convex/_generated/api";
+import { Preloaded } from "convex/react";
 
 type ConvexPreloadContextType = {
   preloadedUserData: Preloaded<typeof api.users.getCurrentUser>;

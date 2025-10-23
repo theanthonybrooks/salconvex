@@ -2,8 +2,9 @@
 
 "use client";
 
-import WorldMapComponent from "@/components/ui/map/map-component";
 import { useEffect } from "react";
+
+import WorldMapComponent from "@/components/ui/map/map-component";
 
 export default function WorldMapPage() {
   useEffect(() => {

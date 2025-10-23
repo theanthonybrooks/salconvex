@@ -1,3 +1,17 @@
+import { useEffect, useRef, useState } from "react";
+import { EventCategory } from "@/types/eventTypes";
+import { motion } from "framer-motion";
+import {
+  Controller,
+  get,
+  Path,
+  useFieldArray,
+  useFormContext,
+  useWatch,
+} from "react-hook-form";
+import { FaTrashCan } from "react-icons/fa6";
+import { z } from "zod";
+
 import {
   CustomDatePicker,
   CustomDatePickerProps,
@@ -21,19 +35,6 @@ import {
 } from "@/helpers/dateFns";
 import { getEventCategoryLabel } from "@/helpers/eventFns";
 import { cn } from "@/helpers/utilsFns";
-import { EventCategory } from "@/types/eventTypes";
-import { motion } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
-import {
-  Controller,
-  get,
-  Path,
-  useFieldArray,
-  useFormContext,
-  useWatch,
-} from "react-hook-form";
-import { FaTrashCan } from "react-icons/fa6";
-import { z } from "zod";
 
 interface FormDatePickerProps<T> {
   isAdmin: boolean;

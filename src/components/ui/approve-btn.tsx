@@ -1,7 +1,4 @@
-import { Button } from "@/components/ui/button";
-import EventContextMenu from "@/features/events/ui/event-context-menu";
-import { getEventCategoryLabel } from "@/helpers/eventFns";
-import { cn } from "@/helpers/utilsFns";
+import { useRouter } from "next/navigation";
 import { ApplicationStatus } from "@/types/applications";
 import {
   EventCategory,
@@ -10,10 +7,14 @@ import {
 } from "@/types/eventTypes";
 import { OpenCallState, OpenCallStatus } from "@/types/openCallTypes";
 import { User } from "@/types/user";
-import { useMutation } from "convex/react";
-import { useRouter } from "next/navigation";
 import { api } from "~/convex/_generated/api";
 import { Id } from "~/convex/_generated/dataModel";
+import { useMutation } from "convex/react";
+
+import { Button } from "@/components/ui/button";
+import EventContextMenu from "@/features/events/ui/event-context-menu";
+import { getEventCategoryLabel } from "@/helpers/eventFns";
+import { cn } from "@/helpers/utilsFns";
 
 interface ApproveBtnProps {
   user: User | null;

@@ -1,6 +1,13 @@
 //TODO: Add ability for me (or other admins) to bookmark users. Also to flag or ban users.
 "use client";
 
+import { ColumnDef } from "@tanstack/react-table";
+import { Id } from "~/convex/_generated/dataModel";
+import { AccountType, UserRole } from "~/convex/schema";
+import { LucideClipboardCopy, MoreHorizontal, User } from "lucide-react";
+import { BsRobot } from "react-icons/bs";
+import { FaEnvelope } from "react-icons/fa6";
+
 import { DeleteUser } from "@/components/data-table/actions/data-table-admin-user-actions";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 import { Button } from "@/components/ui/button";
@@ -22,12 +29,6 @@ import {
 } from "@/features/admin/dashboard/components/admin-user-actions";
 import { ConvexDashboardLink } from "@/features/events/ui/convex-dashboard-link";
 import { cn } from "@/helpers/utilsFns";
-import { ColumnDef } from "@tanstack/react-table";
-import { LucideClipboardCopy, MoreHorizontal, User } from "lucide-react";
-import { BsRobot } from "react-icons/bs";
-import { FaEnvelope } from "react-icons/fa6";
-import { Id } from "~/convex/_generated/dataModel";
-import { AccountType, UserRole } from "~/convex/schema";
 
 export const userColumnLabels: Record<string, string> = {
   name: "Name",

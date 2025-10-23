@@ -1,9 +1,9 @@
 "use client";
 
 import { Link } from "@/components/ui/custom-link";
+import { AccordionComponent } from "@/features/homepage/accordion-component";
 import { generalFaqs, openCallFaqs } from "@/constants/accordions";
 import { infoEmail } from "@/constants/siteInfo";
-import { AccordionComponent } from "@/features/homepage/accordion-component";
 
 export default function FAQPage() {
   return (

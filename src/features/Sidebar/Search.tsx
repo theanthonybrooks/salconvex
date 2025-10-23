@@ -1,14 +1,15 @@
 "use client";
 
+import { useState } from "react";
+import { FiCommand, FiSearch } from "react-icons/fi";
+import { TbWorldSearch } from "react-icons/tb";
+
 import { TooltipSimple } from "@/components/ui/tooltip";
 import {
   CommandItem,
   CommandMenuCustom,
 } from "@/features/Sidebar/CommandMenuCustom";
 import { cn } from "@/helpers/utilsFns";
-import { useState } from "react";
-import { FiCommand, FiSearch } from "react-icons/fi";
-import { TbWorldSearch } from "react-icons/tb";
 
 interface SearchProps<T extends CommandItem> {
   title: string;

@@ -1,5 +1,9 @@
 "use client";
 
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { OpenCallData } from "@/types/openCallTypes";
+import { Check, Clipboard } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { DebouncedTextarea } from "@/components/ui/debounced-textarea2";
 import {
@@ -8,16 +12,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { openCallCategoryFields } from "@/constants/openCallConsts";
 import { formatCurrency } from "@/helpers/currencyFns";
 import { formatEventDates, formatOpenCallDeadline } from "@/helpers/dateFns";
 import { formatBudgetCurrency } from "@/helpers/eventFns";
 import { getDemonym, getFormattedLocationString } from "@/helpers/locations";
 import { cn } from "@/helpers/utilsFns";
+import { openCallCategoryFields } from "@/constants/openCallConsts";
 import { getCallFormatLabel } from "@/lib/openCallFns";
-import { OpenCallData } from "@/types/openCallTypes";
-import { Check, Clipboard } from "lucide-react";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
 
 interface PostCaptionDialogProps {
   data: OpenCallData | null;

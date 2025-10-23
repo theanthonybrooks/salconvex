@@ -1,4 +1,7 @@
+import Image from "next/image";
 import { PostSettings } from "@/app/(pages)/(artist)/thelist/components/open-call-socials";
+import { OpenCallData } from "@/types/openCallTypes";
+
 import EventDates from "@/features/events/components/event-dates";
 import { EligibilityLabelServer } from "@/features/events/open-calls/components/eligibilty-label-server";
 import { formatOpenCallDeadlineForPost } from "@/helpers/dateFns";
@@ -9,8 +12,7 @@ import {
 } from "@/helpers/eventFns";
 import { getFormattedLocationString } from "@/helpers/locations";
 import { cn } from "@/helpers/utilsFns";
-import { OpenCallData } from "@/types/openCallTypes";
-import Image from "next/image";
+
 import styles from "./OpenCallPostDetail.module.css";
 
 interface OpenCallPostProps {
