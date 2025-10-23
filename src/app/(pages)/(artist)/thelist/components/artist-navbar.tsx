@@ -14,7 +14,10 @@ import { Separator } from "@/components/ui/separator";
 
 import { UserProfile } from "@/components/ui/user-profile";
 import { dashboardNavItems } from "@/constants/links";
-import { theListNavbarMenuLinks as thelistitems } from "@/constants/navbarsLinks";
+import {
+  landingPageNavbarMenuLinksAbout as aboutItems,
+  theListNavbarMenuLinks as thelistitems,
+} from "@/constants/navbarsLinks";
 import { Search } from "@/features/Sidebar/Search";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { ListItem } from "@/features/wrapper-elements/navigation/components/navbar";
@@ -76,12 +79,18 @@ export default function TheListNavBar(
   });
 
   const statusKey = subStatus ? subStatus : "none";
-
+  const filteredNavbarMenuAbout = aboutItems.filter(
+    (link) => link.sub.includes(statusKey) || link.sub.includes("all"),
+  );
   const filteredNavbarMenuTheList = thelistitems.filter(
     (link) => link.sub.includes(statusKey) || link.sub.includes("all"),
   );
 
   const isActiveTheList = filteredNavbarMenuTheList.some(
+    (component) => component.href.includes(currentPage) && currentPage !== "",
+  );
+
+  const isActiveAbout = filteredNavbarMenuAbout.some(
     (component) => component.href.includes(currentPage) && currentPage !== "",
   );
 
@@ -111,6 +120,9 @@ export default function TheListNavBar(
       }
     };
   }, [canGoToTop]);
+
+  const activeMainItemClasses =
+    "border-foreground/50   hover:border-foreground/70 data-[state=open]:border-foreground/70";
 
   return (
     <>
@@ -214,7 +226,7 @@ export default function TheListNavBar(
                 prefetch={true}
                 className="hidden px-8 font-bold lg:flex"
               >
-                <Button className="h-9 border-2 border-transparent bg-background text-base font-bold text-foreground hover:border-foreground hover:bg-background active:scale-95 sm:text-base">
+                <Button className="h-9 border-2 border-transparent bg-background text-base font-bold text-foreground hover:border-foreground/70 hover:bg-card/20 active:scale-95 sm:text-base">
                   View Pricing
                 </Button>
               </Link>
@@ -246,90 +258,130 @@ export default function TheListNavBar(
           {!isMobile && (
             <div className="flex items-center gap-2">
               <Link href="/submit">
-                <Button className="hidden h-9 border-2 border-transparent bg-background font-semibold text-foreground hover:border-foreground hover:bg-background active:scale-95 sm:text-base lg:inline-flex">
+                <Button className="hidden h-9 border-2 border-transparent bg-background font-semibold text-foreground hover:border-foreground/70 hover:bg-card/20 active:scale-95 sm:text-base lg:inline-flex">
                   Submit
                 </Button>
               </Link>
               <div className="hidden items-center gap-8 pr-5 lg:flex">
-                <NavigationMenu
-                  delayDuration={Infinity}
-                  className="z-0"
-                  align="right"
-                >
-                  <NavigationMenuList className="gap-2">
-                    <NavigationMenuItem>
-                      <NavigationMenuTrigger
-                        isCurrent={isActiveTheList}
-                        className={cn(
-                          "z-0 border-2 border-transparent hover:border-foreground hover:bg-background data-[state=open]:border-foreground data-[state=open]:bg-background",
-                          isActiveTheList &&
-                            "border-foreground/20 bg-backgroundDark/30 hover:border-foreground/40 hover:bg-backgroundDark/50",
-                        )}
-                        onPointerMove={(event) => event.preventDefault()}
-                        onPointerLeave={(event) => event.preventDefault()}
-                      >
-                        The List
-                      </NavigationMenuTrigger>
+                <div className="z-0 flex items-center gap-2">
+                  <NavigationMenu delayDuration={Infinity} align="right">
+                    <NavigationMenuList className="gap-2">
+                      <NavigationMenuItem>
+                        <NavigationMenuTrigger
+                          isCurrent={isActiveTheList}
+                          className={cn(
+                            "z-0 border-2 border-transparent hover:border-foreground data-[state=open]:border-foreground data-[state=open]:bg-background",
+                            isActiveTheList && activeMainItemClasses,
+                          )}
+                          onPointerMove={(event) => event.preventDefault()}
+                          onPointerLeave={(event) => event.preventDefault()}
+                        >
+                          The List
+                        </NavigationMenuTrigger>
 
-                      <NavigationMenuContent
-                        align="right"
-                        onPointerEnter={(event) => event.preventDefault()}
-                        onPointerLeave={(event) => event.preventDefault()}
-                      >
-                        {/* TODO: put this back to xl:grid-cols-3 when I add more menu items */}
-                        <div className="flex w-[400px] flex-col gap-1 p-3 lg:w-max xl:max-w-[700px]">
-                          {filteredNavbarMenuTheList
-                            .filter(
-                              (component) =>
-                                !component.title.includes("Old Site"),
-                            )
-                            .map((component) => (
-                              <ListItem
-                                key={component.title}
-                                title={component.title}
-                                href={component.href}
-                                className={cn(
-                                  "cursor-pointer text-balance transition-colors duration-200 ease-in-out",
-                                  component.href.includes(currentPage) &&
-                                    currentPage !== "" &&
-                                    "pointer-events-none bg-background",
-                                )}
-                              >
-                                {/* {component.description} */}
-                              </ListItem>
-                            ))}
-                          <Separator thickness={2} className="" />
-                          <p className="m-0 text-center text-foreground/50">
-                            Old Site
-                          </p>
-                          <Separator thickness={2} className="" />
-                          {filteredNavbarMenuTheList
-                            .filter((component) =>
-                              component.title.includes("Old Site"),
-                            )
-                            .map((component) => (
-                              <ListItem
-                                key={component.title}
-                                title={component.title.replace(
-                                  "- (Old Site)",
-                                  "",
-                                )}
-                                href={component.href}
-                                className={cn(
-                                  "cursor-pointer text-balance transition-colors duration-200 ease-in-out",
-                                  component.href.includes(currentPage) &&
-                                    currentPage !== "" &&
-                                    "bg-background",
-                                )}
-                              >
-                                {/* {component.description} */}
-                              </ListItem>
-                            ))}
-                        </div>
-                      </NavigationMenuContent>
-                    </NavigationMenuItem>
-                  </NavigationMenuList>
-                </NavigationMenu>
+                        <NavigationMenuContent
+                          align="right"
+                          onPointerEnter={(event) => event.preventDefault()}
+                          onPointerLeave={(event) => event.preventDefault()}
+                        >
+                          {/* TODO: put this back to xl:grid-cols-3 when I add more menu items */}
+                          <div className="flex w-[400px] flex-col gap-1 p-3 lg:w-max xl:max-w-[700px]">
+                            {filteredNavbarMenuTheList
+                              .filter(
+                                (component) =>
+                                  !component.title.includes("Old Site"),
+                              )
+                              .map((component) => (
+                                <ListItem
+                                  key={component.title}
+                                  title={component.title}
+                                  href={component.href}
+                                  className={cn(
+                                    "cursor-pointer text-balance transition-colors duration-200 ease-in-out",
+                                    component.href.includes(currentPage) &&
+                                      currentPage !== "" &&
+                                      "pointer-events-none bg-background",
+                                  )}
+                                >
+                                  {/* {component.description} */}
+                                </ListItem>
+                              ))}
+                            <Separator thickness={2} className="" />
+                            <p className="m-0 text-center text-foreground/50">
+                              Old Site
+                            </p>
+                            <Separator thickness={2} className="" />
+                            {filteredNavbarMenuTheList
+                              .filter((component) =>
+                                component.title.includes("Old Site"),
+                              )
+                              .map((component) => (
+                                <ListItem
+                                  key={component.title}
+                                  title={component.title.replace(
+                                    "- (Old Site)",
+                                    "",
+                                  )}
+                                  href={component.href}
+                                  className={cn(
+                                    "cursor-pointer text-balance transition-colors duration-200 ease-in-out",
+                                    component.href.includes(currentPage) &&
+                                      currentPage !== "" &&
+                                      "bg-background",
+                                  )}
+                                >
+                                  {/* {component.description} */}
+                                </ListItem>
+                              ))}
+                          </div>
+                        </NavigationMenuContent>
+                      </NavigationMenuItem>
+                    </NavigationMenuList>
+                  </NavigationMenu>
+                  <NavigationMenu delayDuration={Infinity}>
+                    <NavigationMenuList className="gap-2">
+                      <NavigationMenuItem>
+                        <NavigationMenuTrigger
+                          isCurrent={isActiveAbout}
+                          className={cn(
+                            "border-2 border-transparent hover:border-foreground/70 data-[state=open]:border-foreground/50",
+                            isActiveAbout && activeMainItemClasses,
+                          )}
+                          onPointerMove={(event) => event.preventDefault()}
+                          onPointerLeave={(event) => event.preventDefault()}
+                        >
+                          About
+                        </NavigationMenuTrigger>
+                        <NavigationMenuContent
+                          onPointerEnter={(event) => event.preventDefault()}
+                          onPointerLeave={(event) => event.preventDefault()}
+                        >
+                          {/* <ul className="grid w-[400px] gap-2 p-4 lg:w-max lg:grid-cols-2 xl:max-w-[700px] xl:grid-cols-3"> */}
+                          <div className="flex w-[400px] flex-col gap-1 p-3 lg:w-max xl:max-w-[700px]">
+                            {filteredNavbarMenuAbout.map((component) => {
+                              const activeLink =
+                                component.href.includes(currentPage) &&
+                                currentPage !== "";
+                              return (
+                                <ListItem
+                                  key={component.title}
+                                  title={component.title}
+                                  href={component.href}
+                                  activeItem={activeLink}
+                                  className={cn(
+                                    "cursor-pointer text-balance transition-colors duration-200 ease-in-out",
+                                  )}
+                                >
+                                  {/* {component.description} */}
+                                </ListItem>
+                              );
+                            })}
+                          </div>
+                        </NavigationMenuContent>
+                      </NavigationMenuItem>
+                    </NavigationMenuList>
+                  </NavigationMenu>
+                </div>
                 {/* Right Side */}
                 {!user && <NavbarSigninSection />}
 

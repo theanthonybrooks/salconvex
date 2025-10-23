@@ -134,6 +134,7 @@ export default {
         slgHover: "-4px 4px 0 0 #000000",
         slg: "-5px 5px 0 0 #000000",
         slga: "-5px 5px 0 0 rgba(0, 0, 0, 0.7)",
+        slga2: "-5px 5px 0 0 rgba(0, 0, 0, 0.9)",
         llg: "5px 5px 0 0 #000000",
         llga: "5px 5px 0 0 rgba(0, 0, 0, 0.7)",
         vlg: "0 5px 0 0 #000000",

@@ -118,6 +118,9 @@ export default function NavBar(
     (component) => component.href.includes(currentPage) && currentPage !== "",
   );
 
+  const activeMainItemClasses =
+    "border-foreground/50   hover:border-foreground/70 data-[state=open]:border-foreground/70";
+
   return (
     <>
       {/* ------ Desktop & Mobile: Main Navbar ----- */}
@@ -271,7 +274,7 @@ export default function NavBar(
               </motion.div>
 
               {/* Desktop Navigation */}
-              <motion.div
+              <div
                 // animate={{ opacity: isScrolled ? 0 : 1 }}
                 // transition={{ duration: 0.3, ease: "easeOut" }}
                 className="z-0 hidden items-center justify-center gap-2 lg:flex"
@@ -283,9 +286,8 @@ export default function NavBar(
                         <NavigationMenuTrigger
                           isCurrent={isActiveResources}
                           className={cn(
-                            "border-2 border-transparent hover:border-foreground hover:bg-background data-[state=open]:border-foreground data-[state=open]:bg-background",
-                            isActiveResources &&
-                              "border-foreground/20 bg-backgroundDark/30 hover:border-foreground/40 hover:bg-backgroundDark/50",
+                            "border-2 border-transparent hover:border-foreground data-[state=open]:border-foreground",
+                            isActiveResources && activeMainItemClasses,
                           )}
                           onPointerMove={(event) => event.preventDefault()}
                           onPointerLeave={(event) => event.preventDefault()}
@@ -297,21 +299,24 @@ export default function NavBar(
                           onPointerLeave={(event) => event.preventDefault()}
                         >
                           <div className="flex w-[400px] flex-col gap-1 p-3 lg:w-max xl:max-w-[700px]">
-                            {filteredNavbarMenuResources.map((component) => (
-                              <ListItem
-                                key={component.title}
-                                title={component.title}
-                                href={component.href}
-                                className={cn(
-                                  "cursor-pointer text-balance transition-colors duration-200 ease-in-out",
-                                  component.href.includes(currentPage) &&
-                                    fullPagePath === component.href &&
-                                    "pointer-events-none bg-background",
-                                )}
-                              >
-                                {/* {component.description} */}
-                              </ListItem>
-                            ))}
+                            {filteredNavbarMenuResources.map((component) => {
+                              const activeLink =
+                                component.href.includes(currentPage) &&
+                                fullPagePath === component.href;
+                              return (
+                                <ListItem
+                                  key={component.title}
+                                  title={component.title}
+                                  href={component.href}
+                                  activeItem={activeLink}
+                                  className={cn(
+                                    "cursor-pointer text-balance transition-colors duration-200 ease-in-out",
+                                  )}
+                                >
+                                  {/* {component.description} */}
+                                </ListItem>
+                              );
+                            })}
                           </div>
                         </NavigationMenuContent>
                       </NavigationMenuItem>
@@ -324,9 +329,8 @@ export default function NavBar(
                       <NavigationMenuTrigger
                         isCurrent={isActiveTheList}
                         className={cn(
-                          "border-2 border-transparent hover:border-foreground hover:bg-background data-[state=open]:border-foreground data-[state=open]:bg-background",
-                          isActiveTheList &&
-                            "border-foreground/20 bg-backgroundDark/30 hover:border-foreground/40 hover:bg-backgroundDark/50",
+                          "border-2 border-transparent hover:border-foreground data-[state=open]:border-foreground",
+                          isActiveTheList && activeMainItemClasses,
                         )}
                         onPointerMove={(event) => event.preventDefault()}
                         onPointerLeave={(event) => event.preventDefault()}
@@ -343,21 +347,24 @@ export default function NavBar(
                               (component) =>
                                 !component.title.includes("Old Site"),
                             )
-                            .map((component) => (
-                              <ListItem
-                                key={component.title}
-                                title={component.title}
-                                href={component.href}
-                                className={cn(
-                                  "cursor-pointer text-balance transition-colors duration-200 ease-in-out",
-                                  component.href.includes(currentPage) &&
-                                    currentPage !== "" &&
-                                    "pointer-events-none bg-background",
-                                )}
-                              >
-                                {/* {component.description} */}
-                              </ListItem>
-                            ))}
+                            .map((component) => {
+                              const activeLink =
+                                component.href.includes(currentPage) &&
+                                currentPage !== "";
+                              return (
+                                <ListItem
+                                  key={component.title}
+                                  title={component.title}
+                                  href={component.href}
+                                  activeItem={activeLink}
+                                  className={cn(
+                                    "cursor-pointer text-balance transition-colors duration-200 ease-in-out",
+                                  )}
+                                >
+                                  {/* {component.description} */}
+                                </ListItem>
+                              );
+                            })}
                           <Separator thickness={2} className="" />
                           <p className="m-0 text-center text-foreground/50">
                             Old Site
@@ -367,24 +374,27 @@ export default function NavBar(
                             .filter((component) =>
                               component.title.includes("Old Site"),
                             )
-                            .map((component) => (
-                              <ListItem
-                                key={component.title}
-                                title={component.title.replace(
-                                  "- (Old Site)",
-                                  "",
-                                )}
-                                href={component.href}
-                                className={cn(
-                                  "cursor-pointer text-balance transition-colors duration-200 ease-in-out",
-                                  component.href.includes(currentPage) &&
-                                    currentPage !== "" &&
-                                    "pointer-events-none bg-background",
-                                )}
-                              >
-                                {/* {component.description} */}
-                              </ListItem>
-                            ))}
+                            .map((component) => {
+                              const activeLink =
+                                component.href.includes(currentPage) &&
+                                currentPage !== "";
+                              return (
+                                <ListItem
+                                  key={component.title}
+                                  title={component.title.replace(
+                                    "- (Old Site)",
+                                    "",
+                                  )}
+                                  activeItem={activeLink}
+                                  href={component.href}
+                                  className={cn(
+                                    "cursor-pointer text-balance transition-colors duration-200 ease-in-out",
+                                  )}
+                                >
+                                  {/* {component.description} */}
+                                </ListItem>
+                              );
+                            })}
                         </div>
                       </NavigationMenuContent>
                     </NavigationMenuItem>
@@ -396,9 +406,8 @@ export default function NavBar(
                       <NavigationMenuTrigger
                         isCurrent={isActiveAbout}
                         className={cn(
-                          "border-2 border-transparent hover:border-foreground hover:bg-background data-[state=open]:border-foreground data-[state=open]:bg-background",
-                          isActiveAbout &&
-                            "border-foreground/20 bg-backgroundDark/30 hover:border-foreground/40 hover:bg-backgroundDark/50",
+                          "border-2 border-transparent hover:border-foreground/70 data-[state=open]:border-foreground/50",
+                          isActiveAbout && activeMainItemClasses,
                         )}
                         onPointerMove={(event) => event.preventDefault()}
                         onPointerLeave={(event) => event.preventDefault()}
@@ -411,21 +420,24 @@ export default function NavBar(
                       >
                         {/* <ul className="grid w-[400px] gap-2 p-4 lg:w-max lg:grid-cols-2 xl:max-w-[700px] xl:grid-cols-3"> */}
                         <div className="flex w-[400px] flex-col gap-1 p-3 lg:w-max xl:max-w-[700px]">
-                          {filteredNavbarMenuAbout.map((component) => (
-                            <ListItem
-                              key={component.title}
-                              title={component.title}
-                              href={component.href}
-                              className={cn(
-                                "cursor-pointer text-balance transition-colors duration-200 ease-in-out",
-                                component.href.includes(currentPage) &&
-                                  currentPage !== "" &&
-                                  "pointer-events-none bg-background",
-                              )}
-                            >
-                              {/* {component.description} */}
-                            </ListItem>
-                          ))}
+                          {filteredNavbarMenuAbout.map((component) => {
+                            const activeLink =
+                              component.href.includes(currentPage) &&
+                              currentPage !== "";
+                            return (
+                              <ListItem
+                                key={component.title}
+                                title={component.title}
+                                href={component.href}
+                                activeItem={activeLink}
+                                className={cn(
+                                  "cursor-pointer text-balance transition-colors duration-200 ease-in-out",
+                                )}
+                              >
+                                {/* {component.description} */}
+                              </ListItem>
+                            );
+                          })}
                         </div>
                       </NavigationMenuContent>
                     </NavigationMenuItem>
@@ -435,7 +447,7 @@ export default function NavBar(
                 {filteredNavbarLinks.map((link) => (
                   <Link key={link.title} href={link.href} prefetch={true}>
                     {!link.isIcon ? (
-                      <Button className="h-9 border-2 border-transparent bg-background font-semibold text-foreground hover:border-foreground hover:bg-background sm:text-base">
+                      <Button className="h-9 border-2 border-transparent bg-background font-semibold text-foreground hover:border-foreground/70 hover:bg-card/20 sm:text-base">
                         {link.title}
                       </Button>
                     ) : (
@@ -449,7 +461,7 @@ export default function NavBar(
                     )}
                   </Link>
                 ))}
-              </motion.div>
+              </div>
 
               {!user && <NavbarSigninSection />}
 
@@ -507,15 +519,19 @@ export default function NavBar(
 
 export const ListItem = React.forwardRef<
   React.ComponentRef<"a">,
-  React.ComponentPropsWithoutRef<"a"> & { href: string }
->(({ className, title, href, ...props }, ref) => {
+  React.ComponentPropsWithoutRef<"a"> & { href: string } & {
+    activeItem?: boolean;
+  }
+>(({ className, title, href, activeItem, ...props }, ref) => {
   return (
     <div
       className={cn(
         "rounded-md p-2 font-bold decoration-2 underline-offset-4 transition-colors hover:underline active:underline-offset-2",
+        activeItem && "pointer-events-none bg-background white:bg-salPinkLt",
         className,
       )}
     >
+      {" "}
       <NavigationMenuLink asChild>
         <Link
           href={href}

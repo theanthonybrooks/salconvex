@@ -47,7 +47,7 @@ NavigationMenuList.displayName = NavigationMenuPrimitive.List.displayName;
 const NavigationMenuItem = NavigationMenuPrimitive.Item;
 
 const navigationMenuTriggerStyle = cva(
-  "group inline-flex h-11 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-base  font-semibold transition-colors hover:bg-accent hover:text-foreground focus:border-black/10 focus:text-foreground focus:outline-hidden disabled:pointer-events-none disabled:opacity-50 data-active:bg-accent/50 data-[state=open]:bg-accent/50 ",
+  "group inline-flex h-11 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-base  font-semibold transition-colors hover:bg-card/30 hover:text-foreground focus-visible:border-black/10 focus:text-foreground focus:outline-hidden disabled:pointer-events-none disabled:opacity-50 data-active:bg-accent/50 data-[state=open]:bg-salYellowLt light:data-[state=open]:bg-dashboardBgLt ",
 );
 
 type NavigationMenuTriggerProps = React.ComponentPropsWithoutRef<
@@ -72,7 +72,7 @@ const NavigationMenuTrigger = React.forwardRef<
     {children}
     {isCurrent ? (
       <TiArrowSortedDown
-        className="relative ml-1 size-4 text-foreground/40 transition duration-300 group-data-[state=open]:rotate-180"
+        className="relative ml-1 size-4 text-foreground/70 transition duration-300 group-data-[state=open]:rotate-180"
         aria-hidden="true"
       />
     ) : (
@@ -132,7 +132,7 @@ const NavigationMenuViewport = React.forwardRef<
   >
     <NavigationMenuPrimitive.Viewport
       className={cn(
-        "relative mt-1.5 h-[var(--radix-navigation-menu-viewport-height)] w-full origin-top rounded-md border-2 bg-popover text-popover-foreground shadow-slg " +
+        "shadow-slga2 relative mt-1.5 h-[var(--radix-navigation-menu-viewport-height)] w-full origin-top rounded-md border-2 bg-popover text-popover-foreground " +
           "data-[state=open]:animate-in data-[state=closed]:animate-out" +
           "data-[state=closed]:slide-out-to-top-2 data-[state=open]:slide-in-from-top-2",
         className,
