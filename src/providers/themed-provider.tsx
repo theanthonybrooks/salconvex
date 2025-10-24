@@ -52,7 +52,7 @@ export function ThemedProvider({ children }: ThemedProviderProps) {
       enableSystem={false} //? todo: Re-enable dark and system modes once it's actually set up
       // disableTransitionOnChange
     >
-      {!isMounted && user ? <FullPageLoading /> : children};
+      {!isMounted && user ? <FullPageLoading /> : children}
     </ThemeProvider>
   );
 }

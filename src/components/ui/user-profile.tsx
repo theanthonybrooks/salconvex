@@ -2,10 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { api } from "~/convex/_generated/api";
-import { makeUseQueryWithStatus } from "convex-helpers/react";
-import { useQueries } from "convex-helpers/react/cache";
-import { usePreloadedQuery } from "convex/react";
+
+import { FaUserNinja } from "react-icons/fa6";
+import { PiPiggyBank } from "react-icons/pi";
 import {
   Bell,
   HelpCircle,
@@ -19,8 +18,6 @@ import {
   User,
   Users2,
 } from "lucide-react";
-import { FaUserNinja } from "react-icons/fa6";
-import { PiPiggyBank } from "react-icons/pi";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -37,10 +34,16 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { NotificationsDropdown } from "@/components/ui/navbar/notifications-dropdown";
 import { TooltipSimple } from "@/components/ui/tooltip";
 import SignOutBtn from "@/features/auth/components/sign-out-btn";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { cn } from "@/helpers/utilsFns";
+
+import { api } from "~/convex/_generated/api";
+import { makeUseQueryWithStatus } from "convex-helpers/react";
+import { useQueries } from "convex-helpers/react/cache";
+import { usePreloadedQuery } from "convex/react";
 
 interface UserProfileProps {
   // user: UserType;
@@ -83,70 +86,17 @@ export function UserProfile({
   return (
     <div className={cn("flex items-center gap-4")}>
       {isAdmin && (
-        <DropdownMenu
-          onOpenChange={(val) => {
-            setOpen(val);
-            if (!val) {
-              setTooltipDisabled(true);
-              setTimeout(() => setTooltipDisabled(false), 250);
-            }
-          }}
-        >
-          <TooltipSimple
-            content="View Nofitications"
-            side="bottom"
-            disabled={open || tooltipDisabled}
-          >
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                className={cn("relative size-12.5 rounded-full", className)}
-              >
-                <Bell className="size-6" />
-                {isAdmin && totalPending > 0 && (
-                  <div className="absolute -bottom-[0.05rem] -left-1 flex size-5 items-center justify-center rounded-full border-1.5 border-foreground bg-card text-2xs font-bold hover:scale-105 hover:cursor-pointer">
-                    {totalPending}
-                  </div>
-                )}
-              </Button>
-            </DropdownMenuTrigger>
-          </TooltipSimple>
-          <DropdownMenuContent className="z-[60] w-48" thick align="end">
-            <DropdownMenuLabel className="font-normal">
-              <p>Notifications</p>
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              {pendingEvents > 0 && (
-                <DropdownMenuItem
-                  className="w-full"
-                  onClick={() => {
-                    window.location.href =
-                      "/dashboard/admin/submissions?state=submitted";
-                  }}
-                >
-                  {pendingEvents} - Pending Events
-                </DropdownMenuItem>
-              )}
-              {pendingOpenCalls > 0 && (
-                <DropdownMenuItem
-                  className="w-full"
-                  onClick={() => {
-                    window.location.href =
-                      "/dashboard/admin/submissions?openCallState=submitted";
-                  }}
-                >
-                  {pendingOpenCalls} - Pending Open Calls
-                </DropdownMenuItem>
-              )}
-              {!pendingEvents && !pendingOpenCalls && (
-                <DropdownMenuItem className="w-full">
-                  No New Notifications
-                </DropdownMenuItem>
-              )}
-            </DropdownMenuGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <NotificationsDropdown
+          open={open}
+          setOpen={setOpen}
+          setTooltipDisabled={setTooltipDisabled}
+          tooltipDisabled={tooltipDisabled}
+          className={className}
+          isAdmin={isAdmin}
+          totalPending={totalPending}
+          pendingEvents={pendingEvents}
+          pendingOpenCalls={pendingOpenCalls}
+        />
       )}
       <DropdownMenu
         onOpenChange={(val) => {
@@ -226,13 +176,8 @@ export function UserProfile({
                         className="underline-offset-2 hover:cursor-pointer hover:underline"
                       >
                         <DropdownMenuItem className="focus:bg-salYellow/50">
-                          {totalPending > 0 ? (
-                            <div className="flex size-5 items-center justify-center rounded-full border-1.5 border-foreground bg-background text-xs font-bold hover:no-underline">
-                              {totalPending}
-                            </div>
-                          ) : (
-                            <Squirrel className="mr-2 size-4" />
-                          )}
+                          <Squirrel className="mr-2 size-4" />
+
                           <span>Admin</span>
                         </DropdownMenuItem>
                       </Link>
