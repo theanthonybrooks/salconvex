@@ -1,4 +1,9 @@
 import { JSX } from "react";
+import { IconType } from "react-icons";
+
+import { BsPersonVcard } from "react-icons/bs";
+import { FaFacebookF, FaInstagram, FaThreads } from "react-icons/fa6";
+import { PiGraph } from "react-icons/pi";
 import {
   Banana,
   Bookmark,
@@ -29,10 +34,6 @@ import {
   Star,
   User,
 } from "lucide-react";
-import { IconType } from "react-icons";
-import { BsPersonVcard } from "react-icons/bs";
-import { FaFacebookF, FaInstagram, FaThreads } from "react-icons/fa6";
-import { PiGraph } from "react-icons/pi";
 
 export type MenuProps = {
   id: number;
@@ -192,6 +193,7 @@ interface DashNavItem {
   icon: LucideIcon | IconType;
   sectionIcon?: LucideIcon | IconType;
   sub: string[];
+  userRole?: string[];
   userType: string[];
   section?: boolean;
   sectionCat?: string;
@@ -244,7 +246,7 @@ export const dashboardNavItems: DashNavItem[] = [
     sectionCat: "account",
     desc: "Manage your payments",
     sub: ["active", "trialing", "canceled"],
-    userType: ["artist", "admin"],
+    userType: ["artist"],
   },
   // {
   //   label: "Pending Applications",
@@ -266,8 +268,9 @@ export const dashboardNavItems: DashNavItem[] = [
     sectionHead: true,
     heading: "Events",
     desc: "Submitted Events/Open Calls",
-    sub: ["admin"],
-    userType: ["admin"],
+    userRole: ["admin"],
+    sub: [],
+    userType: [],
   },
 
   {
@@ -277,8 +280,9 @@ export const dashboardNavItems: DashNavItem[] = [
     subsection: true,
     sectionCat: "events",
     desc: "Submit a new event",
-    sub: ["admin"],
-    userType: ["admin"],
+    userRole: ["admin"],
+    sub: [],
+    userType: [],
   },
   {
     label: "This Week ",
@@ -287,8 +291,9 @@ export const dashboardNavItems: DashNavItem[] = [
     subsection: true,
     sectionCat: "events",
     desc: "This Week Recap Post",
-    sub: ["admin"],
-    userType: ["admin"],
+    userRole: ["admin"],
+    sub: [],
+    userType: [],
   },
   {
     label: "To-Do List",
@@ -300,8 +305,9 @@ export const dashboardNavItems: DashNavItem[] = [
     sectionHead: true,
     heading: "Admin",
     desc: "Admin To-Do List",
-    sub: ["admin"],
-    userType: ["admin"],
+    userRole: ["admin"],
+    sub: [],
+    userType: [],
   },
   // {
   //   label: "UI/UX Kanban",
@@ -310,8 +316,9 @@ export const dashboardNavItems: DashNavItem[] = [
   //   icon: LucideBrush,
   //   sectionCat: "admin",
   //   desc: "Design Kanban",
-  //   sub: ["admin"],
-  //   userType: ["admin"],
+  // userRole: ["admin"],
+  //   sub: [],
+  //   userType: [],
   // },
   {
     label: "Users",
@@ -320,8 +327,9 @@ export const dashboardNavItems: DashNavItem[] = [
     subsection: true,
     sectionCat: "admin",
     desc: "User List",
-    sub: ["admin"],
-    userType: ["admin"],
+    userRole: ["admin"],
+    sub: [],
+    userType: [],
   },
   {
     label: "Artists",
@@ -330,8 +338,9 @@ export const dashboardNavItems: DashNavItem[] = [
     subsection: true,
     sectionCat: "admin",
     desc: "Artist List",
-    sub: ["admin"],
-    userType: ["admin"],
+    userRole: ["admin"],
+    sub: [],
+    userType: [],
   },
   {
     label: "Newsletter",
@@ -340,8 +349,9 @@ export const dashboardNavItems: DashNavItem[] = [
     subsection: true,
     sectionCat: "admin",
     desc: "Newsletter Subscribers",
-    sub: ["admin"],
-    userType: ["admin"],
+    userRole: ["admin"],
+    sub: [],
+    userType: [],
   },
   {
     label: "Site Analytics",
@@ -350,8 +360,9 @@ export const dashboardNavItems: DashNavItem[] = [
     subsection: true,
     sectionCat: "admin",
     desc: "Posthog Analytics",
-    sub: ["admin"],
-    userType: ["admin"],
+    userRole: ["admin"],
+    sub: [],
+    userType: [],
   },
 
   {
@@ -385,7 +396,7 @@ export const dashboardNavItems: DashNavItem[] = [
     sectionCat: "artist",
     desc: "Saved opportunities",
     sub: ["active", "trialing"],
-    userType: ["artist", "admin"],
+    userType: ["artist"],
   },
   {
     label: "Hidden",
@@ -395,7 +406,7 @@ export const dashboardNavItems: DashNavItem[] = [
     sectionCat: "artist",
     desc: "Hidden events/projects",
     sub: ["active", "trialing"],
-    userType: ["artist", "admin"],
+    userType: ["artist"],
   },
   // {
   //   label: "Submitted",

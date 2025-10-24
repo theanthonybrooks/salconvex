@@ -1,27 +1,31 @@
 "use client";
 
+import {
+  dashboardNavItems,
+  dashboardNavItems as navItems,
+} from "@/constants/links";
+
+import { User } from "@/types/user";
+
 import { Fragment, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useDashboard } from "@/app/(pages)/dashboard/_components/dashboard-context";
-import { User } from "@/types/user";
-import { api } from "~/convex/_generated/api";
-import { UserPrefsType } from "~/convex/schema";
-import { makeUseQueryWithStatus } from "convex-helpers/react";
-import { useQueries } from "convex-helpers/react/cache";
 import { AnimatePresence, motion, Variants } from "framer-motion";
-import { ChevronDown, ChevronRight } from "lucide-react";
+
 import { MdChevronRight } from "react-icons/md";
 import { RiExpandLeftRightLine } from "react-icons/ri";
+import { ChevronDown, ChevronRight } from "lucide-react";
 
 import { TooltipSimple } from "@/components/ui/tooltip";
 import { Search } from "@/features/Sidebar/Search";
 import { getUserFontSizePref } from "@/helpers/stylingFns";
 import { cn } from "@/helpers/utilsFns";
-import {
-  dashboardNavItems,
-  dashboardNavItems as navItems,
-} from "@/constants/links";
+
+import { api } from "~/convex/_generated/api";
+import { UserPrefsType } from "~/convex/schema";
+import { makeUseQueryWithStatus } from "convex-helpers/react";
+import { useQueries } from "convex-helpers/react/cache";
 
 const sectionVariants: Variants = {
   collapsed: {
@@ -68,18 +72,19 @@ export default function DashboardSideBar({
   } = useDashboard();
 
   const statusKey = subStatus ? subStatus : "none";
-  const hasAdminRole = role?.includes("admin");
+  const isAdmin = role?.includes("admin");
   const userType = user?.accountType;
+  const userRole = user?.role;
   const fontSizePref = getUserFontSizePref(userPref?.fontSize);
   const fontSize = fontSizePref?.body;
   const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
   const { data: submittedEventsData } = useQueryWithStatus(
     api.events.event.getSubmittedEventCount,
-    hasAdminRole ? {} : "skip",
+    isAdmin ? {} : "skip",
   );
   const { data: submittedOpenCallsData } = useQueryWithStatus(
     api.openCalls.openCall.getSubmittedOpenCallCount,
-    hasAdminRole ? {} : "skip",
+    isAdmin ? {} : "skip",
   );
   const pendingOpenCalls = submittedOpenCallsData ?? 0;
   const pendingEvents = submittedEventsData ?? 0;
@@ -89,9 +94,15 @@ export default function DashboardSideBar({
   const filteredNavItems = useMemo(() => {
     return navItems.filter((item) => {
       const isAllowedBySub = item.sub.includes(statusKey);
-      const isAdmin = hasAdminRole && !item.label.includes("Help");
+      const hasAdminRole = userRole?.includes("admin");
+      const hasCreatorRole =
+        userRole?.includes("creator") && !item.label.includes("Help");
+      // const isAdmin = isAdmin && !item.label.includes("Help");
       const hasSharedType = userType?.some((type) =>
         item.userType?.includes(type),
+      );
+      const hasSharedRole = userRole?.some((role) =>
+        item.userRole?.includes(role),
       );
 
       const isGeneralItem =
@@ -103,12 +114,14 @@ export default function DashboardSideBar({
 
       return (
         (isAllowedBySub && hasSharedType) ||
-        isAdmin ||
+        (hasAdminRole && hasSharedType) ||
+        hasCreatorRole ||
+        hasSharedRole ||
         isGeneralItem ||
         isPublic
       );
     });
-  }, [statusKey, hasAdminRole, userType]);
+  }, [statusKey, userType, userRole]);
 
   useEffect(() => {
     const matchingSection = filteredNavItems.find(
