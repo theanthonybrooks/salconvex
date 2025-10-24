@@ -1,10 +1,11 @@
 // app/components/ThemedProvider.tsx
 "use client";
 
-import { createContext, ReactNode } from "react";
+import { createContext, ReactNode, useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { ThemeProvider } from "next-themes";
 
+import FullPageLoading from "@/components/ui/loading-screen";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 
 import { UserPrefsType } from "~/convex/schema";
@@ -29,11 +30,13 @@ export function ThemedProvider({ children }: ThemedProviderProps) {
   const isAdmin = userData?.user?.role?.includes("admin");
   const pathname = usePathname();
   const forcedTheme =
-    pathname.startsWith("/auth") || !user ? "default" : undefined;
+    !pathname.startsWith("/auth") && user ? undefined : "default";
+
+  const [isMounted, setIsMounted] = useState(false);
+  useEffect(() => setIsMounted(true), []);
 
   return (
     <ThemeProvider
-      // themes={["light", "dark", "default", "white", "system"]} //TODO: Re-enable dark and system modes once it's actually set up
       themes={
         isAdmin
           ? ["light", "dark", "default", "white", "system"]
@@ -42,13 +45,14 @@ export function ThemedProvider({ children }: ThemedProviderProps) {
             : ["default"]
       }
       attribute="class"
-      // defaultTheme="default"
-      enableSystem={false} //TODO: Re-enable dark and system modes once it's actually set up
-      // disableTransitionOnChange
       storageKey="theme"
       forcedTheme={forcedTheme}
+      //? themes={["light", "dark", "default", "white", "system"]} //todo: Re-enable dark and system modes once it's actually set up
+      defaultTheme="default"
+      enableSystem={false} //? todo: Re-enable dark and system modes once it's actually set up
+      // disableTransitionOnChange
     >
-      {children}
+      {!isMounted ? <FullPageLoading /> : children};
     </ThemeProvider>
   );
 }

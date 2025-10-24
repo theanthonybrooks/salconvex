@@ -1,4 +1,5 @@
 import { Table } from "@tanstack/react-table";
+
 import {
   ChevronLeft,
   ChevronRight,
@@ -29,14 +30,11 @@ export function DataTablePagination<TData>({
   const formType = table.options.meta?.pageType === "form";
   const minimalView = table.options.meta?.minimalView;
 
-  const currentStartingPgResultsNumber =
-    tablePageIndex === 0 ? 1 : tablePageSize + 1;
-  const currentEndingPgResultsNumber =
-    tablePageSize > totalResults
-      ? totalResults
-      : tablePageIndex === 0
-        ? tablePageSize
-        : totalResults - tablePageIndex * tablePageSize + tablePageSize;
+  const currentStartingPgResultsNumber = tablePageIndex * tablePageSize + 1;
+  const currentEndingPgResultsNumber = Math.min(
+    (tablePageIndex + 1) * tablePageSize,
+    totalResults,
+  );
   const hasSelectColumn = table
     .getAllColumns()
     .some((col) => col.id === "select");

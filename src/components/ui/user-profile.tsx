@@ -3,7 +3,6 @@
 import { useState } from "react";
 import Link from "next/link";
 import { api } from "~/convex/_generated/api";
-// import { SignOutButton, useUser } from "@clerk/nextjs";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { useQueries } from "convex-helpers/react/cache";
 import { usePreloadedQuery } from "convex/react";

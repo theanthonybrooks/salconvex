@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+
 import tailwindcssAnimate from "tailwindcss-animate";
 import { fontFamily } from "tailwindcss/defaultTheme";
 import { PluginAPI } from "tailwindcss/types/config";
@@ -329,6 +330,9 @@ export default {
             opacity: "0",
           },
         },
+        spinReverse: {
+          to: { transform: "rotate(-360deg)" },
+        },
       },
       animation: {
         "logo-cloud": "logo-cloud 30s linear infinite",
@@ -341,6 +345,8 @@ export default {
         "border-beam": "border-beam calc(var(--duration)*1s) infinite linear",
         "background-shine": "background-shine 2s linear infinite",
         "caret-blink": "caret-blink 1.25s ease-out infinite",
+        "spin-slow": "spin 9.5s linear infinite",
+        "spin-reverse": "spinReverse 9.5s linear infinite",
       },
     },
   },

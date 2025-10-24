@@ -120,7 +120,7 @@ const EventContextMenu = ({
   const pathname = usePathname();
   const { isMobile } = useDevice();
   const eventPage = pathname?.includes("/event");
-  const isLargeScreen = useMediaQuery("(min-width: 2024px)");
+  const isLargeScreen = useMediaQuery("(min-width: 1535px)");
 
   const { preloadedSubStatus, preloadedUserData } = useConvexPreload();
   const subData = usePreloadedQuery(preloadedSubStatus);
