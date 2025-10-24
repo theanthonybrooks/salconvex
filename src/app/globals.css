@@ -33,12 +33,11 @@ body {
 @layer base {
   :root {
     --sal-yellow: 50 100% 72%; /* #ffe770 */
-    --sal-yellow-light: 50 100% 80%; 
-    --sal-yellow-lt-hover: 50 100% 85%; 
-    --sal-yellow-dark: 50 70% 62%; 
-    --dashboard-bg-lt: 83 50% 95%;
+    --sal-yellow-light: 50 100% 80%;
+    --sal-yellow-lt-hover: 50 100% 85%;
+    --sal-yellow-dark: 50 70% 62%;
 
-    /* --sal-yellow-old: hsl(50 100% 72%); /* #ffe770 */
+    /* --sal-yellow-old: hsl(50 100% 72%);#ffe770 */
     --sal-pink-dark: 303 70% 62%; /* #ff7bff #f4a9f6 */
     --sal-pink: 303 100% 82%; /* #ff7bff #f4a9f6 */
     --sal-pink-light: 303 100% 90%; /* #ff7bff #f4a9f6 */
@@ -48,22 +47,24 @@ body {
     --sal-green: 83, 51%, 88%; /* #e4f0d1 */
     --sal-test: rgb(228, 240, 209);
     --sal-yellow-hex: #f8f16b;
-    --background: 83, 51%, 88%;
-    --background-hex: #e4f0d1;
-    --background-dark: 83, 51%, 78%;
-    /* --background: 0 0% 100%; */
-    --user-icon: var(--sal-yellow-old);
-    --foreground-hex: #020817;
-    --foreground: 222.2 84% 4.9%;
-    /* --sal-progress: rgb(255, 247, 100); */
+    --background-prev: 60 90% 75%; /* #f8f16b */
     --sal-progress: hsl(50 100% 72%);
+    --background-dark: 50 70% 52%;
+    --background: 50 100% 72%;
+    --background-hex: #ffe770;
+
+    --dashboard-bg-lt: 50 100% 90%;
+    --toucan-color: hsl(22, 88%, 54%);
+    /* --sal-progress: var(rgb(240, 121, 244)); */
+    --user-icon: 0, 0%, 100%;
+
+    --foreground: 222.2 84% 4.9%;
+    --foreground-hex: #020817;
     --card: 0 0% 100%;
 
     --card-foreground: 222.2 84% 4.9%;
-    /* --card-secondary: 51, 94%, 93%; */
-    --card-secondary: 0 0% 97%;
 
-    --toucan-color: hsl(22, 88%, 54%);
+    --card-secondary: 51, 94%, 93%;
 
     --popover: 0 0% 100%;
 
@@ -138,6 +139,53 @@ body {
     --fc-event-text-color: #000;
     --fc-event-selected-overlay-color: rgba(0, 0, 0, 0.25);
   }
+  .light {
+    --dashboard-bg-lt: 83 50% 95%;
+    --background: 83, 51%, 88%;
+    --background-hex: #e4f0d1;
+    --background-dark: 83, 51%, 78%;
+    /* --background: 0 0% 100%; */
+
+    --foreground-hex: #020817;
+    --foreground: 222.2 84% 4.9%;
+    /* --sal-progress: rgb(255, 247, 100); */
+
+    --card: 0 0% 100%;
+
+    --card-foreground: 222.2 84% 4.9%;
+    /* --card-secondary: 51, 94%, 93%; */
+    --card-secondary: 0 0% 97%;
+
+    --popover: 0 0% 100%;
+
+    --popover-foreground: 222.2 84% 4.9%;
+
+    --primary: 222.2 47.4% 11.2%;
+
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 40% 96.1%;
+
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96.1%;
+
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 210 40% 96.1%;
+
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --destructive: 0 84.2% 60.2%;
+
+    --destructive-foreground: 210 40% 98%;
+
+    --border: #171716;
+
+    --input: 214.3 31.8% 91.4%;
+
+    --ring: 222.2 84% 4.9%;
+  }
   .dark {
     --color-picker-preview: hsl(47, 1%, 10%);
     --background: 51, 0%, 13%;
@@ -208,67 +256,6 @@ body {
     --sidebar-border: 240 3.7% 15.9%;
 
     --sidebar-ring: 40 91.2% 59.8%;
-  }
-  .default {
-    --background-prev: 60 90% 75%; /* #f8f16b */
-    /* --background: 0 0% 100%; */
-    --background-dark: 50 70% 52%;
-    --background: 50 100% 72%;
-    --background-hex: #ffe770;
-    --dashboard-bg-lt: 50 100% 90%;
-
-    /* --sal-progress: var(rgb(240, 121, 244)); */
-    --user-icon: 0, 0%, 100%;
-
-    --foreground: 222.2 84% 4.9%;
-    --foreground-hex: #020817;
-    --card: 0 0% 100%;
-
-    --card-foreground: 222.2 84% 4.9%;
-
-    --card-secondary: 51, 94%, 93%;
-
-    --popover: 0 0% 100%;
-
-    --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 222.2 47.4% 11.2%;
-
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96.1%;
-
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
-
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 210 40% 96.1%;
-
-    --accent-foreground: 222.2 47.4% 11.2%;
-
-    --destructive: 0 84.2% 60.2%;
-
-    --destructive-foreground: 210 40% 98%;
-
-    --border: #171716;
-
-    --input: 214.3 31.8% 91.4%;
-
-    --ring: 222.2 84% 4.9%;
-
-    /* --chart-1: 12 76% 61%;
-
-    --chart-2: 173 58% 39%;
-
-    --chart-3: 197 37% 24%;
-
-    --chart-4: 43 74% 66%;
-
-    --chart-5: 27 87% 67%; */
-
-    --radius: 0.5rem;
   }
   .white {
     --background-prev: 60 90% 75%; /* #f8f16b */

@@ -407,6 +407,13 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
     (alreadyApprovedOC && alreadyApprovedEvent) ||
     (alreadyApprovedEvent && eventOnly);
 
+  const eventLink = `/thelist/event/${eventData?.slug}/${eventData?.dates?.edition}${hasOpenCall ? "/call" : ""}`;
+  const eventState = eventData?.state;
+  const ocState = openCallData?.state;
+  const unpublished =
+    !["published", "submitted"].includes(eventState ?? "") ||
+    !["published", "submitted"].includes(ocState ?? "");
+
   // console.log(submissionCost);
   // console.log(finalStep, acceptedTerms, isAdmin);
   // #endregion
@@ -2040,12 +2047,16 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
         className="px-4 pb-4 xl:px-8"
         finalLabel={alreadyPaid || alreadyApproved ? "Update" : "Submit"}
         onFinalSubmit={handleSubmit(() => onSubmit())}
+        onViewEvent={() => router.push(eventLink)}
         isDirty={hasUserEditedForm}
         onSave={() => handleSave(true)}
         onPublish={() => handleSave(true, true)}
         lastSaved={lastSavedDate}
         disabled={!isValid || pending || (finalStep && !userAcceptedTerms)}
         pending={pending}
+        formTouched={
+          hasUserEditedForm || savedCount > 0 || !alreadyApproved || unpublished
+        }
         adminMode={isAdmin}
         formType={formType}
         setFormType={setFormType}

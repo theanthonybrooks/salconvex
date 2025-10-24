@@ -10,9 +10,10 @@ import {
 } from "react";
 import Typography from "@mui/material/Typography";
 import { motion } from "framer-motion";
-import { Check, CheckCircle2, LoaderCircle } from "lucide-react";
-import { FaCheckDouble } from "react-icons/fa6";
 import { z } from "zod";
+
+import { FaCheckDouble } from "react-icons/fa6";
+import { Check, CheckCircle2, LoaderCircle } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/helpers/utilsFns";
@@ -53,6 +54,7 @@ interface StepperProps {
   className?: string;
   finalLabel?: string;
   onFinalSubmit?: () => void;
+  onViewEvent?: () => void;
   cancelButton?: ReactNode;
   onSave?: () => void;
   onPublish?: () => void;
@@ -61,6 +63,7 @@ interface StepperProps {
   lastSaved?: string | null;
   errorMsg?: string;
   pending?: boolean;
+  formTouched?: boolean;
   onCheckSchema?: () => void;
   isAdmin?: boolean;
   isMobile?: boolean;
@@ -83,6 +86,7 @@ export default function HorizontalLinearStepper({
   steps,
   finalLabel,
   onFinalSubmit,
+  onViewEvent,
   cancelButton,
   onSave,
   onPublish,
@@ -91,6 +95,7 @@ export default function HorizontalLinearStepper({
   lastSaved,
   errorMsg,
   pending,
+  formTouched,
   onCheckSchema,
   isAdmin,
   isMobile,
@@ -433,13 +438,17 @@ export default function HorizontalLinearStepper({
                   )}
                   disabled={disabled || pending}
                   onClick={
-                    finalStep ? onFinalSubmit : (onNextStep ?? handleNext)
+                    finalStep
+                      ? formTouched
+                        ? onFinalSubmit
+                        : onViewEvent
+                      : (onNextStep ?? handleNext)
                   }
                 >
                   {finalStep ? (
                     finalLabel ? (
                       <div className="flex items-center gap-1">
-                        {finalLabel}
+                        {!formTouched ? "View Submission" : finalLabel}
                         {!pending && <CheckCircle2 className="size-5" />}
                       </div>
                     ) : (

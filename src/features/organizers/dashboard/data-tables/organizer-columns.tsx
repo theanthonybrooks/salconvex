@@ -24,6 +24,7 @@ import {
   GoToEvent,
   ReactivateEvent,
 } from "@/components/data-table/actions/data-table-event-actions";
+import { RenameEventDialog } from "@/components/data-table/actions/data-table-event-name";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 import { Button } from "@/components/ui/button";
 import { ConfirmingDropdown } from "@/components/ui/confirmation-dialog-context";
@@ -407,6 +408,7 @@ export const orgColumns: ColumnDef<OrgEventData>[] = [
                   eventId={event._id}
                   userRole={isAdmin ? "admin" : "user"}
                 />
+                <RenameEventDialog event={event} />
                 {((state === "draft" && !ocApproved) || isAdmin) && (
                   <DeleteEvent eventId={event._id} isAdmin={isAdmin} />
                 )}

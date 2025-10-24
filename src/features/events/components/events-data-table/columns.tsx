@@ -9,8 +9,9 @@ import {
   SubmissionFormState,
 } from "@/types/eventTypes";
 import { OpenCallState } from "@/types/openCallTypes";
+
 import { ColumnDef } from "@tanstack/react-table";
-import { Id } from "~/convex/_generated/dataModel";
+
 import { Globe, LucideClipboardCopy, MoreHorizontal } from "lucide-react";
 
 import {
@@ -60,6 +61,8 @@ import {
 import { SocialDropdownMenus } from "@/features/events/components/social-dropdown-menus";
 import { getEventCategoryLabel, getEventTypeLabel } from "@/helpers/eventFns";
 import { cn } from "@/helpers/utilsFns";
+
+import { Id } from "~/convex/_generated/dataModel";
 
 export const columnLabels: Record<string, string> = {
   name: "Name",
@@ -458,7 +461,9 @@ export const getColumns = (isAdmin: boolean): ColumnDef<Event>[] => {
                             hasOpenCall={false}
                             category={eventCategory}
                           />
-                          <RenameEventDialog event={event} />
+                          {isAdmin && isDashboard && (
+                            <RenameEventDialog event={event} />
+                          )}
                           {isAdmin && hasOC && (
                             <DropdownMenuSub>
                               <DropdownMenuSubTrigger className="flex items-center gap-x-2">

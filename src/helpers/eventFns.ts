@@ -218,8 +218,11 @@ export const formatRateServer = async (
   return `${currencySymbol}${convertedRate.toLocaleString(locale)}/${unit}`;
 };
 
+export type EventLinkFields = Pick<MergedEventPreviewData, "slug" | "dates" | "hasOpenCall">;
+
+
 export const formatEventLink = (
-  event: MergedEventPreviewData,
+  event: EventLinkFields,
   activeSub?: boolean,
   toEvent?: boolean,
 ) => {

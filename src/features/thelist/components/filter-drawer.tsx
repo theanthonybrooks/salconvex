@@ -1,13 +1,21 @@
 "use client";
 
+import { searchDialogVariants } from "@/constants/dialogConsts";
+import {
+  FilterDrawerProps,
+  SearchType,
+  searchTypeOptions,
+  TheListFilterCommandItem,
+} from "@/constants/filterConsts";
+
 import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Command } from "cmdk";
-import { usePreloadedQuery } from "convex/react";
 import { AnimatePresence, motion } from "framer-motion";
-import { LoaderCircle, X } from "lucide-react";
+
 import { BiSolidQuoteLeft, BiSolidQuoteRight } from "react-icons/bi";
 import { IoSearch } from "react-icons/io5";
+import { LoaderCircle, X } from "lucide-react";
 
 import { Link } from "@/components/ui/custom-link";
 import { DialogTitle } from "@/components/ui/dialog";
@@ -25,13 +33,8 @@ import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-con
 import { formatEventLink, getOpenCallStatusLabel } from "@/helpers/eventFns";
 import { getSearchLocationString } from "@/helpers/locations";
 import { cn } from "@/helpers/utilsFns";
-import { searchDialogVariants } from "@/constants/dialogConsts";
-import {
-  FilterDrawerProps,
-  SearchType,
-  searchTypeOptions,
-  TheListFilterCommandItem,
-} from "@/constants/filterConsts";
+
+import { usePreloadedQuery } from "convex/react";
 
 export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
   open,

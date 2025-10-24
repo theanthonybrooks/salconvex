@@ -6,9 +6,6 @@ import { EnrichedEvent, EventCategory } from "@/types/eventTypes";
 import { OpenCallState } from "@/types/openCallTypes";
 import { User } from "@/types/user";
 
-import { getExternalRedirectHtml } from "@/utils/loading-page-html";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { debounce, merge } from "lodash";
 import {
   Dispatch,
   ReactNode,
@@ -19,6 +16,10 @@ import {
   useRef,
   useState,
 } from "react";
+import { useRouter } from "next/navigation";
+import { getExternalRedirectHtml } from "@/utils/loading-page-html";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { debounce, merge } from "lodash";
 import { FormProvider, Path, useForm, useWatch } from "react-hook-form";
 import { toast } from "react-toastify";
 import slugify from "slugify";
@@ -63,12 +64,12 @@ import { cn } from "@/helpers/utilsFns";
 import { handleFileUrl, handleOrgFileUrl } from "@/lib/fileUploadFns";
 import { useDevice } from "@/providers/device-provider";
 
+import { api } from "~/convex/_generated/api";
+import { Doc, Id } from "~/convex/_generated/dataModel";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { useQuery } from "convex-helpers/react/cache";
 import { useQueries } from "convex-helpers/react/cache/hooks";
 import { useAction, useMutation } from "convex/react";
-import { api } from "~/convex/_generated/api";
-import { Doc, Id } from "~/convex/_generated/dataModel";
 
 export const getSteps = (isAdmin: boolean = false) => [
   {
@@ -152,6 +153,7 @@ export const EventOCForm = ({
   planKey,
 }: EventOCFormProps) => {
   // const convex = useConvex();
+  const router = useRouter();
   const { isMobile } = useDevice();
   const isAdmin = user?.role?.includes("admin") || false;
   const steps = getSteps(isAdmin);
@@ -421,6 +423,13 @@ export const EventOCForm = ({
     return { sameAsOrganizer: false };
   }, [existingEvent?.links, existingOrg?.links]);
 
+  const eventLink = `/thelist/event/${eventData?.slug}/${eventData?.dates?.edition}${hasOpenCall ? "/call" : ""}`;
+  const eventState = eventData?.state;
+  const ocState = openCallData?.state;
+  const unpublished =
+    !["published", "submitted"].includes(eventState ?? "") ||
+    !["published", "submitted"].includes(ocState ?? "");
+
   const hasUserEditedStep0 =
     JSON.stringify(dirtyFields?.organization ?? {}).includes("true") &&
     activeStep === 0;
@@ -613,6 +622,7 @@ export const EventOCForm = ({
       await handleSave();
     }
     handleFirstStep();
+    console.log("savedCount: ", savedCount);
     if (savedCount > 0 && activeStep === steps.length - 1) {
       handleDraftUpdate();
     }
@@ -1622,7 +1632,7 @@ export const EventOCForm = ({
           setPending(false);
         }
         if (isAdmin && publish) {
-          console.log(publish)
+          console.log(publish);
           toast.success("Published!");
           setTimeout(() => {
             window.location.href = `/thelist/event/${submissionUrl}`;
@@ -2166,12 +2176,16 @@ export const EventOCForm = ({
         className="px-2 xl:px-8"
         finalLabel={alreadyPaid || alreadyApproved ? "Update" : "Submit"}
         onFinalSubmit={handleSubmit(() => onSubmit())}
+        onViewEvent={() => router.push(eventLink)}
         isDirty={hasUserEditedForm}
         onSave={() => handleSave(true)}
         onPublish={() => handleSave(true, true)}
         lastSaved={lastSavedDate}
         disabled={!isValid || pending || (finalStep && !userAcceptedTerms)}
         pending={pending}
+        formTouched={
+          hasUserEditedForm || savedCount > 0 || !alreadyApproved || unpublished
+        }
         cancelButton={
           <DialogCloseBtn
             tabIndex={4}

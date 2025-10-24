@@ -96,7 +96,7 @@ export const NotificationsDropdown = ({
             </DropdownMenuItem>
           )}
           {!pendingEvents && !pendingOpenCalls && (
-            <DropdownMenuItem className="w-full">
+            <DropdownMenuItem className="pointer-events-none w-full">
               No New Notifications
             </DropdownMenuItem>
           )}

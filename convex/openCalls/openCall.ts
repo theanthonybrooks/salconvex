@@ -164,14 +164,15 @@ export const archiveExpiredOpenCalls = internalMutation({
         }
 
         const newOC = await ctx.db.get(oc._id);
-        if (newOC) await openCallsAggregate.replace(ctx, oc, newOC);
+        if (newOC) await openCallsAggregate.replaceOrInsert(ctx, oc, newOC);
         if (event.category !== "event") {
           await ctx.db.patch(event._id, {
             state: "archived",
             lastEditedAt: Date.now(),
           });
           const newEvent = await ctx.db.get(event._id);
-          if (newEvent) await eventsAggregate.replace(ctx, event, newEvent);
+          if (newEvent)
+            await eventsAggregate.replaceOrInsert(ctx, event, newEvent);
         }
       }
     }

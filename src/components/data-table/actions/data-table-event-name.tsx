@@ -1,12 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
 import { EventCategory } from "@/types/eventTypes";
-import { api } from "~/convex/_generated/api";
-import { useMutation } from "convex/react";
-import { ConvexError } from "convex/values";
-import { BiRename } from "react-icons/bi";
+
+import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
+
+import { BiRename } from "react-icons/bi";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -21,6 +20,10 @@ import { Input } from "@/components/ui/input";
 import { Event } from "@/features/events/components/events-data-table/columns";
 import { getEventCategoryLabel } from "@/helpers/eventFns";
 import { cn } from "@/helpers/utilsFns";
+
+import { api } from "~/convex/_generated/api";
+import { useMutation } from "convex/react";
+import { ConvexError } from "convex/values";
 
 interface EventNameProps {
   event: Event;
@@ -52,10 +55,15 @@ export function DataTableEventName({ event, dashboard }: EventNameProps) {
 export function RenameEventDialog({ event }: EventNameProps) {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState(event.name);
+
   const inputRef = useRef<HTMLInputElement>(null);
   const updateName = useMutation(api.events.event.updateEventName);
 
-  useEffect(() => setName(event.name), [event.name]);
+  useEffect(() => {
+    setName(event.name);
+
+    inputRef.current?.focus();
+  }, [event.name]);
 
   const handleSave = async () => {
     const trimmed = name.trim();
@@ -89,7 +97,7 @@ export function RenameEventDialog({ event }: EventNameProps) {
       </DropdownMenuItem>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent>
+        <DialogContent zIndex="z-top">
           <DialogHeader>
             <DialogTitle>
               Rename{" "}
@@ -108,10 +116,20 @@ export function RenameEventDialog({ event }: EventNameProps) {
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setOpen(false)}>
+            <Button
+              variant="salWithShadowHiddenBg"
+              onClick={() => setOpen(false)}
+            >
               Cancel
             </Button>
-            <Button onClick={handleSave}>Save</Button>
+            <Button
+              disabled={name.trim() === event.name}
+              variant="salWithShadowHidden"
+              onClick={handleSave}
+              className={cn("w-40")}
+            >
+              Save
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
