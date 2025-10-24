@@ -26,7 +26,7 @@ const SignOutBtn = ({ children, email, className }: SignOutBtnProps) => {
       onClick={async () => {
         await updateLastActive({ email: email ?? "" });
         sessionStorage.clear();
-        // localStorage.clear(); //!add this back if I keep running into issues with the wrong theme popping up occasionally
+        localStorage.clear();
 
         await signOut();
         router.push("/auth/sign-in");
