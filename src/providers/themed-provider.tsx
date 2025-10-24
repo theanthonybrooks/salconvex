@@ -1,12 +1,14 @@
 // app/components/ThemedProvider.tsx
 "use client";
 
-import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
-import { usePreloadedQuery } from "convex/react";
-import { ThemeProvider } from "next-themes";
-import { usePathname } from "next/navigation";
 import { createContext, ReactNode } from "react";
+import { usePathname } from "next/navigation";
+import { ThemeProvider } from "next-themes";
+
+import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
+
 import { UserPrefsType } from "~/convex/schema";
+import { usePreloadedQuery } from "convex/react";
 
 interface ThemedProviderProps {
   children: ReactNode;
@@ -30,7 +32,6 @@ export function ThemedProvider({ children }: ThemedProviderProps) {
     pathname.startsWith("/auth") || !user ? "default" : undefined;
 
   return (
-    // <PendingThemeContext.Provider value={{ pendingTheme, setPendingTheme }}>
     <ThemeProvider
       // themes={["light", "dark", "default", "white", "system"]} //TODO: Re-enable dark and system modes once it's actually set up
       themes={
@@ -47,41 +48,7 @@ export function ThemedProvider({ children }: ThemedProviderProps) {
       storageKey="theme"
       forcedTheme={forcedTheme}
     >
-      {/* <ThemeSync userTheme={userTheme} hasUser={!!user}> */}
       {children}
-      {/* </ThemeSync> */}
     </ThemeProvider>
-    // </PendingThemeContext.Provider>
   );
-}
-
-{
-  /*function ThemeSync({
-  hasUser,
-  userTheme,
-  children,
-}: {
-  hasUser?: boolean;
-  userTheme?: string;
-  children: ReactNode;
-}) {
-  const { theme, setTheme } = useTheme();
-  const { pendingTheme, setPendingTheme } = useContext(PendingThemeContext);
-
-  // useEffect(() => {
-  //   if (pendingTheme && userTheme === pendingTheme) setPendingTheme(null);
-  // }, [pendingTheme, userTheme, setPendingTheme]);
-
-  // useEffect(() => {
-  //   if (pendingTheme) return;
-
-  //   if (!hasUser) setTheme("default");
-  //   else if (userTheme && theme !== userTheme) {
-  //     setTheme(userTheme);
-  //   }
-  // }, [theme, userTheme, setTheme, hasUser, pendingTheme]);
-
-  return <>{children}</>;
-}
-*/
 }

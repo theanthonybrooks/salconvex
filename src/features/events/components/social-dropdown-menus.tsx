@@ -1,11 +1,13 @@
 import { EventData, PostStatus } from "@/types/eventTypes";
-import { api } from "~/convex/_generated/api";
-import { useMutation, usePreloadedQuery } from "convex/react";
-import { X } from "lucide-react";
+
 import { MdPhoto } from "react-icons/md";
+import { X } from "lucide-react";
 
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
+
+import { api } from "~/convex/_generated/api";
+import { useMutation, usePreloadedQuery } from "convex/react";
 
 type SocialsEvent = {
   _id: EventData["_id"];
@@ -49,7 +51,7 @@ export const SocialDropdownMenus = ({
     <>
       {!postStatus ? (
         <DropdownMenuItem
-          className="flex items-center gap-x-2 text-sm"
+          className="flex items-center gap-x-2"
           onClick={() => {
             handlePostEvent("toPost");
             if (!openCallState) return;
@@ -65,7 +67,7 @@ export const SocialDropdownMenus = ({
         </DropdownMenuItem>
       ) : (
         <DropdownMenuItem
-          className="flex items-center gap-x-2 text-sm"
+          className="flex items-center gap-x-2"
           onClick={() => handlePostEvent(null)}
         >
           <X className="size-4" />
@@ -75,7 +77,7 @@ export const SocialDropdownMenus = ({
 
       {postStatus && (
         <DropdownMenuItem
-          className="flex items-center gap-x-2 text-sm"
+          className="flex items-center gap-x-2"
           onClick={() => {
             window.open(
               `/thelist/event/${slug}/${edition}/call/social`,

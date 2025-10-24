@@ -63,7 +63,7 @@ const DropdownMenuSubTrigger = React.forwardRef<
   <DropdownMenuPrimitive.SubTrigger
     ref={ref}
     className={cn(
-      "outline-hidden group/trigger relative flex select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm focus:bg-salYellow/50 data-[state=open]:bg-salYellow/50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+      "outline-hidden group/trigger relative flex select-none items-center gap-2 rounded-sm px-2 py-1.5 text-base focus:bg-salYellow/50 data-[state=open]:bg-salYellow/50 sm:text-sm [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
       inset && "pl-8",
       className,
     )}
@@ -129,7 +129,7 @@ const DropdownMenuItem = React.forwardRef<
   <DropdownMenuPrimitive.Item
     ref={ref}
     className={cn(
-      "outline-hidden data-disabled:pointer-events-none data-disabled:opacity-50 relative flex select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm transition-colors hover:cursor-pointer hover:bg-salPink/30 focus:bg-salPink/30 focus:text-accent-foreground [&>svg]:size-4 [&>svg]:shrink-0",
+      "outline-hidden data-disabled:pointer-events-none data-disabled:opacity-50 relative flex select-none items-center gap-2 rounded-sm px-2 py-1.5 text-base transition-colors hover:cursor-pointer hover:bg-salPink/30 focus:bg-salPink/30 focus:text-accent-foreground sm:text-sm [&>svg]:size-4 [&>svg]:shrink-0",
       inset && "pl-8",
       className,
     )}
@@ -193,7 +193,7 @@ const DropdownMenuLabel = React.forwardRef<
   <DropdownMenuPrimitive.Label
     ref={ref}
     className={cn(
-      "px-2 py-1.5 text-sm font-semibold",
+      "px-2 py-1.5 text-base font-semibold sm:text-sm",
       inset && "pl-8",
       className,
     )}

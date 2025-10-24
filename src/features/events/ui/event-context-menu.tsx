@@ -451,7 +451,8 @@ const EventContextMenu = ({
                 <DropdownMenuSubTrigger
                   className="flex items-center gap-x-2"
                   data-side={
-                    buttonTrigger && !eventPage && !isLargeScreen
+                    (buttonTrigger && !eventPage && !isLargeScreen) ||
+                    (buttonTrigger && eventPage && isMobile)
                       ? "left"
                       : "right"
                   }
@@ -475,7 +476,8 @@ const EventContextMenu = ({
               <DropdownMenuSubTrigger
                 className="flex items-center gap-x-2"
                 data-side={
-                  buttonTrigger && !eventPage && !isLargeScreen
+                  (buttonTrigger && !eventPage && !isLargeScreen) ||
+                  (buttonTrigger && eventPage && isMobile)
                     ? "left"
                     : "right"
                 }
@@ -492,7 +494,7 @@ const EventContextMenu = ({
                           id={openCallId}
                           className="flex items-center gap-x-2 sm:text-sm"
                         >
-                          <ArrowRightCircleIcon className="size-4" />
+                          <ArrowRightCircleIcon className="hidden size-4 sm:block" />
                           Go to Convex
                         </ConvexDashboardLink>
                       </DropdownMenuItem>
@@ -502,9 +504,11 @@ const EventContextMenu = ({
                         <CopyableItem
                           copyContent={eventId}
                           className="gap-x-2"
-                          defaultIcon={<FaRegCopy className="size-4" />}
+                          defaultIcon={
+                            <FaRegCopy className="hidden size-4 sm:block" />
+                          }
                         >
-                          Copy Event ID
+                          Event ID
                         </CopyableItem>
                       </DropdownMenuItem>
                     )}
@@ -513,9 +517,11 @@ const EventContextMenu = ({
                         <CopyableItem
                           copyContent={openCallId}
                           className="gap-x-2"
-                          defaultIcon={<FaRegCopy className="size-4" />}
+                          defaultIcon={
+                            <FaRegCopy className="hidden size-4 sm:block" />
+                          }
                         >
-                          Copy Open Call ID
+                          Open Call ID
                         </CopyableItem>
                       </DropdownMenuItem>
                     )}
@@ -524,9 +530,11 @@ const EventContextMenu = ({
                         <CopyableItem
                           copyContent={mainOrgId}
                           className="gap-x-2"
-                          defaultIcon={<FaRegCopy className="size-4" />}
+                          defaultIcon={
+                            <FaRegCopy className="hidden size-4 sm:block" />
+                          }
                         >
-                          Copy Org ID
+                          Org ID
                         </CopyableItem>
                       </DropdownMenuItem>
                     )}
