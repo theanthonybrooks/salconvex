@@ -1123,7 +1123,7 @@ export default defineSchema({
     })
     .searchIndex("search_by_orgName", {
       searchField: "orgName",
-      filterFields: ["continent", "ocState", "eventState", "eventCategory"],
+      filterFields: ["continent", "ocState", "eventState", "eventCategory", "orgName"],
     })
     // Common filters
     // .index("by_eventName", ["eventName"])

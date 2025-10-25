@@ -1,13 +1,14 @@
-import { getAuthUserId } from "@convex-dev/auth/server";
-import { action, QueryCtx } from "./_generated/server";
-
 import {
   formatSubscriptionLabel,
   getCancelReasonLabel,
   getFeedbackLabel,
 } from "@/helpers/subscriptionFns";
-import { getAuthSessionId, invalidateSessions } from "@convex-dev/auth/server";
-import { ConvexError, v } from "convex/values";
+
+import {
+  getAuthSessionId,
+  getAuthUserId,
+  invalidateSessions,
+} from "@convex-dev/auth/server";
 import { Id } from "~/convex/_generated/dataModel";
 import { scryptCrypto } from "~/convex/auth";
 import { updateOrgOwnerBeforeDelete } from "~/convex/organizer/organizations";
@@ -19,11 +20,14 @@ import {
   UserRole,
   userRoleArrayValidator,
 } from "~/convex/schema";
+import { ConvexError, v } from "convex/values";
 import {
+  action,
   internalMutation,
   mutation,
   MutationCtx,
   query,
+  QueryCtx,
 } from "./_generated/server";
 
 export const getUserById = query({
@@ -1050,7 +1054,7 @@ async function deleteRelatedDocuments(
         await ctx.db.patch(org._id, {
           ownerId: adminUserId,
           updatedAt: Date.now(),
-          lastUpdatedBy: userId,
+          lastUpdatedBy: "system admin",
         });
       }
     } catch (error) {

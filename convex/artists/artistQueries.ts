@@ -1,8 +1,8 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
-import { mergedStream, stream } from "convex-helpers/server/stream";
 import { Id } from "~/convex/_generated/dataModel";
 import { query } from "~/convex/_generated/server";
 import schema from "~/convex/schema";
+import { mergedStream, stream } from "convex-helpers/server/stream";
 
 export const getActiveArtists = query({
   handler: async (ctx) => {
@@ -25,8 +25,9 @@ export const getActiveArtists = query({
     );
     const mergedSubs = mergedStream(activeSubs, ["status"]);
     const subs = await mergedSubs.collect();
+    const filteredSubs = subs.filter((sub) => sub.cancelAt === undefined);
     const artists = await Promise.all(
-      subs.map(async (sub) => {
+      filteredSubs.map(async (sub) => {
         const artist = await ctx.db
           .query("artists")
           .withIndex("by_artistId", (q) =>

@@ -3,16 +3,19 @@
 //TODO: Split the list actions, user sub, user orgs, and other queries into their own files.
 
 import { validOCVals } from "@/constants/openCallConsts";
-import { compareEnrichedEvents } from "@/lib/sort/compareEnrichedEvents";
+
 import { OpenCallStatus } from "@/types/openCallTypes";
-import { getAuthUserId } from "@convex-dev/auth/server";
-import { doc } from "convex-helpers/validators";
-import { Infer, v } from "convex/values";
+
 import { addDays, addMonths, addWeeks, startOfWeek } from "date-fns";
-import { query } from "~/convex/_generated/server";
 
 import type { Id } from "~/convex/_generated/dataModel";
+import { compareEnrichedEvents } from "@/lib/sort/compareEnrichedEvents";
+
+import { getAuthUserId } from "@convex-dev/auth/server";
+import { query } from "~/convex/_generated/server";
 import schema from "~/convex/schema";
+import { doc } from "convex-helpers/validators";
+import { Infer, v } from "convex/values";
 
 export const filtersSchema = v.object({
   eventCategories: v.optional(v.array(v.string())),
@@ -234,11 +237,29 @@ export const getFilteredEventsPublic = query({
               .take(30),
           ]);
           //! Remove the dups. Avoiding any duplicate key issues that I was having
+
+          const filteredOrgs = orgs.filter((org) =>
+            org?.orgName?.toLowerCase().includes(searchTerm?.toLowerCase()),
+          );
+          const filteredEvents = events.filter((event) =>
+            event?.eventName?.toLowerCase().includes(searchTerm?.toLowerCase()),
+          );
+          const filteredLocations = eventLocs.filter((event) =>
+            event?.locationFull
+              ?.toLowerCase()
+              .includes(searchTerm?.toLowerCase()),
+          );
+          const filteredOrgLocations = orgLocs.filter((org) =>
+            org?.orgLocation?.full
+              ?.toLowerCase()
+              .includes(searchTerm?.toLowerCase()),
+          );
+
           lookupResults = [
-            ...events,
-            ...eventLocs,
-            ...orgLocs,
-            ...orgs,
+            ...filteredEvents,
+            ...filteredLocations,
+            ...filteredOrgLocations,
+            ...filteredOrgs,
             ...countryAbbrs,
             ...orgCountryAbbrs,
           ].filter(
@@ -246,19 +267,26 @@ export const getFilteredEventsPublic = query({
               index === self.findIndex((t) => t._id === item._id),
           );
         } else if (searchType === "events" && searchTerm) {
-          lookupResults = await ctx.db
+          const eventNameResults = await ctx.db
             .query("eventLookup")
             .withSearchIndex("search_by_name", (q) =>
               q.search("eventName", searchTerm).eq("ocState", "published"),
             )
             .take(30);
+
+          lookupResults = eventNameResults.filter((event) =>
+            event?.eventName?.toLowerCase().includes(searchTerm?.toLowerCase()),
+          );
         } else if (searchType === "orgs" && searchTerm) {
-          lookupResults = await ctx.db
+          const eventOrgNameResults = await ctx.db
             .query("eventLookup")
             .withSearchIndex("search_by_orgName", (q) =>
               q.search("orgName", searchTerm).eq("ocState", "published"),
             )
             .take(30);
+          lookupResults = eventOrgNameResults.filter((org) =>
+            org?.orgName?.toLowerCase().includes(searchTerm?.toLowerCase()),
+          );
         } else if (searchType === "loc" && searchTerm) {
           const [locs, countryAbbrs, orgLocs, orgCountryAbbrs] =
             await Promise.all([
@@ -336,19 +364,25 @@ export const getFilteredEventsPublic = query({
       }
     } else if (view === "event") {
       if (searchType === "events" && searchTerm) {
-        lookupResults = await ctx.db
+        const eventNameResults = await ctx.db
           .query("eventLookup")
           .withSearchIndex("search_by_name", (q) =>
             q.search("eventName", searchTerm).eq("eventState", "published"),
           )
           .take(30);
+        lookupResults = eventNameResults.filter((event) =>
+          event?.eventName?.toLowerCase().includes(searchTerm?.toLowerCase()),
+        );
       } else if (searchType === "orgs" && searchTerm) {
-        lookupResults = await ctx.db
+        const orgEventResults = await ctx.db
           .query("eventLookup")
           .withSearchIndex("search_by_orgName", (q) =>
             q.search("orgName", searchTerm).eq("eventState", "published"),
           )
           .take(30);
+        lookupResults = orgEventResults.filter((org) =>
+          org?.orgName?.toLowerCase().includes(searchTerm?.toLowerCase()),
+        );
       } else if (searchType === "loc" && searchTerm) {
         const [locs, countryAbbrs, orgLocs, orgCountryAbbrs] =
           await Promise.all([
@@ -409,19 +443,26 @@ export const getFilteredEventsPublic = query({
       }
     } else if (view === "archive") {
       if (searchType === "events" && searchTerm) {
-        lookupResults = await ctx.db
+        const eventNameArchiveResults = await ctx.db
           .query("eventLookup")
           .withSearchIndex("search_by_name", (q) =>
             q.search("eventName", searchTerm),
           )
           .take(40);
+
+        lookupResults = eventNameArchiveResults.filter((event) =>
+          event?.eventName?.toLowerCase().includes(searchTerm?.toLowerCase()),
+        );
       } else if (searchType === "orgs" && searchTerm) {
-        lookupResults = await ctx.db
+        const orgArchiveResults = await ctx.db
           .query("eventLookup")
           .withSearchIndex("search_by_orgName", (q) =>
             q.search("orgName", searchTerm),
           )
           .take(30);
+        lookupResults = orgArchiveResults.filter((org) =>
+          org?.orgName?.toLowerCase().includes(searchTerm?.toLowerCase()),
+        );
       } else if (searchType === "loc" && searchTerm) {
         console.log("searching by location");
         const [locs, countryAbbrs, orgLocs, orgCountryAbbrs] =
@@ -452,10 +493,18 @@ export const getFilteredEventsPublic = query({
               )
               .take(30),
           ]);
+        const filteredEventLocs = locs.filter((loc) =>
+          loc?.locationFull?.toLowerCase().includes(searchTerm?.toLowerCase()),
+        );
+        const filteredOrgLocs = orgLocs.filter((org) =>
+          org?.orgLocation?.full
+            ?.toLowerCase()
+            .includes(searchTerm?.toLowerCase()),
+        );
         lookupResults = [
-          ...locs,
+          ...filteredEventLocs,
           ...countryAbbrs,
-          ...orgLocs,
+          ...filteredOrgLocs,
           ...orgCountryAbbrs,
         ].filter(
           (item, index, self) =>
@@ -473,19 +522,25 @@ export const getFilteredEventsPublic = query({
     } else {
       //TODO: Make organizer cards and just show them here.
       if (searchType === "events" && searchTerm) {
-        lookupResults = await ctx.db
+        const eventNameResults = await ctx.db
           .query("eventLookup")
           .withSearchIndex("search_by_name", (q) =>
             q.search("eventName", searchTerm),
           )
-          .take(30);
+          .take(40);
+        lookupResults = eventNameResults.filter((event) =>
+          event?.eventName?.toLowerCase().includes(searchTerm?.toLowerCase()),
+        );
       } else if (searchType === "orgs" && searchTerm) {
-        lookupResults = await ctx.db
+        const orgResults = await ctx.db
           .query("eventLookup")
           .withSearchIndex("search_by_orgName", (q) =>
             q.search("orgName", searchTerm),
           )
-          .take(30);
+          .take(40);
+        lookupResults = orgResults.filter((org) =>
+          org?.orgName?.toLowerCase().includes(searchTerm?.toLowerCase()),
+        );
       } else if (searchType === "loc" && searchTerm) {
         const [locs, countryAbbrs, orgLocs, orgCountryAbbrs] =
           await Promise.all([
