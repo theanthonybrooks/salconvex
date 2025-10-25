@@ -1,7 +1,11 @@
 "use client";
 
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { openCallCategoryFields } from "@/constants/openCallConsts";
+
 import { OpenCallData } from "@/types/openCallTypes";
+
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
+
 import { Check, Clipboard } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -15,9 +19,8 @@ import {
 import { formatCurrency } from "@/helpers/currencyFns";
 import { formatEventDates, formatOpenCallDeadline } from "@/helpers/dateFns";
 import { formatBudgetCurrency } from "@/helpers/eventFns";
-import { getDemonym, getFormattedLocationString } from "@/helpers/locations";
+import { getDemonym, getFormattedLocationString } from "@/helpers/locationFns";
 import { cn } from "@/helpers/utilsFns";
-import { openCallCategoryFields } from "@/constants/openCallConsts";
 import { getCallFormatLabel } from "@/lib/openCallFns";
 
 interface PostCaptionDialogProps {

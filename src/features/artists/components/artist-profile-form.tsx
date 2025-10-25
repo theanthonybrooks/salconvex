@@ -1,17 +1,16 @@
 "use client";
 
+import { User } from "@/types/user";
+
 import { useEffect, useState } from "react";
 import { UpdateArtistSchema, UpdateArtistSchemaValues } from "@/schemas/artist";
-import { User } from "@/types/user";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { api } from "~/convex/_generated/api";
-import { useAction, useMutation, useQuery } from "convex/react";
-import { FunctionReturnType } from "convex/server";
-import { LoaderCircle } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { Country } from "world-countries";
 import { z } from "zod";
+
+import { LoaderCircle } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -30,8 +29,12 @@ import LogoUploader from "@/components/ui/logo-uploader";
 import { MapboxInputFull } from "@/components/ui/mapbox-search";
 import { SearchMappedMultiSelect } from "@/components/ui/mapped-select-multi";
 import { autoHttps, formatHandleInput } from "@/helpers/linkFns";
-import { sortedGroupedCountries } from "@/helpers/locations";
+import { sortedGroupedCountries } from "@/helpers/locationFns";
 import { cn } from "@/helpers/utilsFns";
+
+import { api } from "~/convex/_generated/api";
+import { useAction, useMutation, useQuery } from "convex/react";
+import { FunctionReturnType } from "convex/server";
 
 interface ArtistProfileFormProps {
   user: User | undefined;

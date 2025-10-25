@@ -1,18 +1,16 @@
+import { User } from "@/types/user";
+
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { UpdateArtistSchema, UpdateArtistSchemaValues } from "@/schemas/artist";
-import { User } from "@/types/user";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { api } from "~/convex/_generated/api";
-import { Id } from "~/convex/_generated/dataModel";
-import { useAction, useMutation, useQuery } from "convex/react";
-import { FunctionReturnType } from "convex/server";
 import { formatDate, isBefore } from "date-fns";
-import { LoaderCircle } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
-import { IoMdArrowRoundForward } from "react-icons/io";
 import { toast } from "react-toastify";
 import { Country } from "world-countries";
+
+import { IoMdArrowRoundForward } from "react-icons/io";
+import { LoaderCircle } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -33,8 +31,13 @@ import { MapboxInputFull } from "@/components/ui/mapbox-search";
 import { SearchMappedMultiSelect } from "@/components/ui/mapped-select-multi";
 import { Separator } from "@/components/ui/separator";
 import { autoHttps, formatHandleInput } from "@/helpers/linkFns";
-import { sortedGroupedCountries } from "@/helpers/locations";
+import { sortedGroupedCountries } from "@/helpers/locationFns";
 import { cn } from "@/helpers/utilsFns";
+
+import { api } from "~/convex/_generated/api";
+import { Id } from "~/convex/_generated/dataModel";
+import { useAction, useMutation, useQuery } from "convex/react";
+import { FunctionReturnType } from "convex/server";
 
 interface ArtistProfileFormProps {
   className?: string;

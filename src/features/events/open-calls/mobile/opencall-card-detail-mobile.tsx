@@ -1,13 +1,13 @@
 "use client";
 
+import { OpenCallCardProps } from "@/types/openCallTypes";
+
 import React, { useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { OpenCallCardProps } from "@/types/openCallTypes";
-import { api } from "~/convex/_generated/api";
-import { useMutation, usePreloadedQuery } from "convex/react";
 import { motion } from "framer-motion";
-import { CheckCircleIcon, EyeOff, MapPin } from "lucide-react";
+
 import { FaBookmark, FaRegBookmark } from "react-icons/fa6";
+import { CheckCircleIcon, EyeOff, MapPin } from "lucide-react";
 
 import { Card } from "@/components/ui/card";
 import { ChartWrapper } from "@/components/ui/charts/chart-wrapper";
@@ -23,9 +23,12 @@ import { getOpenCallStatus } from "@/features/events/open-calls/helpers/openCall
 import { OrganizerCard } from "@/features/organizers/components/organizer-card";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { getEventCategoryLabel, getEventTypeLabel } from "@/helpers/eventFns";
-import { getFormattedLocationString } from "@/helpers/locations";
+import { getFormattedLocationString } from "@/helpers/locationFns";
 import { getUserFontSizePref } from "@/helpers/stylingFns";
 import { cn } from "@/helpers/utilsFns";
+
+import { api } from "~/convex/_generated/api";
+import { useMutation, usePreloadedQuery } from "convex/react";
 
 const tabs = ["opencall", "event", "organizer"];
 

@@ -6,8 +6,9 @@ import type { OpenCallCardProps } from "@/types/openCallTypes";
 
 import { useEffect, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { CheckCircleIcon, EyeOff, MapPin } from "lucide-react";
+
 import { FaBookmark, FaRegBookmark } from "react-icons/fa6";
+import { CheckCircleIcon, EyeOff, MapPin } from "lucide-react";
 
 import { ApproveBtn } from "@/components/ui/approve-btn";
 import { Card } from "@/components/ui/card";
@@ -36,7 +37,7 @@ import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-con
 import { formatApplicationLink } from "@/helpers/applicationFns";
 import { formatOpenCallDeadline, formatSingleDate } from "@/helpers/dateFns";
 import { getEventCategoryLabel, getEventTypeLabel } from "@/helpers/eventFns";
-import { getFormattedLocationString } from "@/helpers/locations";
+import { getFormattedLocationString } from "@/helpers/locationFns";
 import { RichTextDisplay } from "@/helpers/richTextFns";
 import { getUserFontSizePref } from "@/helpers/stylingFns";
 import { cn } from "@/helpers/utilsFns";

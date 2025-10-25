@@ -3,9 +3,14 @@ import {
   EU_COUNTRIES,
   usRegions,
 } from "@/constants/locationConsts";
+
 import { EventData } from "@/types/eventTypes";
 import { Organizer } from "@/types/organizer";
+
 import rawCountries, { Country } from "world-countries";
+
+import type { LocationBase } from "~/convex/schema";
+
 import { LocationFull } from "~/convex/schema";
 
 export interface MapboxContextItem {
@@ -344,4 +349,19 @@ export const sortByLocation = <T>(
       ? primaryCompare
       : aSecondary.localeCompare(bSecondary);
   });
+};
+
+//todo: make something similar that checks a search term and returns which section it matches. For example, if the search term is "New York", it would return "state" or "city" depending on which one it's closest to.
+const largeCountries = ["US", "CA", "AU", "NZ", "RU"];
+export const getLocationType = (location: LocationBase) => {
+  if (location.locale) return "locale";
+  if (location.city) return "city";
+  if (location.state) return "state";
+  if (location.stateAbbr) return "state";
+  if (location.region) return "region";
+  if (largeCountries.includes(location.countryAbbr)) return "continent";
+  if (location.country) return "country";
+  if (location.countryAbbr) return "country";
+  if (location.continent) return "continent";
+  return "unknown";
 };

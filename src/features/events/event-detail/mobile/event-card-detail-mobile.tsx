@@ -1,13 +1,13 @@
 "use client";
 
+import { EventCardProps } from "@/types/eventTypes";
+
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { EventCardProps } from "@/types/eventTypes";
-import { api } from "~/convex/_generated/api";
-import { useMutation, usePreloadedQuery } from "convex/react";
 import { motion } from "framer-motion";
-import { CalendarClockIcon, EyeOff, MapPin } from "lucide-react";
+
 import { FaBookmark, FaRegBookmark } from "react-icons/fa6";
+import { CalendarClockIcon, EyeOff, MapPin } from "lucide-react";
 
 import { Card } from "@/components/ui/card";
 import { DraftPendingBanner } from "@/components/ui/draft-pending-banner";
@@ -21,9 +21,12 @@ import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-con
 import { generateICSFile } from "@/helpers/addToCalendar";
 import { isValidIsoDate } from "@/helpers/dateFns";
 import { getEventCategoryLabel, getEventTypeLabel } from "@/helpers/eventFns";
-import { getFormattedLocationString } from "@/helpers/locations";
+import { getFormattedLocationString } from "@/helpers/locationFns";
 import { getUserFontSizePref } from "@/helpers/stylingFns";
 import { cn } from "@/helpers/utilsFns";
+
+import { api } from "~/convex/_generated/api";
+import { useMutation, usePreloadedQuery } from "convex/react";
 
 export const EventCardDetailMobile = (props: EventCardProps) => {
   const updateEventAnalytics = useMutation(

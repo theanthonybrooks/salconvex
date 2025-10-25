@@ -1,5 +1,5 @@
 import { EligibilityLabelBaseProps } from "@/features/events/open-calls/components/eligibility-label-client";
-import { getDemonym } from "@/helpers/locations";
+import { getDemonym } from "@/helpers/locationFns";
 
 export const EligibilityLabelServer = ({
   type,

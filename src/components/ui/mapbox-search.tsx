@@ -1,3 +1,5 @@
+import { USAddressFormatCountries } from "@/constants/locationConsts";
+
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import {
@@ -7,9 +9,8 @@ import {
   fetchMapboxSuggestionsFull,
   MapboxSuggestion,
   stateToRegionMap,
-} from "@/helpers/locations";
+} from "@/helpers/locationFns";
 import { cn } from "@/helpers/utilsFns";
-import { USAddressFormatCountries } from "@/constants/locationConsts";
 
 //NOTE: This is the full version of the mapbox input that passes the full location object rather than just the full string/value.
 export interface FullLocation {

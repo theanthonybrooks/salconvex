@@ -1,6 +1,8 @@
+import { PublicEventPreviewData } from "@/types/eventTypes";
+
 import { forwardRef } from "react";
 import Image from "next/image";
-import { PublicEventPreviewData } from "@/types/eventTypes";
+
 import { PiSkullBold } from "react-icons/pi";
 import { TiMinus } from "react-icons/ti";
 
@@ -8,7 +10,7 @@ import EventDates from "@/features/events/components/event-dates";
 import { EligibilityLabel } from "@/features/events/open-calls/components/eligibility-label-client";
 import { formatOpenCallDeadline } from "@/helpers/dateFns";
 import { formatBudgetCurrency } from "@/helpers/eventFns";
-import { getFormattedLocationString } from "@/helpers/locations";
+import { getFormattedLocationString } from "@/helpers/locationFns";
 import { cn } from "@/helpers/utilsFns";
 
 interface RecapPostProps {

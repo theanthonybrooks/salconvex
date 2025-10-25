@@ -1,5 +1,13 @@
-import { useState } from "react";
+import {
+  EuropeanCountries,
+  EuropeanEUCountries,
+  EuropeanNonEUCountries,
+} from "@/constants/locationConsts";
+
 import { EligibilityType } from "@/types/openCallTypes";
+
+import { useState } from "react";
+
 import { CheckIcon, XIcon } from "lucide-react";
 
 import { PopoverSimple } from "@/components/ui/popover";
@@ -9,13 +17,8 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/state-accordion-test";
-import { getDemonym } from "@/helpers/locations";
+import { getDemonym } from "@/helpers/locationFns";
 import { cn } from "@/helpers/utilsFns";
-import {
-  EuropeanCountries,
-  EuropeanEUCountries,
-  EuropeanNonEUCountries,
-} from "@/constants/locationConsts";
 
 export interface EligibilityLabelBaseProps {
   type: EligibilityType | null;

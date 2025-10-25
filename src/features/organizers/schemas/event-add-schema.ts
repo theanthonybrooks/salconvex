@@ -1,7 +1,3 @@
-import { z } from "zod";
-
-import { eventStateValues } from "@/components/data-table/data-table-constants";
-import { cleanHtml } from "@/helpers/richTextFns";
 import {
   eventCategoryValues,
   eventFormatValues,
@@ -13,6 +9,11 @@ import {
   callTypeValues,
   validOCVals,
 } from "@/constants/openCallConsts";
+
+import { z } from "zod";
+
+import { eventStateValues } from "@/components/data-table/data-table-constants";
+import { cleanHtml } from "@/helpers/richTextFns";
 import {
   domainRegex,
   isValidFacebook,
@@ -214,7 +215,7 @@ const contactSchema = z.object({
   primaryContact: z.string().optional(),
 });
 
-const organizationSchema = z.object({
+const baseOrganizationSchema = z.object({
   _id: z.optional(z.string()),
   name: z
     .string()
@@ -230,10 +231,15 @@ const organizationSchema = z.object({
   ]),
   logoStorageId: z.optional(z.string()),
   location: locationSchema,
+  // about: z.optional(z.string()),
+  // contact: contactSchema.optional(),
+  // links: linksSchemaStrict.optional(),
+  hadFreeCall: z.optional(z.boolean()),
+});
+const organizationSchema = baseOrganizationSchema.extend({
   about: z.optional(z.string()),
   contact: contactSchema.optional(),
   links: linksSchemaStrict.optional(),
-  hadFreeCall: z.optional(z.boolean()),
 });
 
 export const eventBase = z.object({
@@ -456,7 +462,7 @@ export const eventSchema = eventBase.superRefine((data, ctx) => {
 
 export const step1Schema = z
   .object({
-    organization: organizationSchema,
+    organization: baseOrganizationSchema,
   })
   .superRefine((data, ctx) => {
     if (

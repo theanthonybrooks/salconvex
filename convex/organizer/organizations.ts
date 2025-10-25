@@ -647,7 +647,11 @@ export const getUserOrganizations = query({
           q.search("name", args.query.trim().toLowerCase()),
         )
         .collect();
-      return all;
+
+      const filteredResults = all.filter((org) =>
+        org?.name?.toLowerCase().includes(args.query?.toLowerCase()),
+      );
+      return filteredResults;
     } else {
       // const orgs = await ctx.db
       //   .query("organizations")
@@ -664,7 +668,12 @@ export const getUserOrganizations = query({
             .eq("ownerId", user._id),
         )
         .collect();
-      const sortedOrgs = orgs.sort((a, b) => a.name.localeCompare(b.name));
+      const filteredResults = orgs.filter((org) =>
+        org?.name?.toLowerCase().includes(args.query?.toLowerCase()),
+      );
+      const sortedOrgs = filteredResults.sort((a, b) =>
+        a.name.localeCompare(b.name),
+      );
       return sortedOrgs;
     }
   },

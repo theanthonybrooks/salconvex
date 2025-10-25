@@ -9,8 +9,9 @@ import { cn } from "@/helpers/utilsFns";
 import "leaflet/dist/leaflet.css";
 
 import { useMemo, useState } from "react";
-import { FaMapLocationDot } from "react-icons/fa6";
 import { MapContainer, TileLayer } from "react-leaflet";
+
+import { FaMapLocationDot } from "react-icons/fa6";
 
 interface MapPoint {
   latitude: number;
@@ -20,11 +21,20 @@ interface MapPoint {
   eventType?: EventType;
 }
 
+export type LocationType =
+  | "locale"
+  | "city"
+  | "region"
+  | "state"
+  | "country"
+  | "continent"
+  | "unknown";
 interface MapComponentProps {
   latitude?: number;
   longitude?: number;
   label?: string;
   points?: MapPoint[];
+  locationType?: LocationType;
   className?: string;
   containerClassName?: string;
   hasDirections?: boolean;
@@ -36,6 +46,7 @@ export default function MapComponent({
   longitude,
   label,
   points,
+  locationType,
   className,
   containerClassName,
   hasDirections = false,
@@ -62,6 +73,28 @@ export default function MapComponent({
       allPoints.reduce((sum, p) => sum + p.longitude, 0) / allPoints.length;
     return [avgLat, avgLng];
   }, [allPoints]);
+  //TODO: map this in to determine the zoom level based on the country. I started working on this in the locationFns file.
+
+  const zoomLevel = (() => {
+    switch (locationType) {
+      case "locale":
+        return 12;
+      case "city":
+        return 9;
+      case "region":
+        return 7;
+      case "state":
+        return 6;
+      case "country":
+        return 5;
+      case "continent":
+        return 3;
+      default:
+        return mapType === "event" ? 6 : 3;
+    }
+  })();
+
+  console.log(zoomLevel);
 
   return (
     <div className={cn(containerClassName)}>
@@ -78,7 +111,7 @@ export default function MapComponent({
         )}
         <MapContainer
           center={center as [number, number]}
-          zoom={mapType === "event" ? 6 : 3}
+          zoom={zoomLevel}
           scrollWheelZoom={false}
           attributionControl={false}
           className={className}

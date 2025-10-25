@@ -35,7 +35,7 @@ import { OrganizerCard } from "@/features/organizers/components/organizer-card";
 import { OrganizerLogoNameCard } from "@/features/organizers/components/organizer-logo-name-card";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { getEventCategoryLabel, getEventTypeLabel } from "@/helpers/eventFns";
-import { getFormattedLocationString } from "@/helpers/locations";
+import { getFormattedLocationString } from "@/helpers/locationFns";
 import { RichTextDisplay } from "@/helpers/richTextFns";
 import { getUserFontSizePref } from "@/helpers/stylingFns";
 import { cn } from "@/helpers/utilsFns";

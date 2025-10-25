@@ -1925,7 +1925,6 @@ export const EventOCForm = ({
     const orgChanged = orgReady && existingOrg._id !== prevOrgRef.current?._id;
 
     if (orgChanged) {
-      // console.log("resetting");
       setFurthestStep(0);
       reset({
         organization: {

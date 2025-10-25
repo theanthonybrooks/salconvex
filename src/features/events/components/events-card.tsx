@@ -1,5 +1,7 @@
-import { RefObject } from "react";
 import { EventData } from "@/types/eventTypes";
+
+import { RefObject } from "react";
+
 import { FaMapLocationDot } from "react-icons/fa6";
 
 import { Card } from "@/components/ui/card";
@@ -13,6 +15,7 @@ import {
 import EventDates from "@/features/events/components/event-dates";
 import { LazyMap } from "@/features/wrapper-elements/map/lazy-map";
 import { getEventCategoryLabel } from "@/helpers/eventFns";
+import { getLocationType } from "@/helpers/locationFns";
 import { RichTextDisplay } from "@/helpers/richTextFns";
 import { cn } from "@/helpers/utilsFns";
 
@@ -42,6 +45,8 @@ export const EventCard = ({
     // slug,
   } = event;
 
+  console.log(location);
+
   const latitude = location.coordinates?.latitude ?? 0;
   const longitude = location.coordinates?.longitude ?? 0;
   const isMobile = format === "mobile";
@@ -63,6 +68,7 @@ export const EventCard = ({
                     latitude={latitude}
                     longitude={longitude}
                     label={event.name}
+                    locationType={getLocationType(location)}
                     className="z-0 mb-4 h-[200px] w-full overflow-hidden rounded-xl"
                   />
                   <p className={cn("font-medium", fontSize)}>Full Location:</p>
@@ -154,6 +160,7 @@ export const EventCard = ({
                   latitude={latitude}
                   longitude={longitude}
                   label={event.name}
+                  locationType={getLocationType(location)}
                   // hasDirections={true}
                   className={
                     "z-0 mb-4 h-[400px] w-full overflow-hidden rounded-xl"

@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+
+import { Check, CircleCheck, CircleX, Search } from "lucide-react";
+
+import { cn } from "@/helpers/utilsFns";
+
 import { api } from "~/convex/_generated/api";
 import { Doc } from "~/convex/_generated/dataModel";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { useQueries } from "convex-helpers/react/cache";
-import { Check, CircleCheck, CircleX, Search } from "lucide-react";
-
-import { cn } from "@/helpers/utilsFns";
 
 interface OrgSearchProps {
   id: string;
@@ -79,6 +81,7 @@ export const OrgSearch = ({
   };
 
   const handleSelect = (org: Doc<"organizations">) => {
+    // console.log(org);
     onChange(org.name);
     setInputValue(org.name);
     setSelectedVal(org.name);
@@ -149,30 +152,30 @@ export const OrgSearch = ({
     }
   };
 
-  const handleBlur = () => {
-    // console.log("handleBlur");
+  // const handleBlur = () => {
+  //   // console.log("handleBlur");
 
-    if (inputValue.trim() !== "" && inputValue.trim() === selectedVal) {
-      if (results && results?.length > 0 && selectedIndex >= 0) {
-        handleSelect(results[selectedIndex]);
-      }
-      setFocused(false);
-      setSelectedIndex(-1);
-      // console.log("if");
-    } else if (inputValue.trim() === "" && selectedVal.trim() !== "") {
-      if (results && results?.length > 0) {
-        handleSelect(results[selectedIndex]);
-      }
-      setFocused(false);
-      setSelectedIndex(-1);
-    } else {
-      setTimeout(() => {
-        setFocused(false);
-        setSelectedIndex(-1);
-      }, 100);
-      // console.log("else");
-    }
-  };
+  //   if (inputValue.trim() !== "" && inputValue.trim() === selectedVal) {
+  //     if (results && results?.length > 0 && selectedIndex >= 0) {
+  //       handleSelect(results[selectedIndex]);
+  //     }
+  //     setFocused(false);
+  //     setSelectedIndex(-1);
+  //     // console.log("if");
+  //   } else if (inputValue.trim() === "" && selectedVal.trim() !== "") {
+  //     if (results && results?.length > 0) {
+  //       handleSelect(results[selectedIndex]);
+  //     }
+  //     setFocused(false);
+  //     setSelectedIndex(-1);
+  //   } else {
+  //     setTimeout(() => {
+  //       setFocused(false);
+  //       setSelectedIndex(-1);
+  //     }, 100);
+  //     // console.log("else");
+  //   }
+  // };
 
   useEffect(() => {
     if (
@@ -247,7 +250,7 @@ export const OrgSearch = ({
             if (!hasUserInteracted) setHasUserInteracted(true);
             setFocused(true);
           }}
-          onBlur={handleBlur}
+          // onBlur={handleBlur}
           onKeyDown={(e) => {
             if (!hasUserInteracted) setHasUserInteracted(true);
             handleKeyDown(e);
@@ -302,7 +305,11 @@ export const OrgSearch = ({
                 ref={(el) => {
                   itemRefs.current[idx] = el;
                 }}
-                onMouseDown={() => handleSelect(org)}
+                // onMouseDown={() => handleSelect(org)}
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                }}
+                onClick={() => handleSelect(org)}
                 className={cn(
                   "relative flex cursor-pointer items-center gap-x-4 py-3 pl-4 pr-2",
                   selectedIndex === idx

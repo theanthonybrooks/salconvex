@@ -1,5 +1,14 @@
 "use client";
 
+import {
+  NewsletterFrequency,
+  newsletterFrequencyOptions,
+  NewsletterType,
+  newsletterTypeOptions,
+} from "@/constants/newsletterConsts";
+
+import { CookiePref } from "@/types/user";
+
 import { useEffect, useState } from "react";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import {
@@ -14,21 +23,14 @@ import {
   UpdateUserSchema,
   UpdateUserSchemaValues,
 } from "@/schemas/auth";
-import { CookiePref } from "@/types/user";
-import { useAuthActions } from "@convex-dev/auth/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AlertDialogTitle } from "@radix-ui/react-alert-dialog";
 import { FontSizeIcon } from "@radix-ui/react-icons";
-import { api } from "~/convex/_generated/api";
-import { Id } from "~/convex/_generated/dataModel";
-import { FontSizeType, UserPrefsType } from "~/convex/schema";
-import {
-  useAction,
-  useMutation,
-  usePreloadedQuery,
-  useQuery,
-} from "convex/react";
-import { ConvexError } from "convex/values";
+import { useTheme } from "next-themes";
+import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
+import { z } from "zod";
+
 import {
   Clock,
   Cookie,
@@ -41,10 +43,6 @@ import {
   Palette,
   Shield,
 } from "lucide-react";
-import { useTheme } from "next-themes";
-import { useForm } from "react-hook-form";
-import { toast } from "react-toastify";
-import { z } from "zod";
 
 import { FormError } from "@/components/form-error";
 import { FormSuccess } from "@/components/form-success";
@@ -106,13 +104,19 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { getUserFontSizePref } from "@/helpers/stylingFns";
 import { cn } from "@/helpers/utilsFns";
-import {
-  NewsletterFrequency,
-  newsletterFrequencyOptions,
-  NewsletterType,
-  newsletterTypeOptions,
-} from "@/constants/newsletterConsts";
 import { useDevice } from "@/providers/device-provider";
+
+import { useAuthActions } from "@convex-dev/auth/react";
+import { api } from "~/convex/_generated/api";
+import { Id } from "~/convex/_generated/dataModel";
+import { FontSizeType, UserPrefsType } from "~/convex/schema";
+import {
+  useAction,
+  useMutation,
+  usePreloadedQuery,
+  useQuery,
+} from "convex/react";
+import { ConvexError } from "convex/values";
 
 export default function SettingsPage() {
   const pathname = usePathname();
@@ -1523,15 +1527,13 @@ export default function SettingsPage() {
                         </AlertDialogTrigger>
                         <AlertDialogContent className="w-[80dvw] bg-salYellow text-foreground">
                           <AlertDialogHeader>
-                            <AlertDialogTitle className="text-foreground">
+                            <AlertDialogTitle className="font-bold text-foreground">
                               Delete Account
                             </AlertDialogTitle>
                           </AlertDialogHeader>
                           <AlertDialogDescription className="text-foreground">
-                            Are you sure you want to delete your account? Any
-                            active memberships need to be canceled before this
-                            is possible and all data will be permanently
-                            deleted.
+                            Are you sure you want to delete your account? All
+                            data will be permanently deleted.
                           </AlertDialogDescription>
 
                           <AlertDialogFooter>

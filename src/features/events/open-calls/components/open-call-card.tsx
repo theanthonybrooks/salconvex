@@ -1,7 +1,9 @@
+import { DOC_TYPES, IMAGE_TYPES } from "@/constants/fileConsts";
+
 import { ArtistFull } from "@/types/artist";
 import { EventData } from "@/types/eventTypes";
 import { OpenCall } from "@/types/openCallTypes";
-import { UserPrefsType } from "~/convex/schema";
+
 import { CalendarClockIcon, CheckIcon, X } from "lucide-react";
 
 import { Card } from "@/components/ui/card";
@@ -25,10 +27,11 @@ import { generateICSFile } from "@/helpers/addToCalendar";
 import { formatOpenCallDeadline, isValidIsoDate } from "@/helpers/dateFns";
 import { formatBudgetCurrency, formatRate } from "@/helpers/eventFns";
 import { getMimeTypeFromHref } from "@/helpers/fileFns";
-import { getFormattedLocationString } from "@/helpers/locations";
+import { getFormattedLocationString } from "@/helpers/locationFns";
 import { RichTextDisplay } from "@/helpers/richTextFns";
 import { cn } from "@/helpers/utilsFns";
-import { DOC_TYPES, IMAGE_TYPES } from "@/constants/fileConsts";
+
+import { UserPrefsType } from "~/convex/schema";
 
 interface OpenCallCardProps {
   artist?: ArtistFull | null;

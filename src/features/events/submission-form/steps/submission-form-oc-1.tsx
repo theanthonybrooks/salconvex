@@ -1,17 +1,25 @@
-import { useEffect, useState } from "react";
-import { currencies, Currency } from "@/app/data/currencies";
+import {
+  eligibilityOptionValues,
+  openCallLinkFormatOptions,
+} from "@/constants/openCallConsts";
+import { siteUrl } from "@/constants/siteInfo";
+
 import {
   CallFormat,
   EligibilityType,
   openCallFileType,
 } from "@/types/openCallTypes";
 import { User } from "@/types/user";
+
+import { useEffect, useState } from "react";
+import { currencies, Currency } from "@/app/data/currencies";
 import FilePondPluginFileValidateSize from "filepond-plugin-file-validate-size";
 import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type";
-import { ArrowRight } from "lucide-react";
 import { registerPlugin } from "react-filepond";
 import { Controller, useFormContext } from "react-hook-form";
 import { Country } from "world-countries";
+
+import { ArrowRight } from "lucide-react";
 
 import { Link } from "@/components/ui/custom-link";
 import { OcCustomDatePicker } from "@/components/ui/date-picker/oc-date-picker";
@@ -36,18 +44,14 @@ import { FilePondInput } from "@/features/files/filepond";
 import { hasId, OpenCallFilesTable } from "@/features/files/form-file-list";
 import { OpenCallStep1 } from "@/features/organizers/schemas/event-add-schema";
 import { autoHttps } from "@/helpers/linkFns";
-import { enhancedGroupedCountries } from "@/helpers/locations";
+import { enhancedGroupedCountries } from "@/helpers/locationFns";
 import { cn } from "@/helpers/utilsFns";
-import {
-  eligibilityOptionValues,
-  openCallLinkFormatOptions,
-} from "@/constants/openCallConsts";
-import { siteUrl } from "@/constants/siteInfo";
 
 import "filepond/dist/filepond.min.css";
 
-import { Id } from "~/convex/_generated/dataModel";
 import { DateTime } from "luxon";
+
+import { Id } from "~/convex/_generated/dataModel";
 
 registerPlugin(FilePondPluginFileValidateSize, FilePondPluginFileValidateType);
 

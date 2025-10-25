@@ -1,11 +1,13 @@
 "use client";
 
 //TODO: once map page is built, connect the mapPin icons to that. Should have an organizer view on the map page.
+import { validOCVals } from "@/constants/openCallConsts";
+
+import { OrganizerCardProps } from "@/types/organizer";
+
 import { useRef, useState } from "react";
 import Image from "next/image";
-import { OrganizerCardProps } from "@/types/organizer";
-import { api } from "~/convex/_generated/api";
-import { useMutation, usePreloadedQuery } from "convex/react";
+
 import { ExternalLink } from "lucide-react";
 
 import { Card } from "@/components/ui/card";
@@ -23,11 +25,13 @@ import { ConvexDashboardLink } from "@/features/events/ui/convex-dashboard-link"
 import { OrganizerCard } from "@/features/organizers/components/organizer-card";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { formatEventDates } from "@/helpers/dateFns";
-import { getFormattedLocationString } from "@/helpers/locations";
+import { getFormattedLocationString } from "@/helpers/locationFns";
 import { RichTextDisplay } from "@/helpers/richTextFns";
 import { getUserFontSizePref } from "@/helpers/stylingFns";
 import { cn } from "@/helpers/utilsFns";
-import { validOCVals } from "@/constants/openCallConsts";
+
+import { api } from "~/convex/_generated/api";
+import { useMutation, usePreloadedQuery } from "convex/react";
 
 export const OrganizerCardDetailDesktop = (props: OrganizerCardProps) => {
   const updateEventAnalytics = useMutation(

@@ -11,7 +11,7 @@ import { Organizer } from "@/types/organizer";
 
 import slugify from "slugify";
 
-import { sortByLocation } from "@/helpers/locations";
+import { sortByLocation } from "@/helpers/locationFns";
 import { sortByOcStatus } from "@/lib/openCallFns";
 
 import { getAuthUserId } from "@convex-dev/auth/server";

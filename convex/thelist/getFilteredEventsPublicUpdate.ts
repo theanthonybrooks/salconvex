@@ -367,7 +367,10 @@ export const getFilteredEventsPublic = query({
         const eventNameResults = await ctx.db
           .query("eventLookup")
           .withSearchIndex("search_by_name", (q) =>
-            q.search("eventName", searchTerm).eq("eventState", "published"),
+            q
+              .search("eventName", searchTerm)
+              .eq("eventState", "published")
+              .eq("eventCategory", "event"),
           )
           .take(30);
         lookupResults = eventNameResults.filter((event) =>
@@ -377,7 +380,10 @@ export const getFilteredEventsPublic = query({
         const orgEventResults = await ctx.db
           .query("eventLookup")
           .withSearchIndex("search_by_orgName", (q) =>
-            q.search("orgName", searchTerm).eq("eventState", "published"),
+            q
+              .search("orgName", searchTerm)
+              .eq("eventState", "published")
+              .eq("eventCategory", "event"),
           )
           .take(30);
         lookupResults = orgEventResults.filter((org) =>

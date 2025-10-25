@@ -31,7 +31,7 @@ import { SelectSimple } from "@/components/ui/select";
 import { FilterBase } from "@/features/thelist/components/filters/filter-base";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { formatEventLink, getOpenCallStatusLabel } from "@/helpers/eventFns";
-import { getSearchLocationString } from "@/helpers/locations";
+import { getSearchLocationString } from "@/helpers/locationFns";
 import { cn } from "@/helpers/utilsFns";
 
 import { usePreloadedQuery } from "convex/react";
