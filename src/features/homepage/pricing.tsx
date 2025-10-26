@@ -1,18 +1,15 @@
 "use client";
 
+import { User } from "@/types/user";
+
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useManageSubscription } from "@/hooks/use-manage-subscription";
-import { User } from "@/types/user";
-import { api } from "~/convex/_generated/api";
-import { Doc } from "~/convex/_generated/dataModel";
-import { AccountTypeBase } from "~/convex/schema";
-import { useQuery } from "convex-helpers/react/cache";
-import { useAction, usePreloadedQuery } from "convex/react";
 import { motion } from "framer-motion";
-import { CheckCircle2, CircleX } from "lucide-react";
 import { toast } from "react-toastify";
+
+import { CheckCircle2, CircleX } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -33,6 +30,12 @@ import {
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { getUserFontSizePref } from "@/helpers/stylingFns";
 import { cn } from "@/helpers/utilsFns";
+
+import { api } from "~/convex/_generated/api";
+import { Doc } from "~/convex/_generated/dataModel";
+import { AccountTypeBase } from "~/convex/schema";
+import { useQuery } from "convex-helpers/react/cache";
+import { useAction, usePreloadedQuery } from "convex/react";
 
 type SwitchProps = {
   onSwitchAction: (value: string) => void;
@@ -109,7 +112,7 @@ const PricingHeader = ({
     id="pricing-header"
     className="my-6 flex flex-col items-center gap-4 text-center md:my-8 md:gap-8"
   >
-    <h2 className="cursor-pointer text-pretty font-tanker text-4h lowercase tracking-wide text-foreground md:text-wrap md:text-[4em]">
+    <h2 className="cursor-pointer text-balance font-tanker text-4h lowercase tracking-wide text-foreground md:text-wrap md:text-[4em]">
       {title}
     </h2>
     <span className="max-w-2xl text-balance text-foreground">{subtitle}</span>

@@ -24,7 +24,7 @@ export default function WorldMapComponent() {
   );
 
   return (
-    <div className="mt-8 flex h-full w-full flex-1 flex-col items-center justify-center gap-4 px-4">
+    <div className="mt-8 flex h-full w-full flex-1 flex-col items-center justify-center gap-8 px-4">
       <h1 className="font-tanker text-3xl lowercase tracking-wide xl:text-[5rem]">
         World Map
       </h1>
@@ -68,7 +68,7 @@ export default function WorldMapComponent() {
               points={mapData ?? []}
               label={"test"}
               className={cn(
-                "z-0 mx-auto mb-4 h-[calc(80dvh-100px)] w-full max-w-[90dvw] overflow-hidden rounded-xl",
+                "z-0 mx-auto mb-4 h-[calc(95dvh-100px)] w-full max-w-[90dvw] overflow-hidden rounded-xl",
                 fullScreen && "h-dvh",
               )}
               locationType="full"

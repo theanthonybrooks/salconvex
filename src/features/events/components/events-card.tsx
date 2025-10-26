@@ -161,6 +161,8 @@ export const EventCard = ({
 
               <AccordionContent className={cn(fontSize)}>
                 <LazyMap
+                  fullScreen={viewFull}
+                  setFullScreen={setViewFull}
                   latitude={latitude}
                   longitude={longitude}
                   label={event.name}
