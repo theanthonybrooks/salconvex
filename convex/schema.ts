@@ -129,6 +129,8 @@ export const hasOpenCallValidator = v.union(
   v.literal("Unknown"),
   v.literal("False"),
 );
+
+export type HasOpenCallType = Infer<typeof hasOpenCallValidator>;
 // #endregion
 
 // #region -------------Open Call Validators --------------
@@ -447,7 +449,6 @@ const listActionsSchema = {
 };
 
 const organizationSchema = {
-  isPlaceholderName: v.optional(v.boolean()),
   isComplete: v.boolean(),
   ownerId: v.id("users"),
   // organizationName: v.optional(v.string()),
@@ -1123,7 +1124,13 @@ export default defineSchema({
     })
     .searchIndex("search_by_orgName", {
       searchField: "orgName",
-      filterFields: ["continent", "ocState", "eventState", "eventCategory", "orgName"],
+      filterFields: [
+        "continent",
+        "ocState",
+        "eventState",
+        "eventCategory",
+        "orgName",
+      ],
     })
     // Common filters
     // .index("by_eventName", ["eventName"])

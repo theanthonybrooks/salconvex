@@ -1,25 +1,32 @@
 // components/LeafletMapIcon.tsx
 "use client";
 
+import type { MapPoint } from "@/features/events/event-leaflet";
+
 import L from "leaflet";
 import { renderToStaticMarkup } from "react-dom/server";
-import { FaMapMarkerAlt } from "react-icons/fa";
 import { Marker, Popup } from "react-leaflet";
 
-interface LeafletMapIconProps {
-  latitude: number;
-  longitude: number;
-  label?: string;
+import { FaMapMarkerAlt } from "react-icons/fa";
+
+import { formatEventLink } from "@/helpers/eventFns";
+
+type LeafletMapIconProps = MapPoint & {
   iconSize?: number;
   iconColor?: string;
-}
+  type?: "worldMap" | "event";
+  activeSub?: boolean;
+};
 
 export default function LeafletMapIcon({
   latitude,
   longitude,
   label,
+  meta,
   iconSize = 30,
   iconColor = "#E53E3E",
+  type = "event",
+  activeSub,
 }: LeafletMapIconProps) {
   // const iconMarkup = renderToStaticMarkup(
   //   <div className="leaflet-custom-marker-wrapper">
@@ -42,6 +49,19 @@ export default function LeafletMapIcon({
     className: "custom-icon-marker",
   });
 
+  const linkUrl =
+    type === "worldMap" && meta
+      ? formatEventLink(
+          {
+            dates: { edition: meta.edition },
+            slug: meta.slug,
+            hasOpenCall: meta.hasOpenCall,
+          },
+          activeSub,
+          true,
+        )
+      : `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`;
+
   return (
     <Marker position={[latitude, longitude]} icon={customMarkerIcon}>
       {label && (
@@ -49,12 +69,12 @@ export default function LeafletMapIcon({
           <div className="flex flex-col gap-y-1 text-sm">
             {label}
             <a
-              href={`https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`}
+              href={linkUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="underline hover:opacity-70"
             >
-              Get Directions
+              {type === "event" ? "Get Directions" : "View Details"}
             </a>
           </div>
         </Popup>

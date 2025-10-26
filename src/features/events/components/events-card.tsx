@@ -45,8 +45,6 @@ export const EventCard = ({
     // slug,
   } = event;
 
-  console.log(location);
-
   const latitude = location.coordinates?.latitude ?? 0;
   const longitude = location.coordinates?.longitude ?? 0;
   const isMobile = format === "mobile";

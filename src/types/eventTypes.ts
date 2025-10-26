@@ -2,6 +2,7 @@ import { ApplicationStatus } from "@/types/applications";
 import { ArtistFull } from "@/types/artist";
 import { OpenCall, OpenCallStatus } from "@/types/openCallTypes";
 import { Organizer } from "@/types/organizer";
+
 import { Doc, Id } from "~/convex/_generated/dataModel";
 import {
   EventCategoryType,

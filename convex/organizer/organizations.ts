@@ -272,7 +272,7 @@ export const createNewOrg = mutation({
   args: {
     organizationName: v.string(),
     logoStorageId: v.optional(v.id("_storage")),
-    logo: v.optional(v.string()),
+
     location: v.optional(
       v.object({
         ...locationFullFields,
@@ -298,55 +298,30 @@ export const createNewOrg = mutation({
       fileUrl = await ctx.storage.getUrl(args.logoStorageId);
     }
 
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_userId", (q) => q.eq("userId", userId))
-      .unique();
+    const user = await ctx.db.get(userId);
 
     if (!user) {
       throw new ConvexError("User not found");
     }
+    const isAdmin = user?.role?.includes("admin");
     const userAccountTypes = user?.accountType ?? [];
 
-    if (!userAccountTypes.includes("organizer")) {
-      const userSub = await ctx.db
-        .query("userSubscriptions")
-        .withIndex("userId", (q) => q.eq("userId", user._id))
-        .first();
-
-      const userHadTrial = userSub?.hadTrial || false;
-
+    if (!userAccountTypes.includes("organizer") && !isAdmin) {
       const userLog = await ctx.db
         .query("userLog")
-        .withIndex("by_userId", (q) => q.eq("userId", user._id))
+        .withIndex("by_userId", (q) => q.eq("userId", userId))
         .unique();
 
-      await ctx.db.patch(user._id, {
+      await ctx.db.patch(userId, {
         accountType: [...user.accountType, "organizer"],
         updatedAt: Date.now(),
       });
-      if (!userLog) {
-        await ctx.db.insert("userLog", {
-          userId: user._id,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          active: true,
-          banned: false,
-          hadTrial: userHadTrial,
-          bannedReason: undefined,
-          bannedTimestamp: undefined,
-          banningAuthority: undefined,
-          deleted: false,
-          deletedReason: undefined,
-          deletedTimestamp: undefined,
-          deletedBy: undefined,
-          accountTypes: ["organizer"],
-          userEmail: user.email,
-        });
-      } else {
+      if (userLog) {
         await ctx.db.patch(userLog._id, {
           accountTypes: [...userLog.accountTypes, "organizer"],
         });
+      } else {
+        console.error("userLog not found for userId: ", userId);
       }
     }
 
@@ -356,39 +331,19 @@ export const createNewOrg = mutation({
       .unique();
 
     if (org) {
-      const isOwner = org.ownerId === user._id;
-
-      const userRole = await ctx.db
-        .query("users")
-        .withIndex("by_userId", (q) => q.eq("userId", userId))
-        .unique();
-      // .then((user) => user?.role)
-
-      const isAdmin = userRole && userRole?.role?.includes("admin");
+      const isOwner = org.ownerId === userId;
 
       if (!isOwner && !isAdmin) {
         throw new ConvexError(
           "You don't have permission to update this organization",
         );
       }
-
-      //logic to check if the user is the owner of the organization
-      //if not, check if the user has a role of admin
-      //if not, throw an error
-
-      //if user is the owner and it exists, patch the organization (no duplicate organizations allowed)
-      //if user is not the owner and is an admin, patch the organization (don't change the ownerId)
-      //if user is not the owner and is not an admin, throw an error
-      // else if org doesn't exist, create a new organization with current user as the ownerId
-
-      //TODO: Ensure that at some point, you can also edit the organization name. Perhaps this won't be from the form, though, but rather the admin's dashboard. Makes more sense.
-
       await ctx.db.patch(org._id, {
         name: args.organizationName,
         slug: slugify(args.organizationName, { lower: true, strict: true }),
-        logo: fileUrl || args.logo,
-        logoStorageId: args.logoStorageId,
-        location: args.location,
+        logo: fileUrl || org.logo || "/1.jpg",
+        logoStorageId: args.logoStorageId || org.logoStorageId,
+        location: args.location || org.location,
         updatedAt: Date.now(),
         lastUpdatedBy: userId,
       });
@@ -468,6 +423,7 @@ export const updateOrganization = mutation({
   args: {
     orgId: v.id("organizations"),
     logo: v.optional(v.string()),
+    logoStorageId: v.optional(v.id("_storage")),
     location: v.optional(
       v.object({
         ...locationFullFields,
@@ -528,6 +484,7 @@ export const updateOrganization = mutation({
       name: args.name.trim(),
       slug: args.slug,
       logo: args.logo,
+      ...(args.logoStorageId && { logoStorageId: args.logoStorageId }),
       location: {
         ...args.location,
         country: args.location?.country ?? "",

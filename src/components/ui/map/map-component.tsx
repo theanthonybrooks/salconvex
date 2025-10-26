@@ -2,14 +2,17 @@
 
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+
+import { LazyMap } from "@/features/wrapper-elements/map/lazy-map";
+import { cn } from "@/helpers/utilsFns";
+
 import { api } from "~/convex/_generated/api";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { useQueries } from "convex-helpers/react/cache/hooks";
 
-import { LazyMap } from "@/features/wrapper-elements/map/lazy-map";
-
 export default function WorldMapComponent() {
+  const [fullScreen, setFullScreen] = useState(false);
   useEffect(() => {
     sessionStorage.setItem("previousSalPage", "/map");
   }, []);
@@ -26,7 +29,12 @@ export default function WorldMapComponent() {
         World Map
       </h1>
 
-      <div className="flex w-full max-w-[80dvw] grid-cols-[20%_minmax(0,1fr)] flex-col gap-x-10 gap-y-3 xl:grid">
+      <div
+        className={cn(
+          "flex w-full max-w-[80dvw] grid-cols-[20%_minmax(0,1fr)] flex-col gap-x-10 gap-y-3 xl:grid",
+          fullScreen && "!flex h-dvh max-w-[95dvw] items-center justify-center",
+        )}
+      >
         {/* <div className="col-span-1 h-max w-full self-start rounded-xl border-1.5 border-foreground/20 bg-white/50 py-3">
           <p className="px-3 pb-2 text-xl font-bold">Filters</p>
           <Separator className="mb-4" thickness={2} />
@@ -51,6 +59,7 @@ export default function WorldMapComponent() {
             Coming soon!
           </p>
         </div> */}
+        {!fullScreen && <div />}
         <section className="w-full">
           {isPending ? (
             <div>Loading...</div>
@@ -58,7 +67,14 @@ export default function WorldMapComponent() {
             <LazyMap
               points={mapData ?? []}
               label={"test"}
-              className="z-0 mb-4 h-[calc(80dvh-100px)] w-full max-w-[90dvw] overflow-hidden rounded-xl"
+              className={cn(
+                "z-0 mx-auto mb-4 h-[calc(80dvh-100px)] w-full max-w-[90dvw] overflow-hidden rounded-xl",
+                fullScreen && "h-dvh",
+              )}
+              locationType="full"
+              fullScreen={fullScreen}
+              setFullScreen={setFullScreen}
+              mapType="full"
             />
           )}
         </section>

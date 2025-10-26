@@ -358,8 +358,8 @@ export const getLocationType = (location: LocationBase) => {
   if (location.city) return "city";
   if (location.state) return "state";
   if (location.stateAbbr) return "state";
-  if (location.region) return "region";
   if (largeCountries.includes(location.countryAbbr)) return "continent";
+  if (location.region) return "region";
   if (location.country) return "country";
   if (location.countryAbbr) return "country";
   if (location.continent) return "continent";

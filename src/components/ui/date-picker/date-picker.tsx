@@ -104,11 +104,6 @@ export const CustomDatePicker = ({
   isAdmin,
   disabled,
 }: CustomDatePickerProps) => {
-  console.log(value);
-  console.log(
-    minDate,
-    new Date(Number(minDate ?? new Date().getFullYear()), 0, 1),
-  );
   const parsedDate =
     pickerType === "season" ? fromSeason(value ?? "") : toDate(value);
 

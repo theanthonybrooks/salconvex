@@ -12,14 +12,27 @@ import { useMemo, useState } from "react";
 import { MapContainer, TileLayer } from "react-leaflet";
 
 import { FaMapLocationDot } from "react-icons/fa6";
+import { MaximizeIcon, Minimize } from "lucide-react";
 
-interface MapPoint {
+import type { HasOpenCallType } from "~/convex/schema";
+import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
+
+import { usePreloadedQuery } from "convex/react";
+
+export type MapPoint = {
   latitude: number;
   longitude: number;
   label?: string;
-  category?: EventCategory;
-  eventType?: EventType;
-}
+  meta?: {
+    category: EventCategory;
+    eventType?: EventType[];
+    slug: string;
+    hasOpenCall: HasOpenCallType;
+    logo: string;
+    description?: string;
+    edition: number;
+  };
+};
 
 export type LocationType =
   | "locale"
@@ -28,7 +41,8 @@ export type LocationType =
   | "state"
   | "country"
   | "continent"
-  | "unknown";
+  | "unknown"
+  | "full";
 interface MapComponentProps {
   latitude?: number;
   longitude?: number;
@@ -39,6 +53,8 @@ interface MapComponentProps {
   containerClassName?: string;
   hasDirections?: boolean;
   mapType?: "event" | "full";
+  fullScreen?: boolean;
+  setFullScreen?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export default function MapComponent({
@@ -51,7 +67,15 @@ export default function MapComponent({
   containerClassName,
   hasDirections = false,
   mapType = "event",
+  fullScreen,
+  setFullScreen,
 }: MapComponentProps) {
+  const { preloadedUserData, preloadedSubStatus } = useConvexPreload();
+  const userData = usePreloadedQuery(preloadedUserData);
+  const isAdmin = userData?.user?.role?.includes("admin");
+  const subData = usePreloadedQuery(preloadedSubStatus);
+  const { hasActiveSubscription } = subData ?? {};
+
   const [overlay, setOverlay] = useState(true);
 
   // Determine all points (whether single or multiple)
@@ -89,17 +113,19 @@ export default function MapComponent({
         return 5;
       case "continent":
         return 3;
+      case "full":
+        return 1;
       default:
         return mapType === "event" ? 6 : 3;
     }
   })();
 
-  console.log(zoomLevel);
+  // console.log(zoomLevel);
 
   return (
     <div className={cn(containerClassName)}>
       <div className={cn("group relative", className)}>
-        {overlay && (
+        {overlay && mapType === "event" && (
           <>
             <div className="pointer-events-none absolute inset-0 z-20 hidden items-center justify-center rounded-xl opacity-0 transition-opacity duration-200 group-hover:opacity-100 lg:flex">
               <p className="pointer-events-none select-none text-balance px-5 text-center text-2xl font-bold text-white">
@@ -109,12 +135,24 @@ export default function MapComponent({
             <div className="pointer-events-none absolute inset-0 z-10 hidden items-center justify-center rounded-xl bg-black/50 opacity-0 blur-sm transition-opacity duration-200 group-hover:opacity-100 lg:flex"></div>
           </>
         )}
+        {setFullScreen && (
+          <button
+            className="absolute right-2 top-2 z-10 rounded border-2 border-muted-foreground/60 bg-card p-2 hover:scale-105 hover:cursor-pointer active:scale-95"
+            onClick={() => setFullScreen((prev) => !prev)}
+          >
+            {fullScreen ? (
+              <Minimize className="size-4 text-foreground" />
+            ) : (
+              <MaximizeIcon className="size-4 text-foreground" />
+            )}
+          </button>
+        )}
         <MapContainer
           center={center as [number, number]}
           zoom={zoomLevel}
           scrollWheelZoom={false}
           attributionControl={false}
-          className={className}
+          className={cn("z-0 h-full w-full")}
         >
           <TileLayer
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -127,9 +165,12 @@ export default function MapComponent({
               latitude={p.latitude}
               longitude={p.longitude}
               label={p.label}
+              meta={p.meta}
+              type={mapType === "full" ? "worldMap" : "event"}
+              activeSub={hasActiveSubscription || isAdmin}
             />
           ))}
-          <ClickToZoom setOverlay={setOverlay} />
+          {mapType === "event" && <ClickToZoom setOverlay={setOverlay} />}
         </MapContainer>
       </div>
       {hasDirections && (

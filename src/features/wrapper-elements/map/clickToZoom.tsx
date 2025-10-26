@@ -11,8 +11,16 @@ export default function ClickToZoom({ setOverlay }: ClickToZoomProps) {
   const map = useMap();
 
   useEffect(() => {
-    const enable = () => map.scrollWheelZoom.enable();
-    const disable = () => map.scrollWheelZoom.disable();
+    const enable = () => {
+      map.scrollWheelZoom.enable();
+      map.touchZoom.enable();
+      map.dragging.enable();
+    };
+    const disable = () => {
+      map.scrollWheelZoom.disable();
+      map.touchZoom.disable();
+      map.dragging.disable();
+    };
 
     const container = map.getContainer();
 

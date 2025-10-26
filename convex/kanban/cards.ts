@@ -49,11 +49,16 @@ export const searchCards = query({
       );
 
     const results = await q.collect();
-    let output = results;
+    const filteredResults = results.filter((r) =>
+      r.description?.toLowerCase()?.includes(searchTerm?.toLowerCase()),
+    );
+    let output = filteredResults;
 
     // Post-filter for multiple categories
     if (args.category.length > 1) {
-      output = results.filter((q) => args.category.includes(q.category));
+      output = filteredResults.filter((q) =>
+        args.category.includes(q.category),
+      );
     }
     if (args.assignedId) {
       output = output.filter((q) => q.assignedId === args.assignedId);

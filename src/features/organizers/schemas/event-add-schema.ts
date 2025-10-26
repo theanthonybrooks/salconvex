@@ -235,6 +235,7 @@ const baseOrganizationSchema = z.object({
   // contact: contactSchema.optional(),
   // links: linksSchemaStrict.optional(),
   hadFreeCall: z.optional(z.boolean()),
+  isComplete: z.optional(z.boolean()),
 });
 const organizationSchema = baseOrganizationSchema.extend({
   about: z.optional(z.string()),

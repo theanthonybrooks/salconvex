@@ -792,7 +792,6 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
             const { org } = await createNewOrg({
               organizationName: orgData.name,
               logoStorageId: orgLogoStorageId,
-              // logo,
               location: {
                 full: orgData.location.full,
                 locale: orgData.location.locale,

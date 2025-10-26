@@ -323,6 +323,8 @@ export const getCurrentUser = query({
       return null;
     }
 
+    console.log("query called: ", user);
+
     return { userId, user, userPref };
   },
 });

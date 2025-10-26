@@ -875,7 +875,6 @@ export const EventOCForm = ({
             const { org } = await createNewOrg({
               organizationName: orgData.name?.trim(),
               logoStorageId: orgLogoStorageId,
-              // logo,
 
               location: {
                 full: orgData.location.full,

@@ -1,9 +1,3 @@
-import { Metadata } from "next";
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
-
-import Footer from "@/features/wrapper-elements/navigation/components/footer";
-import { NavbarWrapper } from "@/features/wrapper-elements/navigation/components/navbar-wrapper";
 import {
   DEFAULT_DESCRIPTION,
   DEFAULT_ICON,
@@ -11,6 +5,17 @@ import {
   getPageMeta,
 } from "@/constants/pageTitles";
 import { siteUrl } from "@/constants/siteInfo";
+
+import { Metadata } from "next";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
+
+import Footer from "@/features/wrapper-elements/navigation/components/footer";
+import { NavbarWrapper } from "@/features/wrapper-elements/navigation/components/navbar-wrapper";
+
+import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
+import { api } from "~/convex/_generated/api";
+import { fetchQuery } from "convex/nextjs";
 
 export async function generateMetadata(): Promise<Metadata> {
   const headersList = await headers();
@@ -42,13 +47,17 @@ export default async function HomeLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const token = await convexAuthNextjsToken();
   const headersList = await headers();
   const pathname = headersList.get("x-pathname");
+  const userData = await fetchQuery(api.users.getCurrentUser, {}, { token });
+  const { user } = userData ?? {};
+  const isAdmin = user?.role?.includes("admin");
 
-  if (pathname === "/map") {
+  if (pathname === "/map" && !isAdmin) {
     redirect("https://thestreetartlist.helioho.st/map");
   }
-  if (pathname === "/archive") {
+  if (pathname === "/archive" && !isAdmin) {
     redirect("https://thestreetartlist.helioho.st/archive");
   }
 

@@ -1,6 +1,6 @@
-import { validOCVals } from "@/constants/openCallConsts";
-import { v } from "convex/values";
+import { getAuthUserId } from "@convex-dev/auth/server";
 import { query } from "~/convex/_generated/server";
+import { v } from "convex/values";
 
 export const worldMapFiltersSchema = v.object({
   country: v.optional(v.string()),
@@ -14,6 +14,14 @@ export const getWorldMapData = query({
     filters: worldMapFiltersSchema,
   },
   handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    const sub = userId
+      ? await ctx.db
+          .query("userSubscriptions")
+          .withIndex("userId", (q) => q.eq("userId", userId))
+          .first()
+      : null;
+    const activeSub = sub?.status === "active" || sub?.status === "trialing";
     const { filters } = args;
     const country = filters.country;
     const continent = filters.continent;
@@ -63,7 +71,7 @@ export const getWorldMapData = query({
           category: event.category,
           eventType: event.type,
           slug: event.slug,
-          hasOpenCall: validOCVals.includes(event.hasOpenCall),
+          hasOpenCall: event.hasOpenCall,
           logo: event.logo,
           description: event.blurb ?? event.about,
           edition: event.dates.edition,
