@@ -133,7 +133,7 @@ export default function MapComponent({
   return (
     <div className={cn(containerClassName)}>
       <div className={cn("group relative", className)}>
-        {overlay && (
+        {overlay && mapType === "event" && (
           <>
             <div className="pointer-events-none absolute inset-0 z-20 hidden items-center justify-center rounded-xl opacity-0 transition-opacity duration-200 group-hover:opacity-100 lg:flex">
               <p className="pointer-events-none select-none text-balance px-5 text-center text-2xl font-bold text-white">

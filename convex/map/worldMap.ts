@@ -71,10 +71,11 @@ export const getWorldMapData = query({
           category: event.category,
           eventType: event.type,
           slug: event.slug,
-          hasOpenCall: event.hasOpenCall,
+          hasOpenCall: activeSub ? event.hasOpenCall : "False",
           logo: event.logo,
           description: event.blurb ?? event.about,
           edition: event.dates.edition,
+          //todo: include the country, continent, and fullLocation, plus for activeSubs, display a checkbox that toggles the archived state events (and also non-event category projects). Ability
         },
       };
     });
