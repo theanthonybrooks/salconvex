@@ -1,6 +1,6 @@
 import { EventData } from "@/types/eventTypes";
 
-import { RefObject } from "react";
+import { RefObject, useState } from "react";
 
 import { FaMapLocationDot } from "react-icons/fa6";
 
@@ -37,6 +37,7 @@ export const EventCard = ({
   fontSize,
   aboutRef,
 }: EventCardProps) => {
+  const [viewFull, setViewFull] = useState(false);
   const {
     category: eventCategory,
     // type: eventType,
@@ -67,7 +68,12 @@ export const EventCard = ({
                     longitude={longitude}
                     label={event.name}
                     locationType={getLocationType(location)}
-                    className="z-0 mb-4 h-[200px] w-full overflow-hidden rounded-xl"
+                    className={cn(
+                      "z-0 mb-4 h-[200px] w-full overflow-hidden rounded-xl",
+                      viewFull && "h-[600px]",
+                    )}
+                    fullScreen={viewFull}
+                    setFullScreen={setViewFull}
                   />
                   <p className={cn("font-medium", fontSize)}>Full Location:</p>
                   <span className={cn("flex items-center gap-2", fontSize)}>

@@ -16,6 +16,7 @@ import { MaximizeIcon, Minimize } from "lucide-react";
 
 import type { HasOpenCallType } from "~/convex/schema";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
+import { ResetViewOnFullScreen } from "@/helpers/mapFns";
 
 import { usePreloadedQuery } from "convex/react";
 
@@ -152,7 +153,7 @@ export default function MapComponent({
           zoom={zoomLevel}
           scrollWheelZoom={false}
           attributionControl={false}
-          className={cn("z-0 h-full w-full")}
+          className={cn("z-0 h-full w-full", fullScreen && "h-screen w-screen")}
         >
           <TileLayer
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -170,6 +171,11 @@ export default function MapComponent({
               activeSub={hasActiveSubscription || isAdmin}
             />
           ))}
+          <ResetViewOnFullScreen
+            fullScreen={fullScreen}
+            center={center as [number, number]}
+            zoomLevel={zoomLevel}
+          />
           {mapType === "event" && <ClickToZoom setOverlay={setOverlay} />}
         </MapContainer>
       </div>
