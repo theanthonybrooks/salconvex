@@ -1,14 +1,17 @@
 "use client";
 
+import { DeviceOptions, mainMenuItems } from "@/constants/menuLinks";
+import { footerCRText } from "@/constants/text";
+
+import { User } from "@/types/user";
+
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { User } from "@/types/user";
 import { DotFilledIcon } from "@radix-ui/react-icons";
-import { UserPrefsType } from "~/convex/schema";
-import { Authenticated, Unauthenticated } from "convex/react";
 import { AnimatePresence, motion, Variants } from "framer-motion";
+
 import { PiHeartBold } from "react-icons/pi";
 
 import MenuToggle from "@/components/ui/hamburger-icon";
@@ -16,8 +19,9 @@ import SocialsRow from "@/components/ui/socials";
 import ThemeToggle from "@/components/ui/theme-toggle";
 import SignOutBtn from "@/features/auth/components/sign-out-btn";
 import { cn } from "@/helpers/utilsFns";
-import { DeviceOptions, mainMenuItems } from "@/constants/menuLinks";
-import { footerCRText } from "@/constants/text";
+
+import { UserPrefsType } from "~/convex/schema";
+import { Authenticated, Unauthenticated } from "convex/react";
 
 interface FullPageNavProps {
   // userId?: string | undefined

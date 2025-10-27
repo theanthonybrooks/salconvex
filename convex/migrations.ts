@@ -19,6 +19,26 @@ import { DataModel } from "./_generated/dataModel.js";
 export const migrations = new Migrations<DataModel>(components.migrations);
 export const run = migrations.runner();
 
+// export const populateFeatureMap = migrations.define({
+//   table: "userPlans",
+//   migrateOne: async (ctx, plan) => {
+//     if (plan.featureMap) return;
+//     const features = plan.features;
+//     const featureMap: { base: string[]; monthly: string[]; yearly: string[] } =
+//       {
+//         base: [],
+//         monthly: [],
+//         yearly: [],
+//       };
+//     for (const feature of features) {
+//       featureMap.base.push(feature);
+//     }
+//     await ctx.db.patch(plan._id, { featureMap });
+//   },
+// });
+
+// export const runPFM = migrations.runner(internal.migrations.populateFeatureMap);
+
 export const backfillKanbanCardAssignments = migrations.define({
   table: "todoKanban",
   migrateOne: async (ctx, card) => {

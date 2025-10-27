@@ -387,14 +387,6 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
         userType: ["public", "admin"],
         deviceType: ["all"],
       },
-      {
-        title: "Changelog",
-        path: "/changelog",
-        category: "about",
-        public: true,
-        userType: ["public"],
-        deviceType: ["desktop"],
-      },
 
       {
         title: "Terms",
@@ -407,6 +399,14 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
       {
         title: "Privacy",
         path: "/privacy",
+        category: "about",
+        public: true,
+        userType: ["public"],
+        deviceType: ["all"],
+      },
+      {
+        title: "Changelog",
+        path: "/changelog",
         category: "about",
         public: true,
         userType: ["public"],

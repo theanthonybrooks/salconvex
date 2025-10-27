@@ -881,6 +881,30 @@ const eventAnalyticsSchema = {
   hasSub: v.optional(v.boolean()),
 };
 
+const featureMapSchema = v.object({
+  base: v.array(v.string()),
+  monthly: v.array(v.string()),
+  yearly: v.array(v.string()),
+});
+
+export type FeatureMap = Infer<typeof featureMapSchema>;
+
+const userPlansSchema = {
+  key: v.string(),
+  title: v.string(),
+  description: v.string(),
+  stripeProductId: v.string(),
+  img: v.string(),
+  prices: v.object({
+    month: stripeIntervalPricesValidator,
+    year: stripeIntervalPricesValidator,
+  }),
+  features: v.optional(v.array(v.string())),
+  featureMap: featureMapSchema,
+  notIncluded: v.array(v.string()),
+  popular: v.boolean(),
+};
+
 // #endregion
 
 // #region ------------- Table Schemas & Indexes --------------
@@ -1286,20 +1310,7 @@ export default defineSchema({
     .index("by_category", ["category"])
     .index("by_column_order", ["column", "order"]),
 
-  userPlans: defineTable({
-    key: v.string(),
-    title: v.string(),
-    description: v.string(),
-    stripeProductId: v.optional(v.string()),
-    img: v.optional(v.string()),
-    prices: v.object({
-      month: stripeIntervalPricesValidator,
-      year: stripeIntervalPricesValidator,
-    }),
-    features: v.array(v.string()),
-    notIncluded: v.array(v.string()),
-    popular: v.boolean(), // added popular column
-  })
+  userPlans: defineTable(userPlansSchema)
     .index("key", ["key"])
     .index("stripeProductId", ["stripeProductId"]),
 

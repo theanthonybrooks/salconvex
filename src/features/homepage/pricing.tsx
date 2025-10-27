@@ -11,6 +11,7 @@ import { toast } from "react-toastify";
 
 import { CheckCircle2, CircleX } from "lucide-react";
 
+import type { FeatureMap } from "~/convex/schema";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -49,14 +50,15 @@ type PricingCardProps = {
   accountType: string;
 
   prices: {
-    month?: { usd?: { amount: number; stripeId: string } };
-    year?: { usd?: { amount: number; stripeId: string } };
+    month?: { usd?: { amount?: number; stripeId: string } };
+    year?: { usd?: { amount?: number; stripeId: string } };
     rate?: number;
   };
 
   description: string;
+  featureMap?: FeatureMap;
   features?: string[];
-  notIncluded?: string[];
+  notIncluded: string[];
   popular?: boolean;
   image?: string;
   stripePriceId?: string;
@@ -327,6 +329,7 @@ const PricingCard = ({
   planKey,
   prices,
   description,
+  featureMap,
   features,
   notIncluded,
   popular,
@@ -336,13 +339,23 @@ const PricingCard = ({
   subscription,
 }: PricingCardProps) => {
   const [comingSoon, setComingSoon] = useState(false);
+  const monthlyFeatures = featureMap
+    ? [...featureMap.base, ...featureMap.monthly]
+    : features;
+  const yearlyFeatures = featureMap
+    ? [...featureMap.base, ...featureMap.yearly]
+    : features;
   useEffect(() => {
-    if (features?.some((feature) => feature.includes("*"))) {
+    if (
+      (featureMap &&
+        featureMap?.base?.some((feature) => feature.includes("*"))) ||
+      features?.some((feature) => feature.includes("*"))
+    ) {
       setComingSoon(true);
     } else {
       setComingSoon(false);
     }
-  }, [features]);
+  }, [featureMap, features]);
   const isArtist = accountType === "artist";
   const isOrganizer = accountType === "organizer";
   const isFree = prices.rate === 0;
@@ -399,7 +412,7 @@ const PricingCard = ({
         },
         activeSub &&
           !isCurrentUserPlan &&
-          "opacity-50 grayscale hover:opacity-100 hover:grayscale-0",
+          "opacity-75 grayscale hover:opacity-100 hover:grayscale-0",
         isOrganizer && "self-start",
         isCurrentUserPlan && "border-3",
         // isFree && "self-start",
@@ -494,14 +507,23 @@ const PricingCard = ({
           )}
 
           <div className="mt-6 space-y-2">
-            {features?.map((feature) => (
-              <div key={feature} className="flex gap-2">
-                <CheckCircle2
-                  className={cn("size-5 shrink-0 text-foreground")}
-                />
-                <p className={cn("text-muted-foreground")}>{feature}</p>
-              </div>
-            ))}
+            {isYearly
+              ? yearlyFeatures?.map((feature) => (
+                  <div key={feature} className="flex gap-2">
+                    <CheckCircle2
+                      className={cn("size-5 shrink-0 text-foreground")}
+                    />
+                    <p className={cn("text-muted-foreground")}>{feature}</p>
+                  </div>
+                ))
+              : monthlyFeatures?.map((feature) => (
+                  <div key={feature} className="flex gap-2">
+                    <CheckCircle2
+                      className={cn("size-5 shrink-0 text-foreground")}
+                    />
+                    <p className={cn("text-muted-foreground")}>{feature}</p>
+                  </div>
+                ))}
             {planKey === "1" &&
               isOrganizer &&
               notIncluded?.map((feature) => (
