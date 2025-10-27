@@ -43,26 +43,32 @@ export const getWorldMapData = query({
 
     //! For now, just querying the events table, but will make a lookup table just for the map data later. I think? It will need to be a fairly comprehensive lookup, so I may just add the map data to the eventLookup table.
 
-    const query = ctx.db.query("events");
+    // const query = ctx.db.query("events");
 
-    // if (country) {
-    //     query.withIndex("by_country", (q) => q.eq("country", country))
-    // }
-    // if (continent) {
-    //     query.withIndex("by_continent", (q) => q.eq("continent", continent))
-    // }
-    // if (city) {
-    //     query.withIndex("by_city", (q) => q.eq("city", city))
-    // }
+    // // if (country) {
+    // //     query.withIndex("by_country", (q) => q.eq("country", country))
+    // // }
+    // // if (continent) {
+    // //     query.withIndex("by_continent", (q) => q.eq("continent", continent))
+    // // }
+    // // if (city) {
+    // //     query.withIndex("by_city", (q) => q.eq("city", city))
+    // // }
 
+    // // query.withIndex("by_state_approvedAt", (q) =>
+    // //   q.eq("state", "published").gt("approvedAt", undefined),
+    // // );
     // query.withIndex("by_state_approvedAt", (q) =>
     //   q.eq("state", "published").gt("approvedAt", undefined),
     // );
-    query.withIndex("by_state_approvedAt", (q) =>
-      q.eq("state", "published").gt("approvedAt", undefined),
-    );
 
-    const events = await query.collect();
+    // const events = await query.collect();
+    const events = await ctx.db
+      .query("events")
+      .withIndex("by_state_approvedAt", (q) =>
+        q.eq("state", "published").gt("approvedAt", 0),
+      )
+      .collect();
     const archivedEvents = activeSub
       ? await ctx.db
           .query("events")

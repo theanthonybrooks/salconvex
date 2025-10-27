@@ -189,8 +189,7 @@ export default function MapComponent({
             />
             <MarkerClusterGroup
               chunkedLoading
-              showCoverageOnHover={false}
-              spiderfyOnMaxZoom
+              showCoverageOnHover={true}
               maxClusterRadius={5} // optional, controls cluster tightness
               iconCreateFunction={createClusterCustomIcon}
             >

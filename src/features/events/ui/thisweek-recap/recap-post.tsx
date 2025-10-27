@@ -137,6 +137,11 @@ const RecapPost = forwardRef<HTMLDivElement, RecapPostProps>((props, ref) => {
           </ul>
         </section>
       </section>
+      {eligibility?.details && (
+        <section className="absolute bottom-4 right-5 text-sm">
+          *See open call for full eligibility details
+        </section>
+      )}
     </div>
   );
 });
