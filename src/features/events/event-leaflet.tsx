@@ -2,6 +2,8 @@
 
 import { EventCategory, EventType } from "@/types/eventTypes";
 
+import MarkerClusterGroup from "react-leaflet-cluster";
+
 import LeafletMapIcon from "@/components/ui/map-icon";
 import ClickToZoom from "@/features/wrapper-elements/map/clickToZoom";
 import { cn } from "@/helpers/utilsFns";
@@ -9,12 +11,13 @@ import { cn } from "@/helpers/utilsFns";
 import "leaflet/dist/leaflet.css";
 
 import { useMemo, useState } from "react";
+import L from "leaflet";
 import { MapContainer, TileLayer } from "react-leaflet";
 
 import { FaMapLocationDot } from "react-icons/fa6";
-import { MaximizeIcon, Minimize } from "lucide-react";
+import { FiMaximize2, FiMinimize2 } from "react-icons/fi";
 
-import type { HasOpenCallType } from "~/convex/schema";
+import type { EventStateType, HasOpenCallType } from "~/convex/schema";
 import {
   Dialog,
   DialogContent,
@@ -39,6 +42,7 @@ export type MapPoint = {
     logo: string;
     description?: string;
     edition: number;
+    state: EventStateType;
   };
 };
 
@@ -51,7 +55,7 @@ export type LocationType =
   | "continent"
   | "unknown"
   | "full";
-interface MapComponentProps {
+export type MapComponentProps = {
   latitude?: number;
   longitude?: number;
   label?: string;
@@ -62,7 +66,12 @@ interface MapComponentProps {
   hasDirections?: boolean;
   mapType?: "event" | "full";
   fullScreen: boolean;
-  setFullScreen: React.Dispatch<React.SetStateAction<boolean>>;
+  setFullScreenAction: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
+interface ClusterLike {
+  getChildCount(): number;
+  getAllChildMarkers(): L.Marker[];
 }
 
 export default function MapComponent({
@@ -76,7 +85,7 @@ export default function MapComponent({
   hasDirections = false,
   mapType = "event",
   fullScreen,
-  setFullScreen,
+  setFullScreenAction,
 }: MapComponentProps) {
   const { preloadedUserData, preloadedSubStatus } = useConvexPreload();
   const userData = usePreloadedQuery(preloadedUserData);
@@ -128,7 +137,16 @@ export default function MapComponent({
     }
   })();
 
-  // console.log(zoomLevel);
+  const createClusterCustomIcon = function (cluster: ClusterLike) {
+    return L.divIcon({
+      html: `<span style="padding: 5px; width: 5px; height:5px; background: white; border-radius: 50%; border:1px solid black; color: black; font-weight: bold; font-size: 12px;">${cluster.getChildCount()}</span>`,
+      // customMarker is the class name in the styles.css file
+      className: "customMarker",
+      iconSize: L.point(40, 40, true),
+    });
+  };
+
+  console.log(zoomLevel);
 
   return (
     <div className={cn(containerClassName)}>
@@ -143,11 +161,11 @@ export default function MapComponent({
             <div className="pointer-events-none absolute inset-0 z-10 hidden items-center justify-center rounded-xl bg-black/50 opacity-0 blur-sm transition-opacity duration-200 group-hover:opacity-100 lg:flex"></div>
           </>
         )}
-        <Dialog open={fullScreen} onOpenChange={setFullScreen}>
+        <Dialog open={fullScreen} onOpenChange={setFullScreenAction}>
           <DialogTrigger asChild>
             <button className="absolute right-2 top-2 z-10 rounded border-2 border-foreground/40 bg-card p-2 hover:scale-105 hover:cursor-pointer active:scale-95">
               <TooltipSimple content="Enter Full Screen" side="top">
-                <MaximizeIcon className="size-4 text-foreground" />
+                <FiMaximize2 className="size-4 text-foreground" />
               </TooltipSimple>
             </button>
           </DialogTrigger>
@@ -169,17 +187,25 @@ export default function MapComponent({
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             />
-            {allPoints.map((p, i) => (
-              <LeafletMapIcon
-                key={`${p.latitude}-${p.longitude}-${i}`}
-                latitude={p.latitude}
-                longitude={p.longitude}
-                label={p.label}
-                meta={p.meta}
-                type={mapType === "full" ? "worldMap" : "event"}
-                activeSub={hasActiveSubscription || isAdmin}
-              />
-            ))}
+            <MarkerClusterGroup
+              chunkedLoading
+              showCoverageOnHover={false}
+              spiderfyOnMaxZoom
+              maxClusterRadius={5} // optional, controls cluster tightness
+              iconCreateFunction={createClusterCustomIcon}
+            >
+              {allPoints.map((p, i) => (
+                <LeafletMapIcon
+                  key={`${p.latitude}-${p.longitude}-${i}`}
+                  latitude={p.latitude}
+                  longitude={p.longitude}
+                  label={p.label}
+                  meta={p.meta}
+                  type={mapType === "full" ? "worldMap" : "event"}
+                  activeSub={hasActiveSubscription || isAdmin}
+                />
+              ))}
+            </MarkerClusterGroup>
             <ResetViewOnFullScreen
               fullScreen={fullScreen}
               center={center as [number, number]}
@@ -191,7 +217,7 @@ export default function MapComponent({
           <DialogContent className="z-[100] h-[95dvh] w-[90dvw] max-w-none overflow-hidden rounded-lg bg-background p-0 sm:h-screen sm:w-screen sm:rounded-none">
             <DialogTitle className="sr-only">Map Full View</DialogTitle>
             <button
-              onClick={() => setFullScreen(false)}
+              onClick={() => setFullScreenAction(false)}
               className="absolute right-4 top-4 z-[401] rounded border-2 border-foreground/40 bg-card p-2 hover:scale-105 active:scale-95"
             >
               <TooltipSimple
@@ -199,7 +225,7 @@ export default function MapComponent({
                 side="bottom"
                 className="z-[402]"
               >
-                <Minimize className="size-4 text-foreground" />
+                <FiMinimize2 className="size-4 text-foreground" />
               </TooltipSimple>
             </button>
 
@@ -220,17 +246,24 @@ export default function MapComponent({
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
               />
-              {allPoints.map((p, i) => (
-                <LeafletMapIcon
-                  key={`${p.latitude}-${p.longitude}-${i}`}
-                  latitude={p.latitude}
-                  longitude={p.longitude}
-                  label={p.label}
-                  meta={p.meta}
-                  type="worldMap"
-                  activeSub={hasActiveSubscription || isAdmin}
-                />
-              ))}
+              <MarkerClusterGroup
+                chunkedLoading
+                showCoverageOnHover={false}
+                spiderfyOnMaxZoom
+                maxClusterRadius={40} // optional, controls cluster tightness
+              >
+                {allPoints.map((p, i) => (
+                  <LeafletMapIcon
+                    key={`${p.latitude}-${p.longitude}-${i}`}
+                    latitude={p.latitude}
+                    longitude={p.longitude}
+                    label={p.label}
+                    meta={p.meta}
+                    type={mapType === "full" ? "worldMap" : "event"}
+                    activeSub={hasActiveSubscription || isAdmin}
+                  />
+                ))}
+              </MarkerClusterGroup>
             </MapContainer>
           </DialogContent>
         </Dialog>

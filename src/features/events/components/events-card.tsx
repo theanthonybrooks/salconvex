@@ -73,7 +73,7 @@ export const EventCard = ({
                       viewFull && "h-[600px]",
                     )}
                     fullScreen={viewFull}
-                    setFullScreen={setViewFull}
+                    setFullScreenAction={setViewFull}
                   />
                   <p className={cn("font-medium", fontSize)}>Full Location:</p>
                   <span className={cn("flex items-center gap-2", fontSize)}>
@@ -162,7 +162,7 @@ export const EventCard = ({
               <AccordionContent className={cn(fontSize)}>
                 <LazyMap
                   fullScreen={viewFull}
-                  setFullScreen={setViewFull}
+                  setFullScreenAction={setViewFull}
                   latitude={latitude}
                   longitude={longitude}
                   label={event.name}

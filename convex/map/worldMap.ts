@@ -85,6 +85,7 @@ export const getWorldMapData = query({
           logo: event.logo,
           description: event.blurb ?? event.about,
           edition: event.dates.edition,
+          state: event.state,
           //todo: include the country, continent, and fullLocation, plus for activeSubs, display a checkbox that toggles the archived state events (and also non-event category projects). Ability
         },
       };

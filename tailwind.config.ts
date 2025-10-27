@@ -89,6 +89,15 @@ export default {
           DEFAULT: "hsl(var(--destructive))",
           foreground: "hsl(var(--destructive-foreground))",
         },
+        map: {
+          icon: "hsl(var(--map-icon))",
+          yellow: "hsl(var(--map-yellow))",
+          pink: "hsl(var(--map-pink))",
+          green: "hsl(var(--map-green))",
+          orange: "hsl(var(--map-orange))",
+          lilac: "hsl(var(--map-lilac))",
+          blue: "hsl(var(--map-blue))",
+        },
 
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

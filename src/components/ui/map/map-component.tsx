@@ -25,7 +25,7 @@ export default function WorldMapComponent() {
   }, []);
 
   const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
-  const { data: mapData, isPending } = useQueryWithStatus(
+  const { data: mapData } = useQueryWithStatus(
     api.map.worldMap.getWorldMapData,
     { filters: {} },
   );
@@ -50,7 +50,6 @@ export default function WorldMapComponent() {
       <div
         className={cn(
           "flex w-full grid-cols-[20%_minmax(0,1fr)] flex-col overflow-hidden rounded border-1.5 xl:grid",
-          fullScreen && "!flex h-dvh max-w-[95dvw] items-center justify-center",
         )}
       >
         <div className="flex w-full flex-col justify-between gap-y-4 bg-card/70 p-3">
@@ -113,22 +112,17 @@ export default function WorldMapComponent() {
         </div>
 
         <section className="w-full">
-          {isPending ? (
-            <div>Loading...</div>
-          ) : (
-            <LazyMap
-              points={filteredMapData ?? []}
-              label={"test"}
-              className={cn(
-                "z-0 mx-auto h-[calc(95dvh-100px)] w-full max-w-[90dvw] overflow-hidden border-l-1.5",
-                fullScreen && "h-dvh",
-              )}
-              locationType="full"
-              fullScreen={fullScreen}
-              setFullScreen={setFullScreen}
-              mapType="full"
-            />
-          )}
+          <LazyMap
+            points={filteredMapData ?? []}
+            label={"test"}
+            className={cn(
+              "z-0 mx-auto h-[calc(95dvh-100px)] w-full max-w-[90dvw] overflow-hidden border-l-1.5",
+            )}
+            locationType="full"
+            fullScreen={fullScreen}
+            setFullScreenAction={setFullScreen}
+            mapType="full"
+          />
         </section>
       </div>
     </div>

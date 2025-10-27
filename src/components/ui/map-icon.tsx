@@ -2,6 +2,7 @@
 "use client";
 
 import type { MapPoint } from "@/features/events/event-leaflet";
+import type { EventCategory } from "@/types/eventTypes";
 
 import L from "leaflet";
 import { renderToStaticMarkup } from "react-dom/server";
@@ -10,6 +11,7 @@ import { Marker, Popup } from "react-leaflet";
 import { FaMapMarkerAlt } from "react-icons/fa";
 
 import { formatEventLink } from "@/helpers/eventFns";
+import { cn } from "@/helpers/utilsFns";
 
 type LeafletMapIconProps = MapPoint & {
   iconSize?: number;
@@ -18,13 +20,22 @@ type LeafletMapIconProps = MapPoint & {
   activeSub?: boolean;
 };
 
+export const categoryClasses: Record<EventCategory | "archive", string> = {
+  event: "text-map-icon",
+  roster: "text-map-blue",
+  gfund: "text-map-green",
+  archive: "text-slate-500",
+  residency: "text-map-lilac",
+  project: "text-map-orange",
+};
+
 export default function LeafletMapIcon({
   latitude,
   longitude,
   label,
   meta,
   iconSize = 30,
-  iconColor = "#E53E3E",
+  // iconColor = "#E53E3E",
   type = "event",
   activeSub,
 }: LeafletMapIconProps) {
@@ -34,10 +45,16 @@ export default function LeafletMapIcon({
   //     <FaMapMarkerAlt size={iconSize} color={iconColor} />
   //   </div>,
   // );
+
+  const isArchived = meta?.state === "archived";
+  const key = isArchived ? "archive" : (meta?.category ?? "event");
+  const iconClassName = categoryClasses[key];
+
   const iconMarkup = renderToStaticMarkup(
     <div className="leaflet-custom-marker-wrapper relative flex h-[30px] w-[30px] items-center justify-center">
+      <div className="leaflet-custom-shadow" />
       <div className="absolute h-[40%] w-[40%] -translate-y-1 rounded-full bg-card" />
-      <FaMapMarkerAlt color={iconColor} size={iconSize} />
+      <FaMapMarkerAlt className={cn(iconClassName)} size={iconSize} />
     </div>,
   );
 
@@ -66,8 +83,8 @@ export default function LeafletMapIcon({
     <Marker position={[latitude, longitude]} icon={customMarkerIcon}>
       {label && (
         <Popup>
-          <div className="flex flex-col gap-y-1 text-sm">
-            {label}
+          <div className="flex flex-col gap-y-1 px-2 py-1 text-sm">
+            <strong> {label}</strong>
             <a
               href={linkUrl}
               target="_blank"

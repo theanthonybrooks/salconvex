@@ -101,12 +101,20 @@ body {
     --chart-2: hsl(298, 67%, 82%);
 
     --chart-4: hsl(174.71 100% 28.999999999999996%);
-    /* --chart-3: hsl(195.82 72% 23%); */
     --chart-3: hsl(43.66 100% 50%);
 
     --chart-5: hsl(36.49 100% 50%);
 
     /* --nav-height: 100px; */
+
+    /* ---------------- Map icons -------------- */
+    --map-icon: 0, 76%, 57%; /* default */
+    --map-yellow: 50 100% 72%; /* inactive */
+    --map-pink: 303 100% 82%; /* pasteups */
+    --map-green: 174.71 100% 28.999999999999996%; /* grants */
+    --map-orange: 17, 72%, 62%; /* projects (maybe) */
+    --map-lilac: 258, 66%, 72%; /* residency */
+    --map-blue: 214, 85%, 23%; /* roster */
 
     --nav-shadow:
       0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
