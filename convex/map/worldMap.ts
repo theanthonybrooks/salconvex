@@ -55,12 +55,22 @@ export const getWorldMapData = query({
     //     query.withIndex("by_city", (q) => q.eq("city", city))
     // }
 
+    // query.withIndex("by_state_approvedAt", (q) =>
+    //   q.eq("state", "published").gt("approvedAt", undefined),
+    // );
     query.withIndex("by_state_approvedAt", (q) =>
       q.eq("state", "published").gt("approvedAt", undefined),
     );
 
     const events = await query.collect();
-    const eventData = events.map((event) => {
+    const archivedEvents = activeSub
+      ? await ctx.db
+          .query("events")
+          .withIndex("by_state", (q) => q.eq("state", "archived"))
+          .collect()
+      : [];
+    const joinedEvents = [...events, ...archivedEvents];
+    const eventData = joinedEvents.map((event) => {
       const coords = event.location?.coordinates;
 
       return {

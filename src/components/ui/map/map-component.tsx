@@ -39,6 +39,7 @@ export default function WorldMapComponent() {
       event.label.toLowerCase().includes(searchTerm),
     );
   }
+  const numResults = filteredMapData?.length ?? 0;
 
   return (
     <div className="mt-8 flex h-full w-full flex-1 flex-col items-center justify-center gap-8 px-4">
@@ -70,6 +71,9 @@ export default function WorldMapComponent() {
                 onClick={() => setSearch("")}
               />
             </div>
+            <p className="w-full pb-3 text-center text-sm">
+              Total Results: {numResults}
+            </p>
 
             {/* <p className="px-3 pb-2 text-xl font-bold">Filters</p> */}
             <Separator className="mb-4" thickness={2} />
