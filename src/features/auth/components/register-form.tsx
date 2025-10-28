@@ -45,6 +45,7 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp";
 import { PasswordInput } from "@/components/ui/password-input";
+import { PopoverSimple } from "@/components/ui/popover";
 import SmileySvg from "@/features/auth/components/smiley-svg";
 import SpeechBubble from "@/features/auth/components/speech-bubble";
 import { onEmailChange } from "@/helpers/privacyFns";
@@ -580,29 +581,81 @@ const RegisterForm = ({ switchFlow }: RegisterFormProps) => {
                   <FormField
                     control={form.control}
                     name="organizationName"
-                    render={({ field }) => (
-                      <FormItem emptyError>
-                        <FormLabel className="font-bold">
-                          Organization Name
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            disabled={isPending}
-                            {...field}
-                            placeholder="(required)"
-                            inputHeight="sm"
-                            variant="basic"
-                            tabIndex={
-                              step === "signUp" &&
-                              selectedOption.includes("organizer")
-                                ? 8
-                                : -1
-                            }
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
+                    render={({ field }) => {
+                      const popoverContent = (
+                        <>
+                          <p className="mb-3">
+                            If your organization name is available, no extra
+                            steps are required.
+                          </p>
+                          <p className="mb-1">
+                            Else, you can claim your organization name by:
+                          </p>
+                          <ol className="list-inside list-decimal space-y-2">
+                            <li>
+                              Creating an account with the public contact email
+                              for your organization
+                            </li>
+                            <li>
+                              Using an email that matches your organization
+                              website&apos;s domain
+                            </li>
+                            <li>
+                              <Link
+                                href="/support?reason=organization"
+                                target="_blank"
+                                className="font-medium underline underline-offset-2"
+                              >
+                                Contact support
+                              </Link>{" "}
+                              if your organzation isn&apos;t claimable via
+                              website/domain, if you use an email like gmail,
+                              hotmail, outlook, etc that doesn&apos;t match your
+                              organization&apos;s email, or with any other
+                              questions.
+                            </li>
+                          </ol>
+                          <p className="mt-4 text-xs italic text-muted-foreground">
+                            <strong>Note:</strong> All emails require
+                            verification before you can create or claim an
+                            organization name.
+                          </p>
+                        </>
+                      );
+
+                      return (
+                        <FormItem emptyError>
+                          <FormLabel className="font-bold">
+                            Organization Name
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              disabled={isPending}
+                              {...field}
+                              placeholder="(required)"
+                              inputHeight="sm"
+                              variant="basic"
+                              tabIndex={
+                                step === "signUp" &&
+                                selectedOption.includes("organizer")
+                                  ? 8
+                                  : -1
+                              }
+                            />
+                          </FormControl>
+                          <FormMessage />
+                          <PopoverSimple
+                            clickOnly
+                            content={popoverContent}
+                            align="start"
+                            triggerClassName="text-sm italic md:text-muted-foreground"
+                            className="w-max max-w-[min(42em,90vw)] text-sm"
+                          >
+                            How can I claim my organization?
+                          </PopoverSimple>
+                        </FormItem>
+                      );
+                    }}
                   />
                 )}
 

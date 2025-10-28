@@ -1,9 +1,9 @@
 "use client";
 
 import * as React from "react";
-import { useRef } from "react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import * as PopoverPrimitive from "@radix-ui/react-popover";
+
 import { X } from "lucide-react";
 
 import { cn } from "@/helpers/utilsFns";
@@ -243,6 +243,7 @@ export const PopoverSimple = ({
   disabled,
   stayOpenOnHover = false,
   closeDelay = 200, // default: 200ms delay
+  clickOnly = false,
 }: {
   children: React.ReactNode | string;
   content: React.ReactNode;
@@ -255,6 +256,7 @@ export const PopoverSimple = ({
   disabled?: boolean;
   stayOpenOnHover?: boolean;
   closeDelay?: number;
+  clickOnly?: boolean;
 }) => {
   const [popoverOpen, setPopoverOpen] = useState(false);
   const closeTimer = useRef<NodeJS.Timeout | null>(null);
@@ -262,6 +264,7 @@ export const PopoverSimple = ({
   if (disabled) return <>{children}</>;
 
   const handleMouseLeave = () => {
+    if (clickOnly) return;
     if (stayOpenOnHover) {
       // close after a delay
       closeTimer.current = setTimeout(() => setPopoverOpen(false), closeDelay);
@@ -271,6 +274,7 @@ export const PopoverSimple = ({
   };
 
   const handleMouseEnter = () => {
+    if (clickOnly) return;
     if (closeTimer.current) {
       clearTimeout(closeTimer.current);
       closeTimer.current = null;
@@ -284,7 +288,7 @@ export const PopoverSimple = ({
         asChild
         onMouseOver={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
-        className={cn(triggerClassName, "hover:cursor-pointer")}
+        className={cn("select-none hover:cursor-pointer", triggerClassName)}
       >
         {typeof children === "string" ? (
           <span className="inline-flex items-center gap-1">{children}</span>
@@ -301,7 +305,7 @@ export const PopoverSimple = ({
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         className={cn(
-          "outline-hidden relative z-40 w-72 rounded-md border bg-popover p-5 text-popover-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out",
+          "outline-hidden relative z-40 w-72 rounded-md border-1.5 bg-popover p-5 text-popover-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out",
           className,
         )}
       >
