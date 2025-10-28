@@ -110,11 +110,11 @@ body {
     /* ---------------- Map icons -------------- */
     --map-icon: 0, 76%, 57%; /* default */
     --map-yellow: 50 100% 72%; /* inactive */
-    --map-pink: 303 100% 82%; /* pasteups */
-    --map-green: 174.71 100% 28.999999999999996%; /* grants */
-    --map-orange: 17, 72%, 62%; /* projects (maybe) */
-    --map-lilac: 258, 66%, 72%; /* residency */
-    --map-blue: 214, 85%, 23%; /* roster */
+    --map-pink: var(--sal-pink); /* pasteups */
+    --map-green: 148, 60%, 42%; /* #2baa67 */ /* grants */
+    --map-orange: 27, 100%, 61%; /* #ff9239 */ /* projects (maybe) */
+    --map-lilac: 258, 50%, 52%; /* #6b46c1 */ /* residency */
+    --map-blue: 209, 72%, 59%; /* roster */
 
     --nav-shadow:
       0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
@@ -669,6 +669,31 @@ button:active {
 } */
 
 /* Leaflet */
+
+.custom-marker {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: white;
+  border-radius: 50%;
+  border: 1px solid black;
+  color: black;
+  font-weight: bold;
+  font-size: 12px;
+  &:hover {
+    transform: scale(1.025);
+  }
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+.custom-marker-wrapper[style*="opacity: 0.3"] {
+  opacity: 1 !important;
+  scale: 0 !important;
+}
 
 .leaflet-custom-marker-wrapper {
   position: relative;

@@ -139,10 +139,9 @@ export default function MapComponent({
 
   const createClusterCustomIcon = function (cluster: ClusterLike) {
     return L.divIcon({
-      html: `<span style="padding: 5px; width: 5px; height:5px; background: white; border-radius: 50%; border:1px solid black; color: black; font-weight: bold; font-size: 12px;">${cluster.getChildCount()}</span>`,
-      // customMarker is the class name in the styles.css file
-      className: "customMarker",
-      iconSize: L.point(40, 40, true),
+      html: `<div class="custom-marker">${cluster.getChildCount()}</div>`,
+      className: "custom-marker-wrapper",
+      iconSize: L.point(30, 30, true),
     });
   };
 
@@ -189,9 +188,14 @@ export default function MapComponent({
             />
             <MarkerClusterGroup
               chunkedLoading
-              showCoverageOnHover={true}
-              maxClusterRadius={5} // optional, controls cluster tightness
+              spiderfyOnEveryClick={false}
+              showCoverageOnHover={false}
+              zoomToBoundsOnClick
               iconCreateFunction={createClusterCustomIcon}
+              maxClusterRadius={70} //default 80
+              // spiderfyDistanceMultiplier={0} // optional
+              // showCoverageOnHover={true}
+              // maxClusterRadius={5} // optional, controls cluster tightness
             >
               {allPoints.map((p, i) => (
                 <LeafletMapIcon
@@ -247,9 +251,11 @@ export default function MapComponent({
               />
               <MarkerClusterGroup
                 chunkedLoading
+                spiderfyOnEveryClick={false}
                 showCoverageOnHover={false}
-                spiderfyOnMaxZoom
-                maxClusterRadius={40} // optional, controls cluster tightness
+                zoomToBoundsOnClick
+                iconCreateFunction={createClusterCustomIcon}
+                maxClusterRadius={70} //default 80
               >
                 {allPoints.map((p, i) => (
                   <LeafletMapIcon

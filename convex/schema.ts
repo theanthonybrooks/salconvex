@@ -899,7 +899,6 @@ const userPlansSchema = {
     month: stripeIntervalPricesValidator,
     year: stripeIntervalPricesValidator,
   }),
-  features: v.optional(v.array(v.string())),
   featureMap: featureMapSchema,
   notIncluded: v.array(v.string()),
   popular: v.boolean(),
