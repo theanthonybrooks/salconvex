@@ -168,7 +168,7 @@ export const OcCustomDatePicker = ({
 
   const lastSelectedRef = useRef<Date | null>(selected);
 
-  const onPickerChange = (date: Date | null) => {
+  const handlePickerChange = (date: Date | null) => {
     if (!date) return onChange(null);
 
     const pickedLocal = DateTime.fromJSDate(date);
@@ -225,6 +225,31 @@ export const OcCustomDatePicker = ({
     onChange(finalOrg.toUTC().toISO());
   };
 
+  const handleCalendarClose = () => {
+    if (pickerType === "start") return;
+    setTimeout(() => {
+      const active = document.activeElement as HTMLElement | null;
+      if (active && active.tagName === "INPUT") {
+        active.blur();
+
+        const focusable = Array.from(
+          document.querySelectorAll<HTMLElement>(
+            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+          ),
+        ).filter(
+          (el) =>
+            !el.hasAttribute("disabled") && !el.getAttribute("aria-hidden"),
+        );
+
+        const index = focusable.indexOf(active);
+        if (index >= 0 && index < focusable.length - 1) {
+          const next = focusable[index + 1];
+          next.focus();
+        }
+      }
+    }, 50);
+  };
+
   const injectedTime = selected
     ? DateTime.fromJSDate(selected)
         .endOf("day")
@@ -239,7 +264,8 @@ export const OcCustomDatePicker = ({
       onCalendarOpen={() => {
         lastSelectedRef.current = selected;
       }}
-      onChange={onPickerChange}
+      onChange={handlePickerChange}
+      onCalendarClose={handleCalendarClose}
       dateFormat={dateFormat}
       openToDate={openToDate}
       withPortal={true}

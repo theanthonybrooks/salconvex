@@ -1,3 +1,5 @@
+import { BaseFeedbackOptions, Feedback } from "@/constants/stripe";
+
 import React, { useEffect, useState } from "react";
 import { useManageSubscription } from "@/hooks/use-manage-subscription";
 import {
@@ -5,11 +7,10 @@ import {
   CancelSubDialogSchemaValues,
 } from "@/schemas/subscription";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { api } from "~/convex/_generated/api";
-import { useAction, usePreloadedQuery } from "convex/react";
-import { LoaderCircle } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
+
+import { LoaderCircle } from "lucide-react";
 
 import { FormError } from "@/components/form-error";
 import { Button } from "@/components/ui/button";
@@ -37,7 +38,9 @@ import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-con
 import { getUserFontSizePref } from "@/helpers/stylingFns";
 import { getSubscriptionStatusVals } from "@/helpers/subscriptionFns";
 import { cn } from "@/helpers/utilsFns";
-import { BaseFeedbackOptions, Feedback } from "@/constants/stripe";
+
+import { api } from "~/convex/_generated/api";
+import { useAction, usePreloadedQuery } from "convex/react";
 
 type ManageSubDialogProps = {
   dialog: {
@@ -69,7 +72,7 @@ export const SubDialog = ({
   const [pending, setPending] = useState(false);
 
   const cancelSubscription = useAction(
-    api.stripeSubscriptions.cancelSubscription,
+    api.stripe.stripeSubscriptions.cancelSubscription,
   );
   const handleManageSubscription = useManageSubscription({ subscription });
   const form = useForm<CancelSubDialogSchemaValues>({

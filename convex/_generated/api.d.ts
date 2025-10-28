@@ -40,11 +40,13 @@ import type * as otp_resendOtp from "../otp/resendOtp.js";
 import type * as otp_resetOtp from "../otp/resetOtp.js";
 import type * as otp_verificationCodeEmail from "../otp/verificationCodeEmail.js";
 import type * as plans from "../plans.js";
-import type * as stripeSubscriptions from "../stripeSubscriptions.js";
+import type * as stripe_stripeAddOns from "../stripe/stripeAddOns.js";
+import type * as stripe_stripeSubscriptions from "../stripe/stripeSubscriptions.js";
 import type * as subscriptions from "../subscriptions.js";
 import type * as thelist_getFilteredEventsPublicUpdate from "../thelist/getFilteredEventsPublicUpdate.js";
 import type * as uploads_files from "../uploads/files.js";
 import type * as uploads_user from "../uploads/user.js";
+import type * as userAddOns_onlineEvents from "../userAddOns/onlineEvents.js";
 import type * as users from "../users.js";
 
 import type {
@@ -94,11 +96,13 @@ declare const fullApi: ApiFromModules<{
   "otp/resetOtp": typeof otp_resetOtp;
   "otp/verificationCodeEmail": typeof otp_verificationCodeEmail;
   plans: typeof plans;
-  stripeSubscriptions: typeof stripeSubscriptions;
+  "stripe/stripeAddOns": typeof stripe_stripeAddOns;
+  "stripe/stripeSubscriptions": typeof stripe_stripeSubscriptions;
   subscriptions: typeof subscriptions;
   "thelist/getFilteredEventsPublicUpdate": typeof thelist_getFilteredEventsPublicUpdate;
   "uploads/files": typeof uploads_files;
   "uploads/user": typeof uploads_user;
+  "userAddOns/onlineEvents": typeof userAddOns_onlineEvents;
   users: typeof users;
 }>;
 declare const fullApiWithMounts: typeof fullApi;

@@ -360,11 +360,11 @@ const PricingCard = ({
   const isOrganizer = accountType === "organizer";
   const isFree = prices.rate === 0;
   const getCheckoutUrl = useAction(
-    api.stripeSubscriptions.createStripeCheckoutSession,
+    api.stripe.stripeSubscriptions.createStripeCheckoutSession,
   );
 
   const hadFreeCall = useQuery(
-    api.stripeSubscriptions.getOrgHadFreeCall,
+    api.stripe.stripeSubscriptions.getOrgHadFreeCall,
     user ? {} : "skip",
   );
 

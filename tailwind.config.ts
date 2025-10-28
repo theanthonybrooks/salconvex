@@ -230,6 +230,7 @@ export default {
         "80dvw": "80dvw",
         dvw: "100dvw",
         screen: "100vw",
+        
       },
       height: {
         "12.5": "50px",

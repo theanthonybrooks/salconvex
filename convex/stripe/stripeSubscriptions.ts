@@ -6,7 +6,7 @@ import { getAuthUserId } from "@convex-dev/auth/server";
 import { Id } from "~/convex/_generated/dataModel";
 import { updateUserNewsletter } from "~/convex/newsletter/subscriber";
 import { ConvexError, v } from "convex/values";
-import { api, internal } from "./_generated/api";
+import { api, internal } from "../_generated/api";
 import {
   action,
   httpAction,
@@ -16,8 +16,8 @@ import {
   mutation,
   query,
   QueryCtx,
-} from "./_generated/server";
-import schema from "./schema";
+} from "../_generated/server";
+import schema from "../schema";
 
 const planMapping: Record<string, number> = {
   original: 1,
@@ -215,7 +215,7 @@ export const createStripeCheckoutSession = action({
         throw new Error("User not found or missing email");
 
       const { artistSubscription, orgSubscription } = await ctx.runQuery(
-        api.stripeSubscriptions.getUserSubscription,
+        api.stripe.stripeSubscriptions.getUserSubscription,
         {
           userId: user._id,
         },
@@ -229,7 +229,7 @@ export const createStripeCheckoutSession = action({
       }
 
       const plan: any = await ctx.runQuery(
-        internal.stripeSubscriptions.getPlanByKey,
+        internal.stripe.stripeSubscriptions.getPlanByKey,
         {
           key: args.planKey,
         },
@@ -262,6 +262,7 @@ export const createStripeCheckoutSession = action({
           args.accountType === "organizer"
             ? "One-time"
             : args.interval || "month",
+        transactionType: "base",
       };
 
       // console.log("hadTrial: ", args.hadTrial);
@@ -284,10 +285,13 @@ export const createStripeCheckoutSession = action({
         !artistSubscription &&
         isArtist
       ) {
-        await ctx.runMutation(api.stripeSubscriptions.saveStripeCustomerId, {
-          stripeCustomerId,
-          userType: isArtist ? "artist" : "organizer",
-        });
+        await ctx.runMutation(
+          api.stripe.stripeSubscriptions.saveStripeCustomerId,
+          {
+            stripeCustomerId,
+            userType: isArtist ? "artist" : "organizer",
+          },
+        );
       }
 
       // Determine subscription data options
@@ -404,6 +408,8 @@ export const subscriptionStoreWebhook = mutation({
     // Store webhook event
     await ctx.db.insert("stripeWebhookEvents", {
       type: eventType,
+      transactionType:
+        args.body.data.object.metadata?.transactionType ?? "base",
       stripeEventId: args.body.data.object.id,
       createdAt,
       modifiedAt,
@@ -443,7 +449,7 @@ export const subscriptionStoreWebhook = mutation({
     // console.log("metaNumber: ", metaNumber);
 
     switch (eventType) {
-      case "checkout.session.completed":
+      case "checkout.session.completed": //NOTE:
         //note-to-self: in this, the metadata loads something that looks like this:
         // {
         //   accountType: 'artist',
@@ -613,7 +619,7 @@ export const subscriptionStoreWebhook = mutation({
                 const paymentIntentId = baseObject.payment_intent;
                 await ctx.scheduler.runAfter(
                   0,
-                  internal.stripeSubscriptions.processRefund,
+                  internal.stripe.stripeSubscriptions.processRefund,
                   {
                     userId: existingUser._id,
                     paymentIntentId,
@@ -641,7 +647,7 @@ export const subscriptionStoreWebhook = mutation({
       // ...
       //!! SECTION: --------------------------------------------------------------------
 
-      case "checkout.session.expired":
+      case "checkout.session.expired": //NOTE:
         const customer = await ctx.db
           .query("userSubscriptions")
           .withIndex("customerId", (q) => q.eq("customerId", customerId))
@@ -1128,12 +1134,27 @@ export const paymentWebhook = httpAction(async (ctx, request) => {
   try {
     const body = await request.json();
 
-    console.log("Webhook body:", body);
-
-    // track events and based on events store data
-    await ctx.runMutation(api.stripeSubscriptions.subscriptionStoreWebhook, {
-      body,
+    // console.log("Webhook body:", body);
+    console.log("Webhook data: ", {
+      type: body.type,
+      metadata: body.data.object.metadata,
     });
+
+    const transactionType = body.data.object.metadata?.transactionType;
+    if (transactionType === "add_on") {
+      console.log("I'm an additional purchase");
+      await ctx.runMutation(api.stripe.stripeAddOns.addOnStoreWebhook, {
+        body,
+      });
+    } else {
+      // track events and based on events store data
+      await ctx.runMutation(
+        api.stripe.stripeSubscriptions.subscriptionStoreWebhook,
+        {
+          body,
+        },
+      );
+    }
 
     // console.log("Webhook body:", body);
     return new Response(JSON.stringify({ message: "Webhook received!" }), {
@@ -1249,7 +1270,7 @@ export const applyCouponToSubscription = action({
       ],
     });
 
-    await ctx.runMutation(api.stripeSubscriptions.markCouponApplied, {
+    await ctx.runMutation(api.stripe.stripeSubscriptions.markCouponApplied, {
       adminPromoCode: `${userCode}: (${promoCode.id})`,
     });
 
@@ -1378,12 +1399,15 @@ export const processRefund = internalAction({
       console.log("Refunded successfully: ", refund);
 
       if (refund.id) {
-        await ctx.runMutation(internal.stripeSubscriptions.recordRefund, {
-          userId: args.userId,
-          paymentIntentId: args.paymentIntentId,
-          refundId: refund.id,
-          reason: args.reason,
-        });
+        await ctx.runMutation(
+          internal.stripe.stripeSubscriptions.recordRefund,
+          {
+            userId: args.userId,
+            paymentIntentId: args.paymentIntentId,
+            refundId: refund.id,
+            reason: args.reason,
+          },
+        );
       }
     } catch (error) {
       console.error("Error refunding payment: ", error);

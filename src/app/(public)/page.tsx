@@ -3,14 +3,11 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
-import { api } from "~/convex/_generated/api";
-import { makeUseQueryWithStatus } from "convex-helpers/react";
-import { useQueries } from "convex-helpers/react/cache";
-import { usePreloadedQuery } from "convex/react";
 import { motion } from "framer-motion";
-import { Plus } from "lucide-react";
 import { useTheme } from "next-themes";
+
 import { FaEnvelope, FaFacebook, FaGlobe, FaInstagram } from "react-icons/fa6";
+import { Plus } from "lucide-react";
 
 import { AnimatedCounter } from "@/components/ui/animate-counter";
 import {
@@ -31,6 +28,11 @@ import Pricing from "@/features/homepage/pricing";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { cn } from "@/helpers/utilsFns";
 import { useDevice } from "@/providers/device-provider";
+
+import { api } from "~/convex/_generated/api";
+import { makeUseQueryWithStatus } from "convex-helpers/react";
+import { useQueries } from "convex-helpers/react/cache";
+import { usePreloadedQuery } from "convex/react";
 
 // const font = Poppins({ subsets: ["latin"], weight: "600" })
 
@@ -104,10 +106,21 @@ export default function Home() {
   });
 
   useEffect(() => {
+    sessionStorage.removeItem("previousSalPage");
+    if (typeof window === "undefined") return; // safety for SSR
+
     // document.cookie =
     //   "previousSalPage=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax";
+    const redirect = localStorage.getItem("login_redirect");
+    if (!redirect) return;
 
-    sessionStorage.removeItem("previousSalPage");
+    localStorage.removeItem("login_redirect");
+
+    setTimeout(() => {
+      if (window.location.pathname !== redirect) {
+        window.location.assign(redirect);
+      }
+    }, 100);
   }, []);
 
   return (

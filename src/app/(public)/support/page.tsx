@@ -1,17 +1,16 @@
 "use client";
 
+import { infoEmail } from "@/constants/siteInfo";
+import { supportCategoryOptions } from "@/constants/supportConsts";
+
 import { useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ContactFormValues, contactSchema } from "@/schemas/public";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { api } from "~/convex/_generated/api";
-import { makeUseQueryWithStatus } from "convex-helpers/react";
-import { useQueries } from "convex-helpers/react/cache";
-import { useAction, usePreloadedQuery } from "convex/react";
-import { ConvexError } from "convex/values";
 import { capitalize } from "lodash";
-import { LoaderCircle } from "lucide-react";
 import { useForm } from "react-hook-form";
+
+import { LoaderCircle } from "lucide-react";
 
 import { FormError } from "@/components/form-error";
 import { Button } from "@/components/ui/button";
@@ -30,9 +29,13 @@ import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { cn } from "@/helpers/utilsFns";
-import { infoEmail } from "@/constants/siteInfo";
-import { supportCategoryOptions } from "@/constants/supportConsts";
 import { useDevice } from "@/providers/device-provider";
+
+import { api } from "~/convex/_generated/api";
+import { makeUseQueryWithStatus } from "convex-helpers/react";
+import { useQueries } from "convex-helpers/react/cache";
+import { useAction, usePreloadedQuery } from "convex/react";
+import { ConvexError } from "convex/values";
 
 const SupportPage = () => {
   const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
@@ -245,7 +248,7 @@ const SupportPage = () => {
                           <Input
                             {...field}
                             type="name"
-                            placeholder="ex. Bob Bobson"
+                            placeholder="ex. Your Name"
                             className={cn(
                               "w-full border-foreground bg-card",
                               fieldHasError("name") && "invalid-field",

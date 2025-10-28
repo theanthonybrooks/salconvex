@@ -426,6 +426,7 @@ const artistSchema = {
   documents: v.optional(
     v.object({
       cv: v.optional(v.string()),
+      portfolio: v.optional(v.string()),
       resume: v.optional(v.string()),
       artistStatement: v.optional(v.string()),
       images: v.optional(v.array(v.string())),
@@ -904,6 +905,34 @@ const userPlansSchema = {
   popular: v.boolean(),
 };
 
+const userAddOnsSchema = {
+  userId: v.union(v.id("users"), v.null()),
+  name: v.string(),
+  email: v.string(),
+  eventId: v.id("onlineEvents"),
+  paid: v.boolean(),
+  canceled: v.boolean(),
+  file: v.optional(v.string()),
+  link: v.optional(v.string()),
+};
+
+export const onlineEventsSchema = {
+  name: v.string(),
+  slug: v.string(),
+  img: v.optional(v.string()),
+  description: v.string(),
+  requirements: v.array(v.string()),
+  startDate: v.number(),
+  endDate: v.number(),
+  location: v.optional(v.string()),
+  organizer: v.id("users"),
+  price: v.optional(v.number()),
+  updatedAt: v.optional(v.number()),
+  updatedBy: v.optional(v.id("users")),
+};
+export const onlineEventsSchemaValidator = v.object(onlineEventsSchema);
+
+export type OnlineEventType = Infer<typeof onlineEventsSchemaValidator>;
 // #endregion
 
 // #region ------------- Table Schemas & Indexes --------------
@@ -1336,8 +1365,24 @@ export default defineSchema({
     .index("stripeId", ["stripeId"])
     .index("customerId", ["customerId"]),
 
+  userAddOns: defineTable(userAddOnsSchema)
+    .index("by_userId", ["userId"])
+    .index("by_email", ["email"])
+    .index("by_userId_eventId", ["userId", "eventId"])
+    .index("by_email_eventId", ["email", "eventId"])
+    .index("by_eventId", ["eventId"]),
+
+  onlineEvents: defineTable(onlineEventsSchema)
+    .index("by_startDate", ["startDate"])
+    .index("by_endDate", ["endDate"])
+    .index("by_slug", ["slug"])
+    .index("by_slug_startDate", ["slug", "startDate"])
+    .index("by_slug_endDate", ["slug", "endDate"])
+    .index("by_organizer", ["organizer"]),
+
   stripeWebhookEvents: defineTable({
     type: v.string(),
+    transactionType: v.optional(v.string()),
     stripeEventId: v.string(),
     createdAt: v.string(),
     modifiedAt: v.string(),

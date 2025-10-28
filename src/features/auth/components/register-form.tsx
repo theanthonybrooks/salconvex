@@ -649,7 +649,7 @@ const RegisterForm = ({ switchFlow }: RegisterFormProps) => {
                             content={popoverContent}
                             align="start"
                             triggerClassName="text-sm italic md:text-muted-foreground"
-                            className="w-max max-w-[min(42em,90vw)] text-sm"
+                            className="w-max max-w-[min(42em,80vw)] text-sm"
                           >
                             How can I claim my organization?
                           </PopoverSimple>

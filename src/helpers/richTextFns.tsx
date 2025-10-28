@@ -1,11 +1,13 @@
+import { JSX } from "react";
+import parse, { DOMNode, domToReact, Element, Text } from "html-react-parser";
+import sanitizeHtml from "sanitize-html";
+import truncatise, { TruncatiseOptions } from "truncatise";
+
 import { Checkbox } from "@/components/ui/checkbox";
 import { Link } from "@/components/ui/custom-link";
 import { ALLOWED_ATTR, ALLOWED_TAGS } from "@/components/ui/rich-text-editor";
 import { cn } from "@/helpers/utilsFns";
-import DOMPurify from "dompurify";
-import parse, { DOMNode, domToReact, Element, Text } from "html-react-parser";
-import { JSX } from "react";
-import truncatise, { TruncatiseOptions } from "truncatise";
+
 interface RichTextDisplayProps {
   html: string;
   className?: string;
@@ -13,18 +15,31 @@ interface RichTextDisplayProps {
   fontSize?: string;
 }
 
+// export function cleanHtml(
+//   html: string = "",
+//   totalClean: boolean = false,
+// ): string {
+//   if (html === "") return "";
+//   if (totalClean) {
+//     return DOMPurify.sanitize(html, {
+//       ALLOWED_TAGS: [],
+//       ALLOWED_ATTR: [],
+//     });
+//   }
+//   return DOMPurify.sanitize(html, { ALLOWED_TAGS, ALLOWED_ATTR });
+// }
 export function cleanHtml(
   html: string = "",
   totalClean: boolean = false,
 ): string {
   if (html === "") return "";
   if (totalClean) {
-    return DOMPurify.sanitize(html, {
-      ALLOWED_TAGS: [],
-      ALLOWED_ATTR: [],
-    });
+    return sanitizeHtml(html, { allowedTags: [], allowedAttributes: {} });
   }
-  return DOMPurify.sanitize(html, { ALLOWED_TAGS, ALLOWED_ATTR });
+  return sanitizeHtml(html, {
+    allowedTags: ALLOWED_TAGS,
+    allowedAttributes: Object.fromEntries(ALLOWED_ATTR.map((a) => [a, []])),
+  });
 }
 
 export const RichTextDisplay = ({
@@ -33,17 +48,31 @@ export const RichTextDisplay = ({
   maxChars,
   fontSize = "text-sm",
 }: RichTextDisplayProps) => {
-  const clean = DOMPurify.sanitize(html, {
-    ALLOWED_TAGS: [...ALLOWED_TAGS, "input"],
-    ALLOWED_ATTR: [
-      ...ALLOWED_ATTR,
-      "type",
-      "checked",
-      "data-type",
-      "data-checked",
-      "target",
-      "rel",
-    ],
+  // const clean = DOMPurify.sanitize(html, {
+  //   ALLOWED_TAGS: [...ALLOWED_TAGS, "input"],
+  //   ALLOWED_ATTR: [
+  //     ...ALLOWED_ATTR,
+  //     "type",
+  //     "checked",
+  //     "data-type",
+  //     "data-checked",
+  //     "target",
+  //     "rel",
+  //   ],
+  // });
+  const clean = sanitizeHtml(html, {
+    allowedTags: [...ALLOWED_TAGS, "input"],
+    allowedAttributes: {
+      "*": [
+        ...ALLOWED_ATTR,
+        "type",
+        "checked",
+        "data-type",
+        "data-checked",
+        "target",
+        "rel",
+      ],
+    },
   });
 
   const normalized = clean.replace(/<p>\s*<\/p>/g, "<br>");
@@ -160,14 +189,14 @@ export const RichTextDisplay = ({
   }
 
   return (
-    <span
+    <div
       className={cn(
         "rich-text rich-text__preview-wrapper space-y-2",
         className,
       )}
     >
       {parse(truncated, { replace })}
-    </span>
+    </div>
   );
 };
 

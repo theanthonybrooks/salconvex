@@ -170,7 +170,7 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
           "row-start-2 hidden w-full max-w-[300px] grid-cols-[75px_auto] gap-x-3 self-start rounded-3xl border-foreground/20 bg-white/50 p-3 first:mt-6 xl:sticky xl:top-24 xl:grid",
         )}
       >
-        <div className="col-span-full mb-4 grid w-full max-w-[calc(100%-12px)] grid-cols-[75px_auto] gap-x-3 pt-2">
+        <div className="col-span-full mb-4 grid w-full grid-cols-[75px_auto] gap-x-3 pt-2">
           <div className="col-span-1 flex items-start justify-center">
             <EventOrgLogo imgSrc={eventLogo} type="event" />
           </div>

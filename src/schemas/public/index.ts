@@ -3,7 +3,11 @@ import {
   NewsletterType,
   newsletterTypeOptions,
 } from "@/constants/newsletterConsts";
+
 import { z } from "zod";
+
+import { domainRegex } from "@/lib/zodFns";
+
 const newsletterTypeValues = newsletterTypeOptions.map(
   (opt) => opt.value,
 ) as NewsletterType[];
@@ -28,33 +32,6 @@ export const newsletterStatusSchema = z.object({
   email: z.email("Must be a valid email address"),
   // frequency: z.union([z.literal("monthly"), z.literal("weekly")]),
 });
-// .superRefine((data, ctx) => {
-//   if (data.email) {
-//     ctx.addIssue({
-//       code: "custom",
-//       message: "A frequency is required for a newsletter subscription",
-//       path: ["frequency"],
-//     });
-//   }
-// });
-// export const newsletterStatusSchema = z
-//   .object({
-//     email: z.email("Invalid email"),
-//     frequency: z.union([
-//       z.literal("monthly"),
-//       z.literal("weekly"),
-//       z.literal(""),
-//     ]),
-//   })
-//   .superRefine((data, ctx) => {
-//     if (data.email) {
-//       ctx.addIssue({
-//         code: "custom",
-//         message: "A frequency is required for a newsletter subscription",
-//         path: ["frequency"],
-//       });
-//     }
-//   });
 
 export type NewsletterStatusValues = z.infer<typeof newsletterStatusSchema>;
 
@@ -67,3 +44,49 @@ export const newsletterUpdateSchema = z.object({
 });
 
 export type NewsletterUpdateValues = z.infer<typeof newsletterUpdateSchema>;
+
+export const EventRegistrationSchema = z
+  .object({
+    email: z.email("Must be a valid email address"),
+    name: z.string().min(3, "Name is required"),
+    link: z.url(),
+  })
+  .superRefine((data, ctx) => {
+    const link = data.link?.trim();
+    const parsed = z
+      .string()
+      .refine(
+        (val) => {
+          try {
+            const url = new URL(val);
+
+            // protocol must be http/https
+            if (!["http:", "https:"].includes(url.protocol)) return false;
+
+            // reject credentials in the authority section
+            if (url.username || url.password) return false;
+
+            // enforce strict domain pattern
+            if (!domainRegex.test(url.hostname)) return false;
+
+            return true;
+          } catch {
+            return false;
+          }
+        },
+        {
+          message: "Must be a valid website URL (https://example.com)",
+        },
+      )
+      .safeParse(link);
+
+    if (!parsed.success) {
+      ctx.addIssue({
+        code: "custom",
+        message: "Link must be a valid website URL (https://example.com)",
+        path: ["link"],
+      });
+    }
+  });
+
+export type EventRegistrationValues = z.infer<typeof EventRegistrationSchema>;

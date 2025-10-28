@@ -4,13 +4,11 @@
 
 import { useState } from "react";
 import { useManageSubscription } from "@/hooks/use-manage-subscription";
-import { api } from "~/convex/_generated/api";
-import { useAction, usePreloadedQuery } from "convex/react";
-import { ConvexError } from "convex/values";
 import { format } from "date-fns";
-import { CircleCheck, CreditCard, Info, X } from "lucide-react";
-import { FaExclamationTriangle } from "react-icons/fa";
 import { toast } from "react-toastify";
+
+import { FaExclamationTriangle } from "react-icons/fa";
+import { CircleCheck, CreditCard, Info, X } from "lucide-react";
 
 import { SubDialog } from "@/components/ui/account/manage-sub-dialog";
 import { Button } from "@/components/ui/button";
@@ -25,6 +23,10 @@ import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-con
 import { getUserFontSizePref } from "@/helpers/stylingFns";
 import { getSubscriptionStatusVals } from "@/helpers/subscriptionFns";
 import { cn } from "@/helpers/utilsFns";
+
+import { api } from "~/convex/_generated/api";
+import { useAction, usePreloadedQuery } from "convex/react";
+import { ConvexError } from "convex/values";
 
 export default function BillingPage() {
   const [showConfetti, setShowConfetti] = useState(false);
@@ -46,10 +48,10 @@ export default function BillingPage() {
   const handleManageSubscription = useManageSubscription({ subscription });
 
   const applyCoupon = useAction(
-    api.stripeSubscriptions.applyCouponToSubscription,
+    api.stripe.stripeSubscriptions.applyCouponToSubscription,
   );
   const deleteCoupon = useAction(
-    api.stripeSubscriptions.deleteCouponFromSubscription,
+    api.stripe.stripeSubscriptions.deleteCouponFromSubscription,
   );
 
   const currentPeriodEnd = new Date(

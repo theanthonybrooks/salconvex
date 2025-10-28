@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from "react";
 import { EventCategory } from "@/types/eventTypes";
+
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import {
   Controller,
@@ -9,8 +10,9 @@ import {
   useFormContext,
   useWatch,
 } from "react-hook-form";
-import { FaTrashCan } from "react-icons/fa6";
 import { z } from "zod";
+
+import { FaTrashCan } from "react-icons/fa6";
 
 import {
   CustomDatePicker,
@@ -75,7 +77,7 @@ export const FormDatePicker = <T extends EventOCFormValues>({
 
   const data = watch(watchPath) as z.infer<typeof eventBase.shape.dates>;
   const eventData = watch("event");
-  // const edition = eventData?.dates?.edition;
+  const edition = eventData?.dates?.edition;
 
   const eventFormat = eventData?.dates?.eventFormat;
   const hasEventDates = eventFormat !== "noEvent" && eventFormat !== "ongoing";
@@ -186,7 +188,8 @@ export const FormDatePicker = <T extends EventOCFormValues>({
         );
       } else if (formatValue === "yearRange") {
         // console.log("year range");
-        const y = toYear(new Date());
+        // const y = toYear(new Date());
+        const y = String(edition);
         setValue("event.dates.prodDates", [{ start: y, end: y }], {
           shouldValidate: true,
           shouldDirty: true,
@@ -218,7 +221,14 @@ export const FormDatePicker = <T extends EventOCFormValues>({
       }
     }
     initialValue.current = formatValue as string | undefined;
-  }, [formatValue, type, eventData?.dates?.eventDates, setValue, unregister]);
+  }, [
+    formatValue,
+    type,
+    eventData?.dates?.eventDates,
+    setValue,
+    unregister,
+    edition,
+  ]);
 
   useEffect(() => {
     const isSetDates = formatValue === "setDates";
@@ -309,9 +319,11 @@ export const FormDatePicker = <T extends EventOCFormValues>({
                   Season Range
                 </SelectItem>
 
-                <SelectItem fit value="ongoing">
-                  Ongoing
-                </SelectItem>
+                {!isProduction && (
+                  <SelectItem fit value="ongoing">
+                    Ongoing
+                  </SelectItem>
+                )}
               </SelectContent>
             </Select>
           );

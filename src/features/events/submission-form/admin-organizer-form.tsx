@@ -139,7 +139,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   const eventId = searchParams.get("_id");
   const currentValues = getValues();
   const getCheckoutUrl = useAction(
-    api.stripeSubscriptions.createStripeCheckoutSession,
+    api.stripe.stripeSubscriptions.createStripeCheckoutSession,
   );
   const getTimezone = useAction(api.actions.getTimezone.getTimezone);
 
@@ -165,7 +165,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   const generateUploadUrl = useMutation(api.uploads.files.generateUploadUrl);
   const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
   const orgHadFreeCall = useQuery(
-    api.stripeSubscriptions.getOrgHadFreeCall,
+    api.stripe.stripeSubscriptions.getOrgHadFreeCall,
     !isAdmin ? {} : "skip",
   );
 

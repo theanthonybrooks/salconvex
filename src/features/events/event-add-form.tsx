@@ -218,7 +218,7 @@ export const EventOCForm = ({
   const currentValues = getValues();
   const getTimezone = useAction(api.actions.getTimezone.getTimezone);
   const getCheckoutUrl = useAction(
-    api.stripeSubscriptions.createStripeCheckoutSession,
+    api.stripe.stripeSubscriptions.createStripeCheckoutSession,
   );
   const createNewOrg = useMutation(api.organizer.organizations.createNewOrg);
   const saveOrgFile = useMutation(api.uploads.files.saveOrgFile);

@@ -34,7 +34,8 @@
     "Convex",
     "Type",
     "Analytics",
-    "Nav"
+    "Nav",
+    "Add-Ons"
   ],
   "typescript.tsdk": "node_modules\\typescript\\lib",
   "python.analysis.autoImportCompletions": true
