@@ -365,9 +365,7 @@ export default function DashboardSideBar({
                                   href={sectionItem.href}
                                   className={cn(
                                     "ml-2 flex items-center justify-between gap-2 rounded-lg px-3 py-2 transition-colors",
-                                    fontSize === "text-base"
-                                      ? "sm:text-base"
-                                      : "text-sm",
+                                    fontSize,
                                     pathname === sectionItem.href
                                       ? "cursor-default bg-primary/5 font-medium text-primary"
                                       : "text-primary hover:bg-primary/10 hover:text-foreground",

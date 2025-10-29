@@ -1,5 +1,7 @@
-import { getAuthUserId } from "@convex-dev/auth/server";
 import Stripe from "stripe";
+
+import { getAuthUserId } from "@convex-dev/auth/server";
+import { v } from "convex/values";
 import { action, query } from "./_generated/server";
 
 //
@@ -121,5 +123,44 @@ export const getStripeDashboardUrl = action({
     } catch (error: any) {
       throw new Error("Stripe Error: " + error.message);
     }
+  },
+});
+
+export const checkSubscriptionWithEmail = query({
+  args: {
+    email: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const user = await ctx.db
+      .query("users")
+      .withIndex("email", (q) => q.eq("email", args.email))
+      .unique();
+    if (!user) return null;
+
+    const subscription = await ctx.db
+      .query("userSubscriptions")
+      .withIndex("userId", (q) => q.eq("userId", user._id))
+      .first();
+
+    const hasActiveSubscription =
+      subscription?.status === "active" || subscription?.status === "trialing";
+
+    const subStatus = subscription?.status || "none";
+
+    const subPlan = subscription?.plan;
+    const now = new Date();
+    const cancelAtTime = subscription?.cancelAt
+      ? new Date(subscription.cancelAt)
+      : undefined;
+
+    const willCancel = Boolean(cancelAtTime && cancelAtTime > now);
+    const cancelAt = willCancel ? subscription?.cancelAt : undefined;
+    // console.log("Sub status: ", subStatus)
+    return {
+      hasActiveSubscription,
+      subPlan,
+      subStatus,
+      cancelAt,
+    };
   },
 });

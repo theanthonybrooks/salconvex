@@ -116,11 +116,18 @@ export const registerForOnlineEvent = mutation({
     const userId = await getAuthUserId(ctx);
     if (!userId && !args.email)
       throw new ConvexError("Requires userId or email");
-    const user = userId ? await ctx.db.get(userId) : null;
-    const subscription = userId
+    const user = userId
+      ? await ctx.db.get(userId)
+      : args.email
+        ? await ctx.db
+            .query("users")
+            .withIndex("email", (q) => q.eq("email", args.email ?? ""))
+            .first()
+        : null;
+    const subscription = user
       ? await ctx.db
           .query("userSubscriptions")
-          .withIndex("userId", (q) => q.eq("userId", userId))
+          .withIndex("userId", (q) => q.eq("userId", user._id))
           .first()
       : null;
     const plan = subscription?.plan ?? 0;

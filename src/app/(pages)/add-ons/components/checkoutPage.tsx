@@ -4,7 +4,6 @@ import type { EventRegistrationValues } from "@/schemas/public";
 
 import { useRouter } from "next/navigation";
 import { EventRegistrationSchema } from "@/schemas/public";
-import { getExternalRedirectHtml } from "@/utils/loading-page-html";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
@@ -36,13 +35,19 @@ import { cn } from "@/helpers/utilsFns";
 import { api } from "~/convex/_generated/api";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { useQueries } from "convex-helpers/react/cache";
-import { useAction, useMutation, usePreloadedQuery } from "convex/react";
+import {
+  useAction,
+  useConvex,
+  useMutation,
+  usePreloadedQuery,
+} from "convex/react";
 
 type CheckoutPageProps = {
   event: Doc<"onlineEvents">;
 };
 
 export const CheckoutPage = ({ event }: CheckoutPageProps) => {
+  const convex = useConvex();
   const router = useRouter();
   const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
   const { preloadedUserData, preloadedSubStatus } = useConvexPreload();
@@ -130,22 +135,35 @@ export const CheckoutPage = ({ event }: CheckoutPageProps) => {
     const registrationEmail = user?.email ?? values.email;
 
     let url: string | undefined;
-    let newTab: Window | null = null;
+    let signedOutPremium = false;
 
     try {
+      if (!user) {
+        const result = await convex.query(
+          api.subscriptions.checkSubscriptionWithEmail,
+          {
+            email: registrationEmail,
+          },
+        );
+        if (
+          result?.hasActiveSubscription &&
+          result?.subPlan &&
+          result.subPlan >= 2
+        ) {
+          signedOutPremium = true;
+        }
+      }
       if (!registrationName || !registrationEmail) {
         throw new Error("Name or email not provided");
       }
-      if (paidEvent && !premiumPlan) {
-        newTab = window.open("about:blank");
-      }
+
       await registerForEvent({
         eventId: event._id,
         name: registrationName,
         email: registrationEmail,
         link: values.link,
       });
-      if (premiumPlan || !paidEvent) {
+      if (premiumPlan || !paidEvent || signedOutPremium) {
         toast.success("Successfully registered!", {
           onClick: () => toast.dismiss(),
         });
@@ -157,33 +175,15 @@ export const CheckoutPage = ({ event }: CheckoutPageProps) => {
           price: event.price ?? 0,
         });
         url = result.url;
-
-        if (!newTab) {
-          toast.error(
-            "Stripe redirect blocked. Please enable popups for this site.",
-          );
-          console.error("Popup was blocked");
-          return;
-        }
         if (url) {
-          newTab.document.write(getExternalRedirectHtml(url, 1));
-          newTab.document.close();
-          newTab.location.href = url;
-          // onClick();
-          // onClick()
+          window.location.href = url;
         }
       }
-      //   setTimeout(() => {
-      //     // setOpen(false);
-      //     window.location.href = `/thelist/event/${submissionUrl}`;
-      //   }, 1000);
+
       form.reset();
     } catch (error) {
       console.error("Failed to submit form:", error);
       toast.error("Failed to submit form");
-      if (!newTab?.closed) {
-        newTab?.document.close();
-      }
     }
   };
 

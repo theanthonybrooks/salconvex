@@ -578,13 +578,17 @@ export default function SettingsPage() {
         className="space-y-6"
       >
         <TabsList className="scrollable invis h-12 w-full max-w-full justify-around bg-white/80 md:w-auto md:justify-start">
-          <TabsTrigger value="account" className="h-9 px-4" border>
+          <TabsTrigger
+            value="account"
+            className={cn("h-9 px-4", fontSize)}
+            border
+          >
             Account
           </TabsTrigger>
 
           <TabsTrigger
             value="notifications"
-            className="hidden h-9 px-4 lg:block"
+            className={cn("hidden h-9 px-4 lg:block", fontSize)}
             border
           >
             Notifications
@@ -592,10 +596,18 @@ export default function SettingsPage() {
 
           {/* /~ //NOTE: in order to disabled, just add "disabled" to the tabs    trigger ~/ */}
 
-          <TabsTrigger value="appearance" className="h-9 px-4" border>
+          <TabsTrigger
+            value="appearance"
+            className={cn("h-9 px-4", fontSize)}
+            border
+          >
             Appearance
           </TabsTrigger>
-          <TabsTrigger value="security" className="h-9 px-4" border>
+          <TabsTrigger
+            value="security"
+            className={cn("h-9 px-4", fontSize)}
+            border
+          >
             Security
           </TabsTrigger>
         </TabsList>
