@@ -35,7 +35,8 @@
     "Type",
     "Analytics",
     "Nav",
-    "Add-Ons"
+    "Add-Ons",
+    "Extras"
   ],
   "typescript.tsdk": "node_modules\\typescript\\lib",
   "python.analysis.autoImportCompletions": true

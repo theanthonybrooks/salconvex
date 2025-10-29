@@ -5,14 +5,17 @@ import {
   NewsletterFrequency,
   NewsletterType,
 } from "@/constants/newsletterConsts";
-import { cleanInput } from "@/helpers/utilsFns";
+
 import { html } from "common-tags";
-import { ConvexError, v } from "convex/values";
 import { capitalize } from "lodash";
 import { Resend } from "resend";
+
+import { cleanInput } from "@/helpers/utilsFns";
+
 import { api } from "~/convex/_generated/api";
 import { Id } from "~/convex/_generated/dataModel";
-import { action } from "../_generated/server";
+import { ConvexError, v } from "convex/values";
+import { action, internalAction } from "../_generated/server";
 
 const resend = new Resend(process.env.AUTH_RESEND_KEY);
 const year = new Date().getFullYear();
@@ -557,6 +560,204 @@ export const sendNewsletterUpdateConfirmation = action({
         frequency: resultFrequency,
         type: resultType,
       };
+    } catch (error) {
+      console.error("Failed to send message:", error);
+      throw new ConvexError("Could not send message. Please try again.");
+    }
+  },
+});
+
+export const sendEventRegistrationEmail = internalAction({
+  args: {
+    eventId: v.id("onlineEvents"),
+    userId: v.id("users"),
+    email: v.string(),
+    action: v.union(
+      v.literal("register"),
+      v.literal("cancel"),
+      v.literal("renew"),
+    ),
+  },
+  handler: async (ctx, args) => {
+    const { email, eventId, userId, action } = args;
+    let status: string = "unknown_error";
+    const cancellationEmail = action === "cancel";
+
+    try {
+      const userData = await ctx.runQuery(api.users.getUserById, {
+        id: userId,
+      });
+
+      if (!userData) {
+        throw new ConvexError({ message: "User not found", data: userId });
+      }
+
+      const firstName = userData.firstName;
+
+      const eventData = await ctx.runQuery(
+        api.userAddOns.onlineEvents.getOnlineEvent,
+        { eventId },
+      );
+
+      if (!eventData) {
+        throw new ConvexError({ message: "Event not found", data: eventId });
+      }
+      status = "success";
+      const eventName = eventData.name;
+      const eventStart = eventData.startDate;
+      const eventLink = `${process.env.FRONTEND_URL}/extras/${eventData.slug}`;
+
+      const cancellationHtmlContent = html` <h2
+          style="font-weight:bold; text-align:start; margin-top:30px"
+        >
+          What if plans change and I can't make it?
+        </h2>
+        <p>
+          If you&apos;re already subscribed with a Banana Cap or Fat Cap
+          membership, you can follow the link below to cancel your registration
+          to the event. Since you&apos;re already a member, the event is free
+          for you and there's no need for anything more.
+        </p>
+        <p>
+          If you&apos;re not a member, the same steps apply, but the
+          registration fee will be credited to your account and can be used for
+          a different, future event (or the same one if you change your mind).
+        </p>
+        <p>
+          Either way, just be sure to cancel at least 72 hours before the event
+          starts, or you will lose the cancellation fee.
+        </p>
+        <p>
+          Registration update link: (<a
+            href="https://thestreetartlist.com/pricing"
+            target="_blank"
+            >here</a
+          >)
+        </p>`;
+
+      const htmlContent = html`
+        <!DOCTYPE html>
+        <html lang="en">
+          <head>
+            <meta
+              http-equiv="Content-Type"
+              content="text/html; charset=UTF-8"
+            />
+            <meta
+              name="viewport"
+              content="width=device-width, initial-scale=1.0"
+            />
+            <title>
+              ${eventName}
+              ${action === "cancel"
+                ? "Cancellation"
+                : action === "register"
+                  ? "Registration"
+                  : "Renewal"}
+              Confirmation
+            </title>
+
+            <link
+              href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&display=swap"
+              rel="stylesheet"
+            />
+            ${newsletterStyling}
+          </head>
+          <body style="margin:0; padding:20px; background-color:#ffe770; ">
+            <table
+              role="presentation"
+              border="0"
+              cellpadding="0"
+              cellspacing="0"
+              width="100%"
+            >
+              <tr>
+                <td align="center">
+                  <table
+                    role="presentation"
+                    border="0"
+                    cellpadding="0"
+                    cellspacing="0"
+                    width="600"
+                    class="container"
+                  >
+                    <tr>
+                      <td
+                        class="content"
+                        style="padding:40px; text-align:center;"
+                      >
+                        <img
+                          src="https://thestreetartlist.com/branding/extras/extras-heading.png"
+                          alt="The Street Art List"
+                          width="300"
+                          style="display:block; margin:0 auto; padding-bottom:20px;"
+                        />
+                        <p
+                          style="text-transform:uppercase; font-weight:bold; font-size:0.875rem; text-align:start; margin:30px 0"
+                        >
+                          ${eventName}
+                          ${action === "cancel"
+                            ? "Cancellation"
+                            : action === "register"
+                              ? "Registration"
+                              : "Renewal"}
+                          Confirmation
+                        </p>
+                        <hr />
+
+                        <p
+                          style="font-size:0.875rem; line-height:2; margin:0 0 20px; text-align:left;  "
+                        >
+                          Hey there, ${firstName}. You&apos;ve successfully
+                          ${action === "cancel"
+                            ? "cancelled your registration"
+                            : action === "register"
+                              ? "registered"
+                              : "renewed your registration"}
+                          for the upcoming ${eventName} on
+                          <b
+                            ><a
+                              href="https://thestreetartlist.com"
+                              target="_blank"
+                              style="color:black; text-decoration:none; font-weight:bold;"
+                              >The Street Art List</a
+                            ></b
+                          >!
+                        </p>
+
+                        <hr />
+                        <p style="width:100%; text-align:center;">
+                          Copyright © The Street Art List ${year}. All rights
+                          reserved.
+                        </p>
+                        <p
+                          style="font-size:12px; line-height:1.4; margin:0; text-align:center; font-family:'Space Grotesk', Helvetica, Arial, sans-serif; color:#666666;"
+                        >
+                          You are receiving this email because you or someone
+                          with your email registered for an event on The Street
+                          Art List. If you didn&apos;t request this, you can
+                          ignore this message.
+                        </p>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+          </body>
+        </html>
+      `;
+
+      if (status === "success") {
+        await resend.emails.send({
+          from: "The Street Art List<events@support.thestreetartlist.com>",
+          to: email,
+          subject: `${eventName} Registration Confirmation`,
+          html: htmlContent,
+        });
+      }
+
+      return { success: true, status };
     } catch (error) {
       console.error("Failed to send message:", error);
       throw new ConvexError("Could not send message. Please try again.");

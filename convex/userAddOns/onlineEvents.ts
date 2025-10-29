@@ -1,9 +1,14 @@
 import slugify from "slugify";
 
 import type { Doc, Id } from "~/convex/_generated/dataModel";
-import type { QueryCtx } from "~/convex/_generated/server";
+import type {
+  ActionCtx,
+  MutationCtx,
+  QueryCtx,
+} from "~/convex/_generated/server";
 
 import { getAuthUserId } from "@convex-dev/auth/server";
+import { internal } from "~/convex/_generated/api";
 import { mutation, query } from "~/convex/_generated/server";
 import {
   onlineEventsSchema,
@@ -35,6 +40,25 @@ export async function getRegistration(
   } else {
     return null;
   }
+}
+
+export async function sendEventRegistrationEmailHelper(
+  ctx: MutationCtx | ActionCtx,
+  eventId: Id<"onlineEvents">,
+  userId: Id<"users">,
+  email: string,
+  action: "register" | "cancel" | "renew",
+) {
+  await ctx.scheduler.runAfter(
+    0,
+    internal.actions.resend.sendEventRegistrationEmail,
+    {
+      eventId,
+      userId,
+      email,
+      action,
+    },
+  );
 }
 
 export const getOnlineEvent = query({
@@ -149,7 +173,7 @@ export const registerForOnlineEvent = mutation({
     const userId = await getAuthUserId(ctx);
     const formattedEmail = args.email?.toLowerCase();
 
-    if (!userId && !args.email)
+    if (!userId || !formattedEmail)
       throw new ConvexError("Requires userId or email");
     const user = userId
       ? await ctx.db.get(userId)
@@ -166,6 +190,8 @@ export const registerForOnlineEvent = mutation({
           .first()
       : null;
     const plan = subscription?.plan ?? 0;
+    const event = await ctx.db.get(args.eventId);
+    if (!event) throw new ConvexError("Event not found");
     const registration = await getRegistration(
       ctx,
       args.eventId,
@@ -182,7 +208,8 @@ export const registerForOnlineEvent = mutation({
         await ctx.db.patch(registration._id, {
           canceled: false,
         });
-        return { paid: false, registration: registration };
+
+        return { paid: false, registration, user, event, status: "success" };
       }
     }
 
@@ -194,9 +221,6 @@ export const registerForOnlineEvent = mutation({
             .first()
         : null;
     const artistPortfolio = artist?.documents?.portfolio;
-
-    const event = await ctx.db.get(args.eventId);
-    if (!event) throw new ConvexError("Event not found");
 
     const newRegistration = await ctx.db.insert("userAddOns", {
       userId: user?._id ?? null,
@@ -218,8 +242,15 @@ export const registerForOnlineEvent = mutation({
         },
       });
     }
+    await sendEventRegistrationEmailHelper(
+      ctx,
+      args.eventId,
+      userId,
+      formattedEmail,
+      "register",
+    );
 
-    return { event, registration: newRegistration };
+    return { event, registration: newRegistration, status: "success" };
 
     //use resend to send confirmation email for signup (should note whether it's been paid or not (or is included in their membership)
   },
@@ -228,12 +259,13 @@ export const registerForOnlineEvent = mutation({
 export const updateRegistration = mutation({
   args: {
     eventId: v.id("onlineEvents"),
-    email: v.optional(v.string()),
+    email: v.string(),
     action: v.union(v.literal("cancel"), v.literal("renew")),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) return null;
+    const formattedEmail = args.email?.toLowerCase();
 
     const event = await ctx.db.get(args.eventId);
     if (!event)
@@ -246,7 +278,7 @@ export const updateRegistration = mutation({
       ctx,
       args.eventId,
       userId,
-      args.email,
+      formattedEmail,
     );
 
     if (!registration)
@@ -314,7 +346,7 @@ export const updateRegistration = mutation({
           //     voucherId: voucher._id,
           //   });
           // });
-          return { error: "Voucher already redeemed" };
+          return { error: "Voucher already redeemed", status: "error" };
         }
       }
       await ctx.db.patch(registration._id, {
@@ -327,6 +359,14 @@ export const updateRegistration = mutation({
         },
       });
     }
+    await sendEventRegistrationEmailHelper(
+      ctx,
+      args.eventId,
+      userId,
+      formattedEmail,
+      args.action,
+    );
+    return { event, status: "success" };
   },
 });
 
@@ -334,9 +374,10 @@ export const checkRegistration = query({
   args: {
     eventId: v.id("onlineEvents"),
     email: v.optional(v.string()),
+    userId: v.optional(v.id("users")),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
+    const userId = args.userId ?? (await getAuthUserId(ctx));
     if (!userId) return null;
 
     const registration = await getRegistration(

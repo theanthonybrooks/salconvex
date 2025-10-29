@@ -3,6 +3,7 @@ import Stripe from "stripe";
 import type { Id } from "~/convex/_generated/dataModel";
 
 import { getAuthUserId } from "@convex-dev/auth/server";
+import { sendEventRegistrationEmailHelper } from "~/convex/userAddOns/onlineEvents";
 import { ConvexError, v } from "convex/values";
 import { api } from "../_generated/api";
 import { action, mutation } from "../_generated/server";
@@ -235,6 +236,7 @@ export const addOnStoreWebhook = mutation({
           baseObject.payment_status,
           paymentStatus,
         );
+        const formattedEmail = metadata.email?.toLowerCase();
         const event = await ctx.db.get(eventId);
         if (!event) throw new Error("Event not found for : " + eventId);
 
@@ -249,7 +251,7 @@ export const addOnStoreWebhook = mutation({
             : await ctx.db
                 .query("userAddOns")
                 .withIndex("by_email_eventId", (q) =>
-                  q.eq("email", metadata.email).eq("eventId", eventId),
+                  q.eq("email", formattedEmail).eq("eventId", eventId),
                 )
                 .first();
 
@@ -264,6 +266,13 @@ export const addOnStoreWebhook = mutation({
               current: event.capacity.current + 1,
             },
           });
+          await sendEventRegistrationEmailHelper(
+            ctx,
+            event._id,
+            userId,
+            formattedEmail,
+            "register",
+          );
         } else {
           throw new ConvexError(
             "Registration not found for: " +

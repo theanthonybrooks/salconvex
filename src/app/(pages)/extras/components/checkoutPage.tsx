@@ -241,7 +241,7 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
     try {
       if (!user) return;
       const result = await updateRegistration({
-        email: user?.email ?? "",
+        email: user.email,
         eventId: event._id,
         action,
       });
@@ -253,10 +253,10 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
       }
       if (action === "cancel") {
         toast.dismiss();
-        toast.success("Successfully cancelled registration!");
+        toast.success("Successfully cancelled!");
       } else {
         toast.dismiss();
-        toast.success("Successfully renewed registration!");
+        toast.success("Successfully renewed your registration!");
       }
     } catch (error) {
       toast.dismiss();
@@ -286,8 +286,8 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
           <Image
             src={event.img}
             alt={name}
-            width={400}
-            height={200}
+            width={300}
+            height={150}
             className=""
           />
         )}
