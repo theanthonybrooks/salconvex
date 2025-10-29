@@ -173,10 +173,17 @@ export const registerForOnlineEvent = mutation({
       args.email,
     );
     if (registration) {
-      throw new ConvexError({
-        message: `You're already registered for this event. ${userId ? "Log in to update, or c" : "Check your email for the event confirmation or c"}ontact support`,
-        data: `A registration already exists for ${args.eventId} and ${userId ? userId : "email"}`,
-      });
+      if (registration.paid) {
+        throw new ConvexError({
+          message: `You're already registered for this event. ${userId ? "Log in to update, or c" : "Check your email for the event confirmation or c"}ontact support`,
+          data: `A registration already exists for ${args.eventId} and ${userId ? userId : "email"}`,
+        });
+      } else {
+        await ctx.db.patch(registration._id, {
+          canceled: false,
+        });
+        return { paid: false, registration: registration };
+      }
     }
 
     const artist =
@@ -340,6 +347,10 @@ export const checkRegistration = query({
     );
     if (!registration) return null;
 
-    return { paid: registration.paid, canceled: registration.canceled };
+    return {
+      paid: registration.paid,
+      canceled: registration.canceled,
+      registration,
+    };
   },
 });

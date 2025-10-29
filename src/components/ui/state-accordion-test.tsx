@@ -99,8 +99,8 @@ const AccordionTrigger = React.forwardRef<
           <div className="flex w-full items-center justify-between">
             <span className={cn("hover:underline", fontSize)}>{title}</span>
             <span className="absolute right-2">
-              <Minus className="ralph size-4 shrink-0 origin-center text-muted-foreground transition-transform ease-in hover:scale-125 group-data-[state=closed]:hidden" />
-              <Plus className="mert size-4 shrink-0 origin-center text-muted-foreground transition-transform ease-in hover:scale-125 group-data-[state=open]:hidden" />
+              <Minus className="ralph size-4 shrink-0 origin-center text-foreground transition-transform ease-in hover:scale-125 group-data-[state=closed]:hidden" />
+              <Plus className="mert size-4 shrink-0 origin-center text-foreground transition-transform ease-in hover:scale-125 group-data-[state=open]:hidden" />
             </span>
           </div>
 

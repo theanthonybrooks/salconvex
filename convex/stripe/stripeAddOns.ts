@@ -141,7 +141,7 @@ export const createStripeAddOnCheckoutSession = action({
           mode: "payment",
           subscription_data: {},
           //TODO: set this to the event page or some sort of confirmation page
-          success_url: `${process.env.FRONTEND_URL}/add-ons/${event.slug}`,
+          success_url: `${process.env.FRONTEND_URL}/extras/${event.slug}`,
           cancel_url: `${process.env.FRONTEND_URL}/pricing`,
           metadata: metadata,
           client_reference_id: metadata.userId,
@@ -256,6 +256,7 @@ export const addOnStoreWebhook = mutation({
         if (registration && paymentStatus) {
           await ctx.db.patch(registration._id, {
             paid: paymentStatus,
+            canceled: false,
           });
           await ctx.db.patch(event._id, {
             capacity: {
