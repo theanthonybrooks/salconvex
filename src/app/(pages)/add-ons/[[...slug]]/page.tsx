@@ -5,7 +5,7 @@ import { CheckoutPage } from "@/app/(pages)/add-ons/components/checkoutPage";
 import { capitalize } from "lodash";
 
 import { api } from "~/convex/_generated/api";
-import { fetchQuery } from "convex/nextjs";
+import { fetchQuery, preloadQuery } from "convex/nextjs";
 
 type Props = {
   params: Promise<{ slug: string; year: string }>;
@@ -43,7 +43,7 @@ export default async function AddOnsPage({
   const slugValue = Array.isArray(slug) ? slug[0] : slug;
 
   const event = slug
-    ? await fetchQuery(api.userAddOns.onlineEvents.getOnlineEvent, {
+    ? await preloadQuery(api.userAddOns.onlineEvents.getOnlineEvent, {
         slug: slugValue,
       })
     : null;
@@ -52,5 +52,5 @@ export default async function AddOnsPage({
     redirect("/404");
   }
 
-  return <CheckoutPage event={event} />;
+  return <CheckoutPage preloaded={event} />;
 }

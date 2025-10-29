@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import * as AccordionPrimitive from "@radix-ui/react-accordion";
+
 import { Minus, Plus } from "lucide-react";
 
 import { cn } from "@/helpers/utilsFns";
@@ -123,8 +124,10 @@ AccordionTrigger.displayName = AccordionPrimitive.Trigger.displayName;
 
 const AccordionContent = React.forwardRef<
   React.ComponentRef<typeof AccordionPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Content>
->(({ className, children, ...props }, ref) => {
+  React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Content> & {
+    fontSize?: string;
+  }
+>(({ className, children, fontSize, ...props }, ref) => {
   const { triggerProps } = React.useContext(AccordionItemContext);
 
   return (
@@ -134,6 +137,7 @@ const AccordionContent = React.forwardRef<
         "overflow-hidden pb-4 text-sm transition-all data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down",
         triggerProps?.hasPreview && "pt-2",
         className,
+        fontSize,
       )}
       {...props}
     >

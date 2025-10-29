@@ -914,6 +914,7 @@ const userAddOnsSchema = {
   canceled: v.boolean(),
   file: v.optional(v.string()),
   link: v.optional(v.string()),
+  plan: v.optional(v.number()),
 };
 
 export const onlineEventsSchema = {
@@ -922,17 +923,34 @@ export const onlineEventsSchema = {
   img: v.optional(v.string()),
   description: v.string(),
   requirements: v.array(v.string()),
+  regDeadline: v.number(),
   startDate: v.number(),
   endDate: v.number(),
   location: v.optional(v.string()),
   organizer: v.id("users"),
-  price: v.optional(v.number()),
+  price: v.number(),
+  capacity: v.object({
+    max: v.number(),
+    current: v.number(),
+  }),
+
+  terms: v.array(v.string()),
   updatedAt: v.optional(v.number()),
   updatedBy: v.optional(v.id("users")),
 };
 export const onlineEventsSchemaValidator = v.object(onlineEventsSchema);
 
 export type OnlineEventType = Infer<typeof onlineEventsSchemaValidator>;
+
+export const eventVoucherSchema = v.object({
+  eventId: v.id("onlineEvents"),
+  registrationId: v.id("userAddOns"),
+  userId: v.union(v.id("users"), v.null()),
+  email: v.string(),
+  amount: v.number(),
+  redeemed: v.boolean(),
+});
+
 // #endregion
 
 // #region ------------- Table Schemas & Indexes --------------
@@ -1379,6 +1397,13 @@ export default defineSchema({
     .index("by_slug_startDate", ["slug", "startDate"])
     .index("by_slug_endDate", ["slug", "endDate"])
     .index("by_organizer", ["organizer"]),
+
+  eventVouchers: defineTable(eventVoucherSchema)
+    .index("by_eventId", ["eventId"])
+    .index("by_registrationId", ["registrationId"])
+    .index("by_email_reedemed", ["email", "redeemed"])
+    .index("by_userId_reedemed", ["userId", "redeemed"])
+    .index("by_userId", ["userId"]),
 
   stripeWebhookEvents: defineTable({
     type: v.string(),

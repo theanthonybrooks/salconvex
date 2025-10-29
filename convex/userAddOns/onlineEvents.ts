@@ -1,5 +1,8 @@
 import slugify from "slugify";
 
+import type { Doc, Id } from "~/convex/_generated/dataModel";
+import type { QueryCtx } from "~/convex/_generated/server";
+
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { mutation, query } from "~/convex/_generated/server";
 import {
@@ -7,6 +10,32 @@ import {
   onlineEventsSchemaValidator,
 } from "~/convex/schema";
 import { ConvexError, v } from "convex/values";
+
+export async function getRegistration(
+  ctx: QueryCtx,
+  eventId: Id<"onlineEvents">,
+  userId?: Id<"users"> | null,
+  email?: string | null,
+): Promise<Doc<"userAddOns"> | null> {
+  const formattedEmail = email?.toLowerCase();
+  if (userId) {
+    return await ctx.db
+      .query("userAddOns")
+      .withIndex("by_userId_eventId", (q) =>
+        q.eq("userId", userId).eq("eventId", eventId),
+      )
+      .first();
+  } else if (formattedEmail) {
+    return await ctx.db
+      .query("userAddOns")
+      .withIndex("by_email_eventId", (q) =>
+        q.eq("email", formattedEmail).eq("eventId", eventId),
+      )
+      .first();
+  } else {
+    return null;
+  }
+}
 
 export const getOnlineEvent = query({
   args: {
@@ -48,10 +77,14 @@ export const createOnlineEvent = mutation({
       slug: slug,
       description: args.description,
       requirements: args.requirements,
+      terms: args.terms,
       startDate: args.startDate,
       endDate: args.endDate,
       location: args.location,
       organizer: userId,
+      price: args.price,
+      capacity: args.capacity,
+      regDeadline: args.regDeadline,
     });
     return event;
   },
@@ -114,6 +147,8 @@ export const registerForOnlineEvent = mutation({
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
+    const formattedEmail = args.email?.toLowerCase();
+
     if (!userId && !args.email)
       throw new ConvexError("Requires userId or email");
     const user = userId
@@ -121,7 +156,7 @@ export const registerForOnlineEvent = mutation({
       : args.email
         ? await ctx.db
             .query("users")
-            .withIndex("email", (q) => q.eq("email", args.email ?? ""))
+            .withIndex("email", (q) => q.eq("email", formattedEmail ?? ""))
             .first()
         : null;
     const subscription = user
@@ -131,12 +166,24 @@ export const registerForOnlineEvent = mutation({
           .first()
       : null;
     const plan = subscription?.plan ?? 0;
+    const registration = await getRegistration(
+      ctx,
+      args.eventId,
+      userId,
+      args.email,
+    );
+    if (registration) {
+      throw new ConvexError({
+        message: `You're already registered for this event. ${userId ? "Log in to update, or c" : "Check your email for the event confirmation or c"}ontact support`,
+        data: `A registration already exists for ${args.eventId} and ${userId ? userId : "email"}`,
+      });
+    }
 
     const artist =
-      plan >= 2 && userId
+      plan >= 2 && user
         ? await ctx.db
             .query("artists")
-            .withIndex("by_artistId", (q) => q.eq("artistId", userId))
+            .withIndex("by_artistId", (q) => q.eq("artistId", user._id))
             .first()
         : null;
     const artistPortfolio = artist?.documents?.portfolio;
@@ -144,84 +191,135 @@ export const registerForOnlineEvent = mutation({
     const event = await ctx.db.get(args.eventId);
     if (!event) throw new ConvexError("Event not found");
 
-    const registration = await ctx.db.insert("userAddOns", {
-      userId,
+    const newRegistration = await ctx.db.insert("userAddOns", {
+      userId: user?._id ?? null,
       name: user?.name ?? args.name ?? "guest",
-      email: user?.email ?? args.email ?? "",
+      email: user?.email ?? formattedEmail ?? "",
       eventId: args.eventId,
       paid: plan >= 2,
+      plan,
       canceled: false,
       link: args.link,
       file: artistPortfolio,
     });
 
-    return { event, registration };
+    if (plan >= 2 && event.capacity.current < event.capacity.max) {
+      await ctx.db.patch(event._id, {
+        capacity: {
+          ...event.capacity,
+          current: event.capacity.current + 1,
+        },
+      });
+    }
+
+    return { event, registration: newRegistration };
 
     //use resend to send confirmation email for signup (should note whether it's been paid or not (or is included in their membership)
   },
 });
 
-export const cancelRegistration = mutation({
+export const updateRegistration = mutation({
   args: {
     eventId: v.id("onlineEvents"),
     email: v.optional(v.string()),
+    action: v.union(v.literal("cancel"), v.literal("renew")),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) return null;
 
-    const registration = userId
-      ? await ctx.db
-          .query("userAddOns")
-          .withIndex("by_userId_eventId", (q) =>
-            q.eq("userId", userId).eq("eventId", args.eventId),
+    const event = await ctx.db.get(args.eventId);
+    if (!event)
+      throw new ConvexError({
+        message: "Event not found",
+        data: `No event found for ${args.eventId}`,
+      });
+
+    const registration = await getRegistration(
+      ctx,
+      args.eventId,
+      userId,
+      args.email,
+    );
+
+    if (!registration)
+      throw new ConvexError({
+        message: "Registration not found",
+        data: `No registration found for ${args.eventId} and ${userId ? userId : "email"}`,
+      });
+
+    if (args.action === "cancel") {
+      await ctx.db.patch(registration._id, {
+        canceled: true,
+      });
+
+      await ctx.db.patch(event._id, {
+        capacity: {
+          ...event.capacity,
+          current: event.capacity.current - 1,
+        },
+      });
+
+      if (registration.plan && registration.plan < 2) {
+        const voucher = await ctx.db
+          .query("eventVouchers")
+          .withIndex("by_registrationId", (q) =>
+            q.eq("registrationId", registration._id),
           )
-          .first()
-      : args.email
-        ? await ctx.db
-            .query("userAddOns")
-            .withIndex("by_email_eventId", (q) =>
-              q.eq("email", args.email ?? "").eq("eventId", args.eventId),
-            )
-            .first()
-        : null;
-    if (!registration) return null;
-
-    await ctx.db.patch(registration._id, {
-      canceled: true,
-    });
-  },
-});
-
-export const renewRegistration = mutation({
-  args: {
-    eventId: v.id("onlineEvents"),
-    email: v.optional(v.string()),
-  },
-  handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) return null;
-
-    const registration = userId
-      ? await ctx.db
-          .query("userAddOns")
-          .withIndex("by_userId_eventId", (q) =>
-            q.eq("userId", userId).eq("eventId", args.eventId),
+          .first();
+        if (voucher) {
+          await ctx.db.patch(voucher._id, {
+            redeemed: false,
+          });
+        } else {
+          await ctx.db.insert("eventVouchers", {
+            userId,
+            registrationId: registration._id,
+            eventId: event._id,
+            email: registration.email,
+            amount: event.price,
+            redeemed: false,
+          });
+        }
+      }
+    } else if (args.action === "renew") {
+      if (event.capacity.current === event.capacity.max) {
+        throw new ConvexError({ message: "No more spots available" });
+      }
+      if (registration.plan && registration.plan < 2) {
+        const voucher = await ctx.db
+          .query("eventVouchers")
+          .withIndex("by_registrationId", (q) =>
+            q.eq("registrationId", registration._id),
           )
-          .first()
-      : args.email
-        ? await ctx.db
-            .query("userAddOns")
-            .withIndex("by_email_eventId", (q) =>
-              q.eq("email", args.email ?? "").eq("eventId", args.eventId),
-            )
-            .first()
-        : null;
-    if (!registration) return null;
-
-    await ctx.db.patch(registration._id, {
-      canceled: false,
-    });
+          .first();
+        if (voucher?.redeemed === false) {
+          await ctx.db.patch(voucher._id, {
+            redeemed: true,
+          });
+        } else if (voucher?.redeemed === true) {
+          await ctx.db.patch(registration._id, {
+            paid: false,
+          });
+          // .then(() => {
+          //   throw new ConvexError({
+          //     message: "Voucher already redeemed",
+          //     voucherId: voucher._id,
+          //   });
+          // });
+          return { error: "Voucher already redeemed" };
+        }
+      }
+      await ctx.db.patch(registration._id, {
+        canceled: false,
+      });
+      await ctx.db.patch(event._id, {
+        capacity: {
+          ...event.capacity,
+          current: event.capacity.current + 1,
+        },
+      });
+    }
   },
 });
 
@@ -234,21 +332,12 @@ export const checkRegistration = query({
     const userId = await getAuthUserId(ctx);
     if (!userId) return null;
 
-    const registration = userId
-      ? await ctx.db
-          .query("userAddOns")
-          .withIndex("by_userId_eventId", (q) =>
-            q.eq("userId", userId).eq("eventId", args.eventId),
-          )
-          .first()
-      : args.email
-        ? await ctx.db
-            .query("userAddOns")
-            .withIndex("by_email_eventId", (q) =>
-              q.eq("email", args.email ?? "").eq("eventId", args.eventId),
-            )
-            .first()
-        : null;
+    const registration = await getRegistration(
+      ctx,
+      args.eventId,
+      userId,
+      args.email,
+    );
     if (!registration) return null;
 
     return { paid: registration.paid, canceled: registration.canceled };

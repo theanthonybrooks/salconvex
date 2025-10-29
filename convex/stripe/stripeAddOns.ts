@@ -235,6 +235,8 @@ export const addOnStoreWebhook = mutation({
           baseObject.payment_status,
           paymentStatus,
         );
+        const event = await ctx.db.get(eventId);
+        if (!event) throw new Error("Event not found for : " + eventId);
 
         const registration =
           userId && userId !== "guest"
@@ -254,6 +256,12 @@ export const addOnStoreWebhook = mutation({
         if (registration && paymentStatus) {
           await ctx.db.patch(registration._id, {
             paid: paymentStatus,
+          });
+          await ctx.db.patch(event._id, {
+            capacity: {
+              ...event.capacity,
+              current: event.capacity.current + 1,
+            },
           });
         } else {
           throw new ConvexError(
