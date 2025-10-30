@@ -5,15 +5,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { LoginFormValues, LoginSchema } from "@/schemas/auth";
-import { useAuthActions } from "@convex-dev/auth/react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { api } from "~/convex/_generated/api";
-import { useConvex, useMutation } from "convex/react";
-import { ConvexError } from "convex/values";
-import { Heart, LoaderCircle } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useForm } from "react-hook-form";
+
 import { FaGoogle } from "react-icons/fa";
+import { Heart, LoaderCircle } from "lucide-react";
 
 import { FormError } from "@/components/form-error";
 import { FormSuccess } from "@/components/form-success";
@@ -35,6 +32,11 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
+
+import { useAuthActions } from "@convex-dev/auth/react";
+import { api } from "~/convex/_generated/api";
+import { useConvex, useMutation } from "convex/react";
+import { ConvexError } from "convex/values";
 
 interface SignInCardProps {
   // setState: (state: SignInFlow) => void
@@ -354,7 +356,7 @@ const SignInCard = ({ switchFlow, forgotPasswordHandler }: SignInCardProps) => {
               />
             </div>
             <Button
-              className="mt-8 w-full bg-white py-6 text-base focus-visible:bg-salPinkLt sm:mt-6 sm:py-0 md:bg-salYellow"
+              className="mt-8 w-full bg-white py-6 focus-visible:bg-salPinkLt sm:mt-6 sm:py-0 sm:text-base md:bg-salYellow"
               size="lg"
               type="submit"
               variant={

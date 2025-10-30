@@ -105,8 +105,13 @@ const RegisterForm = ({ switchFlow }: RegisterFormProps) => {
   });
 
   const {
+    watch,
     formState: { isValid },
   } = form;
+
+  const chosenAccountType = watch("accountType");
+  const isOrganizerType =
+    chosenAccountType.length === 1 && chosenAccountType.includes("organizer");
 
   useEffect(() => {
     const accountType = form.getValues("accountType");
@@ -270,11 +275,15 @@ const RegisterForm = ({ switchFlow }: RegisterFormProps) => {
 
           if (callBackSrc && callBackSrc === "newUser") {
             sessionStorage.removeItem("src");
-            router.replace("/pricing");
+            router.replace(
+              `/pricing?type=${isOrganizerType ? "organizer" : "artist"}`,
+            );
           } else if (prevSalPage) {
             router.replace(prevSalPage);
           } else {
-            router.replace("/pricing");
+            router.replace(
+              `/pricing?type=${isOrganizerType ? "organizer" : "artist"}`,
+            );
           }
         }
       } catch (error) {
@@ -294,6 +303,7 @@ const RegisterForm = ({ switchFlow }: RegisterFormProps) => {
       }
     },
     [
+      isOrganizerType,
       otp,
       setError,
       setIsLoading,
@@ -538,6 +548,7 @@ const RegisterForm = ({ switchFlow }: RegisterFormProps) => {
                             setSelectedOption(value as AccountType);
                           }}
                           defaultValue={field.value}
+                          disabled={isPending}
                           placeholder="Select account type(s)"
                           variant="basic"
                           maxCount={3}
@@ -703,7 +714,7 @@ const RegisterForm = ({ switchFlow }: RegisterFormProps) => {
               </AnimatePresence>
               <Button
                 disabled={isPending || !isValid}
-                className="mt-6 w-full bg-white text-base md:bg-salYellow"
+                className="mt-6 w-full bg-white sm:text-base md:bg-salYellow"
                 size="lg"
                 type="submit"
                 variant={
