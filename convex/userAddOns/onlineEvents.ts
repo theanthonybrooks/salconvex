@@ -305,9 +305,10 @@ export const updateRegistration = mutation({
           .withIndex("by_userId", (q) => q.eq("userId", userId))
           .first();
         if (voucher) {
-          const voucherAmount = voucher.amount;
+          const initialVoucherAmt = voucher.amount;
           await ctx.db.patch(voucher._id, {
             redeemed: false,
+            amount: initialVoucherAmt + event.price,
           });
         } else {
           await ctx.db.insert("eventVouchers", {
@@ -327,13 +328,21 @@ export const updateRegistration = mutation({
       if (registration.plan && registration.plan < 2) {
         const voucher = await ctx.db
           .query("eventVouchers")
-          .withIndex("by_registrationId", (q) =>
-            q.eq("registrationId", registration._id),
-          )
+          .withIndex("by_userId", (q) => q.eq("userId", userId))
           .first();
+
         if (voucher?.redeemed === false) {
+          const initialVoucherAmt = voucher.amount;
+          const newVoucherAmt = initialVoucherAmt - event.price;
+          if (newVoucherAmt < 0)
+            return {
+              error: `Voucher amount (${initialVoucherAmt}) is less than the event price (${event.price})`,
+              status: "error",
+            };
+
           await ctx.db.patch(voucher._id, {
-            redeemed: true,
+            amount: newVoucherAmt,
+            redeemed: newVoucherAmt === 0,
           });
         } else if (voucher?.redeemed === true) {
           await ctx.db.patch(registration._id, {
@@ -347,6 +356,7 @@ export const updateRegistration = mutation({
           // });
           return { error: "Voucher already redeemed", status: "error" };
         }
+        return { error: "No voucher found", status: "error" };
       }
       await ctx.db.patch(registration._id, {
         canceled: false,

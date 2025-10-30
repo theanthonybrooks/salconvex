@@ -75,6 +75,8 @@ const primaryContacts = v.union(
   v.literal("vk"),
 );
 
+export type PrimaryContact = Infer<typeof primaryContacts>;
+
 const contactValidator = v.object({
   organizer: v.optional(v.string()),
   organizerTitle: v.optional(v.string()),

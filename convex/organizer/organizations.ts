@@ -9,6 +9,8 @@ import { Organizer } from "@/types/organizer";
 
 import slugify from "slugify";
 
+import type { PrimaryContact } from "~/convex/schema";
+
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { Id } from "~/convex/_generated/dataModel";
 import {
@@ -495,7 +497,7 @@ export const updateOrganization = mutation({
       contact: {
         organizer: args.contact?.organizer,
         organizerTitle: args.contact?.organizerTitle,
-        primaryContact: args.contact?.primaryContact || "",
+        primaryContact: args.contact?.primaryContact as PrimaryContact,
       },
       links: sanitizedLinks,
       updatedAt: Date.now(),
