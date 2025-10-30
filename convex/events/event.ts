@@ -1,5 +1,3 @@
-import { COUNTRIES_REQUIRING_STATE } from "@/constants/locationConsts";
-
 import {
   EventCategory,
   EventFormat,
@@ -10,9 +8,6 @@ import { OpenCall, OpenCallApplication } from "@/types/openCallTypes";
 import { Organizer } from "@/types/organizer";
 
 import slugify from "slugify";
-
-import { sortByLocation } from "@/helpers/locationFns";
-import { sortByOcStatus } from "@/lib/openCallFns";
 
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { internal } from "~/convex/_generated/api";
@@ -42,55 +37,65 @@ import { ConvexError, v } from "convex/values";
 //     ),
 //     activeSub: v.optional(v.boolean()),
 //   },
+
 //   handler: async (ctx, { searchTerm, searchType, activeSub }) => {
 //     const userId = await getAuthUserId(ctx);
-//     const user = userId ? await ctx.db.get(userId) : null;
 //     const sub = userId
 //       ? await ctx.db
 //           .query("userSubscriptions")
 //           .withIndex("userId", (q) => q.eq("userId", userId))
 //           .first()
 //       : null;
-//     const isAdmin = user?.role?.includes("admin");
+
 //     const hasActiveSubscription =
-//       sub?.status === "active" || sub?.status === "trialing" || isAdmin;
+//       sub?.status === "active" || sub?.status === "trialing";
 
 //     const term = searchTerm.trim();
 //     if (!term) return { results: [], label: null };
 
 //     const searchTerms = term.toLowerCase().split(/\s+/);
-//     const now = Date.now()
+//     const now = Date.now();
 
-//     //TODO: How to make this more efficient? Use eventLookup table
-//     const allOpenCalls = activeSub
-//       ? await ctx.db.query("openCalls").collect()
-//       : [];
-
-//note-to-self: Flagging logic: 0 = none ever, 1 = expired, 2 = active, 3 = future (optional) for now
-
-//     const attachOpenCallStatusFlag = <T extends { _id: Id<"events"> }>(
+//     /**
+//      * Enrich events with their open call status, querying only related open calls.
+//      */
+//     const attachOpenCallStatusFlag = async <T extends { _id: Id<"events"> }>(
 //       events: T[],
-//     ) => {
-//       if (!hasActiveSubscription) {
+//     ): Promise<(T & { ocStatus: number })[]> => {
+//       if (!hasActiveSubscription || events.length === 0) {
 //         return events.map((e) => ({ ...e, ocStatus: 0 }));
 //       }
+
+//       // Fetch open calls only for these events, in parallel
+//       const openCallGroups = await Promise.all(
+//         events.map(async (event) => {
+//           const openCalls = await ctx.db
+//             .query("openCalls")
+//             .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
+//             .collect();
+//           return [event._id, openCalls] as const;
+//         }),
+//       );
 
 //       const callMap = new Map<
 //         Id<"events">,
 //         { ocStart?: string; ocEnd?: string; callType?: string }[]
 //       >();
 
-//       for (const oc of allOpenCalls) {
-//         const { eventId, basicInfo } = oc;
-//         const dates = basicInfo?.dates;
-//         const rollingCall = basicInfo?.callType === "Rolling";
-//         if (!dates && !rollingCall) continue;
-//         if (!callMap.has(eventId)) callMap.set(eventId, []);
-//         callMap.get(eventId)!.push({
-//           ocStart: dates.ocStart ?? undefined,
-//           ocEnd: dates.ocEnd ?? undefined,
-//           callType: basicInfo?.callType,
-//         });
+//       for (const [eventId, openCalls] of openCallGroups) {
+//         for (const oc of openCalls) {
+//           const { basicInfo } = oc;
+//           const dates = basicInfo?.dates;
+//           const rollingCall = basicInfo?.callType === "Rolling";
+//           if (!dates && !rollingCall) continue;
+
+//           if (!callMap.has(eventId)) callMap.set(eventId, []);
+//           callMap.get(eventId)!.push({
+//             ocStart: dates?.ocStart ?? undefined,
+//             ocEnd: dates?.ocEnd ?? undefined,
+//             callType: basicInfo?.callType,
+//           });
+//         }
 //       }
 
 //       return events.map((e) => {
@@ -118,6 +123,10 @@ import { ConvexError, v } from "convex/values";
 //       });
 //     };
 
+//     // -----------------------
+//     // SEARCH LOGIC
+//     // -----------------------
+
 //     if (searchType === "events") {
 //       const events = await ctx.db
 //         .query("events")
@@ -126,29 +135,31 @@ import { ConvexError, v } from "convex/values";
 //         )
 //         .take(20);
 
-//       const filteredEvents = events.filter((event) =>
-//         searchTerms.every((t) => event.name.toLowerCase().includes(t)),
+//       const filtered = events.filter((e) =>
+//         searchTerms.every((t) => e.name.toLowerCase().includes(t)),
 //       );
 
+//       const enriched = await attachOpenCallStatusFlag(filtered);
+
 //       return {
-//         results: sortByOcStatus(attachOpenCallStatusFlag(filteredEvents)),
+//         results: sortByOcStatus(enriched),
 //         label: "Events",
 //       };
 //     }
 
 //     if (searchType === "orgs") {
-//       const results = await ctx.db
+//       const orgs = await ctx.db
 //         .query("organizations")
 //         .withSearchIndex("search_by_name", (q) =>
 //           q.search("name", term).eq("isComplete", true),
 //         )
 //         .take(20);
 
-//       const filteredOrgs = results.filter((org) =>
-//         searchTerms.every((t) => org.name.toLowerCase().includes(t)),
+//       const filtered = orgs.filter((o) =>
+//         searchTerms.every((t) => o.name.toLowerCase().includes(t)),
 //       );
 
-//       return { results: filteredOrgs, label: "Organizers" };
+//       return { results: filtered, label: "Organizers" };
 //     }
 
 //     if (searchType === "loc") {
@@ -178,9 +189,13 @@ import { ConvexError, v } from "convex/values";
 //         (item) => item.location,
 //       );
 
+//       const enrichedEvents = await attachOpenCallStatusFlag(
+//         sortedEventLocResults,
+//       );
+
 //       return {
 //         results: {
-//           events: attachOpenCallStatusFlag(sortedEventLocResults),
+//           events: enrichedEvents,
 //           organizers: sortedOrgLocResults,
 //         },
 //         label: "Location",
@@ -215,11 +230,11 @@ import { ConvexError, v } from "convex/values";
 //           .take(20),
 //       ]);
 
-//       const filteredEventName = eventName.filter((event) =>
-//         searchTerms.every((t) => event.name.toLowerCase().includes(t)),
+//       const filteredEventName = eventName.filter((e) =>
+//         searchTerms.every((t) => e.name.toLowerCase().includes(t)),
 //       );
-//       const filteredOrgName = orgName.filter((org) =>
-//         searchTerms.every((t) => org.name.toLowerCase().includes(t)),
+//       const filteredOrgName = orgName.filter((o) =>
+//         searchTerms.every((t) => o.name.toLowerCase().includes(t)),
 //       );
 
 //       const sortedOrgLoc = sortByLocation(
@@ -233,13 +248,16 @@ import { ConvexError, v } from "convex/values";
 //         (item) => item.location,
 //       );
 
+//       const [enrichedEventName, enrichedEventLoc] = await Promise.all([
+//         attachOpenCallStatusFlag(filteredEventName),
+//         attachOpenCallStatusFlag(sortedEventLoc),
+//       ]);
+
 //       return {
 //         results: {
-//           eventName: sortByOcStatus(
-//             attachOpenCallStatusFlag(filteredEventName),
-//           ),
+//           eventName: sortByOcStatus(enrichedEventName),
 //           orgName: filteredOrgName,
-//           eventLoc: attachOpenCallStatusFlag(sortedEventLoc),
+//           eventLoc: enrichedEventLoc,
 //           orgLoc: sortedOrgLoc,
 //         },
 //         label: "All",
@@ -249,248 +267,6 @@ import { ConvexError, v } from "convex/values";
 //     return { results: [], label: null };
 //   },
 // });
-
-export const globalSearch = query({
-  args: {
-    searchTerm: v.string(),
-    searchType: v.union(
-      v.literal("events"),
-      v.literal("orgs"),
-      v.literal("loc"),
-      v.literal("all"),
-    ),
-    activeSub: v.optional(v.boolean()),
-  },
-
-  handler: async (ctx, { searchTerm, searchType, activeSub }) => {
-    const userId = await getAuthUserId(ctx);
-    const sub = userId
-      ? await ctx.db
-          .query("userSubscriptions")
-          .withIndex("userId", (q) => q.eq("userId", userId))
-          .first()
-      : null;
-
-    const hasActiveSubscription =
-      sub?.status === "active" || sub?.status === "trialing";
-
-    const term = searchTerm.trim();
-    if (!term) return { results: [], label: null };
-
-    const searchTerms = term.toLowerCase().split(/\s+/);
-    const now = Date.now();
-
-    /**
-     * Enrich events with their open call status, querying only related open calls.
-     */
-    const attachOpenCallStatusFlag = async <T extends { _id: Id<"events"> }>(
-      events: T[],
-    ): Promise<(T & { ocStatus: number })[]> => {
-      if (!hasActiveSubscription || events.length === 0) {
-        return events.map((e) => ({ ...e, ocStatus: 0 }));
-      }
-
-      // Fetch open calls only for these events, in parallel
-      const openCallGroups = await Promise.all(
-        events.map(async (event) => {
-          const openCalls = await ctx.db
-            .query("openCalls")
-            .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
-            .collect();
-          return [event._id, openCalls] as const;
-        }),
-      );
-
-      const callMap = new Map<
-        Id<"events">,
-        { ocStart?: string; ocEnd?: string; callType?: string }[]
-      >();
-
-      for (const [eventId, openCalls] of openCallGroups) {
-        for (const oc of openCalls) {
-          const { basicInfo } = oc;
-          const dates = basicInfo?.dates;
-          const rollingCall = basicInfo?.callType === "Rolling";
-          if (!dates && !rollingCall) continue;
-
-          if (!callMap.has(eventId)) callMap.set(eventId, []);
-          callMap.get(eventId)!.push({
-            ocStart: dates?.ocStart ?? undefined,
-            ocEnd: dates?.ocEnd ?? undefined,
-            callType: basicInfo?.callType,
-          });
-        }
-      }
-
-      return events.map((e) => {
-        const calls = callMap.get(e._id);
-        if (!calls || calls.length === 0) return { ...e, ocStatus: 0 };
-
-        let status = 1;
-        for (const { ocStart, ocEnd, callType } of calls) {
-          const start = ocStart ? Date.parse(ocStart) : NaN;
-          const end = ocEnd ? Date.parse(ocEnd) : NaN;
-          const rollingCall = callType === "Rolling";
-
-          if (!isNaN(start) && start > now) {
-            status = Math.max(status, 3); // future
-          } else if (
-            (!isNaN(start) && !isNaN(end) && start <= now && end >= now) ||
-            rollingCall
-          ) {
-            status = 2; // active overrides
-            break;
-          }
-        }
-
-        return { ...e, ocStatus: status };
-      });
-    };
-
-    // -----------------------
-    // SEARCH LOGIC
-    // -----------------------
-
-    if (searchType === "events") {
-      const events = await ctx.db
-        .query("events")
-        .withSearchIndex("search_by_name", (q) =>
-          q.search("name", term).eq("state", "published"),
-        )
-        .take(20);
-
-      const filtered = events.filter((e) =>
-        searchTerms.every((t) => e.name.toLowerCase().includes(t)),
-      );
-
-      const enriched = await attachOpenCallStatusFlag(filtered);
-
-      return {
-        results: sortByOcStatus(enriched),
-        label: "Events",
-      };
-    }
-
-    if (searchType === "orgs") {
-      const orgs = await ctx.db
-        .query("organizations")
-        .withSearchIndex("search_by_name", (q) =>
-          q.search("name", term).eq("isComplete", true),
-        )
-        .take(20);
-
-      const filtered = orgs.filter((o) =>
-        searchTerms.every((t) => o.name.toLowerCase().includes(t)),
-      );
-
-      return { results: filtered, label: "Organizers" };
-    }
-
-    if (searchType === "loc") {
-      const [eventLocResults, orgLocResults] = await Promise.all([
-        ctx.db
-          .query("events")
-          .withSearchIndex("search_by_location", (q) =>
-            q.search("location.full", term).eq("state", "published"),
-          )
-          .take(20),
-        ctx.db
-          .query("organizations")
-          .withSearchIndex("search_by_location", (q) =>
-            q.search("location.full", term).eq("isComplete", true),
-          )
-          .take(20),
-      ]);
-
-      const sortedOrgLocResults = sortByLocation(
-        orgLocResults,
-        COUNTRIES_REQUIRING_STATE,
-        (item) => item.location,
-      );
-      const sortedEventLocResults = sortByLocation(
-        eventLocResults,
-        COUNTRIES_REQUIRING_STATE,
-        (item) => item.location,
-      );
-
-      const enrichedEvents = await attachOpenCallStatusFlag(
-        sortedEventLocResults,
-      );
-
-      return {
-        results: {
-          events: enrichedEvents,
-          organizers: sortedOrgLocResults,
-        },
-        label: "Location",
-      };
-    }
-
-    if (searchType === "all") {
-      const [eventName, orgName, eventLoc, orgLoc] = await Promise.all([
-        ctx.db
-          .query("events")
-          .withSearchIndex("search_by_name", (q) =>
-            q.search("name", term).eq("state", "published"),
-          )
-          .take(20),
-        ctx.db
-          .query("organizations")
-          .withSearchIndex("search_by_name", (q) =>
-            q.search("name", term).eq("isComplete", true),
-          )
-          .take(20),
-        ctx.db
-          .query("events")
-          .withSearchIndex("search_by_location", (q) =>
-            q.search("location.full", term).eq("state", "published"),
-          )
-          .take(20),
-        ctx.db
-          .query("organizations")
-          .withSearchIndex("search_by_location", (q) =>
-            q.search("location.full", term).eq("isComplete", true),
-          )
-          .take(20),
-      ]);
-
-      const filteredEventName = eventName.filter((e) =>
-        searchTerms.every((t) => e.name.toLowerCase().includes(t)),
-      );
-      const filteredOrgName = orgName.filter((o) =>
-        searchTerms.every((t) => o.name.toLowerCase().includes(t)),
-      );
-
-      const sortedOrgLoc = sortByLocation(
-        orgLoc,
-        COUNTRIES_REQUIRING_STATE,
-        (item) => item.location,
-      );
-      const sortedEventLoc = sortByLocation(
-        eventLoc,
-        COUNTRIES_REQUIRING_STATE,
-        (item) => item.location,
-      );
-
-      const [enrichedEventName, enrichedEventLoc] = await Promise.all([
-        attachOpenCallStatusFlag(filteredEventName),
-        attachOpenCallStatusFlag(sortedEventLoc),
-      ]);
-
-      return {
-        results: {
-          eventName: sortByOcStatus(enrichedEventName),
-          orgName: filteredOrgName,
-          eventLoc: enrichedEventLoc,
-          orgLoc: sortedOrgLoc,
-        },
-        label: "All",
-      };
-    }
-
-    return { results: [], label: null };
-  },
-});
 
 export async function generateUniqueNameAndSlug(
   ctx: MutationCtx,

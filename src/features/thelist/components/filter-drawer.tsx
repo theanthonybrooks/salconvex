@@ -97,30 +97,6 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
         return searchTypeOptions;
     }
   }
-  // const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
-
-  // const { data: searchResults } = useQueryWithStatus(
-  //   api.events.event.globalSearch,
-  //   value.trim().length >= 2
-  //     ? {
-  //         searchTerm: localValue,
-  //         searchType,
-  //         activeSub: paidUser,
-  //       }
-  //     : "skip",
-  // );
-
-  // useEffect(() => {
-  //   const handler = debounce((nextValue: string) => {
-  //     setDebouncedValue(nextValue);
-  //   }, 300);
-
-  //   handler(value);
-
-  //   return () => {
-  //     handler.cancel();
-  //   };
-  // }, [value]);
 
   useEffect(() => {
     shortcutRef.current = shortcut;

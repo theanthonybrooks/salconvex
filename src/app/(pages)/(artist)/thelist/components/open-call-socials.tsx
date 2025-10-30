@@ -1,8 +1,12 @@
 "use client";
 
+import { OpenCallData } from "@/types/openCallTypes";
+
 import { ComponentType, useEffect, useState } from "react";
 import { OpenCallPost } from "@/app/(pages)/(artist)/thelist/components/open-call-post";
-import { OpenCallData } from "@/types/openCallTypes";
+import { toast } from "react-toastify";
+
+import { BiPhotoAlbum } from "react-icons/bi";
 import {
   ArrowLeft,
   LetterText,
@@ -10,8 +14,6 @@ import {
   LucideIcon,
   Settings2,
 } from "lucide-react";
-import { BiPhotoAlbum } from "react-icons/bi";
-import { toast } from "react-toastify";
 
 import { Link } from "@/components/ui/custom-link";
 import { PostCaptionDialog } from "@/components/ui/post-caption-dialog";
@@ -170,7 +172,7 @@ const OpenCallSocials = ({ data }: OpenCallSocialsProps) => {
             <PostCaptionDialog
               data={data}
               open={textDialogOpen}
-              setOpen={setTextDialogOpen}
+              setOpenAction={setTextDialogOpen}
             />
           </div>
         </section>

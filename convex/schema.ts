@@ -64,7 +64,14 @@ export const userPrefsValidator = v.object({
 
 export type UserPrefsType = Infer<typeof userPrefsValidator>;
 // #endregion
-
+// #region ------------- Organization Validators --------------
+const contactValidator = v.object({
+  organizer: v.optional(v.string()),
+  organizerTitle: v.optional(v.string()),
+  primaryContact: v.string(),
+});
+export type ContactType = Infer<typeof contactValidator>;
+// #endregion
 // #region -------------Event Validators --------------
 export const eventStateValidator = v.union(
   v.literal("draft"),
@@ -262,6 +269,58 @@ export type LinkFormatType = Infer<typeof linkFormatValidator>;
 
 // #endregion
 
+// #region ------------- Location Validators --------------
+const locationBaseFields = {
+  full: v.optional(v.string()),
+  locale: v.optional(v.string()),
+  city: v.optional(v.string()),
+  state: v.optional(v.string()),
+  stateAbbr: v.optional(v.string()),
+  region: v.optional(v.string()),
+  country: v.string(), // base check moved to superRefine
+  countryAbbr: v.string(),
+  continent: v.optional(v.string()),
+};
+const coordinateFields = {
+  coordinates: v.optional(
+    v.object({
+      latitude: v.number(),
+      longitude: v.number(),
+    }),
+  ),
+};
+
+const additionalLocationFields = {
+  currency: v.optional(
+    v.object({
+      code: v.string(),
+      name: v.string(),
+      symbol: v.string(),
+      format: v.optional(v.string()),
+    }),
+  ),
+  demonym: v.optional(v.string()),
+  timezone: v.optional(v.string()),
+  timezoneOffset: v.optional(v.number()),
+};
+export const locationFullFields = {
+  ...locationBaseFields,
+  ...coordinateFields,
+};
+
+export const orgLocationFields = {
+  ...locationFullFields,
+  ...additionalLocationFields,
+};
+export const locationBaseValidator = v.object(locationBaseFields);
+export const locationFullValidator = v.object(locationFullFields);
+export const orgLocationValidator = v.object(orgLocationFields);
+export type LocationBase = Infer<typeof locationBaseValidator>;
+export type LocationFull = Infer<typeof locationFullValidator>;
+export type OrgLocation = Infer<typeof orgLocationValidator>;
+
+// #endregion
+
 // #region ------------- Table Schema Definitions --------------
 
 const openCallFilesSchema = v.object({
@@ -304,34 +363,6 @@ const customUserSchema = v.object({
 });
 
 export type UserType = Infer<typeof customUserSchema>;
-
-const locationBaseFields = {
-  full: v.optional(v.string()),
-  locale: v.optional(v.string()),
-  city: v.optional(v.string()),
-  state: v.optional(v.string()),
-  stateAbbr: v.optional(v.string()),
-  region: v.optional(v.string()),
-  country: v.string(), // base check moved to superRefine
-  countryAbbr: v.string(),
-  continent: v.optional(v.string()),
-};
-const coordinateFields = {
-  coordinates: v.optional(
-    v.object({
-      latitude: v.number(),
-      longitude: v.number(),
-    }),
-  ),
-};
-export const locationFullFields = {
-  ...locationBaseFields,
-  ...coordinateFields,
-};
-export const locationBaseValidator = v.object(locationBaseFields);
-export const locationFullValidator = v.object(locationFullFields);
-export type LocationBase = Infer<typeof locationBaseValidator>;
-export type LocationFull = Infer<typeof locationFullValidator>;
 
 export const eventLookupOrganization = {
   mainOrgId: v.id("organizations"),
@@ -461,30 +492,9 @@ const organizationSchema = {
   logo: v.string(), //will default to /1.jpg as always
   logoStorageId: v.optional(v.id("_storage")),
 
-  location: v.optional(
-    v.object({
-      ...locationFullFields,
-      currency: v.optional(
-        v.object({
-          code: v.string(),
-          name: v.string(),
-          symbol: v.string(),
-          format: v.optional(v.string()),
-        }),
-      ),
-      demonym: v.optional(v.string()),
-      timezone: v.optional(v.string()),
-      timezoneOffset: v.optional(v.number()),
-    }),
-  ),
+  location: v.optional(orgLocationValidator),
   about: v.optional(v.string()),
-  contact: v.optional(
-    v.object({
-      organizer: v.optional(v.string()),
-      organizerTitle: v.optional(v.string()),
-      primaryContact: v.string(),
-    }),
-  ),
+  contact: v.optional(contactValidator),
   links: v.optional(linksValidator),
   hadFreeCall: v.boolean(),
   updatedAt: v.optional(v.number()),

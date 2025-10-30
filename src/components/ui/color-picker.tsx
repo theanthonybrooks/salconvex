@@ -1,11 +1,13 @@
 "use client";
 
+import { ColorMode, colorModes } from "@/constants/colorConsts";
+
 import { useRef, useState } from "react";
-import { api } from "~/convex/_generated/api";
 import Color from "color";
 import { html } from "common-tags";
-import { useQuery } from "convex-helpers/react/cache";
-import { useMutation } from "convex/react";
+import slugify from "slugify";
+
+import { BiColor } from "react-icons/bi";
 import {
   Check,
   ChevronLeft,
@@ -16,8 +18,6 @@ import {
   Plus,
   SwatchBook,
 } from "lucide-react";
-import { BiColor } from "react-icons/bi";
-import slugify from "slugify";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -32,7 +32,10 @@ import { Input } from "@/components/ui/input";
 import { SelectSimple } from "@/components/ui/select";
 import { TooltipSimple } from "@/components/ui/tooltip";
 import { cn } from "@/helpers/utilsFns";
-import { ColorMode, colorModes } from "@/constants/colorConsts";
+
+import { api } from "~/convex/_generated/api";
+import { useQuery } from "convex-helpers/react/cache";
+import { useMutation } from "convex/react";
 
 type Color = { value: string; gradient?: boolean };
 
@@ -225,7 +228,19 @@ export const ColorPicker = ({
   return (
     <>
       {!modalOpen && (
-        <label className="mb-1 block text-sm font-medium">{label}</label>
+        <div
+          className={cn(
+            "mb-1 flex w-full items-center justify-between pr-4 text-sm",
+          )}
+        >
+          <label className="block font-medium">{label}</label>
+          <span
+            className="hover:cursor-pointer"
+            onClick={() => setModalOpen((prev) => !prev)}
+          >
+            Open Color Picker
+          </span>
+        </div>
       )}
       {modalOpen === false ? (
         <div className={cn("flex items-center gap-2")}>
@@ -260,7 +275,7 @@ export const ColorPicker = ({
           /> */}
           <span
             className={cn(
-              "absolute right-4 top-4 cursor-pointer hover:scale-105 hover:text-red-600 active:scale-95",
+              "absolute right-4 top-4 cursor-pointer text-sm hover:scale-105 hover:text-red-600 active:scale-95",
             )}
             onClick={() => setModalOpen(!modalOpen)}
           >

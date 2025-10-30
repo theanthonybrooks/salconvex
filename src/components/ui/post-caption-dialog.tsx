@@ -23,19 +23,19 @@ import { getDemonym, getFormattedLocationString } from "@/helpers/locationFns";
 import { cn } from "@/helpers/utilsFns";
 import { getCallFormatLabel } from "@/lib/openCallFns";
 
-interface PostCaptionDialogProps {
+type PostCaptionDialogProps = {
   data: OpenCallData | null;
   className?: string;
   open: boolean;
-  setOpen: Dispatch<SetStateAction<boolean>>;
-}
+  setOpenAction: Dispatch<SetStateAction<boolean>>;
+};
 
 export const PostCaptionDialog = ({
   data,
 
   className,
   open,
-  setOpen,
+  setOpenAction,
 }: PostCaptionDialogProps) => {
   const [copied, setCopied] = useState<"alt" | "caption" | null>(null);
   const [captionText, setCaptionText] = useState("");
@@ -132,7 +132,7 @@ export const PostCaptionDialog = ({
       });
   };
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={setOpenAction}>
       <DialogContent
         className={cn(
           "w-full bg-card sm:max-h-[80dvh] sm:max-w-[min(64rem,90dvw)]",
