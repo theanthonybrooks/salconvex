@@ -1,5 +1,6 @@
 "use client";
 
+import type { ViewOptions } from "@/features/events/event-list-client";
 import type { MergedEventPreviewData, PostStatus } from "@/types/eventTypes";
 import type { User } from "@/types/user";
 
@@ -56,6 +57,7 @@ export interface EventCardPreviewProps {
   publicView?: boolean;
   publicPreview?: boolean;
   activeSub: boolean;
+  viewType?: ViewOptions;
 }
 
 const EventCardPreview = ({
@@ -65,9 +67,11 @@ const EventCardPreview = ({
   userPref,
   publicPreview,
   activeSub,
+  viewType,
 }: EventCardPreviewProps) => {
   const pathname = usePathname();
   const thisWeekPage = pathname.includes("thisweek");
+  const eventView = viewType === "event";
 
   const isAdmin = user?.role?.includes("admin");
   const isArtist = user?.accountType?.includes("artist");
@@ -277,7 +281,11 @@ const EventCardPreview = ({
                 hasSub: activeSub,
               });
             }
-            router.push(linkPath);
+            if (!publicPreview && !hasValidSub && !eventView) {
+              router.push("/pricing");
+            } else {
+              router.push(linkPath);
+            }
           }}
           className="col-span-1 row-start-1 mx-auto pl-2 pt-3 active:scale-95"
         >
@@ -592,7 +600,7 @@ const EventCardPreview = ({
                     hasSub: activeSub,
                   });
                 }
-                if (!publicPreview) {
+                if (!publicPreview && !hasValidSub && !eventView) {
                   router.push("/pricing");
                 } else {
                   router.push(linkPath);

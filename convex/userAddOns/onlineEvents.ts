@@ -241,14 +241,14 @@ export const registerForOnlineEvent = mutation({
           current: event.capacity.current + 1,
         },
       });
+      await sendEventRegistrationEmailHelper(
+        ctx,
+        args.eventId,
+        userId,
+        formattedEmail,
+        "register",
+      );
     }
-    await sendEventRegistrationEmailHelper(
-      ctx,
-      args.eventId,
-      userId,
-      formattedEmail,
-      "register",
-    );
 
     return { event, registration: newRegistration, status: "success" };
 
@@ -392,6 +392,35 @@ export const checkRegistration = query({
       paid: registration.paid,
       canceled: registration.canceled,
       registration,
+    };
+  },
+});
+
+export const getUserVouchers = query({
+  args: {
+    userId: v.id("users"),
+  },
+  handler: async (ctx, args) => {
+    const userId = args.userId;
+    const user = await ctx.db.get(userId);
+    if (!user) return null;
+
+    const vouchers = await ctx.db
+      .query("eventVouchers")
+      .withIndex("by_userId_reedemed", (q) =>
+        q.eq("userId", userId).eq("redeemed", false),
+      )
+      .collect();
+
+    const voucherTotal = vouchers.reduce((acc, voucher) => {
+      return acc + voucher.amount;
+    }, 0);
+
+    console.log(voucherTotal);
+
+    return {
+      vouchers,
+      voucherTotal,
     };
   },
 });

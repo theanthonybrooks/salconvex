@@ -128,7 +128,6 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
   } = event;
   const remainingCapacity = capacity.max - capacity.current;
   const remainingSpace = remainingCapacity > 0;
-  console.log(remainingCapacity);
   const startDate = new Date(event.startDate);
   const endDate = new Date(event.endDate);
   const isoStartDate = startDate.toISOString();
@@ -341,7 +340,9 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
           <AccordionItem value="deadline">
             <AccordionTrigger title="Deadline & Terms:" fontSize={fontSize} />
             <AccordionContent fontSize={fontSize} className={cn("space-y-2")}>
-              <strong>Registration Deadline:</strong> {deadlineOutput}
+              <strong>Registration Deadline:</strong>
+              <p> {deadlineOutput}</p>
+
               <br />
               <strong>Terms:</strong>
               <ol className={cn("list-inside list-decimal space-y-1 pl-4")}>
@@ -356,11 +357,16 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
           <AccordionItem value="whereAndWhen">
             <AccordionTrigger title="Where & When:" fontSize={fontSize} />
             <AccordionContent fontSize={fontSize} className={cn("space-y-2")}>
-              <strong>Location:</strong> The event will take place online via{" "}
-              {event.location}
+              <span>
+                <strong>Location:</strong>
+                <p>The event will take place online via {event.location}</p>
+              </span>
               <br />
-              <strong>When:</strong> {dateOutput}
-              <br />
+              <span>
+                <strong>When:</strong>
+                <p> {dateOutput}</p>
+              </span>
+
               <p className="text-sm italic">
                 All times are displayed in your local timezone.
               </p>

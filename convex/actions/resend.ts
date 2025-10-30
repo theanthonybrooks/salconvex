@@ -610,7 +610,8 @@ export const sendEventRegistrationEmail = internalAction({
       const seventyTwoHours = 72 * 60 * 60 * 1000;
       const atLeastSeventyTwoHours = now <= eventStart - seventyTwoHours;
 
-      const renewalHtmlContent = html` <h3
+      const renewalHtmlContent = html`
+        <h3
           style="font-weight:bold; text-align:start; margin-top:30px; margin-bottom:10px;"
         >
           Plans change, and we're glad to have you back!
@@ -618,20 +619,14 @@ export const sendEventRegistrationEmail = internalAction({
         ${bananaCap
           ? ` <p>
           Since you&apos;re already subscribed with at least a Banana Cap
-          membership, you can follow the link below to cancel your registration in case things come up again. And if you do, you can re-register again at any point if you change your mind and there are available spots! Please just do so within 72 hours of the event's start to ensure that the spaces can go to someone else.
-        </p>`
+          membership, you can follow the link below to cancel your registration in case things come up again. And if you do, you can re-register again at any point if you change your mind and there are available spots!
+        </p><p >Please just do so within 72 hours of the event's start to ensure that the spaces can go to someone else.</p>`
           : ` <p>
           You can cancel up to 72 hours before the event starts to have your registration fee refunded in the form of a voucher (can be used for other events). Anything after that 72 hours will forfeit your registration fee. To cancel, ensure that you're logged in to your account and follow the link below.
         </p>`}
-        <p>
-          Registration update link: (<a
-            href="https://thestreetartlist.com/extras/${eventData.slug}"
-            target="_blank"
-            style="color:black; text-decoration:none; font-weight:bold;"
-            >here</a
-          >)
-        </p>`;
-      const registrationHtmlContent = html` <h3
+      `;
+      const registrationHtmlContent = html`
+        <h3
           style="font-weight:bold; text-align:start; margin-top:30px; margin-bottom:10px;"
         >
           What if plans change and I can't make it?
@@ -639,20 +634,14 @@ export const sendEventRegistrationEmail = internalAction({
         ${bananaCap
           ? ` <p>
           Since you&apos;re already subscribed with at least a Banana Cap
-          membership, you can follow the link below to cancel your registration. Please just do so within 72 hours of the event's start to ensure that the spaces can go to someone else. And if you do and there are still available spots, you can re-register again at any point if you change your mind!  
+          membership, you can follow the link below to cancel your registration. Please just do so within 72 hours of the event's start to ensure that the spaces can go to someone else. And if you change your mind and there are still available spots, you can re-register again!  
         </p>`
           : ` <p>
           You can cancel up to 72 hours before the event starts to have your registration fee refunded in the form of a voucher (can be used for other events). Anything after that 72 hours will forfeit your registration fee. To cancel, ensure that you're logged in to your account and follow the link below.
         </p>`}
-        <p>
-          Registration update link: (<a
-            href="https://thestreetartlist.com/extras/${eventData.slug}"
-            target="_blank"
-            style="color:black; text-decoration:none; font-weight:bold;"
-            >here</a
-          >)
-        </p>`;
-      const cancellationHtmlContent = html` <h3
+      `;
+      const cancellationHtmlContent = html`
+        <h3
           style="font-weight:bold; text-align:start; margin-top:30px; margin-bottom:10px;"
         >
           What if plans change? Can I register again?
@@ -663,16 +652,9 @@ export const sendEventRegistrationEmail = internalAction({
           membership, you can follow the link below to re-register for the event free of charge (if there are still available spots). 
         </p>`
           : ` <p>
-          ${atLeastSeventyTwoHours ? `Your previous registration fee was added to your account as a voucher that can be used for another event in the future, or for this event if you change your mind (if there are available spots)` : `As you cancelled with less than 72 hours prior to the start of the event, your registration fee will not be returned as per the terms of the event, agreed upon during registration`} 
+          ${atLeastSeventyTwoHours ? `Your previous registration fee was added to your account as a voucher that can be used for another event in the future, or for this event if you change your mind (if there are available spots)` : `As you cancelled with less than 72 hours prior to the start of the event, your registration fee will not be returned as per the terms of the event, agreed upon during registration. `} 
         </p>`}
-        <p>
-          Registration update link: (<a
-            href="https://thestreetartlist.com/extras/${eventData.slug}"
-            target="_blank"
-            style="color:black; text-decoration:none; font-weight:bold;"
-            >here</a
-          >)
-        </p>`;
+      `;
 
       const htmlContent = html`
         <!DOCTYPE html>
@@ -768,6 +750,17 @@ export const sendEventRegistrationEmail = internalAction({
                             ? registrationHtmlContent
                             : renewalHtmlContent}
 
+                        <p>
+                          Registration update link: (<a
+                            href="https://thestreetartlist.com/extras/${eventData.slug}"
+                            target="_blank"
+                            style="color:black; text-decoration:none; font-weight:bold;"
+                            >here</a
+                          >)
+                        </p>
+                        <p>
+                          You can reply to this email if you have any questions.
+                        </p>
                         <hr />
                         <p style="width:100%; text-align:center;">
                           Copyright © The Street Art List ${year}. All rights
@@ -796,7 +789,7 @@ export const sendEventRegistrationEmail = internalAction({
         await resend.emails.send({
           from: "The Street Art List<events@support.thestreetartlist.com>",
           to: email,
-          subject: `${eventName} ${
+          subject: `${eventName} - ${
             action === "cancel"
               ? "Cancellation"
               : action === "register"

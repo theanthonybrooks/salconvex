@@ -1,10 +1,8 @@
 "use client";
 
 //TODO: Add view sync to the params. Otherwise when you refresh or go back, it resets to the default view.
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import Image from "next/image";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useFilteredEventsQuery } from "@/hooks/use-filtered-events-query";
+import { SearchType } from "@/constants/filterConsts";
+
 import {
   EventCategory,
   EventType,
@@ -16,7 +14,11 @@ import {
   SearchParams,
   SortOptions,
 } from "@/types/thelist";
-import { usePreloadedQuery } from "convex/react";
+
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import Image from "next/image";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useFilteredEventsQuery } from "@/hooks/use-filtered-events-query";
 import { motion } from "framer-motion";
 
 import { Button } from "@/components/ui/button";
@@ -31,8 +33,9 @@ import { useArtistPreload } from "@/features/wrapper-elements/artist-preload-con
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { generateSkeletonGroups } from "@/helpers/skeletonFns";
 import { cn, setParamIfNotDefault } from "@/helpers/utilsFns";
-import { SearchType } from "@/constants/filterConsts";
 import { useDevice } from "@/providers/device-provider";
+
+import { usePreloadedQuery } from "convex/react";
 
 export const viewOptionValues = [
   { value: "openCall", label: "Open Calls" },
@@ -677,6 +680,7 @@ const ClientEventList = () => {
                               user={user}
                               userPref={userPref}
                               activeSub={hasActiveSubscription}
+                              viewType={view}
                             />
                           </div>
                         );

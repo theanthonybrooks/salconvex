@@ -80,6 +80,14 @@ export const createStripeAddOnCheckoutSession = action({
         throw new ConvexError("Event not found");
       }
 
+      const userVouchers = userId
+        ? await ctx.runQuery(api.userAddOns.onlineEvents.getUserVouchers, {
+            userId,
+          })
+        : null;
+
+      const { voucherTotal, vouchers } = userVouchers ?? {};
+
       const { artistSubscription, orgSubscription } = userId
         ? await ctx.runQuery(
             api.stripe.stripeSubscriptions.getUserSubscription,
@@ -93,6 +101,28 @@ export const createStripeAddOnCheckoutSession = action({
         artistSubscription?.customerId || orgSubscription?.customerId;
 
       const eventPrice = args.price * 100;
+      const discountAmount = Math.min(eventPrice, (voucherTotal ?? 0) * 100);
+
+      const coupon =
+        discountAmount > 0
+          ? await stripe.coupons.create({
+              amount_off: discountAmount,
+              currency: "usd",
+              name: "Previous Event Voucher",
+              duration: "once",
+            })
+          : null;
+
+      const discounts = args.isEligibleForFree
+        ? [{ coupon: process.env.STRIPE_FREE_COUPON }]
+        : coupon
+          ? [{ coupon: coupon.id }]
+          : undefined;
+
+      console.log({
+        eventPrice,
+        discountAmount,
+      });
 
       // console.log("priceId which: ", priceId);
 
@@ -105,6 +135,11 @@ export const createStripeAddOnCheckoutSession = action({
         eventId: event._id,
         date: new Date(event.startDate).toISOString(),
       };
+
+      if (voucherTotal && vouchers?.length) {
+        metadata.voucherIds = vouchers.map((v) => v._id).join(",");
+        metadata.voucherTotal = (voucherTotal ?? 0).toString();
+      }
 
       // console.log("hadTrial: ", args.hadTrial);
       // console.log("Meta Data: ", metadata);
@@ -146,9 +181,7 @@ export const createStripeAddOnCheckoutSession = action({
           cancel_url: `${process.env.FRONTEND_URL}/pricing`,
           metadata: metadata,
           client_reference_id: metadata.userId,
-          discounts: args.isEligibleForFree
-            ? [{ coupon: process.env.STRIPE_FREE_COUPON }]
-            : undefined,
+          discounts,
         });
 
       // console.log("checkout session created: ", session);
