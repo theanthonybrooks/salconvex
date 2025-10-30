@@ -302,11 +302,10 @@ export const updateRegistration = mutation({
       if (registration.plan && registration.plan < 2) {
         const voucher = await ctx.db
           .query("eventVouchers")
-          .withIndex("by_registrationId", (q) =>
-            q.eq("registrationId", registration._id),
-          )
+          .withIndex("by_userId", (q) => q.eq("userId", userId))
           .first();
         if (voucher) {
+          const voucherAmount = voucher.amount;
           await ctx.db.patch(voucher._id, {
             redeemed: false,
           });

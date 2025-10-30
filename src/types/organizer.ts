@@ -14,7 +14,7 @@ export const primaryContacts = [
   "threads",
   "vk",
 ] as const;
-export type PrimaryContact = (typeof primaryContacts)[number];
+// export type PrimaryContact = (typeof primaryContacts)[number];
 
 // export type Organizer = {
 //   _id: Id<"organizations">;

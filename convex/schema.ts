@@ -65,10 +65,20 @@ export const userPrefsValidator = v.object({
 export type UserPrefsType = Infer<typeof userPrefsValidator>;
 // #endregion
 // #region ------------- Organization Validators --------------
+const primaryContacts = v.union(
+  v.literal("email"),
+  v.literal("phone"),
+  v.literal("website"),
+  v.literal("facebook"),
+  v.literal("instagram"),
+  v.literal("threads"),
+  v.literal("vk"),
+);
+
 const contactValidator = v.object({
   organizer: v.optional(v.string()),
   organizerTitle: v.optional(v.string()),
-  primaryContact: v.string(),
+  primaryContact: primaryContacts,
 });
 export type ContactType = Infer<typeof contactValidator>;
 // #endregion
@@ -934,7 +944,7 @@ export type OnlineEventType = Infer<typeof onlineEventsSchemaValidator>;
 export const eventVoucherSchema = v.object({
   eventId: v.id("onlineEvents"),
   registrationId: v.id("userAddOns"),
-  userId: v.union(v.id("users"), v.null()),
+  userId: v.id("users"),
   email: v.string(),
   amount: v.number(),
   redeemed: v.boolean(),
