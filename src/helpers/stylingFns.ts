@@ -20,6 +20,7 @@ type FontPref = {
   body: string;
   small: string;
   tiny: string;
+  pref: NonNullable<FontSizeType>;
 };
 
 export function getUserFontSizePref(pref?: FontSizeType): FontPref | null {
@@ -29,6 +30,7 @@ export function getUserFontSizePref(pref?: FontSizeType): FontPref | null {
       body: "text-sm",
       small: "text-xs",
       tiny: "text-xs",
+      pref: "normal",
     };
 
   let subHeading: string | null;
@@ -55,6 +57,7 @@ export function getUserFontSizePref(pref?: FontSizeType): FontPref | null {
     body,
     small,
     tiny,
+    pref,
   };
   return fontPref;
 }

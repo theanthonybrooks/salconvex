@@ -5,14 +5,17 @@ import {
   paidEvents,
 } from "@/constants/eventConsts";
 import { CALL_TYPE_LABELS } from "@/constants/openCallConsts";
-import { convertCurrency } from "@/helpers/currencyFns";
+
 import {
   EventCategory,
   EventType,
   MergedEventPreviewData,
 } from "@/types/eventTypes";
 import { CallType } from "@/types/openCallTypes";
+
 import currencies from "currency-codes";
+
+import { convertCurrency } from "@/helpers/currencyFns";
 
 export const isFreeEvent = (eventTypes: EventType[] | string[]): boolean => {
   const hasFree = eventTypes.some((type) => freeEvents.includes(type));
@@ -27,11 +30,17 @@ export const getCallTypeLabel = (callType: CallType): string => {
 
 export const getEventTypeLabel = (
   eventType: EventType | EventType[] | null,
+  abbreviate: boolean = false,
 ): string => {
   if (!eventType) return "";
 
-  const getLabel = (type: EventType): string =>
-    eventTypeOptions.find((opt) => opt.value === type)?.label ?? "Other";
+  // const getLabel = (type: EventType): string =>
+  //   eventTypeOptions.find((opt) => opt.value === type)?.label ?? "Other";
+  const getLabel = (type: EventType): string => {
+    const opt = eventTypeOptions.find((opt) => opt.value === type);
+    if (!opt) return "Other";
+    return abbreviate ? opt.abbr : opt.label;
+  };
 
   if (Array.isArray(eventType)) {
     return eventType
@@ -218,10 +227,12 @@ export const formatRateServer = async (
   return `${currencySymbol}${convertedRate.toLocaleString(locale)}/${unit}`;
 };
 
-export type EventLinkFields = Pick<MergedEventPreviewData, "slug" | "hasOpenCall"> & {
+export type EventLinkFields = Pick<
+  MergedEventPreviewData,
+  "slug" | "hasOpenCall"
+> & {
   dates: Pick<MergedEventPreviewData["dates"], "edition">;
 };
-
 
 export const formatEventLink = (
   event: EventLinkFields,

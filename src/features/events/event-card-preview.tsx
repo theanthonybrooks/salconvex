@@ -104,6 +104,7 @@ const EventCardPreview = ({
   } = event;
   const fontSizePref = getUserFontSizePref(userPref?.fontSize);
   const fontSize = fontSizePref?.body;
+  const fontPref = fontSizePref?.pref;
   const { openCall } = tabs;
   const compensation = event.hasActiveOpenCall
     ? openCall?.compensation
@@ -198,8 +199,8 @@ const EventCardPreview = ({
 
   const linkPath = formatEventLink(
     event,
-    !publicView || publicPreview || isUserOrg,
-    activeSub && openCall?.state !== "published",
+    hasValidSub || (publicPreview && !eventView) || isUserOrg,
+    eventView || openCall?.state !== "published",
   );
 
   const { toggleListAction } = useToggleListAction(event._id);
@@ -651,7 +652,9 @@ const EventCardPreview = ({
                 className={cn("flex items-start gap-x-1 text-sm", fontSize)}
               >
                 <p className="font-semibold">Type:</p>
-                {eventType.map((type) => getEventTypeLabel(type)).join(" | ")}
+                {eventType
+                  .map((type) => getEventTypeLabel(type, fontPref === "large"))
+                  .join(" | ")}
               </span>
             )}
             {(event.about || event.blurb) && (
@@ -836,19 +839,26 @@ const EventCardPreview = ({
             </div>
           </div>
         ) : (
-          <div className="flex flex-col gap-y-6 pb-3 pt-8 text-sm">
+          <div
+            className={cn("flex flex-col gap-y-6 pb-3 pt-8 text-sm", fontSize)}
+          >
             <span className="font-semibold">Event Links:</span>
 
-            <LinkList event={event} purpose="preview" />
+            <LinkList event={event} purpose="preview" fontSize={fontSize} />
           </div>
         )}
-        <div className="flex flex-col items-center justify-center gap-y-6 py-6 text-sm">
+        <div
+          className={cn(
+            "flex flex-col items-center justify-center gap-y-6 py-6 text-sm",
+            fontSize,
+          )}
+        >
           {event.openCallStatus !== null && (
             <>
               {event.openCallStatus === "coming-soon" ? (
-                <p className="text-sm">Open Call Coming Soon!</p>
+                <p>Open Call Coming Soon!</p>
               ) : event.openCallStatus === "ended" ? (
-                <p className="text-sm">Open Call Ended</p>
+                <p>Open Call Ended</p>
               ) : (
                 ""
               )}
