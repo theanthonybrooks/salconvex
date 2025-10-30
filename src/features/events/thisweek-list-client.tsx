@@ -1,13 +1,14 @@
 "use client";
 
+// import { getFourCharMonth } from "@/lib/dateFns"
+import { MergedEventPreviewData } from "@/types/eventTypes";
+import { SortOptions } from "@/types/thelist";
+
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useFilteredEventsQuery } from "@/hooks/use-filtered-events-query";
-// import { getFourCharMonth } from "@/lib/dateFns"
-import { MergedEventPreviewData } from "@/types/eventTypes";
-import { SortOptions } from "@/types/thelist";
-import { usePreloadedQuery } from "convex/react";
+
 import { LucideUploadCloud } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -25,6 +26,8 @@ import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-con
 import { formatCondensedDateRange } from "@/helpers/dateFns";
 import { generateSkeletonGroups } from "@/helpers/skeletonFns";
 import { cn } from "@/helpers/utilsFns";
+
+import { usePreloadedQuery } from "convex/react";
 
 // interface Props {
 
@@ -347,7 +350,7 @@ const ClientThisWeekList = (
                   if (subStatus?.subStatus === "past_due") {
                     router.push("/dashboard/billing");
                   } else {
-                    router.push("/pricing");
+                    router.push("/pricing?type=artist");
                   }
                 }}
               >

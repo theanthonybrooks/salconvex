@@ -1,10 +1,11 @@
 import { redirect } from "next/navigation";
-import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
-import { api } from "~/convex/_generated/api";
-import { fetchQuery } from "convex/nextjs";
 
 import { AdminEventForm } from "@/features/events/submission-form/admin-organizer-form";
 import { OrganizerDashboardTableWrapper } from "@/features/organizer/dashboard/org-dashboard-table-wrapper";
+
+import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
+import { api } from "~/convex/_generated/api";
+import { fetchQuery } from "convex/nextjs";
 
 export default async function OrganizerPage({
   params,
@@ -33,7 +34,7 @@ export default async function OrganizerPage({
     !user?.accountType?.includes("organizer")
   ) {
     if (!subStatus || subStatus === "canceled") {
-      redirect("/pricing");
+      redirect("/pricing?type=artist");
     }
     redirect("/thelist");
   }

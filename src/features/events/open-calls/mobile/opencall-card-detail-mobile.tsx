@@ -125,7 +125,7 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
 
   const onBookmark = async () => {
     if (!hasActiveSubscription) {
-      router.push("/pricing");
+      router.push("/pricing?type=artist");
     } else {
       if (!isAdmin && !bookmarked && !isUserOrg) {
         updateEventAnalytics({
@@ -144,7 +144,7 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
 
   const onHide = async () => {
     if (!hasActiveSubscription) {
-      router.push("/pricing");
+      router.push("/pricing?type=artist");
     } else {
       if (!isAdmin && !hidden && !isUserOrg) {
         updateEventAnalytics({

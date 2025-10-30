@@ -138,7 +138,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
   const locationString = getFormattedLocationString(location);
   const onBookmark = async () => {
     if (!hasActiveSubscription) {
-      router.push("/pricing");
+      router.push("/pricing?type=artist");
     } else {
       if (!isAdmin && !bookmarked && !isUserOrg) {
         console.log(isAdmin, bookmarked, isUserOrg);
@@ -158,7 +158,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
 
   const onHide = async () => {
     if (!hasActiveSubscription) {
-      router.push("/pricing");
+      router.push("/pricing?type=artist");
     } else {
       if (!isAdmin && !hidden && !isUserOrg) {
         updateEventAnalytics({

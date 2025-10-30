@@ -214,7 +214,7 @@ const EventCardPreview = ({
 
   const onBookmark = async () => {
     if (publicView) {
-      router.push("/pricing");
+      router.push("/pricing?type=artist");
     } else {
       toggleListAction({ bookmarked: !bookmarked });
       try {
@@ -237,7 +237,7 @@ const EventCardPreview = ({
 
   const onHide = async () => {
     if (publicView) {
-      router.push("/pricing");
+      router.push("/pricing?type=artist");
     } else {
       toggleListAction({ hidden: !hidden });
       try {
@@ -283,7 +283,7 @@ const EventCardPreview = ({
               });
             }
             if (!publicPreview && !hasValidSub && !eventView) {
-              router.push("/pricing");
+              router.push("/pricing?type=artist");
             } else {
               router.push(linkPath);
             }
@@ -602,7 +602,7 @@ const EventCardPreview = ({
                   });
                 }
                 if (!publicPreview && !hasValidSub && !eventView) {
-                  router.push("/pricing");
+                  router.push("/pricing?type=artist");
                 } else {
                   router.push(linkPath);
                 }

@@ -826,7 +826,7 @@ const PublicHeader = ({
             if (subStatus === "past_due") {
               router.push("/dashboard/billing");
             } else {
-              router.push("/pricing");
+              router.push("/pricing?type=artist");
             }
           }}
         >
