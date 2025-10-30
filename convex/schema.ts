@@ -369,22 +369,7 @@ export const eventLookupOrganization = {
   orgName: v.string(),
   ownerId: v.id("users"),
   orgSlug: v.optional(v.string()),
-  orgLocation: v.optional(
-    v.object({
-      ...locationFullFields,
-      currency: v.optional(
-        v.object({
-          code: v.string(),
-          name: v.string(),
-          symbol: v.string(),
-          format: v.optional(v.string()),
-        }),
-      ),
-      demonym: v.optional(v.string()),
-      timezone: v.optional(v.string()),
-      timezoneOffset: v.optional(v.number()),
-    }),
-  ),
+  orgLocation: v.optional(orgLocationValidator),
 };
 
 export type EventLookupOrgBase = Infer<typeof eventLookupOrganizationValidator>;
@@ -437,19 +422,10 @@ const artistSchema = {
   artistNationality: v.array(v.string()),
   artistResidency: v.object({
     ...locationBaseFields,
+    ...additionalLocationFields,
     country: v.optional(v.string()),
     countryAbbr: v.optional(v.string()),
     location: v.optional(v.array(v.number())),
-    timezone: v.optional(v.string()),
-    timezoneOffset: v.optional(v.number()),
-    currency: v.optional(
-      v.object({
-        code: v.string(),
-        name: v.string(),
-        symbol: v.string(),
-        format: v.optional(v.string()),
-      }),
-    ),
   }),
 
   contact: v.optional(linksValidator),

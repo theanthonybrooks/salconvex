@@ -1,11 +1,18 @@
 "use client";
 
+import { dashboardNavItems } from "@/constants/links";
+import {
+  landingPageNavbarMenuLinksAbout as aboutItems,
+  theListNavbarMenuLinks as thelistitems,
+} from "@/constants/navbarsLinks";
+
+import { User } from "@/types/user";
+
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
-import { User } from "@/types/user";
-import { usePreloadedQuery } from "convex/react";
 // import { useQuery } from "convex-helpers/react/cache"
 import { motion, useMotionValueEvent, useScroll } from "framer-motion";
+
 import { ArrowUpIcon } from "lucide-react";
 
 import FullPageNav from "@/components/full-page-nav";
@@ -25,12 +32,9 @@ import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-con
 import { ListItem } from "@/features/wrapper-elements/navigation/components/navbar";
 import { NavbarSigninSection } from "@/features/wrapper-elements/navigation/components/navbar-signin-section";
 import { cn } from "@/helpers/utilsFns";
-import { dashboardNavItems } from "@/constants/links";
-import {
-  landingPageNavbarMenuLinksAbout as aboutItems,
-  theListNavbarMenuLinks as thelistitems,
-} from "@/constants/navbarsLinks";
 import { useDevice } from "@/providers/device-provider";
+
+import { usePreloadedQuery } from "convex/react";
 
 interface TheListNavBarProps {
   userId?: string | undefined;
@@ -63,7 +67,7 @@ export default function TheListNavBar(
   //   console.log("Page scroll: ", latest)
   // })
   // const isAdmin = user?.role?.includes("admin");
-  // const fullPagePath = pathname;
+  const fullPagePath = pathname;
   const currentPage = pathname.split("/")[1];
 
   const [isScrolled, setIsScrolled] = useState(false);
@@ -295,21 +299,35 @@ export default function TheListNavBar(
                                 (component) =>
                                   !component.title.includes("Old Site"),
                               )
-                              .map((component) => (
-                                <ListItem
-                                  key={component.title}
-                                  title={component.title}
-                                  href={component.href}
-                                  className={cn(
-                                    "cursor-pointer text-balance transition-colors duration-200 ease-in-out",
-                                    component.href.includes(currentPage) &&
-                                      currentPage !== "" &&
-                                      "pointer-events-none bg-background",
-                                  )}
-                                >
-                                  {/* {component.description} */}
-                                </ListItem>
-                              ))}
+                              .map((component) => {
+                                console.log(fullPagePath);
+                                console.log(currentPage, component.href);
+                                const activeLink =
+                                  component.href.includes(currentPage) &&
+                                  currentPage !== "";
+                                const subPage = fullPagePath.startsWith(
+                                  component.href + "/",
+                                );
+
+                                return (
+                                  <ListItem
+                                    key={component.title}
+                                    title={component.title}
+                                    href={component.href}
+                                    className={cn(
+                                      "cursor-pointer text-balance transition-colors duration-200 ease-in-out",
+                                      subPage &&
+                                        "pointer-events-auto hover:bg-salPinkLt/70 hover:no-underline",
+                                      // component.href.includes(currentPage) &&
+                                      //   currentPage !== "" &&
+                                      //   "pointer-events-none bg-background",
+                                    )}
+                                    activeItem={activeLink}
+                                  >
+                                    {/* {component.description} */}
+                                  </ListItem>
+                                );
+                              })}
                             <Separator thickness={2} className="" />
                             <p className="m-0 text-center text-foreground/50">
                               Old Site

@@ -106,12 +106,14 @@ export const RichTextDisplay = ({
             className="rich-check"
             defaultChecked={checked}
             onCheckedChange={(newChecked) => {
-              const parent = document.activeElement?.closest("li");
-              if (parent) {
-                parent.setAttribute(
-                  "data-checked",
-                  newChecked ? "true" : "false",
-                );
+              if (typeof document !== "undefined") {
+                const parent = document.activeElement?.closest("li");
+                if (parent) {
+                  parent.setAttribute(
+                    "data-checked",
+                    newChecked ? "true" : "false",
+                  );
+                }
               }
             }}
           />
