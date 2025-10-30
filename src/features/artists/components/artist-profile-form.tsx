@@ -316,7 +316,7 @@ export const ArtistProfileForm = ({ user, type }: ArtistProfileFormProps) => {
                   tabIndex={7}
                 />
               </FormControl>
-              <FormLabel className="font-bold">
+              <FormLabel className="font-bold hover:cursor-pointer">
                 Would you like to be considered for our artist feature?
                 <sup>*</sup>
               </FormLabel>

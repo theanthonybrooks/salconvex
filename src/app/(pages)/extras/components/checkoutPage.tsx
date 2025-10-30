@@ -3,7 +3,6 @@
 import type { EventRegistrationValues } from "@/schemas/public";
 import type { Preloaded } from "convex/react";
 
-import { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { EventRegistrationSchema } from "@/schemas/public";
@@ -26,7 +25,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import FullPageLoading from "@/components/ui/loading-screen";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -63,7 +61,6 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
   const event = usePreloadedQuery(preloaded);
 
   const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
-  const [termsAgreement, setTermsAgreement] = useState(false);
   const { preloadedUserData, preloadedSubStatus } = useConvexPreload();
   const userData = usePreloadedQuery(preloadedUserData);
   const { user, userPref } = userData ?? {};
@@ -97,6 +94,7 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
       email: user?.email ?? "",
       name: user?.name ?? "",
       link: registration?.link ?? "",
+      termsAgreement: false,
     },
     mode: "onChange",
     delayError: 1000,
@@ -104,9 +102,11 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
 
   const {
     handleSubmit,
-
+    watch,
     formState: { isValid },
   } = form;
+
+  const termsAgreement = watch("termsAgreement");
 
   const registerForEvent = useMutation(
     api.userAddOns.onlineEvents.registerForOnlineEvent,
@@ -583,8 +583,26 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
                         </FormItem>
                       )}
                     />
-
-                    <Label
+                    <FormField
+                      control={form.control}
+                      name="termsAgreement"
+                      render={({ field }) => (
+                        <FormItem className="my-2 flex items-center gap-2 space-y-0">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value || false}
+                              onCheckedChange={field.onChange}
+                              className="text-base"
+                            />
+                          </FormControl>
+                          <FormLabel className="hover:cursor-pointer">
+                            I have read and agree to the terms of this event
+                            <sup>*</sup>
+                          </FormLabel>
+                        </FormItem>
+                      )}
+                    />
+                    {/* <Label
                       htmlFor="termsAgreement"
                       className="inline-flex items-center gap-2"
                     >
@@ -596,7 +614,7 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
                         }
                       />{" "}
                       I have read and agree to the terms of this event
-                    </Label>
+                    </Label> */}
 
                     <Button
                       variant="salWithShadowHidden"

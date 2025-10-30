@@ -80,7 +80,7 @@ export type PrimaryContact = Infer<typeof primaryContacts>;
 const contactValidator = v.object({
   organizer: v.optional(v.string()),
   organizerTitle: v.optional(v.string()),
-  primaryContact: primaryContacts,
+  primaryContact: v.string(),
 });
 export type ContactType = Infer<typeof contactValidator>;
 // #endregion

@@ -470,7 +470,7 @@ export const ArtistProfileForm = ({
                     tabIndex={7}
                   />
                 </FormControl>
-                <FormLabel className="hidden font-bold leading-6 sm:block sm:leading-normal">
+                <FormLabel className="hidden font-bold leading-6 hover:cursor-pointer sm:block sm:leading-normal">
                   Would you like to be considered for our artist feature?
                   <sup>*</sup>
                 </FormLabel>

@@ -50,6 +50,7 @@ export const EventRegistrationSchema = z
     email: z.email("Must be a valid email address"),
     name: z.string().min(3, "Name is required"),
     link: z.url(),
+    termsAgreement: z.boolean(),
   })
   .superRefine((data, ctx) => {
     const link = data.link?.trim();

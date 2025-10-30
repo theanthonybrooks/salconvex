@@ -919,7 +919,7 @@ export const EventOCForm = ({
                   timezoneOffset,
                 },
                 contact: {
-                  primaryContact: orgData.contact?.primaryContact || "",
+                  primaryContact: orgData.contact?.primaryContact ?? "",
                 },
               });
             }

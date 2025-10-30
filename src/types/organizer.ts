@@ -1,7 +1,7 @@
 import { ArtistFull } from "@/types/artist";
 import { EventData } from "@/types/eventTypes";
 
-import type { ContactType, LinksType, OrgLocation } from "~/convex/schema";
+import type { LinksType, OrgLocation, PrimaryContact } from "~/convex/schema";
 
 import { Doc, Id } from "~/convex/_generated/dataModel";
 
@@ -80,7 +80,11 @@ export type Organizer = Omit<
 > & {
   links: LinksType;
   location: OrgLocation;
-  contact: ContactType;
+  contact: {
+    organizer?: string;
+    organizerTitle?: string;
+    primaryContact: PrimaryContact;
+  };
 };
 
 export type OrgEventData = EventData & {
