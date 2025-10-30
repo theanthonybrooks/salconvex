@@ -2,18 +2,19 @@
 
 import { useEffect, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { api } from "~/convex/_generated/api";
-import { makeUseQueryWithStatus } from "convex-helpers/react";
-import { useQuery } from "convex-helpers/react/cache";
-import { useQueries } from "convex-helpers/react/cache/hooks";
-import { usePreloadedQuery } from "convex/react";
-import { ConvexError } from "convex/values";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { SalBackNavigation } from "@/features/events/components/sal-back-navigation";
 import { OpenCallCardDetailDesktop } from "@/features/events/open-calls/desktop/opencall-card-detail-desktop";
 import { OpenCallCardDetailMobile } from "@/features/events/open-calls/mobile/opencall-card-detail-mobile";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
+
+import { api } from "~/convex/_generated/api";
+import { makeUseQueryWithStatus } from "convex-helpers/react";
+import { useQuery } from "convex-helpers/react/cache";
+import { useQueries } from "convex-helpers/react/cache/hooks";
+import { usePreloadedQuery } from "convex/react";
+import { ConvexError } from "convex/values";
 
 const OpenCallDetail = () => {
   const hasRedirected = useRef(false);
@@ -67,7 +68,11 @@ const OpenCallDetail = () => {
   //     document.title = `Open Call | ${document.title}`;
   //   }
   // }, [data?.event?.name]);
-  const isOwner = user?._id === data?.organizer?.ownerId;
+  const isOwner =
+    user?._id === data?.organizer?.ownerId ||
+    Boolean(user && data?.organizer?.allowedEditors.includes(user._id));
+
+  console.log("isOwner: ", isOwner, data);
 
   return (
     // <OpenCallDetailWrapper>

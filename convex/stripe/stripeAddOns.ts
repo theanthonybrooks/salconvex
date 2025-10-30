@@ -11,43 +11,6 @@ import { action, mutation } from "../_generated/server";
 // Initialize the Stripe client
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
-export const saveStripeCustomerId = mutation({
-  args: {
-    stripeCustomerId: v.string(),
-    userType: v.union(v.literal("artist"), v.literal("organizer")),
-  },
-  handler: async (ctx, args) => {
-    const isArtist = args.userType === "artist";
-    const isOrganizer = args.userType === "organizer";
-    const userId = await getAuthUserId(ctx);
-    if (!userId) throw new Error("Not authenticated");
-
-    const artistSubscription = await ctx.db
-      .query("userSubscriptions")
-      .withIndex("userId", (q) => q.eq("userId", userId))
-      .first();
-
-    const orgSubscription = await ctx.db
-      .query("organizationSubscriptions")
-      .withIndex("userId", (q) => q.eq("userId", userId))
-      .first();
-
-    if (!artistSubscription && isArtist) {
-      await ctx.db.insert("userSubscriptions", {
-        customerId: args.stripeCustomerId,
-        userId,
-        lastEditedAt: Date.now(),
-      });
-    } else if (!orgSubscription && isOrganizer) {
-      await ctx.db.insert("organizationSubscriptions", {
-        customerId: args.stripeCustomerId,
-        userId,
-        lastEditedAt: Date.now(),
-      });
-    }
-  },
-});
-
 // ACTION: Create a Stripe Checkout Session.
 export const createStripeAddOnCheckoutSession = action({
   args: {
@@ -89,12 +52,9 @@ export const createStripeAddOnCheckoutSession = action({
       const { voucherTotal, vouchers } = userVouchers ?? {};
 
       const { artistSubscription, orgSubscription } = userId
-        ? await ctx.runQuery(
-            api.stripe.stripeSubscriptions.getUserSubscription,
-            {
-              userId,
-            },
-          )
+        ? await ctx.runQuery(api.stripe.stripeBase.getUserSubscriptions, {
+            userId,
+          })
         : {};
 
       let stripeCustomerId =

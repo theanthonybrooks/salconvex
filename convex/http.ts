@@ -1,6 +1,6 @@
 import { httpRouter } from "convex/server";
 import { auth } from "./auth";
-import { paymentWebhook } from "./stripe/stripeSubscriptions";
+import { paymentWebhook } from "./stripe/stripeBase";
 
 const http = httpRouter();
 

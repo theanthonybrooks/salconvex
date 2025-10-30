@@ -1,9 +1,9 @@
 import Github from "@auth/core/providers/github";
 import Google from "@auth/core/providers/google";
-import { convexAuth, getAuthUserId } from "@convex-dev/auth/server";
-import { ConvexError } from "convex/values";
 import { Scrypt } from "lucia";
 import slugify from "slugify";
+
+import { convexAuth, getAuthUserId } from "@convex-dev/auth/server";
 import {
   checkNewsletterUser,
   updateNewsletterUser,
@@ -13,6 +13,7 @@ import {
   updateOrgOwner,
 } from "~/convex/organizer/organizations";
 import { AccountType } from "~/convex/schema";
+import { ConvexError } from "convex/values";
 import { CustomPassword } from "./functions/customPassword";
 import { ResendOTP } from "./otp/resendOtp";
 import { findUserByEmailPW } from "./users";
@@ -161,6 +162,7 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
         if (newOrg) {
           await ctx.db.insert("organizations", {
             ownerId: newUserId,
+            allowedEditors: [],
             name: profile.organizationName,
             slug: slugify(profile.organizationName as string, {
               lower: true,

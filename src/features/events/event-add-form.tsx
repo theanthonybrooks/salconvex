@@ -191,6 +191,7 @@ export const EventOCForm = ({
       // eventName: "",
     },
     mode: "onChange",
+    delayError: 1000,
   });
 
   const {
@@ -210,15 +211,17 @@ export const EventOCForm = ({
     },
     reset,
   } = form;
+
   // #region ------------- Definitions --------------
   // #region ------------- Actions, Mutations, Queries --------------
 
   // const paidCall = formType === 3 && !isAdmin;
 
   const currentValues = getValues();
+
   const getTimezone = useAction(api.actions.getTimezone.getTimezone);
   const getCheckoutUrl = useAction(
-    api.stripe.stripeSubscriptions.createStripeCheckoutSession,
+    api.stripe.stripeOrganizations.createStripeOrgCheckoutSession,
   );
   const createNewOrg = useMutation(api.organizer.organizations.createNewOrg);
   const saveOrgFile = useMutation(api.uploads.files.saveOrgFile);
@@ -298,7 +301,8 @@ export const EventOCForm = ({
   //
   //
   // #region ------------- Refs --------------
-  const prevErrorJson = useRef<string>("");
+  const prevIssues = useRef<string | null>(null);
+  const prevErrorJson = useRef<string>("{}");
   const lastChangedRef = useRef<number | null>(null);
   const canCheckSchema = useRef(false);
   const canClearEventData = useRef(true);
@@ -433,6 +437,7 @@ export const EventOCForm = ({
   const hasUserEditedStep0 =
     JSON.stringify(dirtyFields?.organization ?? {}).includes("true") &&
     activeStep === 0;
+
   const hasUserEditedStep4 =
     JSON.stringify(dirtyFields?.openCall ?? {}).includes("true") &&
     activeStep === 4;
@@ -557,13 +562,13 @@ export const EventOCForm = ({
 
       if (paidCall && !alreadyPaid) {
         const result = await getCheckoutUrl({
-          planKey,
+          orgId: orgData._id as Id<"organizations">,
+          eventId: eventData._id as Id<"events">,
           slidingPrice:
             typeof submissionCost?.price === "number" &&
             submissionCost?.price > 0
               ? submissionCost?.price
               : 50,
-          accountType: "organizer",
           isEligibleForFree,
           openCallId,
         });
@@ -573,7 +578,7 @@ export const EventOCForm = ({
         toast.success(
           alreadyPaid || alreadyApproved
             ? "Successfully updated project!"
-            : `Successfully submitted ${eventOnly ? "event" : getEventCategoryLabel(category, true) + " and open call"}!`,
+            : `Successfully submitted ${eventOnly ? "event" : getEventCategoryLabel(category, true).toLowerCase() + " and open call"}!`,
           {
             onClick: () => toast.dismiss(),
           },
@@ -761,6 +766,7 @@ export const EventOCForm = ({
 
       const result = schema.safeParse(currentValues);
 
+      console.log("safeParse result: ", result);
       if (isAdmin) {
         console.log("safeParse result: ", result);
       }
@@ -770,26 +776,13 @@ export const EventOCForm = ({
         if (isAdmin) {
           console.log("issues: ", issues);
         }
+        console.log("issues: ", issues);
 
         issues.forEach((issue) => {
           const path = issue.path.join(".") as Path<EventOCFormValues>;
           setError(path, { type: "manual", message: issue.message });
         });
 
-        // Prefer first user-meaningful message
-        // const firstMessage =
-        //   issues.find(
-        //     (i) =>
-        //       i.message &&
-        //       i.message !== "Required" &&
-        //       i.message !== "Invalid input",
-        //   )?.message ?? issues[0]?.message;
-        // const userRelevantIssues = issues.filter(
-        //   (i) =>
-        //     i.message &&
-        //     !["Required", "Invalid input", "invalid_union"].includes(i.message),
-        //   // i.message && !["Required"].includes(i.message),
-        // );
         const userRelevantIssues = issues.filter(
           (i) =>
             i.message &&
@@ -800,9 +793,17 @@ export const EventOCForm = ({
             ),
         );
 
-        const firstMessage = userRelevantIssues[0]?.message || "";
+        const serializedIssues = JSON.stringify(userRelevantIssues);
 
-        setErrorMsg(firstMessage || "");
+        const messagesHaveChanged = serializedIssues !== prevIssues.current;
+
+        prevIssues.current = serializedIssues;
+
+        const firstMessage = userRelevantIssues[0]?.message || "";
+        const latestMessage =
+          userRelevantIssues[userRelevantIssues.length - 1]?.message || "";
+
+        setErrorMsg(messagesHaveChanged ? latestMessage : firstMessage || "");
 
         if (shouldToast) {
           toast.dismiss("form-validation-error");
@@ -1730,13 +1731,16 @@ export const EventOCForm = ({
       organization: {
         name: "",
         logo: "",
-        location: { ...orgData.location, full: "" },
+        location: undefined,
+        contact: {
+          primaryContact: "",
+        },
       },
       event: {
         formType,
         name: "",
         logo: "/1.jpg",
-        location: { ...orgData.location, full: "" },
+        location: undefined,
         hasOpenCall: "False",
       },
       openCall: {
@@ -1829,15 +1833,17 @@ export const EventOCForm = ({
   //   }
   // }, [schema, hasUserEditedForm, errors]);
 
+  const serializedErrors = JSON.stringify(errors);
+  // console.log("serializedErrors", serializedErrors);
   useEffect(() => {
     if (!schema || !hasUserEditedForm) return;
-
+    // console.log("has edited me");
     const debouncedCheck = debounce(() => {
-      const serialized = JSON.stringify(errors);
-      // console.log("errors changed", serialized);
-      if (serialized !== prevErrorJson.current) {
+      // if (!prevFormValues.current && dirtyFields)
+      // console.log("with debounce");
+      if (serializedErrors !== prevErrorJson.current) {
         // console.log("error changed");
-        prevErrorJson.current = serialized;
+        prevErrorJson.current = serializedErrors;
         canCheckSchema.current = true;
       }
     }, 300);
@@ -1847,10 +1853,14 @@ export const EventOCForm = ({
     return () => {
       debouncedCheck.cancel();
     };
-  }, [errors, schema, hasUserEditedForm]);
+  }, [serializedErrors, schema, hasUserEditedForm]);
 
   useEffect(() => {
-    // console.log(isStepValidZod, hasUserEditedForm, canCheckSchema.current);
+    console.log({
+      isStepValidZod,
+      hasUserEditedForm,
+      canCheck: canCheckSchema.current,
+    });
     if (!canCheckSchema.current) {
       if (isStepValidZod) {
         canCheckSchema.current = true;

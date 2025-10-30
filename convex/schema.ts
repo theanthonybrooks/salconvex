@@ -452,6 +452,7 @@ const listActionsSchema = {
 const organizationSchema = {
   isComplete: v.boolean(),
   ownerId: v.id("users"),
+  allowedEditors: v.array(v.id("users")),
   // organizationName: v.optional(v.string()),
   name: v.string(),
   slug: v.string(), //todo: use slugs
@@ -492,6 +493,8 @@ const organizationSchema = {
   // events: v.array(v.id("events")),
   // TODO: Link organization to events and from events to open calls
 };
+const organizerSchemaValidator = v.object(organizationSchema);
+export type OrganizerSchemaType = Infer<typeof organizerSchemaValidator>;
 
 //TODO: Make another table that joins the events and open calls. Will act as a quick lookup for totals.
 
@@ -1040,6 +1043,10 @@ export default defineSchema({
 
   // Organization Tables
   organizations: defineTable(organizationSchema)
+    .searchIndex("search_by_slug", {
+      searchField: "slug",
+      filterFields: ["name", "slug", "ownerId"],
+    })
     .searchIndex("search_by_name", {
       searchField: "name",
       filterFields: [
@@ -1051,6 +1058,7 @@ export default defineSchema({
         "links.instagram",
         "isComplete",
         "ownerId",
+        "name",
       ],
     })
     .searchIndex("search_by_location", {

@@ -223,12 +223,14 @@ const baseOrganizationSchema = z.object({
     .max(50, "Max 50 characters")
     .regex(/^[^";]*$/, "No quotes or semicolons allowed"),
   slug: z.optional(z.string()),
-  logo: z.union([
-    z
-      .instanceof(Blob)
-      .refine((b) => b.size > 0, { message: "Logo is required" }),
-    z.string().min(1, "Required"),
-  ]),
+  logo: z
+    .union([
+      z
+        .instanceof(Blob)
+        .refine((b) => b.size > 0, { message: "Logo is required" }),
+      z.string(),
+    ])
+    .optional(),
   logoStorageId: z.optional(z.string()),
   location: locationSchema,
   // about: z.optional(z.string()),
@@ -466,18 +468,15 @@ export const step1Schema = z
     organization: baseOrganizationSchema,
   })
   .superRefine((data, ctx) => {
-    if (
-      typeof data.organization.logo === "string" &&
-      data.organization.logo?.trim()
-    ) {
-      const trimmedLogo = data.organization.logo.trim();
-      if (trimmedLogo.length > 0 && trimmedLogo.length < 5) {
-        ctx.addIssue({
-          code: "custom",
-          message: "Logo is required",
-          path: ["logo"],
-        });
-      }
+    const orgCountry = data.organization.location.country;
+    const orgLogo = data.organization.logo;
+
+    if (orgCountry && !orgLogo) {
+      ctx.addIssue({
+        code: "custom",
+        message: "Logo is required",
+        path: ["logo"],
+      });
     }
   });
 

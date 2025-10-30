@@ -387,9 +387,6 @@ const PricingCard = ({
         interval,
         planKey,
         hadTrial,
-        slidingPrice: 50,
-        accountType,
-        isEligibleForFree,
       });
 
       if (url) {

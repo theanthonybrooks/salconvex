@@ -1,9 +1,12 @@
-import { useEffect, useRef, useState } from "react";
+import { supportEmail } from "@/constants/siteInfo";
+
 import { EnrichedEvent } from "@/types/eventTypes";
-import { Doc } from "~/convex/_generated/dataModel";
+
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { LucideChevronLeft, LucideChevronRight } from "lucide-react";
 import { Controller, useFormContext } from "react-hook-form";
+
+import { LucideChevronLeft, LucideChevronRight } from "lucide-react";
 
 import { DataTable } from "@/components/data-table/data-table";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -21,7 +24,8 @@ import {
 import { EventOCFormValues } from "@/features/events/event-add-form";
 import { OrgSearch } from "@/features/organizers/components/org-search";
 import { cn } from "@/helpers/utilsFns";
-import { supportEmail } from "@/constants/siteInfo";
+
+import { Doc } from "~/convex/_generated/dataModel";
 
 interface SubmissionFormOrgStepProps {
   isAdmin: boolean;

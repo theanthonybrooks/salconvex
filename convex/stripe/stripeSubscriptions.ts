@@ -9,9 +9,6 @@ import { ConvexError, v } from "convex/values";
 import { api, internal } from "../_generated/api";
 import {
   action,
-  httpAction,
-  internalAction,
-  internalMutation,
   internalQuery,
   mutation,
   query,
@@ -118,94 +115,17 @@ export const getUserHasSubscription = query({
   },
 });
 
-export const getUserSubscription = query({
-  args: {
-    userId: v.string(),
-  },
-  handler: async (ctx, args) => {
-    const { userId } = args;
-
-    if (!userId) throw new Error("Not authenticated");
-
-    const artistSubscription = await ctx.db
-      .query("userSubscriptions")
-      .withIndex("userId", (q) => q.eq("userId", userId))
-      .first();
-
-    const orgSubscription = await ctx.db
-      .query("organizationSubscriptions")
-      .withIndex("userId", (q) => q.eq("userId", userId))
-      .first();
-
-    return { artistSubscription, orgSubscription };
-  },
-});
-
-export const saveStripeCustomerId = mutation({
-  args: {
-    stripeCustomerId: v.string(),
-    userType: v.union(v.literal("artist"), v.literal("organizer")),
-  },
-  handler: async (ctx, args) => {
-    const isArtist = args.userType === "artist";
-    const isOrganizer = args.userType === "organizer";
-    const userId = await getAuthUserId(ctx);
-    if (!userId) throw new Error("Not authenticated");
-
-    const artistSubscription = await ctx.db
-      .query("userSubscriptions")
-      .withIndex("userId", (q) => q.eq("userId", userId))
-      .first();
-
-    const orgSubscription = await ctx.db
-      .query("organizationSubscriptions")
-      .withIndex("userId", (q) => q.eq("userId", userId))
-      .first();
-
-    if (!artistSubscription && isArtist) {
-      await ctx.db.insert("userSubscriptions", {
-        customerId: args.stripeCustomerId,
-        userId,
-        lastEditedAt: Date.now(),
-      });
-    } else if (!orgSubscription && isOrganizer) {
-      await ctx.db.insert("organizationSubscriptions", {
-        customerId: args.stripeCustomerId,
-        userId,
-        lastEditedAt: Date.now(),
-      });
-    }
-  },
-});
-
 // ACTION: Create a Stripe Checkout Session.
 export const createStripeCheckoutSession = action({
   args: {
     planKey: schema.tables.userPlans.validator.fields.key,
     interval: v.optional(v.string()),
     hadTrial: v.optional(v.boolean()),
-    accountType: v.optional(v.string()),
-    slidingPrice: v.optional(v.number()),
-    isEligibleForFree: v.optional(v.boolean()),
-    openCallId: v.optional(v.union(v.id("openCalls"), v.null())),
   },
-  handler: async (
-    ctx,
-    args: {
-      planKey: string;
-      interval?: string;
-      hadTrial?: boolean;
-      accountType?: string;
-      slidingPrice?: number;
-      isEligibleForFree?: boolean;
-      openCallId?: Id<"openCalls"> | undefined | null;
-    },
-  ): Promise<{ url: string }> => {
+  handler: async (ctx, args): Promise<{ url: string }> => {
     try {
       console.log(args);
 
-      const isOrganizer = args.accountType === "organizer";
-      const isArtist = args.accountType === "artist";
       const identity = await getAuthUserId(ctx);
       if (!identity) throw new Error("Not authenticated");
       const result = await ctx.runQuery(api.users.getCurrentUser, {});
@@ -215,7 +135,7 @@ export const createStripeCheckoutSession = action({
         throw new Error("User not found or missing email");
 
       const { artistSubscription, orgSubscription } = await ctx.runQuery(
-        api.stripe.stripeSubscriptions.getUserSubscription,
+        api.stripe.stripeBase.getUserSubscriptions,
         {
           userId: user._id,
         },
@@ -224,10 +144,6 @@ export const createStripeCheckoutSession = action({
       let stripeCustomerId =
         artistSubscription?.customerId || orgSubscription?.customerId;
 
-      if (args.accountType === "organizer") {
-        if (!args.slidingPrice) throw new Error("Sliding price not provided");
-      }
-
       const plan: any = await ctx.runQuery(
         internal.stripe.stripeSubscriptions.getPlanByKey,
         {
@@ -235,17 +151,14 @@ export const createStripeCheckoutSession = action({
         },
       );
       // console.log(plan);
-      if (args.accountType === "artist") {
-        if (!plan || !plan.prices || !plan.prices.month) {
-          throw new Error("Plan not found or missing pricing info");
-        }
+
+      if (!plan || !plan.prices || !plan.prices.month) {
+        throw new Error("Plan not found or missing pricing info");
       }
 
       const priceId =
-        args.slidingPrice && isOrganizer
-          ? args.slidingPrice
-          : (args.interval && plan.prices[args.interval]?.usd?.stripeId) ||
-            plan.prices.month.usd.stripeId;
+        (args.interval && plan.prices[args.interval]?.usd?.stripeId) ||
+        plan.prices.month.usd.stripeId;
 
       // console.log("priceId which: ", priceId);
 
@@ -256,13 +169,9 @@ export const createStripeCheckoutSession = action({
         userId: user._id,
         userEmail: user.email,
         plan: args.planKey,
-        openCallId: args.openCallId ?? "",
-        accountType: args.accountType ?? "",
-        interval:
-          args.accountType === "organizer"
-            ? "One-time"
-            : args.interval || "month",
-        transactionType: "base",
+        accountType: "artist",
+        interval: args.interval || "month",
+        transactionType: "artist",
       };
 
       // console.log("hadTrial: ", args.hadTrial);
@@ -280,28 +189,18 @@ export const createStripeCheckoutSession = action({
         // await ctx.db.insert("userSubscriptions")
       }
 
-      if (
-        // (!orgSubscription && isOrganizer) ||
-        !artistSubscription &&
-        isArtist
-      ) {
-        await ctx.runMutation(
-          api.stripe.stripeSubscriptions.saveStripeCustomerId,
-          {
-            stripeCustomerId,
-            userType: isArtist ? "artist" : "organizer",
-          },
-        );
+      if (!artistSubscription) {
+        await ctx.runMutation(api.stripe.stripeBase.saveStripeCustomerId, {
+          stripeCustomerId,
+          userType: "artist",
+        });
       }
 
       // Determine subscription data options
       const subscriptionData: Stripe.Checkout.SessionCreateParams.SubscriptionData =
         {
-          ...(args.hadTrial || (args.slidingPrice && isOrganizer)
-            ? {}
-            : { trial_period_days: 14 }),
+          ...(args.hadTrial ? {} : { trial_period_days: 14 }),
         };
-      //TODO: Make some sort of trial/one-off for organizers of events. Could just check if they already have an open call? Would prefer to add a flag, though.
 
       // Create a Stripe Checkout Session.
       const session: Stripe.Checkout.Session =
@@ -309,28 +208,14 @@ export const createStripeCheckoutSession = action({
           payment_method_types: ["card"],
           customer: stripeCustomerId,
           line_items: [
-            args.accountType === "artist"
-              ? {
-                  price: priceId,
-                  quantity: 1,
-                }
-              : {
-                  price_data: {
-                    currency: "usd",
-                    unit_amount: args.slidingPrice
-                      ? args.slidingPrice * 100
-                      : 5000,
-                    product_data: {
-                      name: "Open Call Listing - – One-Time",
-                    },
-                  },
-                  quantity: 1,
-                },
+            {
+              price: priceId,
+              quantity: 1,
+            },
           ],
-          mode: args.accountType === "organizer" ? "payment" : "subscription",
+          mode: "subscription",
 
-          subscription_data:
-            args.accountType === "organizer" ? {} : subscriptionData,
+          subscription_data: subscriptionData,
           success_url: `${process.env.FRONTEND_URL}/thelist`,
           cancel_url: `${process.env.FRONTEND_URL}/pricing`,
           //TODO: MAKE SUCCESS AND CANCEL PAGES (or other redirects with modals?)
@@ -340,9 +225,6 @@ export const createStripeCheckoutSession = action({
           //   : {}),
           metadata: metadata,
           client_reference_id: metadata.userId,
-          discounts: args.isEligibleForFree
-            ? [{ coupon: process.env.STRIPE_FREE_COUPON }]
-            : undefined,
         });
 
       // console.log("checkout session created: ", session);
@@ -496,14 +378,7 @@ export const subscriptionStoreWebhook = mutation({
           .withIndex("userId", (q) => q.eq("userId", userId))
           .first();
 
-        const checkoutOrg = await ctx.db
-          .query("organizations")
-          .withIndex("by_ownerId", (q) =>
-            q.eq("ownerId", args.body.data.object.metadata.userId),
-          )
-          .first();
         console.log("checkoutCustomer: ", checkoutCustomer);
-        console.log("checkoutOrg: ", checkoutOrg);
 
         if ((checkoutCustomer || checkoutUser) && !oneTime) {
           console.log("user subscription already exists");
@@ -540,42 +415,6 @@ export const subscriptionStoreWebhook = mutation({
           });
         }
 
-        if (oneTime && checkoutOrg) {
-          const checkoutOrgSub = await ctx.db
-            .query("organizationSubscriptions")
-            .withIndex("organizationId", (q) =>
-              q.eq("organizationId", checkoutOrg._id),
-            )
-            .first();
-
-          console.log("one-time checkoutOrgSub: ", checkoutOrgSub);
-
-          await ctx.db.patch(checkoutOrg._id, {
-            updatedAt: Date.now(),
-            lastUpdatedBy: metadata?.userId,
-          });
-
-          if (freeCall) {
-            await ctx.db.patch(checkoutOrg._id, {
-              hadFreeCall: true,
-            });
-          }
-          await ctx.db.insert("organizationSubscriptions", {
-            organizationId: checkoutOrg._id,
-            userId,
-            openCallId: args.body.data.object.metadata?.openCallId,
-            stripeId: args.body.data.object.id,
-            currency: args.body.data.object.currency,
-            status: args.body.data.object.status,
-            amountSubtotal: args.body.data.object.amount_subtotal,
-            amountTotal: args.body.data.object.amount_total,
-            amountDiscount: args.body.data.object.total_details.amount_discount,
-            metadata,
-            customerId,
-            paidStatus: paymentStatus,
-          });
-        }
-
         // console.log("should be able to do logic for one-time here");
 
         const existingUser = await ctx.db
@@ -589,46 +428,7 @@ export const subscriptionStoreWebhook = mutation({
           console.log("account type: ", metadata?.accountType);
           console.log("oc id: ", metadata?.openCallId);
 
-          //TODO: Add logic for organizations. Currently, it's adding the metadata in the style of artists plans, which isn't useful or accurate.
-
-          if (metadata?.accountType === "organizer") {
-            console.log("patching user subscription as organizer");
-            // await ctx.db.patch(existingUser._id, {
-            //   subscription: `Organizer-${metadata.interval}`,
-            // });
-            // await ctx.db.patch(metadata.openCallId, {
-            //   paid: paymentStatus === "paid" ? true : false,
-            //   paidAt: createdAt,
-            //   state: paymentStatus === "paid" ? "submitted" : "pending",
-            // });
-            if (paymentStatus === "paid") {
-              const existingOpenCall = await ctx.db.get(
-                metadata.openCallId as Id<"openCalls">,
-              );
-              if (existingOpenCall) {
-                await ctx.db.patch(existingOpenCall._id, {
-                  lastUpdatedAt: createdAt,
-                  paid: paymentStatus === "paid" ? true : false,
-                  paidAt: createdAt,
-                  state: paymentStatus === "paid" ? "submitted" : "pending",
-                });
-              } else {
-                console.error(
-                  "No existing open call found — refunding payment.",
-                );
-                const paymentIntentId = baseObject.payment_intent;
-                await ctx.scheduler.runAfter(
-                  0,
-                  internal.stripe.stripeSubscriptions.processRefund,
-                  {
-                    userId: existingUser._id,
-                    paymentIntentId,
-                    reason: "No open call found. Refuned to organizer.",
-                  },
-                );
-              }
-            }
-          } else if (metadata?.accountType === "artist") {
+          if (metadata?.accountType === "artist") {
             // TODO: Update this to run a query and update for the user plan in all places. It's getting a bit hectic, so I'd rather not do it like this and would prefer to just have a lookup table or something.
             await ctx.db.patch(existingUser._id, {
               subscription: `${metadata.interval}ly-${metaPlan}`,
@@ -1124,57 +924,6 @@ export const subscriptionStoreWebhook = mutation({
   },
 });
 
-export const paymentWebhook = httpAction(async (ctx, request) => {
-  // console.log("Webhook received!", {
-  //   method: request.method,
-  //   url: request.url,
-  //   headers: request.headers,
-  // });
-
-  try {
-    const body = await request.json();
-
-    // console.log("Webhook body:", body);
-    console.log("Webhook data: ", {
-      type: body.type,
-      metadata: body.data.object.metadata,
-    });
-
-    const transactionType = body.data.object.metadata?.transactionType;
-    if (transactionType === "add_on") {
-      console.log("I'm an additional purchase");
-      await ctx.runMutation(api.stripe.stripeAddOns.addOnStoreWebhook, {
-        body,
-      });
-    } else {
-      // track events and based on events store data
-      await ctx.runMutation(
-        api.stripe.stripeSubscriptions.subscriptionStoreWebhook,
-        {
-          body,
-        },
-      );
-    }
-
-    // console.log("Webhook body:", body);
-    return new Response(JSON.stringify({ message: "Webhook received!" }), {
-      status: 200,
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-  } catch (error: any) {
-    console.error("JSON parsing failed:", error.message, error.stack);
-    return new Response(
-      JSON.stringify({ error: "Invalid request body", details: error.message }),
-      {
-        status: 400,
-        headers: { "Content-Type": "application/json" },
-      },
-    );
-  }
-});
-
 export const applyCouponToSubscription = action({
   args: {
     couponCode: v.string(),
@@ -1380,54 +1129,5 @@ export const cancelSubscription = action({
     }
 
     return { success: true };
-  },
-});
-
-export const processRefund = internalAction({
-  args: {
-    userId: v.id("users"),
-    paymentIntentId: v.string(),
-    reason: v.string(),
-  },
-  handler: async (ctx, args) => {
-    try {
-      const refund = await stripe.refunds.create({
-        payment_intent: args.paymentIntentId,
-        reason: "requested_by_customer",
-      });
-
-      console.log("Refunded successfully: ", refund);
-
-      if (refund.id) {
-        await ctx.runMutation(
-          internal.stripe.stripeSubscriptions.recordRefund,
-          {
-            userId: args.userId,
-            paymentIntentId: args.paymentIntentId,
-            refundId: refund.id,
-            reason: args.reason,
-          },
-        );
-      }
-    } catch (error) {
-      console.error("Error refunding payment: ", error);
-    }
-  },
-});
-
-export const recordRefund = internalMutation({
-  args: {
-    userId: v.id("users"),
-    paymentIntentId: v.string(),
-    refundId: v.string(),
-    reason: v.string(),
-  },
-  handler: async (ctx, args) => {
-    await ctx.db.insert("stripeRefunds", {
-      userId: args.userId,
-      paymentIntentId: args.paymentIntentId,
-      refundId: args.refundId,
-      reason: args.reason,
-    });
   },
 });

@@ -41,6 +41,8 @@ import type * as otp_resetOtp from "../otp/resetOtp.js";
 import type * as otp_verificationCodeEmail from "../otp/verificationCodeEmail.js";
 import type * as plans from "../plans.js";
 import type * as stripe_stripeAddOns from "../stripe/stripeAddOns.js";
+import type * as stripe_stripeBase from "../stripe/stripeBase.js";
+import type * as stripe_stripeOrganizations from "../stripe/stripeOrganizations.js";
 import type * as stripe_stripeSubscriptions from "../stripe/stripeSubscriptions.js";
 import type * as subscriptions from "../subscriptions.js";
 import type * as thelist_getFilteredEventsPublicUpdate from "../thelist/getFilteredEventsPublicUpdate.js";
@@ -97,6 +99,8 @@ declare const fullApi: ApiFromModules<{
   "otp/verificationCodeEmail": typeof otp_verificationCodeEmail;
   plans: typeof plans;
   "stripe/stripeAddOns": typeof stripe_stripeAddOns;
+  "stripe/stripeBase": typeof stripe_stripeBase;
+  "stripe/stripeOrganizations": typeof stripe_stripeOrganizations;
   "stripe/stripeSubscriptions": typeof stripe_stripeSubscriptions;
   subscriptions: typeof subscriptions;
   "thelist/getFilteredEventsPublicUpdate": typeof thelist_getFilteredEventsPublicUpdate;

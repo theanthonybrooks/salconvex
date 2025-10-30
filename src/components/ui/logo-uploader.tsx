@@ -2,8 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { LoaderCircle, PlusIcon } from "lucide-react";
 import { toast } from "react-toastify";
+
+import { LoaderCircle, PlusIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { CropModal } from "@/components/ui/crop-modal";
@@ -75,6 +76,7 @@ export default function LogoUploader({
       // );
       if (!shownErrorUrls.current.has(url)) {
         shownErrorUrls.current.add(url);
+        toast.dismiss();
         toast.error(
           "Could not load image from URL. Make sure it's a valid, public image",
         );

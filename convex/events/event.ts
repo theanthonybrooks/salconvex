@@ -1186,6 +1186,17 @@ export const getEventBySlug = query({
   },
 });
 
+export const getEventById = query({
+  args: {
+    eventId: v.id("events"),
+  },
+  handler: async (ctx, args) => {
+    const event = await ctx.db.get(args.eventId);
+    if (!event) return null;
+    return event;
+  },
+});
+
 export const getEventBySlugAndEdition = query({
   args: {
     slug: v.string(),
@@ -1231,7 +1242,14 @@ export const getEventWithDetails = query({
       ctx.db.get(event.mainOrgId),
     ]);
 
-    if (organizer?.ownerId !== userId && !eventPublished && !eventArchived)
+    const allowedEditor = user && organizer?.allowedEditors.includes(user._id);
+
+    if (
+      organizer?.ownerId !== userId &&
+      !eventPublished &&
+      !eventArchived &&
+      !allowedEditor
+    )
       throw new ConvexError("You don't have permission to view this event");
 
     const openCall = openCalls.find(
@@ -1319,7 +1337,9 @@ export const getEventWithOCDetails = query({
 
     const organizer = await ctx.db.get(event.mainOrgId);
 
-    const userIsOrganizer = user?._id === organizer?.ownerId;
+    const userIsOrganizer =
+      user?._id === organizer?.ownerId ||
+      Boolean(user && organizer?.allowedEditors.includes(user._id));
 
     const openCall = await ctx.db
       .query("openCalls")

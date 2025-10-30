@@ -18,7 +18,6 @@ import {
   QueryCtx,
 } from "~/convex/_generated/server";
 import { linksValidator, locationFullFields } from "~/convex/schema";
-import { filter } from "convex-helpers/server/filter";
 import { ConvexError, v } from "convex/values";
 
 const genericEmailDomains = [
@@ -363,6 +362,7 @@ export const createNewOrg = mutation({
 
     const orgId = await ctx.db.insert("organizations", {
       ownerId: user._id,
+      allowedEditors: [],
       name: args.organizationName,
       slug: slugify(args.organizationName, { lower: true, strict: true }),
       events: [],
@@ -594,20 +594,25 @@ export const getUserOrganizations = query({
 
     const user = await ctx.db.get(userId);
     if (!user) return null;
+    const slug = slugify(args.query, {
+      lower: true,
+      strict: true,
+    });
 
     if (user?.role.includes("admin")) {
       // const all = await ctx.db.query("organizations").collect();
       // return all.filter(filterFn);
       const all = await ctx.db
         .query("organizations")
-        .withSearchIndex("search_by_name", (q) =>
-          q.search("name", args.query.trim().toLowerCase()),
-        )
+        .withSearchIndex("search_by_slug", (q) => q.search("slug", slug))
         .collect();
 
-      const filteredResults = all.filter((org) =>
-        org?.name?.toLowerCase().includes(args.query?.toLowerCase()),
-      );
+      const filteredResults =
+        args.query.trim().length > 0
+          ? all.filter((org) =>
+              org.name.toLowerCase().includes(args.query?.toLowerCase()),
+            )
+          : all;
       return filteredResults;
     } else {
       // const orgs = await ctx.db
@@ -619,15 +624,16 @@ export const getUserOrganizations = query({
       //   .collect();
       const orgs = await ctx.db
         .query("organizations")
-        .withSearchIndex("search_by_name", (q) =>
-          q
-            .search("name", args.query.trim().toLowerCase())
-            .eq("ownerId", user._id),
-        )
+        .withSearchIndex("search_by_slug", (q) => q.search("slug", slug))
         .collect();
-      const filteredResults = orgs.filter((org) =>
-        org?.name?.toLowerCase().includes(args.query?.toLowerCase()),
+
+      const filteredResults = orgs.filter(
+        (org) =>
+          (org.ownerId === user._id || org.allowedEditors.includes(user._id)) &&
+          (args.query.trim().length === 0 ||
+            org.name.toLowerCase().includes(args.query?.toLowerCase())),
       );
+
       const sortedOrgs = filteredResults.sort((a, b) =>
         a.name.localeCompare(b.name),
       );
@@ -681,8 +687,11 @@ export const isOwnerOrIsNewOrg = query({
     organizationName: v.string(),
   },
   handler: async (ctx, args) => {
-    const inputName = args.organizationName.trim().toLowerCase();
-
+    if (args.organizationName === "") return null;
+    const inputSlug = slugify(args.organizationName, {
+      lower: true,
+      strict: true,
+    });
     const userId = await getAuthUserId(ctx);
     if (!userId) return null;
     const user = await ctx.db
@@ -696,25 +705,33 @@ export const isOwnerOrIsNewOrg = query({
 
     if (isAdmin) return "userIsAdmin";
 
-    const owner = await ctx.db
+    const org = await ctx.db
       .query("organizations")
-      .withSearchIndex("search_by_name", (q) =>
-        q.search("name", args.organizationName).eq("ownerId", user._id),
+      .withSearchIndex("search_by_slug", (q) =>
+        q.search("slug", args.organizationName).eq("slug", inputSlug),
       )
       .first();
 
-    if (owner && owner.ownerId === user._id) return "ownedByUser";
-    if (owner) throw new ConvexError("Organization already exists");
+    if (!org) return "available";
 
-    const org = await filter(
-      ctx.db.query("organizations"),
-      (org) => org.name.toLowerCase() === inputName,
-    ).unique();
+    const isOwner = user?._id === org?.ownerId;
+    const allowedEditors = org?.allowedEditors ?? [];
+    const isAllowedEditor = allowedEditors.includes(user._id);
 
-    if (org) throw new ConvexError("Organization already exists");
+    if (isOwner) return "ownedByUser";
+    if (isAllowedEditor) return "allowedEditor";
+
+    throw new ConvexError("Organization already exists");
+    // if (owner) throw new ConvexError("Organization already exists");
+
+    // const org = await filter(
+    //   ctx.db.query("organizations"),
+    //   (org) => org.name.toLowerCase() === inputName,
+    // ).unique();
+
+    // if (org) throw new ConvexError("Organization already exists");
 
     // console.log("if org");
-    if (inputName === "") return null;
 
     // console.log("else");
     return "available";

@@ -733,7 +733,14 @@ const ClientEventList = () => {
             })
           ) : (
             <div className="mb-12 mt-6 flex flex-col items-center gap-5">
-              <h1 className="text-2xl font-bold">No Results</h1>
+              <h1 className="text-2xl font-bold">
+                No Results {view === "orgView" ? "(yet)" : ""}
+              </h1>
+              {view === "orgView" && (
+                <p className="mb-3 text-sm italic sm:text-base">
+                  Your submissions will show here once they&apos;re approved
+                </p>
+              )}
               <Image
                 src="/nothinghere.gif"
                 alt="No Results Found"

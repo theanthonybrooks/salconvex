@@ -276,24 +276,33 @@ export const OrgSearch = ({
         {/* {focused && inputValue === "" && (
           <span className='absolute left-10 top-1/2 -translate-y-1/2 h-10 w-[2px] bg-foreground animate-caret-blink pointer-events-none' />
         )} */}
-        {isValid && !clearHovered && (
-          <CircleCheck
-            onMouseEnter={() => setClearHovered(true)}
-            onMouseLeave={() => setClearHovered(false)}
-            className="absolute right-[9px] top-1/2 size-6 -translate-y-1/2 cursor-pointer font-bold text-emerald-600 lg:right-4 lg:size-7"
-          />
-        )}
-        {(invalid || (clearHovered && isValid === true)) && (
-          <CircleX
-            onMouseEnter={() => setClearHovered(true)}
-            onMouseLeave={() => setClearHovered(false)}
-            onClick={handleReset}
-            className={cn(
-              "absolute right-[9px] top-1/2 size-6 -translate-y-1/2 cursor-pointer font-bold text-red-600 lg:right-4 lg:size-7",
-              clearHovered && "scale-110 font-semibold spin-in-90",
-            )}
-          />
-        )}
+        <div
+          className={cn(
+            "absolute right-[9px] top-1/2 -translate-y-1/2 cursor-pointer lg:right-4",
+          )}
+          onMouseEnter={() => setClearHovered(true)}
+          onMouseLeave={() => setClearHovered(false)}
+        >
+          {isValid && !clearHovered ? (
+            <CircleCheck
+              // onMouseOver={() => setClearHovered(true)}
+              // onMouseOut={() => setClearHovered(false)}
+              // onMouseEnter={() => setClearHovered(true)}
+              // onMouseLeave={() => setClearHovered(false)}
+              className="size-6 font-bold text-emerald-600 lg:size-7"
+            />
+          ) : invalid || clearHovered ? (
+            <CircleX
+              // onMouseEnter={() => setClearHovered(false)}
+              // onMouseLeave={() => setClearHovered(false)}
+              onClick={handleReset}
+              className={cn(
+                "font-bold text-red-600 lg:size-7",
+                clearHovered && "scale-110 font-semibold spin-in-90",
+              )}
+            />
+          ) : null}
+        </div>
         {showSuggestions && (
           <ul
             ref={listRef}

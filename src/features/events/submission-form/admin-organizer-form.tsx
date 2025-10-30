@@ -132,6 +132,8 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
     },
     reset,
   } = form;
+
+  const serializedErrors = JSON.stringify(errors);
   // #region ------------- Definitions --------------
   // #region ------------- Actions, Mutations, Queries --------------
 
@@ -139,7 +141,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   const eventId = searchParams.get("_id");
   const currentValues = getValues();
   const getCheckoutUrl = useAction(
-    api.stripe.stripeSubscriptions.createStripeCheckoutSession,
+    api.stripe.stripeOrganizations.createStripeOrgCheckoutSession,
   );
   const getTimezone = useAction(api.actions.getTimezone.getTimezone);
 
@@ -223,7 +225,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   //
   //
   // #region ------------- Refs --------------
-
+  const prevIssues = useRef<string | null>(null);
   const prevErrorJson = useRef<string>("");
   const lastChangedRef = useRef<number | null>(null);
   const canCheckSchema = useRef(false);
@@ -496,13 +498,13 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
 
       if (paidCall && !alreadyPaid) {
         const result = await getCheckoutUrl({
-          planKey: formType.toString(),
+          orgId: orgData._id as Id<"organizations">,
+          eventId: eventData._id as Id<"events">,
           slidingPrice:
             typeof submissionCost?.price === "number" &&
             submissionCost?.price > 0
               ? submissionCost?.price
               : 50,
-          accountType: "organizer",
           isEligibleForFree,
           openCallId,
         });
@@ -721,10 +723,17 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
               i.message.toLowerCase().includes("invalid input")
             ),
         );
+        const serializedIssues = JSON.stringify(userRelevantIssues);
+
+        const messagesHaveChanged = serializedIssues !== prevIssues.current;
+
+        prevIssues.current = serializedIssues;
 
         const firstMessage = userRelevantIssues[0]?.message || "";
+        const latestMessage =
+          userRelevantIssues[userRelevantIssues.length - 1]?.message || "";
 
-        setErrorMsg(firstMessage || "");
+        setErrorMsg(messagesHaveChanged ? latestMessage : firstMessage || "");
 
         if (shouldToast) {
           toast.dismiss("form-validation-error");
@@ -1701,13 +1710,13 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
 
   useEffect(() => {
     if (!schema || !hasUserEditedForm) return;
-
+    // console.log("has edited me");
     const debouncedCheck = debounce(() => {
-      const serialized = JSON.stringify(errors);
-      // console.log("errors changed", serialized);
-      if (serialized !== prevErrorJson.current) {
+      // if (!prevFormValues.current && dirtyFields)
+      // console.log("with debounce");
+      if (serializedErrors !== prevErrorJson.current) {
         // console.log("error changed");
-        prevErrorJson.current = serialized;
+        prevErrorJson.current = serializedErrors;
         canCheckSchema.current = true;
       }
     }, 300);
@@ -1717,7 +1726,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
     return () => {
       debouncedCheck.cancel();
     };
-  }, [errors, schema, hasUserEditedForm]);
+  }, [serializedErrors, schema, hasUserEditedForm]);
 
   useEffect(() => {
     if (!canCheckSchema.current) {

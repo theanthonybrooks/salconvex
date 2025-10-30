@@ -549,7 +549,7 @@ export const duplicateOC = mutation({
       dates: {
         ...event.dates,
         eventDates: [{ start: "", end: "" }],
-        prodDates: [],
+        prodDates: [{ start: "", end: "" }],
         edition,
       },
       location: {
