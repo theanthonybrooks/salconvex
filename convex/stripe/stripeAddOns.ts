@@ -34,14 +34,16 @@ export const createStripeAddOnCheckoutSession = action({
         throw new ConvexError("Email required for checkout");
       }
       //note-to-self: may make this event optional later for non-event add-ons like the spreadsheet or the newsletter if someone just wants the newsletter without signing up (though I think it wouldn't make much sense as it wouldn't be cheaper than just paying $5 per month)
-      const event = await ctx.runQuery(
+      const eventResult = await ctx.runQuery(
         api.userAddOns.onlineEvents.getOnlineEvent,
         { eventId: args.eventId },
       );
 
-      if (!event) {
+      if (!eventResult.data) {
         throw new ConvexError("Event not found");
       }
+
+      const event = eventResult.data;
 
       const userVoucher = userId
         ? await ctx.runQuery(api.userAddOns.onlineEvents.getUserVoucher, {
