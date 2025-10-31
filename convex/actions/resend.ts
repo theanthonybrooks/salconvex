@@ -595,14 +595,15 @@ export const sendEventRegistrationEmail = internalAction({
       const userPlan = userData.plan ?? 0;
       const bananaCap = userPlan >= 2;
 
-      const eventData = await ctx.runQuery(
+      const result = await ctx.runQuery(
         api.userAddOns.onlineEvents.getOnlineEvent,
         { eventId },
       );
 
-      if (!eventData) {
+      if (!result.data) {
         throw new ConvexError({ message: "Event not found", data: eventId });
       }
+      const eventData = result.data;
       status = "success";
       const eventName = eventData.name;
       const eventStart = eventData.startDate;
