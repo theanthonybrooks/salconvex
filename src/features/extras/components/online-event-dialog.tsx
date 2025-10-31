@@ -420,8 +420,8 @@ export const OnlineEventDialog = ({
                       value={field.value}
                       onChangeAction={(value) => field.onChange(value)}
                       placeholder="Select location"
-                      className="w-full bg-card sm:h-11"
-                      contentClassName="sm:max-h-80"
+                      className="w-full border-gray-300 bg-card sm:h-11"
+                      contentClassName="sm:max-h-80 "
                     />
                   </FormControl>
                   <FormMessage />
@@ -442,7 +442,7 @@ export const OnlineEventDialog = ({
                       placeholder="Full details about the event "
                       charLimit={5000}
                       formInputPreview
-                      inputPreviewContainerClassName="rounded-lg"
+                      inputPreviewContainerClassName="rounded-lg border-gray-300"
                     />
                   </FormControl>
                   <FormMessage />
