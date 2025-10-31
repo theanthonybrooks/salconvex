@@ -43,6 +43,7 @@ import { DashboardClassSync } from "@/providers/dashboard-provider";
 import { api } from "~/convex/_generated/api";
 
 import "./globals.css";
+import "./styles/react-day-picker.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl[0]),

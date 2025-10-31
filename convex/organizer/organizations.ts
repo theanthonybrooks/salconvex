@@ -591,6 +591,7 @@ export const getUserOrganizations = query({
     query: v.string(), // keep required
   },
   handler: async (ctx, args) => {
+    const trimmedQuery = args.query.trim();
     const userId = await getAuthUserId(ctx);
     if (!userId) return null;
 
@@ -604,10 +605,13 @@ export const getUserOrganizations = query({
     if (user?.role.includes("admin")) {
       // const all = await ctx.db.query("organizations").collect();
       // return all.filter(filterFn);
-      const all = await ctx.db
-        .query("organizations")
-        .withSearchIndex("search_by_slug", (q) => q.search("slug", slug))
-        .collect();
+      const all =
+        trimmedQuery === ""
+          ? await ctx.db.query("organizations").order("asc").collect()
+          : await ctx.db
+              .query("organizations")
+              .withSearchIndex("search_by_slug", (q) => q.search("slug", slug))
+              .collect();
 
       const filteredResults =
         args.query.trim().length > 0
@@ -617,17 +621,17 @@ export const getUserOrganizations = query({
           : all;
       return filteredResults;
     } else {
-      // const orgs = await ctx.db
-      //   .query("organizations")
-      //   .withIndex("by_name_ownerId", (q) =>
-      //     q.eq("name", args.query.trim().toLowerCase()).eq("ownerId", user._id),
-      //   )
-      //   .order("asc")
-      //   .collect();
-      const orgs = await ctx.db
-        .query("organizations")
-        .withSearchIndex("search_by_slug", (q) => q.search("slug", slug))
-        .collect();
+      const orgs =
+        trimmedQuery === ""
+          ? await ctx.db
+              .query("organizations")
+              .withIndex("by_ownerId", (q) => q.eq("ownerId", userId))
+              .order("asc")
+              .collect()
+          : await ctx.db
+              .query("organizations")
+              .withSearchIndex("search_by_slug", (q) => q.search("slug", slug))
+              .collect();
 
       const filteredResults = orgs.filter(
         (org) =>

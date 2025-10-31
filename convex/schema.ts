@@ -918,16 +918,24 @@ const userAddOnsSchema = {
   plan: v.optional(v.number()),
 };
 
+export const onlineEventStateValues = v.union(
+  v.literal("draft"),
+  v.literal("published"),
+);
+
+export type OnlineEventStateType = Infer<typeof onlineEventStateValues>;
+
 export const onlineEventsSchema = {
   name: v.string(),
   slug: v.string(),
   img: v.optional(v.string()),
+  imgStorageId: v.optional(v.id("_storage")),
   description: v.string(),
   requirements: v.array(v.string()),
   regDeadline: v.number(),
   startDate: v.number(),
   endDate: v.number(),
-  location: v.optional(v.string()),
+  location: v.string(),
   organizer: v.id("users"),
   price: v.number(),
   capacity: v.object({
@@ -938,6 +946,7 @@ export const onlineEventsSchema = {
   terms: v.array(v.string()),
   updatedAt: v.optional(v.number()),
   updatedBy: v.optional(v.id("users")),
+  state: onlineEventStateValues,
 };
 export const onlineEventsSchemaValidator = v.object(onlineEventsSchema);
 

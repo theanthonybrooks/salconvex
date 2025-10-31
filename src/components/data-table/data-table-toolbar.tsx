@@ -1,15 +1,16 @@
 "use client";
 
+import { eventTypeOptions } from "@/constants/eventConsts";
+
+import { TableTypes } from "@/types/tanstack-table";
+
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { TableTypes } from "@/types/tanstack-table";
 import { Table } from "@tanstack/react-table";
-import { api } from "~/convex/_generated/api";
-import { Id } from "~/convex/_generated/dataModel";
-import { useMutation } from "convex/react";
-import { X } from "lucide-react";
-import { TbFilterX } from "react-icons/tb";
 import { toast } from "react-toastify";
+
+import { TbFilterX } from "react-icons/tb";
+import { X } from "lucide-react";
 
 import {
   accountTypeOptions,
@@ -26,10 +27,13 @@ import { AlertDialogSimple } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { TooltipSimple } from "@/components/ui/tooltip";
+import { OnlineEventDialog } from "@/features/extras/components/online-event-dialog";
 import { cn } from "@/helpers/utilsFns";
-import { eventTypeOptions } from "@/constants/eventConsts";
 import { useDevice } from "@/providers/device-provider";
 
+import { api } from "~/convex/_generated/api";
+import { Id } from "~/convex/_generated/dataModel";
+import { useMutation } from "convex/react";
 import { DataTableFacetedFilter } from "./data-table-faceted-filter";
 
 interface DataTableToolbarProps<TData> {
@@ -63,6 +67,7 @@ export function DataTableToolbar<TData>({
   const minimalView = table.options.meta?.minimalView;
   const forDashboard = pageType === "dashboard";
   const eventAndOC = tableType === "events" || tableType === "openCalls";
+  const extrasTable = tableType === "extras";
   const appsTable = tableType === "applications";
   const artistsTable = tableType === "artists";
   const bookmarksTable = tableType === "bookmarks";
@@ -146,6 +151,16 @@ export function DataTableToolbar<TData>({
           }}
           className="mx-auto h-12 w-full sm:h-10 sm:w-[150px] lg:w-[200px]"
         />
+        {extrasTable && isAdmin && (
+          <OnlineEventDialog type="create">
+            <Button
+              variant="salWithShadowHidden"
+              className="h-10 w-full px-2 sm:w-fit lg:px-3"
+            >
+              Add Event
+            </Button>
+          </OnlineEventDialog>
+        )}
         {eventAndOC && (
           <div className="flex items-center gap-3 [@media(max-width:640px)]:w-full [@media(max-width:640px)]:flex-col">
             {table.getColumn("state") && (

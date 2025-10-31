@@ -9,8 +9,10 @@
 //     getIsSomeTrue?: (columnId: string) => boolean;
 //   }
 // }
-import { ToolbarData } from "@/components/data-table/data-table";
 import { RowData } from "@tanstack/react-table";
+
+import { ToolbarData } from "@/components/data-table/data-table";
+
 export const tableTypes = [
   "events",
   "orgEvents",
@@ -22,6 +24,7 @@ export const tableTypes = [
   "hidden",
   "newsletter",
   "artists",
+  "extras",
 ] as const;
 
 export const pageTypes = ["form", "dashboard"] as const;

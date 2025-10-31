@@ -152,30 +152,30 @@ export const OrgSearch = ({
     }
   };
 
-  // const handleBlur = () => {
-  //   // console.log("handleBlur");
-
-  //   if (inputValue.trim() !== "" && inputValue.trim() === selectedVal) {
-  //     if (results && results?.length > 0 && selectedIndex >= 0) {
-  //       handleSelect(results[selectedIndex]);
-  //     }
-  //     setFocused(false);
-  //     setSelectedIndex(-1);
-  //     // console.log("if");
-  //   } else if (inputValue.trim() === "" && selectedVal.trim() !== "") {
-  //     if (results && results?.length > 0) {
-  //       handleSelect(results[selectedIndex]);
-  //     }
-  //     setFocused(false);
-  //     setSelectedIndex(-1);
-  //   } else {
-  //     setTimeout(() => {
-  //       setFocused(false);
-  //       setSelectedIndex(-1);
-  //     }, 100);
-  //     // console.log("else");
-  //   }
-  // };
+  const handleBlur = () => {
+    // console.log("handleBlur");
+    setFocused(false);
+    // if (inputValue.trim() !== "" && inputValue.trim() === selectedVal) {
+    //   if (results && results?.length > 0 && selectedIndex >= 0) {
+    //     handleSelect(results[selectedIndex]);
+    //   }
+    //   setFocused(false);
+    //   setSelectedIndex(-1);
+    //   // console.log("if");
+    // } else if (inputValue.trim() === "" && selectedVal.trim() !== "") {
+    //   if (results && results?.length > 0) {
+    //     handleSelect(results[selectedIndex]);
+    //   }
+    //   setFocused(false);
+    //   setSelectedIndex(-1);
+    // } else {
+    //   setTimeout(() => {
+    //     setFocused(false);
+    //     setSelectedIndex(-1);
+    //   }, 100);
+    //   // console.log("else");
+    // }
+  };
 
   useEffect(() => {
     if (
@@ -250,7 +250,7 @@ export const OrgSearch = ({
             if (!hasUserInteracted) setHasUserInteracted(true);
             setFocused(true);
           }}
-          // onBlur={handleBlur}
+          onBlur={handleBlur}
           onKeyDown={(e) => {
             if (!hasUserInteracted) setHasUserInteracted(true);
             handleKeyDown(e);

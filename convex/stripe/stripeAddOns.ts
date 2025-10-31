@@ -43,13 +43,13 @@ export const createStripeAddOnCheckoutSession = action({
         throw new ConvexError("Event not found");
       }
 
-      const userVouchers = userId
-        ? await ctx.runQuery(api.userAddOns.onlineEvents.getUserVouchers, {
+      const userVoucher = userId
+        ? await ctx.runQuery(api.userAddOns.onlineEvents.getUserVoucher, {
             userId,
           })
         : null;
 
-      const { voucherTotal, vouchers } = userVouchers ?? {};
+      const voucherTotal = userVoucher?.amount ?? 0;
 
       const { artistSubscription, orgSubscription } = userId
         ? await ctx.runQuery(api.stripe.stripeBase.getUserSubscriptions, {
@@ -68,7 +68,7 @@ export const createStripeAddOnCheckoutSession = action({
           ? await stripe.coupons.create({
               amount_off: discountAmount,
               currency: "usd",
-              name: "Previous Event Voucher",
+              name: "Previous Event Voucher(s)",
               duration: "once",
             })
           : null;
@@ -96,8 +96,8 @@ export const createStripeAddOnCheckoutSession = action({
         date: new Date(event.startDate).toISOString(),
       };
 
-      if (voucherTotal && vouchers?.length) {
-        metadata.voucherIds = vouchers.map((v) => v._id).join(",");
+      if (voucherTotal && userVoucher) {
+        metadata.voucherId = userVoucher._id;
         metadata.voucherTotal = (voucherTotal ?? 0).toString();
       }
 
@@ -199,9 +199,13 @@ export const addOnStoreWebhook = mutation({
     switch (eventType) {
       case "checkout.session.completed":
         //note-to-self: in this, the metadata loads something that looks like this:
+        console.log("checkout session completed:", args.body.data);
         const paymentStatus = baseObject.payment_status === "paid";
         const eventId = baseObject.metadata.eventId as Id<"onlineEvents">;
         const registeredUserId = baseObject.metadata.userId as Id<"users">;
+        const voucherId = baseObject.metadata.voucherId as Id<"eventVouchers">;
+        const voucherAmount = baseObject.metadata.voucherTotal as number;
+        // console.log(baseObject.metadata);
         // {
         //   accountType: 'artist',
         //   interval: 'month',
@@ -214,21 +218,20 @@ export const addOnStoreWebhook = mutation({
 
         // email = baseObject.customer_details.email
         // userId = baseObject.client_reference_id;
-        console.log(
-          "metadata.userId: ",
-          userId,
-          "metadata.email: ",
-          metadata.email,
-          "client_reference_id (userId): ",
-          baseObject.client_reference_id,
-        );
-        console.log("checkout session completed:", args.body.data);
+        // console.log(
+        //   "metadata.userId: ",
+        //   userId,
+        //   "metadata.email: ",
+        //   metadata.email,
+        //   "client_reference_id (userId): ",
+        //   baseObject.client_reference_id,
+        // );
 
-        console.log(
-          "payment status: ",
-          baseObject.payment_status,
-          paymentStatus,
-        );
+        // console.log(
+        //   "payment status: ",
+        //   baseObject.payment_status,
+        //   paymentStatus,
+        // );
         const formattedEmail = metadata.email?.toLowerCase();
         const event = await ctx.db.get(eventId);
         if (!event) throw new Error("Event not found for : " + eventId);
@@ -247,6 +250,7 @@ export const addOnStoreWebhook = mutation({
                   q.eq("email", formattedEmail).eq("eventId", eventId),
                 )
                 .first();
+        const voucher = voucherId ? await ctx.db.get(voucherId) : null;
 
         if (registration && paymentStatus) {
           await ctx.db.patch(registration._id, {
@@ -266,6 +270,23 @@ export const addOnStoreWebhook = mutation({
             formattedEmail,
             "register",
           );
+          if (voucher) {
+            const newVoucherAmount = Math.max(
+              0,
+              voucher.amount - voucherAmount,
+            );
+
+            console.log(
+              newVoucherAmount,
+              voucher.amount,
+              voucherAmount,
+              newVoucherAmount === 0,
+            );
+            await ctx.db.patch(voucher._id, {
+              amount: newVoucherAmount,
+              redeemed: newVoucherAmount === 0,
+            });
+          }
         } else {
           throw new ConvexError(
             "Registration not found for: " +

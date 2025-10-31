@@ -1,4 +1,5 @@
 import type { VariantProps } from "class-variance-authority";
+
 import * as React from "react";
 import { Slot, Slottable } from "@radix-ui/react-slot";
 import { cva } from "class-variance-authority";
@@ -37,7 +38,7 @@ const buttonVariants = cva(
         salWithShadowHiddenLeft: `linear !rounded-r-none border-2 border-r border-foreground bg-white font-medium text-foreground shadow-none transition-all duration-300 hover:-translate-x-[3px] hover:translate-y-[-3px] hover:shadow-llg active:translate-x-0 active:translate-y-0 active:shadow-none dark:border-primary-foreground dark:text-primary-foreground`,
         salWithShadowHiddenVert: `linear border-2 border-foreground bg-white font-medium text-foreground shadow-none transition-all duration-300 hover:translate-y-[-3px] hover:shadow-vlg active:translate-y-0 active:shadow-none dark:border-primary-foreground dark:text-primary-foreground`,
         salWithoutShadow: `focus:bg-salyellow/70 border-2 border-foreground bg-white text-foreground hover:bg-salYellow/80 active:bg-salYellow/70 dark:border-primary-foreground dark:text-primary-foreground`,
-        salWithShadowYlw: `bg-salyellow linear border-2 border-foreground font-medium text-foreground shadow-slg transition-all duration-300 hover:translate-x-[-1px] hover:bg-salYellowLt hover:shadow-slgHover focus:translate-x-[-1px] focus:bg-salYellowLt focus:shadow-slgHover active:translate-x-[-3px] active:translate-y-[3px] active:shadow-none dark:border-primary-foreground dark:text-primary-foreground`,
+        salWithShadowYlw: `linear border-2 border-foreground bg-salYellow font-medium text-foreground shadow-slg transition-all duration-300 hover:translate-x-[-1px] hover:bg-salYellowLt hover:shadow-slgHover focus:translate-x-[-1px] focus:bg-salYellowLt focus:shadow-slgHover active:translate-x-[-3px] active:translate-y-[3px] active:shadow-none dark:border-primary-foreground dark:text-primary-foreground`,
         salWithShadowHiddenYlw: `linear border-2 border-foreground bg-salYellow font-medium text-foreground shadow-none transition-all duration-300 hover:translate-x-[3px] hover:translate-y-[-3px] hover:shadow-slg active:translate-x-0 active:translate-y-0 active:shadow-none white:bg-white dark:border-primary-foreground dark:text-primary-foreground`,
         salWithShadowPink: `linear border-2 border-foreground bg-salPink font-medium text-foreground shadow-slg transition-all duration-300 hover:translate-x-[-1px] hover:bg-salPinkLt hover:shadow-slgHover focus:translate-x-[-1px] focus:bg-salPinkLt focus:shadow-slgHover active:translate-x-[-3px] active:translate-y-[3px] active:shadow-none dark:border-primary-foreground dark:text-primary-foreground`,
       },

@@ -1,6 +1,5 @@
 import { User } from "@/types/user";
-import { api } from "~/convex/_generated/api";
-import { useQuery } from "convex-helpers/react/cache/hooks";
+
 import { CheckIcon } from "lucide-react";
 
 import { AvatarSimple } from "@/components/ui/avatar";
@@ -11,6 +10,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { cn } from "@/helpers/utilsFns";
+
+import { api } from "~/convex/_generated/api";
+import { useQuery } from "convex-helpers/react/cache/hooks";
 
 interface UserSelectorProps {
   type: "staff" | "user" | "organization" | "openCall"; //todo: use later when this is implemented elsewhere
@@ -18,6 +21,7 @@ interface UserSelectorProps {
   currentUser: User | null;
   setCurrentUser: React.Dispatch<React.SetStateAction<User | null>>;
   minimal?: boolean;
+  className?: string;
 }
 
 export const StaffUserSelector = ({
@@ -26,8 +30,10 @@ export const StaffUserSelector = ({
   currentUser,
   setCurrentUser,
   minimal,
+  className,
 }: UserSelectorProps) => {
-  const { image: currentUserImage, name: currentUserName } = currentUser || {};
+  const { image: currentUserImage, firstName: currentUserName } =
+    currentUser || {};
 
   const staffUsers = useQuery(
     api.admin.getStaffUsers,
@@ -38,7 +44,12 @@ export const StaffUserSelector = ({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="flex items-center gap-2 rounded-md px-2 py-1 transition-colors hover:scale-105 active:scale-95">
+        <button
+          className={cn(
+            "flex items-center gap-2 rounded-md px-2 py-1 transition-colors hover:scale-105 active:scale-95",
+            className,
+          )}
+        >
           <AvatarSimple
             src={currentUserImage}
             alt={currentUserName}

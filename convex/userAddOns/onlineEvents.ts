@@ -10,10 +10,7 @@ import type {
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { internal } from "~/convex/_generated/api";
 import { mutation, query } from "~/convex/_generated/server";
-import {
-  onlineEventsSchema,
-  onlineEventsSchemaValidator,
-} from "~/convex/schema";
+import { onlineEventsSchema, onlineEventStateValues } from "~/convex/schema";
 import { ConvexError, v } from "convex/values";
 
 export async function getRegistration(
@@ -61,12 +58,49 @@ export async function sendEventRegistrationEmailHelper(
   );
 }
 
+export const getAllOnlineEvents = query({
+  handler: async (ctx) => {
+    let totalEvents = 0;
+    const events = await ctx.db.query("onlineEvents").collect();
+    const results = await Promise.all(
+      events.map(async (event) => {
+        if (event) totalEvents += 1;
+        return {
+          _id: event._id,
+          name: event.name,
+          img: event.img,
+          description: event.description,
+          startDate: event.startDate,
+          endDate: event.endDate,
+          regDeadline: event.regDeadline,
+          price: event.price,
+          capacity: event.capacity,
+          organizer: event.organizer,
+          terms: event.terms,
+          requirements: event.requirements,
+          location: event.location,
+          updatedAt: event.updatedAt,
+          createdAt: event._creationTime,
+          state: event.state,
+        };
+      }),
+    );
+    return {
+      events: results,
+      totalEvents,
+    };
+  },
+});
+
 export const getOnlineEvent = query({
   args: {
     slug: v.optional(v.string()),
     eventId: v.optional(v.id("onlineEvents")),
   },
   handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    const user = userId ? await ctx.db.get(userId) : null;
+    const isAdmin = user?.role?.includes("admin");
     // const event = await ctx.db.query("onlineEvents").withIndex("by_slug_startDate", (q) => q.eq("slug", args.slug).gt("startDate", Date.now())).first();
     const now = Date.now();
     const event = args.eventId
@@ -78,15 +112,43 @@ export const getOnlineEvent = query({
           )
           .order("asc")
           .first();
-    console.log(event);
-    if (!event) return null;
+    if (!event)
+      return { success: false, message: "Event not found", data: null };
+    if (event.state === "draft" && !isAdmin)
+      return { success: false, message: "Event is draft", data: null };
+
+    return { success: true, message: "Success", data: event };
+  },
+});
+
+export const updateOnlineEventState = mutation({
+  args: {
+    eventId: v.id("onlineEvents"),
+    state: v.optional(onlineEventStateValues),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new ConvexError("Not authenticated");
+    const user = await ctx.db.get(userId);
+
+    const event = await ctx.db.get(args.eventId);
+
+    if (!event) throw new ConvexError("Event not found");
+
+    await ctx.db.patch(event._id, {
+      state: args.state,
+    });
 
     return event;
   },
 });
 
 export const createOnlineEvent = mutation({
-  args: onlineEventsSchemaValidator,
+  args: {
+    ...onlineEventsSchema,
+    slug: v.optional(v.string()),
+    state: v.optional(onlineEventStateValues),
+  },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new ConvexError("Not authenticated");
@@ -98,6 +160,7 @@ export const createOnlineEvent = mutation({
     const slug = slugify(args.name, { lower: true, strict: true });
     const event = await ctx.db.insert("onlineEvents", {
       name: args.name,
+      img: args.img,
       slug: slug,
       description: args.description,
       requirements: args.requirements,
@@ -109,6 +172,7 @@ export const createOnlineEvent = mutation({
       price: args.price,
       capacity: args.capacity,
       regDeadline: args.regDeadline,
+      state: args.state ?? "draft",
     });
     return event;
   },
@@ -118,6 +182,8 @@ export const updateOnlineEvent = mutation({
   args: {
     ...onlineEventsSchema,
     eventId: v.id("onlineEvents"),
+    slug: v.optional(v.string()),
+    state: v.optional(onlineEventStateValues),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
@@ -131,13 +197,34 @@ export const updateOnlineEvent = mutation({
     const event = await ctx.db.get(args.eventId);
     if (!event) throw new ConvexError("Event not found");
 
+    const slug = args.name
+      ? slugify(args.name, { lower: true, strict: true })
+      : event.slug;
+
+    const eventData = {
+      name: args.name ?? event.name,
+      slug,
+      img: args.img ?? event.img,
+      imgStorageId: args.imgStorageId ?? event.imgStorageId,
+      description: args.description ?? event.description ?? "",
+      requirements: args.requirements ?? event.requirements ?? [],
+      startDate: args.startDate ?? event.startDate ?? Date.now(),
+      endDate: args.endDate ?? event.endDate ?? Date.now(),
+      regDeadline: args.regDeadline ?? event.regDeadline ?? Date.now(),
+      location: args.location ?? event.location ?? "",
+      terms: args.terms ?? event.terms ?? [],
+      organizer: args.organizer ?? event.organizer ?? userId,
+      price: args.price ?? event.price ?? 15,
+      capacity: {
+        ...event.capacity,
+        max: args.capacity?.max ?? event.capacity.max ?? 20,
+      },
+      updatedBy: userId,
+      updatedAt: Date.now(),
+    };
+
     await ctx.db.patch(event._id, {
-      name: args.name,
-      description: args.description,
-      requirements: args.requirements,
-      startDate: args.startDate,
-      endDate: args.endDate,
-      location: args.location,
+      ...eventData,
     });
   },
 });
@@ -334,11 +421,16 @@ export const updateRegistration = mutation({
         if (voucher?.redeemed === false) {
           const initialVoucherAmt = voucher.amount;
           const newVoucherAmt = initialVoucherAmt - event.price;
-          if (newVoucherAmt < 0)
+          if (newVoucherAmt < 0) {
+            await ctx.db.patch(registration._id, {
+              paid: false,
+            });
+
             return {
-              error: `Voucher amount (${initialVoucherAmt}) is less than the event price (${event.price})`,
+              error: `Voucher amount ($${initialVoucherAmt}) is less than the event price ($${event.price})`,
               status: "error",
             };
+          }
 
           await ctx.db.patch(voucher._id, {
             amount: newVoucherAmt,
@@ -356,7 +448,6 @@ export const updateRegistration = mutation({
           // });
           return { error: "Voucher already redeemed", status: "error" };
         }
-        return { error: "No voucher found", status: "error" };
       }
       await ctx.db.patch(registration._id, {
         canceled: false,
@@ -405,7 +496,7 @@ export const checkRegistration = query({
   },
 });
 
-export const getUserVouchers = query({
+export const getUserVoucher = query({
   args: {
     userId: v.id("users"),
   },
@@ -414,22 +505,11 @@ export const getUserVouchers = query({
     const user = await ctx.db.get(userId);
     if (!user) return null;
 
-    const vouchers = await ctx.db
+    const voucher = await ctx.db
       .query("eventVouchers")
-      .withIndex("by_userId_reedemed", (q) =>
-        q.eq("userId", userId).eq("redeemed", false),
-      )
-      .collect();
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .first();
 
-    const voucherTotal = vouchers.reduce((acc, voucher) => {
-      return acc + voucher.amount;
-    }, 0);
-
-    console.log(voucherTotal);
-
-    return {
-      vouchers,
-      voucherTotal,
-    };
+    return voucher;
   },
 });

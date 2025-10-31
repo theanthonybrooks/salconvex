@@ -10,6 +10,7 @@ import {
   ArtistColumnProps,
   artistColumns,
 } from "@/features/admin/dashboard/artist-columns";
+import { extraColumns } from "@/features/admin/dashboard/extras-column";
 import { newsletterColumns } from "@/features/admin/dashboard/newsletter-columns";
 import { userColumns } from "@/features/admin/dashboard/user-columns";
 import { applicationColumns } from "@/features/artists/applications/components/events-data-table/application-columns";
@@ -53,6 +54,7 @@ export function AdminDashboardTableWrapper({
   const usersPage = page === "users";
   const artistsPage = page === "artists";
   const newsletterPage = page === "newsletter";
+  const extrasPage = page === "extras";
 
   const usersData = useQuery(
     api.users.usersWithSubscriptions,
@@ -71,6 +73,13 @@ export function AdminDashboardTableWrapper({
     api.artists.artistQueries.getActiveArtists,
     artistsPage ? {} : "skip",
   );
+
+  const extrasData = useQuery(
+    api.userAddOns.onlineEvents.getAllOnlineEvents,
+    extrasPage ? {} : "skip",
+  );
+
+  console.log(extrasData);
 
   return (
     <>
@@ -114,6 +123,52 @@ export function AdminDashboardTableWrapper({
               className="mx-auto w-full max-w-[80dvw] overflow-x-auto sm:max-w-[90vw]"
               outerContainerClassName={cn("lg:hidden")}
               defaultSort={{ id: `lastEditedAt`, desc: true }}
+            />
+          </div>
+        </>
+      )}
+      {extrasPage && (
+        <>
+          <div className="hidden max-h-full w-full px-10 pb-10 pt-7 lg:block">
+            <h3 className="mb-3 text-xl">Online Events</h3>
+            <DataTable
+              columns={extraColumns}
+              data={extrasData?.events ?? []}
+              defaultVisibility={{
+                description: false,
+                terms: false,
+                requirements: false,
+                location: false,
+                updatedAt: false,
+                createdAt: false,
+                img: false,
+              }}
+              adminActions={adminActions}
+              tableType="extras"
+              pageType="dashboard"
+              defaultSort={{ id: `startDate`, desc: true }}
+              pageSize={50}
+            />
+          </div>
+          <div className="flex flex-col items-center justify-center gap-4 py-7 lg:hidden">
+            <DataTable
+              columns={extraColumns}
+              data={extrasData?.events ?? []}
+              defaultVisibility={{
+                description: false,
+                terms: false,
+                requirements: false,
+                location: false,
+                updatedAt: false,
+                createdAt: false,
+                img: false,
+              }}
+              defaultSort={{ id: `startDate`, desc: true }}
+              adminActions={adminActions}
+              tableType="extras"
+              pageType="dashboard"
+              className="mx-auto w-full max-w-[80dvw] overflow-x-auto sm:max-w-[90vw]"
+              outerContainerClassName={cn("lg:hidden")}
             />
           </div>
         </>

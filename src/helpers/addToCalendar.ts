@@ -194,7 +194,7 @@ export const generateGeneralICSFile = (
   // console.log("formattedIsoDisplayEnd", formattedIsoDisplayEnd)
   // console.log("formattedIsoStart", formattedIsoStart)
   // console.log("formattedIsoEnd", formattedIsoEnd)
-  console.log(urlFormatted);
+  // console.log(urlFormatted);
   const icsContent = `
 BEGIN:VCALENDAR
 VERSION:2.0

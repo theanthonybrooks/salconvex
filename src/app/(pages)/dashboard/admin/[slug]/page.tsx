@@ -1,12 +1,13 @@
 import { redirect } from "next/navigation";
-import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
-import { api } from "~/convex/_generated/api";
-import { fetchQuery } from "convex/nextjs";
 
 import { KanbanBoard } from "@/components/ui/kanban/kanban-board";
 import { AdminDashboardTableWrapper } from "@/features/admin/dashboard/admin-dashboard-table-wrapper";
 import AnalyticsPage from "@/features/dashboard/posthog-analytics";
 import { AdminEventForm } from "@/features/events/submission-form/admin-organizer-form";
+
+import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
+import { api } from "~/convex/_generated/api";
+import { fetchQuery } from "convex/nextjs";
 
 export default async function AdminPage({
   params,
@@ -59,6 +60,8 @@ export default async function AdminPage({
       return <AdminDashboardTableWrapper page="applications" />;
     case "newsletter":
       return <AdminDashboardTableWrapper page="newsletter" />;
+    case "extras":
+      return <AdminDashboardTableWrapper page="extras" />;
     default:
       redirect("/dashboard/admin");
   }

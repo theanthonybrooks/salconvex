@@ -7,6 +7,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { EventRegistrationSchema } from "@/schemas/public";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { capitalize } from "lodash";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 
@@ -42,13 +43,8 @@ import { cn } from "@/helpers/utilsFns";
 
 import { api } from "~/convex/_generated/api";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
-import { useQueries } from "convex-helpers/react/cache";
-import {
-  useAction,
-  useConvex,
-  useMutation,
-  usePreloadedQuery,
-} from "convex/react";
+import { useQueries, useQuery } from "convex-helpers/react/cache";
+import { useAction, useMutation, usePreloadedQuery } from "convex/react";
 import { ConvexError } from "convex/values";
 
 type CheckoutPageProps = {
@@ -56,9 +52,10 @@ type CheckoutPageProps = {
 };
 
 export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
-  const convex = useConvex();
   const router = useRouter();
-  const event = usePreloadedQuery(preloaded);
+  const queryResult = usePreloadedQuery(preloaded);
+  const event = queryResult?.data;
+  const eventIsDraft = event?.state === "draft";
 
   const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
   const { preloadedUserData, preloadedSubStatus } = useConvexPreload();
@@ -84,6 +81,13 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
       ? { eventId: event._id, email: user.email }
       : "skip",
   );
+  const voucher = useQuery(
+    api.userAddOns.onlineEvents.getUserVoucher,
+    user ? { userId: user?._id } : "skip",
+  );
+  const voucherTotal = voucher?.amount ?? 0;
+  const voucherCoversPrice = voucherTotal >= eventPrice;
+  // console.log({ voucherTotal, eventPrice, voucherCoversPrice });
   const { paid, canceled, registration } = userIsRegistered ?? {};
   const activeRegistration = paid && !canceled;
   const canceledRegistration = paid && canceled;
@@ -176,35 +180,20 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
     const registrationEmail = user?.email ?? values.email;
 
     let url: string | undefined;
-    let signedOutPremium = false;
 
     try {
-      if (!user) {
-        const result = await convex.query(
-          api.subscriptions.checkSubscriptionWithEmail,
-          {
-            email: registrationEmail,
-          },
-        );
-        if (
-          result?.hasActiveSubscription &&
-          result?.subPlan &&
-          result.subPlan >= 2
-        ) {
-          signedOutPremium = true;
-        }
-      }
       if (!registrationName || !registrationEmail) {
         throw new Error("Name or email not provided");
       }
-
-      await registerForEvent({
-        eventId: event._id,
-        name: registrationName,
-        email: registrationEmail,
-        link: values.link,
-      });
-      if (premiumPlan || !paidEvent || signedOutPremium) {
+      if (!registration) {
+        await registerForEvent({
+          eventId: event._id,
+          name: registrationName,
+          email: registrationEmail,
+          link: values.link,
+        });
+      }
+      if (premiumPlan || !paidEvent) {
         toast.dismiss();
         toast.success("Successfully registered!", {
           onClick: () => toast.dismiss(),
@@ -280,6 +269,11 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
 
   return (
     <div className="mx-auto flex h-full w-full flex-col justify-center sm:max-w-[90vw]">
+      {eventIsDraft && (
+        <p className="mx-auto mb-6 w-max rounded-lg border-1.5 bg-white/30 p-6 text-center text-red-600">
+          This event is a draft. Publish it via the dashboard
+        </p>
+      )}
       <section className="mb-10 flex flex-col items-center gap-10">
         {event.img && (
           <Image
@@ -299,6 +293,7 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
           {name}
         </h1>
         <h2 className="text-lg font-semibold">{`${datePart} @ ${timePart}`}</h2>
+
         {remainingCapacity < 3 && remainingSpace && (
           <p className="-mt-6 text-balance text-center font-bold text-red-600">
             Only {remainingCapacity} space{remainingCapacity > 1 ? "s" : ""}{" "}
@@ -359,7 +354,10 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
             <AccordionContent fontSize={fontSize} className={cn("space-y-2")}>
               <span>
                 <strong>Location:</strong>
-                <p>The event will take place online via {event.location}</p>
+                <p>
+                  The event will take place online via{" "}
+                  {capitalize(event.location)}
+                </p>
               </span>
               <br />
               <span>
@@ -440,7 +438,7 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
             </div>
           ) : (
             <>
-              {canceledRegistration ? (
+              {canceledRegistration && voucherCoversPrice ? (
                 <>
                   {/* <FormError
                     message={
