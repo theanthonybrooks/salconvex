@@ -255,7 +255,7 @@ export const createNewOpenCall = mutation({
 
     const newId = await ctx.db.insert("openCalls", openCallData);
     const newOC = await ctx.db.get(newId);
-    if (newOC) await openCallsAggregate.insert(ctx, newOC);
+    if (newOC) await openCallsAggregate.insertIfDoesNotExist(ctx, newOC);
 
     // await ctx.db.insert("eventOpenCalls", {
     //   eventId: args.eventId,
@@ -570,7 +570,8 @@ export const duplicateOC = mutation({
       lastEditedAt: Date.now(),
     });
     const newEventDoc = await ctx.db.get(newEvent);
-    if (newEventDoc) await eventsAggregate.insert(ctx, newEventDoc);
+    if (newEventDoc)
+      await eventsAggregate.insertIfDoesNotExist(ctx, newEventDoc);
 
     const newOpenCall = await ctx.db.insert("openCalls", {
       adminNoteOC: openCall.adminNoteOC,
@@ -608,7 +609,7 @@ export const duplicateOC = mutation({
       lastUpdatedBy: userId,
     });
     const newOCDoc = await ctx.db.get(newOpenCall);
-    if (newOCDoc) await openCallsAggregate.insert(ctx, newOCDoc);
+    if (newOCDoc) await openCallsAggregate.insertIfDoesNotExist(ctx, newOCDoc);
 
     return { openCall: newOpenCall, event: newEvent };
   },
@@ -658,12 +659,8 @@ export const changeOCStatus = mutation({
   handler: async (ctx, args) => {
     const targetBoth = args.target === "both";
     const userId = await getAuthUserId(ctx);
-    if (!userId) throw new ConvexError("Not authenticated");
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_userId", (q) => q.eq("userId", userId))
-      .unique();
-    if (!user) throw new ConvexError("User not found");
+    const user = userId ? await ctx.db.get(userId) : null;
+    if (!user || !userId) throw new ConvexError("Not authenticated");
     const isAdmin = user.role.includes("admin");
     if (args.newStatus === "published" && !isAdmin)
       throw new ConvexError("You don't have permission to approve events");
@@ -679,6 +676,15 @@ export const changeOCStatus = mutation({
         : args.newStatus || "submitted";
     const approvedBy = isAdmin ? userId : undefined;
     const prevEvent = await ctx.db.get(eventId);
+    if (!prevEvent) {
+      await ctx.runMutation(internal.events.eventLookup.deleteEventLookup, {
+        eventId,
+        openCallOnly: false,
+      });
+      await ctx.db.delete(oc._id);
+      await openCallsAggregate.deleteIfExists(ctx, oc);
+      return null;
+    }
 
     if (targetBoth || outputState === "published") {
       await ctx.db.patch(eventId, {
@@ -692,6 +698,7 @@ export const changeOCStatus = mutation({
         lastEditedAt: Date.now(),
       });
     }
+
     const newEvent = await ctx.db.get(eventId);
     if (newEvent && prevEvent)
       await eventsAggregate.replaceOrInsert(ctx, prevEvent, newEvent);

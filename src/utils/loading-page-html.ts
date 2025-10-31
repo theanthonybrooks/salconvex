@@ -1,5 +1,14 @@
-export function getExternalRedirectHtml(redirectUrl: string, type?: number) {
-  const redirectType = type === 1 ? "Stripe" : "the application site";
+export function getExternalRedirectHtml(
+  redirectUrl: string,
+  type?: number,
+  label?: string,
+) {
+  const redirectType =
+    type === 1
+      ? "Stripe"
+      : type && type > 1
+        ? (label ?? "destination")
+        : "the application site";
   return `
     <html>
       <head>

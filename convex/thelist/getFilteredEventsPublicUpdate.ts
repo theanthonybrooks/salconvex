@@ -339,6 +339,8 @@ export const getFilteredEventsPublic = query({
             .withIndex("by_ocState", (q) => q.eq("ocState", "published"))
             .collect();
         }
+
+        console.log(lookupResults);
       }
     } else if (thisWeekPg || nextWeekPg) {
       if (!hasActiveSubscription) {

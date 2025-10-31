@@ -5,8 +5,11 @@ import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { extrasSchema } from "@/schemas/admin";
+import { getExternalRedirectHtml } from "@/utils/loading-page-html";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
+import slugify from "slugify";
 
 import { LoaderCircle, Trash } from "lucide-react";
 
@@ -163,6 +166,8 @@ export const OnlineEventDialog = ({
     try {
       if (!user) throw new Error("User not found");
       setPending(true);
+      const newTab = window.open("about:blank");
+
       if (type === "edit" && eventId) {
         await updateEvent({
           ...data,
@@ -183,7 +188,21 @@ export const OnlineEventDialog = ({
           },
         });
       }
-      form.reset();
+
+      if (!newTab) {
+        toast.error("Failed to open new tab");
+        return;
+      }
+      const slug = slugify(data.name, { lower: true, strict: true });
+      const url = `/extras/${slug}`;
+      newTab.document.write(
+        getExternalRedirectHtml(url, 2, `the ${data.name} Event`),
+      );
+      newTab.document.close();
+      newTab.location.href = url;
+      form.reset({
+        ...defaultValues,
+      });
       setOpen(false);
     } catch (err) {
       console.error("Failed to update event:", err);

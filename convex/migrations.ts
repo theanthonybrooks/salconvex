@@ -272,6 +272,7 @@ export const clearEventsAggregate2 = migrations.define({
   table: "events",
   migrateOne: async (ctx, event) => {
     await eventsAggregate.clear(ctx);
+    await openCallsAggregate.clear(ctx);
   },
 });
 
@@ -283,8 +284,8 @@ export const backfillEventsAggregate2 = migrations.define({
 });
 
 export const clearOCAggregate2 = migrations.define({
-  table: "events",
-  migrateOne: async (ctx, event) => {
+  table: "openCalls",
+  migrateOne: async (ctx, doc) => {
     await openCallsAggregate.clear(ctx);
   },
 });
@@ -295,12 +296,17 @@ export const backfillOCAggregate2 = migrations.define({
   },
 });
 
-export const runBFA = migrations.runner([
+export const runCEA = migrations.runner(
   internal.migrations.clearEventsAggregate2,
-  internal.migrations.clearOCAggregate2,
+);
+
+export const runBFA = migrations.runner([
   internal.migrations.backfillEventsAggregate2,
-  internal.migrations.backfillOCAggregate2,
 ]);
+
+export const runBFOA = migrations.runner(
+  internal.migrations.backfillOCAggregate2,
+);
 
 export const runBackfillEA = migrations.runner(
   internal.migrations.backfillEventsAggregate2,

@@ -714,8 +714,9 @@ export const sendEventRegistrationEmail = internalAction({
                           width="300"
                           style="display:block; margin:0 auto; padding-bottom:20px;"
                         />
-                        <p
+                        <h2
                           style="text-transform:uppercase; font-weight:bold; font-size:1.2rem; text-align:start; margin:30px 0"
+                          class="heading"
                         >
                           ${action === "cancel"
                             ? "Cancellation"
@@ -723,7 +724,7 @@ export const sendEventRegistrationEmail = internalAction({
                               ? "Registration"
                               : "Renewal"}
                           Confirmation
-                        </p>
+                        </h2>
                         <hr />
 
                         <p

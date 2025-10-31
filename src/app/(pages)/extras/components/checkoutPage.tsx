@@ -294,15 +294,20 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
         </h1>
         <h2 className="text-lg font-semibold">{`${datePart} @ ${timePart}`}</h2>
 
-        {remainingCapacity < 3 && remainingSpace && (
+        {remainingCapacity <= 3 && remainingSpace && (
           <p className="-mt-6 text-balance text-center font-bold text-red-600">
             Only {remainingCapacity} space{remainingCapacity > 1 ? "s" : ""}{" "}
             left!
           </p>
         )}
+        {!remainingSpace && (
+          <p className="-mt-6 text-balance text-center font-bold text-red-600">
+            This event is fully booked!
+          </p>
+        )}
         <p className="text-balance text-center font-medium">
-          <strong>Price:</strong> ${eventPrice} or free for users with Banana or
-          Fatcap memberships
+          <strong>Price:</strong> Free for users with Banana or Fatcap
+          memberships. ${eventPrice} otherwise.
         </p>
       </section>
       <div className={cn("grid gap-5 px-8 pb-10 sm:grid-cols-[60%_50px_auto]")}>
@@ -455,10 +460,17 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
                     height={250}
                     className="mb-6 rounded-full"
                   />
-                  <p>You&apos;ve cancelled your registration for this event.</p>
+                  <p className={cn("mb-2 text-balance text-center", fontSize)}>
+                    You&apos;ve cancelled your registration for this event.
+                  </p>
                   {remainingSpace ? (
                     <>
-                      <p className="mb-2">
+                      <p
+                        className={cn(
+                          "mb-2 text-balance text-center",
+                          fontSize,
+                        )}
+                      >
                         Had a change of schedule? Renew your registration.
                       </p>
                       <Button
@@ -505,7 +517,7 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
                     }
                     className={cn("mb-4 w-full")}
                   />
-                  <p className="mb-2">
+                  <p className={cn("mb-2 text-balance text-center", fontSize)}>
                     Can&apos;t attend? You can cancel your registration below.
                   </p>
                   <Button

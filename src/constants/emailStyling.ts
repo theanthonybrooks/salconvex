@@ -122,6 +122,12 @@ export const newsletterStyling = html`
       padding: 10px;
     }
 
+    @media only screen and (max-width: 420px) {
+      .content {
+        padding: 20px !important;
+      }
+    }
+
     /* -------------------------------------
         HEADER, FOOTER, MAIN
     ------------------------------------- */
@@ -210,6 +216,12 @@ export const newsletterStyling = html`
     }
     a:hover {
       text-decoration: underline;
+    }
+
+    .heading {
+      font-size: 1.2rem;
+      text-align: start;
+      margin: 30px 0;
     }
 
     /* -------------------------------------

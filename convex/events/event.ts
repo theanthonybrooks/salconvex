@@ -513,10 +513,7 @@ export const getSubmittedEventCount = query({
   handler: async (ctx) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) return null;
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_userId", (q) => q.eq("userId", userId))
-      .unique();
+    const user = await ctx.db.get(userId);
     if (!user) throw new ConvexError("User not found");
     const isAdmin = user?.role?.includes("admin");
     if (!isAdmin)
@@ -1228,26 +1225,14 @@ export const createOrUpdateEvent = mutation({
       throw new ConvexError("Event name is required");
     }
 
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_userId", (q) => q.eq("userId", userId))
-      .unique();
+    const user = await ctx.db.get(userId);
 
     if (!user) {
       throw new ConvexError("User not found");
     }
     const isAdmin = user?.role.includes("admin");
-    // console.log("isAdmin", isAdmin);
     const organization = await ctx.db.get(args.mainOrgId);
-    // console.log("organization", organization);
-    // console.log(organization?.links);
     const linksLength = Object.keys(args.links ?? {}).length;
-    // const links = !args.links
-    //   ? { sameAsOrganizer: false }
-    //   : linksSameAsOrg || linksLength === 1
-    //     ? { ...organization?.links, sameAsOrganizer: true }
-    //     : { ...args.links, sameAsOrganizer: false };
-
     const links = !args.links
       ? { sameAsOrganizer: false }
       : linksSameAsOrg || (args.finalStep && linksLength === 1)
@@ -1292,10 +1277,8 @@ export const createOrUpdateEvent = mutation({
 
     if (event) {
       const isOwner = event.mainOrgId === args.mainOrgId || isAdmin;
-      // console.log("isOwner", isOwner);
       if (!isOwner)
         throw new ConvexError("You don't have permission to update this event");
-      console.log("patching");
 
       const existingFormType =
         typeof event.formType === "number" && event.formType > 0
@@ -1307,7 +1290,6 @@ export const createOrUpdateEvent = mutation({
           ? args.formType
           : existingFormType;
 
-      // console.log(existingFormType, updatedFormType);
       const oldEvent = event;
       await ctx.db.patch(event._id, {
         formType: updatedFormType,
@@ -1345,7 +1327,7 @@ export const createOrUpdateEvent = mutation({
 
       const updatedEvent = await ctx.db.get(event._id);
       if (updatedEvent)
-        await eventsAggregate.replace(ctx, oldEvent, updatedEvent);
+        await eventsAggregate.replaceOrInsert(ctx, oldEvent, updatedEvent);
       if (updatedEvent?.approvedAt) {
         await ctx.runMutation(
           internal.events.eventLookup.addUpdateEventLookup,
@@ -1354,11 +1336,9 @@ export const createOrUpdateEvent = mutation({
           },
         );
       }
-      // console.log("updatedEvent", updatedEvent);
       return { event: updatedEvent };
     }
 
-    // console.log("inserting");
     const eventId = await ctx.db.insert("events", {
       formType: args.formType,
       name: args.name.trim(),
@@ -1395,7 +1375,7 @@ export const createOrUpdateEvent = mutation({
       lastEditedAt: Date.now(),
     });
     const newEvent = await ctx.db.get(eventId);
-    if (newEvent) await eventsAggregate.insert(ctx, newEvent);
+    if (newEvent) await eventsAggregate.insertIfDoesNotExist(ctx, newEvent);
     return { event: newEvent };
   },
 });
@@ -1408,10 +1388,7 @@ export const updateEventStatus = mutation({
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new Error("Not authenticated");
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_userId", (q) => q.eq("userId", userId))
-      .unique();
+    const user = await ctx.db.get(userId);
     if (!user) throw new Error("User not found");
     const isAdmin = user.role.includes("admin");
     if (!isAdmin)
@@ -1550,9 +1527,8 @@ export const archiveEvent = mutation({
       });
       const newOpenCall = await ctx.db.get(openCall._id);
       if (newOpenCall)
-        await openCallsAggregate.replace(ctx, oldOpenCall, newOpenCall);
+        await openCallsAggregate.replaceOrInsert(ctx, oldOpenCall, newOpenCall);
     }
-    console.log("hello");
 
     const oldDoc = event;
     await ctx.db.patch(event._id, {
@@ -1561,7 +1537,7 @@ export const archiveEvent = mutation({
       lastEditedBy: userId,
     });
     const newDoc = await ctx.db.get(event._id);
-    if (newDoc) await eventsAggregate.replace(ctx, oldDoc, newDoc);
+    if (newDoc) await eventsAggregate.replaceOrInsert(ctx, oldDoc, newDoc);
     await ctx.runMutation(internal.events.eventLookup.addUpdateEventLookup, {
       eventId: args.eventId,
     });
@@ -1631,7 +1607,7 @@ export const duplicateEvent = mutation({
       lastEditedAt: Date.now(),
     });
     const newEvent = await ctx.db.get(newEventId);
-    if (newEvent) await eventsAggregate.insert(ctx, newEvent);
+    if (newEvent) await eventsAggregate.insertIfDoesNotExist(ctx, newEvent);
 
     return { event: newEventId };
   },
@@ -1665,12 +1641,11 @@ export const deleteEvent = mutation({
       .query("openCalls")
       .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
       .collect();
-
     for (const openCall of openCalls) {
       //TODO: Delete open call docs and any associated rows/files
 
       await ctx.db.delete(openCall._id);
-      await openCallsAggregate.delete(ctx, openCall);
+      await openCallsAggregate.deleteIfExists(ctx, openCall);
     }
 
     if (event.logoStorageId && event.logoStorageId !== orgLogoStorageId) {
@@ -1679,7 +1654,7 @@ export const deleteEvent = mutation({
     }
     const oldEvent = event;
     await ctx.db.delete(event._id);
-    if (oldEvent) await eventsAggregate.delete(ctx, oldEvent);
+    if (oldEvent) await eventsAggregate.deleteIfExists(ctx, oldEvent);
 
     console.log("deleting event lookup");
     await ctx.runMutation(internal.events.eventLookup.deleteEventLookup, {

@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+
 import { FaCheckCircle } from "react-icons/fa";
 
 import { cn } from "@/helpers/utilsFns";
@@ -18,7 +19,7 @@ export const FormSuccess = ({ message, className, icon }: FormSuccessProps) => {
         className,
       )}
     >
-      {icon ? icon : <FaCheckCircle className="size-4" />}
+      {icon ? icon : <FaCheckCircle className="size-6 shrink-0" />}
       <span className="text-balance text-center"> {message}</span>
     </div>
   );
