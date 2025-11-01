@@ -37,6 +37,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { SelectSimple } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { cn } from "@/helpers/utilsFns";
 
@@ -129,6 +130,7 @@ export const OnlineEventDialog = ({
       current: 0,
     },
     organizer: user?._id ?? "",
+    organizerBio: "",
     terms: [],
     requirements: [],
   };
@@ -372,9 +374,12 @@ export const OnlineEventDialog = ({
               name="regDeadline"
               render={({ field }) => (
                 <FormItem className="col-span-3 w-full">
-                  <FormLabel className="font-bold">Reg Deadline</FormLabel>
+                  <FormLabel className="font-bold">
+                    Registration Deadline
+                  </FormLabel>
                   <FormControl>
                     <DateTimePickerField
+                      minDate={Date.now()}
                       value={field.value}
                       onChange={field.onChange}
                     />
@@ -390,11 +395,6 @@ export const OnlineEventDialog = ({
                 <FormItem className="col-span-3 w-full">
                   <FormLabel className="font-bold">Start Date</FormLabel>
                   <FormControl>
-                    {/* <Input
-                      {...field}
-                      placeholder="Start Date"
-                      className="w-full "
-                    /> */}
                     <DateTimePickerField
                       value={field.value}
                       onChange={field.onChange}
@@ -499,51 +499,6 @@ export const OnlineEventDialog = ({
                   View {showAllReqs ? "Less" : "More"}
                 </span>
               </div>
-              {/* <div className="space-y-2">
-                {formReqs
-                  ?.slice(0, showAllReqs ? formReqs.length || 1 : 1)
-
-                  .map((req, i) => {
-                    const isFirst = i === 0;
-                    return (
-                      <div key={i} className={cn("flex w-full gap-y-1")}>
-                        <Input
-                          value={req}
-                          onChange={(e) => {
-                            const newReqs = [...formReqs];
-                            newReqs[i] = e.target.value;
-                            setValue("requirements", newReqs);
-                          }}
-                          className={cn("w-full")}
-                        />
-                        {!isFirst && (
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            onClick={() =>
-                              setValue(
-                                "requirements",
-                                formReqs.filter((_, j) => j !== i),
-                              )
-                            }
-                            className="hover:scale-105 hover:text-red-600 active:scale-95"
-                          >
-                            <Trash className="size-5" />
-                          </Button>
-                        )}
-                      </div>
-                    );
-                  })}
-                {formReqs?.[formReqs.length - 1]?.trim() && showAllReqs && (
-                  <Button
-                    variant="ghost"
-                    type="button"
-                    onClick={() => setValue("requirements", [...formReqs, ""])}
-                  >
-                    + Add Requirement
-                  </Button>
-                )}
-              </div> */}
               <div className="space-y-2">
                 {(formReqs.length === 0 ? [""] : formReqs)
                   .slice(0, showAllReqs ? formReqs.length || 1 : 1)
@@ -551,7 +506,7 @@ export const OnlineEventDialog = ({
                     const isFirst = i === 0;
                     return (
                       <div key={i} className="flex w-full gap-y-1">
-                        <Input
+                        <Textarea
                           value={req}
                           onChange={(e) => {
                             const newReqs = [
@@ -560,7 +515,7 @@ export const OnlineEventDialog = ({
                             newReqs[i] = e.target.value;
                             setValue("requirements", newReqs);
                           }}
-                          className="w-full"
+                          className="w-full resize-none bg-card"
                         />
                         {!isFirst && (
                           <Button
@@ -606,50 +561,7 @@ export const OnlineEventDialog = ({
                   View {showAllTerms ? "Less" : "More"}
                 </span>{" "}
               </div>
-              {/* <div className="space-y-2">
-                {formTerms
-                  ?.slice(0, showAllTerms ? formTerms.length || 1 : 1)
 
-                  .map((req, i) => {
-                    const isFirst = i === 0;
-                    return (
-                      <div key={i} className="flex gap-2">
-                        <Input
-                          value={req}
-                          onChange={(e) => {
-                            const newReqs = [...formTerms];
-                            newReqs[i] = e.target.value;
-                            setValue("terms", newReqs);
-                          }}
-                        />
-                        {!isFirst && (
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            onClick={() =>
-                              setValue(
-                                "terms",
-                                formTerms.filter((_, j) => j !== i),
-                              )
-                            }
-                            className="hover:scale-105 hover:text-red-600 active:scale-95"
-                          >
-                            <Trash className="size-5" />
-                          </Button>
-                        )}
-                      </div>
-                    );
-                  })}
-                {formTerms?.[formTerms.length - 1]?.trim() && showAllTerms && (
-                  <Button
-                    variant="ghost"
-                    type="button"
-                    onClick={() => setValue("terms", [...formTerms, ""])}
-                  >
-                    + Add Term
-                  </Button>
-                )}
-              </div> */}
               <div className="space-y-2">
                 {(formTerms.length === 0 ? [""] : formTerms)
                   .slice(0, showAllTerms ? formTerms.length || 1 : 1)
@@ -657,7 +569,7 @@ export const OnlineEventDialog = ({
                     const isFirst = i === 0;
                     return (
                       <div key={i} className="flex w-full gap-y-1">
-                        <Input
+                        <Textarea
                           value={req}
                           onChange={(e) => {
                             const newReqs = [
@@ -666,7 +578,7 @@ export const OnlineEventDialog = ({
                             newReqs[i] = e.target.value;
                             setValue("terms", newReqs);
                           }}
-                          className="w-full"
+                          className="w-full resize-none bg-card"
                         />
                         {!isFirst && (
                           <Button
@@ -699,7 +611,26 @@ export const OnlineEventDialog = ({
                 )}
               </div>
             </FormItem>
-
+            <FormField
+              control={form.control}
+              name="organizerBio"
+              render={({ field }) => (
+                <FormItem className="col-span-full">
+                  <FormLabel className="font-bold">Organizer Bio</FormLabel>
+                  <FormControl>
+                    <RichTextEditor
+                      value={field.value ?? ""}
+                      onChange={field.onChange}
+                      placeholder="A bit about the organizer"
+                      charLimit={2500}
+                      formInputPreview
+                      inputPreviewContainerClassName="rounded-lg border-gray-300"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <div
               className={cn(
                 "col-span-full mt-4 flex w-full flex-col-reverse items-center justify-between gap-2 px-3 sm:mt-2 sm:flex-row",

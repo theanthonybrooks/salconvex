@@ -14,6 +14,7 @@ export const extrasSchema = z.object({
     current: z.number().optional(),
   }),
   organizer: z.string().optional(),
+  organizerBio: z.string(),
   terms: z
     .array(z.string().trim().min(1, "Term cannot be empty"))
     .min(1, "At least one term is required"),

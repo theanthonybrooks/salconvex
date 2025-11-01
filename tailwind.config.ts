@@ -230,7 +230,6 @@ export default {
         "80dvw": "80dvw",
         dvw: "100dvw",
         screen: "100vw",
-        
       },
       height: {
         "12.5": "50px",
@@ -246,6 +245,7 @@ export default {
         "30": "120px",
         "50": "200px",
         "70": "280px",
+        "75": "300px",
       },
       fontSize: {
         "2xs": "0.6rem",

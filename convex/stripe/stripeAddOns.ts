@@ -207,33 +207,6 @@ export const addOnStoreWebhook = mutation({
         const registeredUserId = baseObject.metadata.userId as Id<"users">;
         const voucherId = baseObject.metadata.voucherId as Id<"eventVouchers">;
         const voucherAmount = baseObject.metadata.voucherTotal as number;
-        // console.log(baseObject.metadata);
-        // {
-        //   accountType: 'artist',
-        //   interval: 'month',
-        //   openCallId: '',
-        //   plan: 'original',
-        //   userEmail: 'newacc@thestreetartlist.com',
-        //   userId: 'mh7c2z6vq780jv39ac74ewkn6h7sm7fv'
-        // }
-        // Also, in the base object is a key called "client_reference_id" that has the user's _id value.
-
-        // email = baseObject.customer_details.email
-        // userId = baseObject.client_reference_id;
-        // console.log(
-        //   "metadata.userId: ",
-        //   userId,
-        //   "metadata.email: ",
-        //   metadata.email,
-        //   "client_reference_id (userId): ",
-        //   baseObject.client_reference_id,
-        // );
-
-        // console.log(
-        //   "payment status: ",
-        //   baseObject.payment_status,
-        //   paymentStatus,
-        // );
         const formattedEmail = metadata.email?.toLowerCase();
         const event = await ctx.db.get(eventId);
         if (!event) throw new Error("Event not found for : " + eventId);
@@ -304,30 +277,23 @@ export const addOnStoreWebhook = mutation({
         break;
 
       // ...
-      //!! SECTION: --------------------------------------------------------------------
 
       case "checkout.session.expired":
         console.log("checkout.session.expired");
         break;
 
-      //!! SECTION: --------------------------------------------------------------------
-
       case "invoice.created":
         console.log("invoice.created:", args.body);
         break;
-      //!! SECTION: --------------------------------------------------------------------
 
-      //!! SECTION: --------------------------------------------------------------------
       case "customer.discount.created":
         console.log("customer.discount.created");
         break;
 
-      //!! SECTION: --------------------------------------------------------------------
       case "customer.discount.deleted":
         console.log("customer.discount.deleted");
         break;
 
-      //!! SECTION: --------------------------------------------------------------------
       case "invoice.payment_succeeded":
         console.log("invoice.payment_succeeded");
 

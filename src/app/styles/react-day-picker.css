@@ -1,18 +1,21 @@
 /* Variables declaration */
 .rdp-root {
-  --rdp-accent-color: blue; /* The accent color used for selected days and UI elements. */
+  --rdp-accent-color: var(
+    --foreground
+  ); /* The accent color used for selected days and UI elements. */
   --rdp-accent-background-color: #f0f0ff; /* The accent background color used for selected days and UI elements. */
 
   --rdp-day-height: 44px; /* The height of the day cells. */
   --rdp-day-width: 44px; /* The width of the day cells. */
 
-  --rdp-day_button-border-radius: 100%; /* The border radius of the day cells. */
+  --rdp-day_button-border-radius: 25%; /* The border radius of the day cells. */
   --rdp-day_button-border: 2px solid transparent; /* The border of the day cells. */
   --rdp-day_button-height: 42px; /* The height of the day cells. */
   --rdp-day_button-width: 42px; /* The width of the day cells. */
 
-  --rdp-selected-border: 2px solid var(--rdp-accent-color); /* The border of the selected days. */
-  --rdp-disabled-opacity: 0.5; /* The opacity of the disabled days. */
+  --rdp-selected-border: 2px solid hsl(var(--foreground)); /* The border of the selected days. */
+
+  --rdp-disabled-opacity: 0.3; /* The opacity of the disabled days. */
   --rdp-outside-opacity: 0.75; /* The opacity of the days outside the current month. */
   --rdp-today-color: var(
     --rdp-accent-color
@@ -22,7 +25,7 @@
 
   --rdp-months-gap: 2rem; /* The gap between the months in the multi-month view. */
 
-  --rdp-nav_button-disabled-opacity: 0.5; /* The opacity of the disabled navigation buttons. */
+  --rdp-nav_button-disabled-opacity: 0.3; /* The opacity of the disabled navigation buttons. */
   --rdp-nav_button-height: 2.25rem; /* The height of the navigation buttons. */
   --rdp-nav_button-width: 2.25rem; /* The width of the navigation buttons. */
   --rdp-nav-height: 2.75rem; /* The height of the navigation bar. */
@@ -113,6 +116,13 @@
   height: var(--rdp-day_button-height);
   border: var(--rdp-day_button-border);
   border-radius: var(--rdp-day_button-border-radius);
+  width: 1.5rem;
+  height: 1.75rem;
+  margin-inline: auto;
+
+  &:hover {
+    background: hsl(var(--sal-pink-lt-hover));
+  }
 }
 
 .rdp-day_button:disabled {
@@ -208,6 +218,7 @@
 
 .rdp-dropdown_root[data-disabled="true"] .rdp-chevron {
   opacity: var(--rdp-disabled-opacity);
+  /* color: hsl(var(--foreground) / 0.3); */
 }
 
 .rdp-month_caption {
@@ -253,10 +264,15 @@
   flex-wrap: wrap;
   gap: var(--rdp-months-gap);
   max-width: fit-content;
+  margin-inline: auto;
 }
 
 .rdp-month_grid {
   border-collapse: collapse;
+  height: 20rem;
+  border: 1.5px solid hsl(var(--foreground));
+  border-radius: 12px;
+  display: block;
 }
 
 .rdp-nav {
@@ -293,6 +309,13 @@
 /* DAY MODIFIERS */
 .rdp-today:not(.rdp-outside) {
   color: var(--rdp-today-color);
+
+  font-weight: bold;
+  .rdp-day_button {
+    background: hsl(var(--sal-yellow-light));
+    border-radius: var(--rdp-day_button-border-radius);
+    border: 1.5px solid hsl(var(--foreground));
+  }
 }
 
 .rdp-selected {
@@ -302,6 +325,11 @@
 
 .rdp-selected .rdp-day_button {
   border: var(--rdp-selected-border);
+  background: hsl(var(--sal-pink-light));
+  height: 1.5rem;
+  width: 1.75rem;
+  margin-inline: auto;
+  /* border: 2px solid black; */
 }
 
 .rdp-outside {

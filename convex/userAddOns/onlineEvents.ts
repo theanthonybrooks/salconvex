@@ -169,6 +169,7 @@ export const createOnlineEvent = mutation({
       endDate: args.endDate,
       location: args.location,
       organizer: userId,
+      organizerBio: args.organizerBio,
       price: args.price,
       capacity: args.capacity,
       regDeadline: args.regDeadline,

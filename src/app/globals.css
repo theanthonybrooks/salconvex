@@ -3,6 +3,8 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@import "./styles/react-day-picker.css";
 /* @font-face {
   font-family: "Tanker-Regular";
   src: url("/fonts/tanker/Tanker-Regular.ttf") format("truetype");

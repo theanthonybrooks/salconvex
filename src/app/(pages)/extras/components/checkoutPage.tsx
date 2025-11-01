@@ -129,6 +129,7 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
     requirements,
     terms,
     regDeadline,
+    organizerBio,
   } = event;
   const remainingCapacity = capacity.max - capacity.current;
   const remainingSpace = remainingCapacity > 0;
@@ -373,6 +374,12 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
               <p className="text-sm italic">
                 All times are displayed in your local timezone.
               </p>
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem value="organizer">
+            <AccordionTrigger title="Organizer:" fontSize={fontSize} />
+            <AccordionContent fontSize={fontSize}>
+              <RichTextDisplay html={organizerBio} fontSize={fontSize} />
             </AccordionContent>
           </AccordionItem>
         </Accordion>

@@ -942,6 +942,7 @@ export const onlineEventsSchema = {
     max: v.number(),
     current: v.number(),
   }),
+  organizerBio: v.string(),
 
   terms: v.array(v.string()),
   updatedAt: v.optional(v.number()),

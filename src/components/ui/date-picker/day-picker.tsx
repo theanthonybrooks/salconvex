@@ -1,16 +1,16 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { format } from "date-fns";
 import { DayPicker } from "react-day-picker";
 
+import { ScrollableTimeList } from "@/components/ui/date-picker/scrollable-time-list";
 import {
   Dialog,
   DialogContent,
+  DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-
-import "react-day-picker/style.css";
 
 type DayPickerProps = {
   value?: number;
@@ -19,47 +19,57 @@ type DayPickerProps = {
   minDate?: number;
 };
 
+// --- Helper to generate time list (every 30 min + 11:59 PM) ---
+function generateTimeOptions(): string[] {
+  const times: string[] = [];
+  for (let h = 0; h < 24; h++) {
+    for (let m = 0; m < 60; m += 30) {
+      const hour12 = ((h + 11) % 12) + 1;
+      const suffix = h < 12 ? "AM" : "PM";
+      const minuteStr = m.toString().padStart(2, "0");
+      times.push(`${hour12}:${minuteStr} ${suffix}`);
+    }
+  }
+  times.push("11:59 PM");
+  return times;
+}
+
 export function DateTimePickerField({
   value: initialValue,
   onChange,
   label = "Select date and time",
   minDate,
 }: DayPickerProps) {
+  const [open, setOpen] = useState(false);
+
   const initialDate = initialValue ? new Date(initialValue) : undefined;
   const [date, setDate] = useState<Date | undefined>(initialDate);
-  const [timeStr, setTimeStr] = useState<string>(
-    initialDate
-      ? `${initialDate.getHours().toString().padStart(2, "0")}:${initialDate
-          .getMinutes()
-          .toString()
-          .padStart(2, "0")}`
-      : "00:00",
-  );
+  const [timeStr, setTimeStr] = useState<string>(() => {
+    if (!initialDate) return "12:00 AM";
+    let h = initialDate.getHours();
+    const m = initialDate.getMinutes();
+    const suffix = h < 12 ? "AM" : "PM";
+    h = ((h + 11) % 12) + 1;
+    return `${h}:${m.toString().padStart(2, "0")} ${suffix}`;
+  });
+
+  const timeOptions = useMemo(() => generateTimeOptions(), []);
   const startMonth = minDate ? new Date(minDate) : new Date();
-  const minTime = (() => {
-    if (!minDate || !date) return undefined;
-    const min = startMonth;
-    const sameDay =
-      date.getFullYear() === min.getFullYear() &&
-      date.getMonth() === min.getMonth() &&
-      date.getDate() === min.getDate();
+  const thisYear = new Date().getFullYear();
+  const inFiveYears = thisYear + 5;
 
-    return sameDay
-      ? `${min.getHours().toString().padStart(2, "0")}:${min
-          .getMinutes()
-          .toString()
-          .padStart(2, "0")}`
-      : undefined;
-  })();
-
-  const formattedDisplay = date
-    ? format(date, "MMM d, yy @ HH:mm a") // e.g. "Oct 30, 14:45"
-    : "";
-
+  // --- Handle date selection ---
   const handleDateSelect = (d: Date | undefined) => {
     setDate(d);
     if (d) {
-      const [h, m] = timeStr.split(":").map(Number);
+      const match = timeStr.match(/^(\d{1,2}):(\d{2})\s?(AM|PM)$/i);
+      if (!match) return;
+      const [hourStr, minuteStr, period] = match;
+      let h = parseInt(hourStr, 10);
+      const m = parseInt(minuteStr, 10);
+      if (period.toUpperCase() === "PM" && h < 12) h += 12;
+      if (period.toUpperCase() === "AM" && h === 12) h = 0;
+
       const updated = new Date(d);
       updated.setHours(h);
       updated.setMinutes(m);
@@ -69,87 +79,84 @@ export function DateTimePickerField({
     }
   };
 
-  //   const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //     const newTime = e.target.value;
-  //     setTimeStr(newTime);
-  //     if (date) {
-  //       const [h, m] = newTime.split(":").map(Number);
-  //       const updated = new Date(date);
-  //       updated.setHours(h);
-  //       updated.setMinutes(m);
-  //       onChange(updated.getTime());
-  //     }
-  //   };
-  const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newTime = e.target.value;
-    const [h, m] = newTime.split(":").map(Number);
-
+  // --- Handle time selection from list ---
+  const handleTimeSelect = (time: string) => {
     if (!date) return;
 
-    const updated = new Date(date);
-    updated.setHours(h);
-    updated.setMinutes(m);
+    const [hourStr, minuteStr, period] = time.split(/[:\s]/);
+    let hour = parseInt(hourStr);
+    const minute = parseInt(minuteStr);
+    if (period === "PM" && hour < 12) hour += 12;
+    if (period === "AM" && hour === 12) hour = 0;
 
-    // Prevent selecting a time earlier than minDate (same day only)
+    const updated = new Date(date);
+    updated.setHours(hour);
+    updated.setMinutes(minute);
+
+    // enforce minDate (same logic you already had)
     if (minDate) {
-      const min = startMonth;
+      const min = new Date(minDate);
       const sameDay =
         updated.getFullYear() === min.getFullYear() &&
         updated.getMonth() === min.getMonth() &&
         updated.getDate() === min.getDate();
-
-      if (sameDay && updated.getTime() < min.getTime()) {
-        // Clamp to minimum valid time
-        setTimeStr(
-          `${min.getHours().toString().padStart(2, "0")}:${min
-            .getMinutes()
-            .toString()
-            .padStart(2, "0")}`,
-        );
-        onChange(min.getTime());
-        return;
-      }
+      if (sameDay && updated.getTime() < min.getTime()) return;
     }
 
-    setTimeStr(newTime);
+    setTimeStr(time);
     onChange(updated.getTime());
   };
 
+  // --- Sync external initial value ---
   useEffect(() => {
     if (initialValue) {
       const newDate = new Date(initialValue);
       setDate(newDate);
-      setTimeStr(
-        `${newDate.getHours().toString().padStart(2, "0")}:${newDate
-          .getMinutes()
-          .toString()
-          .padStart(2, "0")}`,
-      );
+      let h = newDate.getHours();
+      const m = newDate.getMinutes();
+      const suffix = h < 12 ? "AM" : "PM";
+      h = ((h + 11) % 12) + 1;
+      setTimeStr(`${h}:${m.toString().padStart(2, "0")} ${suffix}`);
     }
   }, [initialValue]);
 
-  // <>
-  //   <DayPicker mode="single" selected={date} onSelect={handleDateSelect} />
-  //   <input type="time" value={timeStr} onChange={handleTimeChange} />
-  // </>
-  const thisYear = new Date().getFullYear();
-  const inFiveYears = thisYear + 5;
+  const formattedDisplay = date ? format(date, "MMM d, yy @ h:mm a") : "";
 
   return (
-    <Dialog>
-      <DialogTitle className="sr-only">Select Date and Time</DialogTitle>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogHeader className="sr-only">
+        <DialogTitle>Select Date and Time</DialogTitle>
+      </DialogHeader>
+
       <DialogTrigger asChild>
         <div className="relative w-full">
           <Input
             readOnly
             value={formattedDisplay}
-            placeholder={label || "Select date and time"}
+            placeholder={label}
             className="cursor-pointer"
           />
         </div>
       </DialogTrigger>
 
-      <DialogContent className="space-y-4 sm:max-w-[400px]">
+      <DialogContent
+        className="flex items-end justify-center gap-6 bg-card px-4 sm:max-w-lg"
+        onOpenAutoFocus={() => {
+          // delay one frame so layout is ready
+          requestAnimationFrame(() => {
+            const selectedButton = document.querySelector(
+              "button.selected-time",
+            ) as HTMLElement | null;
+            if (selectedButton) {
+              selectedButton.scrollIntoView({
+                block: "center",
+                behavior: "instant",
+              });
+            }
+          });
+        }}
+      >
+        {/* Date Picker */}
         <DayPicker
           mode="single"
           selected={date}
@@ -159,20 +166,92 @@ export function DateTimePickerField({
           startMonth={startMonth}
           endMonth={new Date(inFiveYears, 0)}
           disabled={{ before: new Date(minDate ?? 0) }}
+          required
         />
-        <div className="flex items-center gap-2">
-          <label htmlFor="time" className="text-sm font-medium">
-            Time:
-          </label>
-          <input
-            id="time"
-            type="time"
-            min={minTime}
-            value={timeStr}
-            onChange={handleTimeChange}
-            className="rounded-md border border-input bg-background p-2 text-sm"
-          />
-        </div>
+
+        {/* Time List */}
+        <ScrollableTimeList
+          timeOptions={timeOptions}
+          timeStr={timeStr}
+          handleTimeSelect={handleTimeSelect}
+          date={date}
+          minDate={minDate}
+        />
+
+        {/* <div className="relative w-full">
+          {canScrollUp && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="pointer-events-none absolute left-0 right-0 top-0 flex h-6 justify-center bg-gradient-to-b from-background/90 to-transparent"
+            >
+              <ChevronUp className="h-3 w-3 text-muted-foreground opacity-60" />
+            </motion.div>
+          )}
+
+          <motion.div
+            ref={timeListRef}
+            className="scrollable mini invis mt-5 flex max-h-80 w-fit flex-col items-center rounded-xl border-1.5 p-1 px-4 text-sm"
+          >
+            {timeOptions.map((t) => {
+              const isSelected = t === timeStr;
+              let isDisabled = false;
+
+              if (minDate && date) {
+                const min = new Date(minDate);
+                const sameDay =
+                  date.getFullYear() === min.getFullYear() &&
+                  date.getMonth() === min.getMonth() &&
+                  date.getDate() === min.getDate();
+
+                if (sameDay) {
+                  // Convert the candidate time string ("4:30 PM") to a comparable Date
+                  const [hourStr, minuteStr, period] = t.split(/[:\s]/);
+                  let hour = parseInt(hourStr);
+                  const minute = parseInt(minuteStr);
+                  if (period === "PM" && hour < 12) hour += 12;
+                  if (period === "AM" && hour === 12) hour = 0;
+
+                  const candidate = new Date(date);
+                  candidate.setHours(hour);
+                  candidate.setMinutes(minute);
+
+                  if (candidate.getTime() < min.getTime()) {
+                    isDisabled = true;
+                  }
+                }
+              }
+
+              return (
+                <button
+                  key={t}
+                  onClick={() => !isDisabled && handleTimeSelect(t)}
+                  disabled={isDisabled}
+                  className={cn(
+                    "rounded-lg border-1.5 border-transparent p-1 px-2 text-foreground transition-colors",
+                    isSelected
+                      ? "selected-time border-1.5 border-foreground bg-salPinkLt font-medium"
+                      : "hover:bg-salPinkLtHover",
+                    isDisabled && "pointer-events-none opacity-40",
+                  )}
+                >
+                  {t}
+                </button>
+              );
+            })}
+          </motion.div>
+          {canScrollDown && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="pointer-events-none absolute bottom-0 left-0 right-0 flex h-6 justify-center bg-gradient-to-t from-background/90 to-transparent"
+            >
+              <ChevronDown className="h-3 w-3 text-muted-foreground opacity-60" />
+            </motion.div>
+          )}
+        </div> */}
       </DialogContent>
     </Dialog>
   );
