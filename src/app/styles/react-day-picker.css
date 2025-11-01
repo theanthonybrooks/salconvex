@@ -227,6 +227,9 @@
   height: var(--rdp-nav-height);
   font-weight: bold;
   font-size: large;
+  @media (width <= 768px) {
+    margin-bottom: 0.825rem;
+  }
 }
 
 .rdp-root[data-nav-layout="around"] .rdp-month,

@@ -2,7 +2,9 @@ import { useEffect, useMemo, useState } from "react";
 import { format } from "date-fns";
 import { DayPicker } from "react-day-picker";
 
+import { CustomDropdownNav } from "@/components/ui/date-picker/custom-caption";
 import { ScrollableTimeList } from "@/components/ui/date-picker/scrollable-time-list";
+import { MobileTimePicker } from "@/components/ui/date-picker/scrollable-time-list-mobile";
 import {
   Dialog,
   DialogContent,
@@ -11,6 +13,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { useDevice } from "@/providers/device-provider";
 
 type DayPickerProps = {
   value?: number;
@@ -40,6 +43,7 @@ export function DateTimePickerField({
   label = "Select date and time",
   minDate,
 }: DayPickerProps) {
+  const { isMobile } = useDevice();
   const [open, setOpen] = useState(false);
 
   const initialDate = initialValue ? new Date(initialValue) : undefined;
@@ -140,7 +144,8 @@ export function DateTimePickerField({
       </DialogTrigger>
 
       <DialogContent
-        className="flex items-end justify-center gap-6 bg-card px-4 sm:max-w-lg"
+        zIndex="z-[33]"
+        className="flex flex-col items-center justify-center gap-6 bg-card px-4 pt-10 sm:max-w-lg md:flex-row md:items-end md:pt-5"
         onOpenAutoFocus={() => {
           // delay one frame so layout is ready
           requestAnimationFrame(() => {
@@ -167,16 +172,43 @@ export function DateTimePickerField({
           endMonth={new Date(inFiveYears, 0)}
           disabled={{ before: new Date(minDate ?? 0) }}
           required
+          hideNavigation
+          components={{
+            DropdownNav: CustomDropdownNav,
+          }}
         />
 
+        {/* //note-to-self: has a timeZone prop. */}
+
         {/* Time List */}
-        <ScrollableTimeList
-          timeOptions={timeOptions}
-          timeStr={timeStr}
-          handleTimeSelect={handleTimeSelect}
-          date={date}
-          minDate={minDate}
-        />
+        {!isMobile && (
+          <ScrollableTimeList
+            timeOptions={timeOptions}
+            timeStr={timeStr}
+            handleTimeSelect={handleTimeSelect}
+            date={date}
+            minDate={minDate}
+          />
+        )}
+
+        {isMobile && (
+          <MobileTimePicker
+            date={date}
+            minDate={minDate}
+            onChange={(newDate) => {
+              if (!newDate) {
+                onChange(undefined);
+                return;
+              }
+
+              // enforce minDate
+              if (minDate && newDate.getTime() < minDate) return;
+
+              setDate(newDate);
+              onChange(newDate.getTime());
+            }}
+          />
+        )}
 
         {/* <div className="relative w-full">
           {canScrollUp && (
