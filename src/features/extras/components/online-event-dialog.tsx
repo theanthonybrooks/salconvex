@@ -408,9 +408,9 @@ export const OnlineEventDialog = ({
                   }
                 }}
                 initialImage={eventData?.img}
-                className="gap-4 pr-8"
-                size={200}
-                height={100}
+                className="gap-4"
+                size={isMobile ? 250 : 200}
+                height={isMobile ? 125 : 100}
                 showFullImage
                 loading={uploading}
               />
