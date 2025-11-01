@@ -3,6 +3,7 @@ import { motion, useMotionValueEvent, useScroll } from "framer-motion";
 
 import { ChevronDown, ChevronUp } from "lucide-react";
 
+import { Separator } from "@/components/ui/separator";
 import { cn } from "@/helpers/utilsFns";
 
 interface ScrollableTimeListProps {
@@ -47,7 +48,8 @@ export function ScrollableTimeList({
         ref={ref}
         className="scrollable mini invis flex h-full max-h-[inherit] w-fit flex-col items-center p-1 px-3 text-sm"
       >
-        {timeOptions.map((t) => {
+        {timeOptions.map((t, i) => {
+          const isFirst = i === 0;
           const isSelected = t === timeStr;
           let isDisabled = false;
 
@@ -76,20 +78,23 @@ export function ScrollableTimeList({
           }
 
           return (
-            <button
-              key={t}
-              onClick={() => !isDisabled && handleTimeSelect(t)}
-              disabled={isDisabled}
-              className={cn(
-                "rounded-lg border-1.5 border-transparent p-1 px-2 text-foreground transition-colors",
-                isSelected
-                  ? "selected-time border-1.5 border-foreground bg-salPinkLt font-medium"
-                  : "hover:bg-salPinkLtHover",
-                isDisabled && "pointer-events-none opacity-20",
-              )}
-            >
-              {t}
-            </button>
+            <>
+              <button
+                key={t}
+                onClick={() => !isDisabled && handleTimeSelect(t)}
+                disabled={isDisabled}
+                className={cn(
+                  "rounded-lg border-1.5 border-transparent p-1 px-2 text-foreground transition-colors",
+                  isSelected
+                    ? "selected-time border-1.5 border-foreground bg-salPinkLt font-medium"
+                    : "hover:bg-salPinkLtHover",
+                  isDisabled && "pointer-events-none opacity-20",
+                )}
+              >
+                {t}
+              </button>
+              {isFirst && <Separator thickness={1} className={cn("my-1")} />}
+            </>
           );
         })}
       </motion.div>

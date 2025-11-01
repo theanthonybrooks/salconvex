@@ -21,9 +21,11 @@ type LogoUploaderProps = {
   className?: string;
   reset?: boolean;
   size?: number;
+  height?: number;
   disabled?: boolean;
   tabIndex?: number;
   loading?: boolean;
+  showFullImage?: boolean;
 };
 
 export default function LogoUploader({
@@ -36,8 +38,10 @@ export default function LogoUploader({
   tabIndex = 0,
   disabled,
   size = 80,
+  height = size,
   imageOnly = false,
   loading = false,
+  showFullImage = false,
 }: LogoUploaderProps) {
   const shownErrorUrls = useRef<Set<string>>(new Set());
 
@@ -66,14 +70,16 @@ export default function LogoUploader({
 
     try {
       const { objectUrl } = await fetchImageAsObjectURL(url);
+
       setOriginalImage(objectUrl);
-      setImageForCropping(objectUrl);
-      setEditMode(true);
+      setCroppedPreviewUrl(objectUrl);
+
+      if (!showFullImage) {
+        setImageForCropping(objectUrl);
+        setEditMode(true);
+      }
     } catch (error) {
       console.error("Failed to fetch image:", error);
-      // toast.error(
-      //   "Could not load image from URL. Make sure it's a valid, public image",
-      // );
       if (!shownErrorUrls.current.has(url)) {
         shownErrorUrls.current.add(url);
         toast.dismiss();
@@ -86,7 +92,17 @@ export default function LogoUploader({
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) openCropperWithFile(file);
+    if (!file) return;
+
+    if (showFullImage) {
+      // Skip crop modal — upload directly
+      onChangeAction(file);
+      const objectUrl = URL.createObjectURL(file);
+      setOriginalImage(objectUrl);
+      setCroppedPreviewUrl(objectUrl);
+    } else {
+      openCropperWithFile(file);
+    }
   };
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
@@ -133,8 +149,12 @@ export default function LogoUploader({
             imageForCropping ? "border-solid" : "border-dashed",
             disabled &&
               "cursor-default text-muted-foreground hover:bg-transparent",
+            showFullImage && "rounded border-none focus:ring-0",
+            showFullImage &&
+              !croppedPreviewUrl &&
+              "border-dashed border-foreground/30",
           )}
-          style={{ height: size, width: size }}
+          style={{ height, width: size }}
           onClick={() => fileInputRef.current?.click()}
           tabIndex={tabIndex}
           role="button"
@@ -166,22 +186,27 @@ export default function LogoUploader({
               src={croppedPreviewUrl}
               alt="Avatar preview"
               width={size}
-              height={size}
-              className="rounded-full bg-card object-cover"
+              height={height}
+              className={cn(
+                "rounded-full bg-card object-cover",
+                showFullImage && "rounded-none bg-transparent",
+              )}
             />
           ) : (
             <span className="text-center text-sm text-gray-400">+ Upload</span>
           )}
 
-          <div
-            className={cn(
-              "absolute bottom-0 right-3 flex size-5 translate-x-[45%] cursor-pointer items-center justify-center overflow-hidden rounded-full border-1.5 bg-emerald-500 hover:scale-110 hover:bg-emerald-400 active:scale-95",
-              disabled &&
-                "cursor-default bg-muted-foreground hover:scale-100 hover:bg-muted-foreground",
-            )}
-          >
-            <PlusIcon className="size-4 text-white" />
-          </div>
+          {!showFullImage && (
+            <div
+              className={cn(
+                "absolute bottom-0 right-3 flex size-5 translate-x-[45%] cursor-pointer items-center justify-center overflow-hidden rounded-full border-1.5 bg-emerald-500 hover:scale-110 hover:bg-emerald-400 active:scale-95",
+                disabled &&
+                  "cursor-default bg-muted-foreground hover:scale-100 hover:bg-muted-foreground",
+              )}
+            >
+              <PlusIcon className="size-4 text-white" />
+            </div>
+          )}
         </div>
         {!imageOnly && (
           <>
@@ -214,26 +239,28 @@ export default function LogoUploader({
             )}
             {(imageForCropping || originalImage) && (
               <div className="flex w-full items-center gap-2">
-                <Button
-                  type="button"
-                  variant="salWithShadowHidden"
-                  onClick={() => {
-                    if (originalImage) {
-                      setImageForCropping(originalImage);
-                      setEditMode(true);
-                    }
-                  }}
-                  className="flex-1"
-                >
-                  {loading ? (
-                    <div className="flex flex-row items-center gap-2">
-                      <LoaderCircle className="h-4 w-4 animate-spin" />
-                      Uploading...
-                    </div>
-                  ) : (
-                    `Edit`
-                  )}
-                </Button>
+                {!showFullImage && (
+                  <Button
+                    type="button"
+                    variant="salWithShadowHidden"
+                    onClick={() => {
+                      if (originalImage) {
+                        setImageForCropping(originalImage);
+                        setEditMode(true);
+                      }
+                    }}
+                    className="flex-1"
+                  >
+                    {loading ? (
+                      <div className="flex flex-row items-center gap-2">
+                        <LoaderCircle className="h-4 w-4 animate-spin" />
+                        Uploading...
+                      </div>
+                    ) : (
+                      `Edit`
+                    )}
+                  </Button>
+                )}
                 <Button
                   type="button"
                   variant="salWithShadowHidden"

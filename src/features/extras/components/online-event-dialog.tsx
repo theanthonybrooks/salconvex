@@ -2,8 +2,7 @@ import type { ExtrasType } from "@/schemas/admin";
 import type { User } from "@/types/user";
 import type { ReactNode } from "react";
 
-import { useEffect, useState } from "react";
-import Image from "next/image";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { extrasSchema } from "@/schemas/admin";
 import { getExternalRedirectHtml } from "@/utils/loading-page-html";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -16,7 +15,10 @@ import { LoaderCircle, Trash } from "lucide-react";
 import type { Id } from "~/convex/_generated/dataModel";
 import { StaffUserSelector } from "@/components/ui/admin/userSelector";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { DateTimePickerField } from "@/components/ui/date-picker/day-picker";
+import { DebouncedControllerInput } from "@/components/ui/debounced-form-input";
+import { DebouncedFormTextarea } from "@/components/ui/debounced-form-textarea";
 import {
   Dialog,
   DialogContent,
@@ -35,11 +37,13 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import LogoUploader from "@/components/ui/logo-uploader";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { SelectSimple } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { cn } from "@/helpers/utilsFns";
+import { useDevice } from "@/providers/device-provider";
 
 import { api } from "~/convex/_generated/api";
 import { useQuery } from "convex-helpers/react/cache";
@@ -57,39 +61,22 @@ type OnlineEventDialogProps = {
   type?: "edit" | "create";
 };
 
-// const eventData: {
-//     _id: Id<"onlineEvents">;
-//     _creationTime: number;
-//     updatedAt?: number | undefined;
-//     img?: string | undefined;
-//     updatedBy?: Id<"users"> | undefined;
-//     organizer: Id<"users">;
-//     name: string;
-//     location: string;
-//     slug: string;
-//     requirements: string[];
-//     description: string;
-//     regDeadline: number;
-//     startDate: number;
-//     endDate: number;
-//     price: number;
-//     capacity: {
-//         max: number;
-//         current: number;
-//     };
-//     terms: string[];
-// } | null | undefined
-
 export const OnlineEventDialog = ({
   eventId,
   children,
   type = "edit",
 }: OnlineEventDialogProps) => {
+  const { isMobile } = useDevice();
+  const organizerRef = useRef<User | null>(null);
   const { preloadedUserData } = useConvexPreload();
   const [open, setOpen] = useState(false);
   const [pending, setPending] = useState(false);
   const [showAllReqs, setShowAllReqs] = useState(true);
   const [showAllTerms, setShowAllTerms] = useState(true);
+  const [redirectOnSuccess, setRedirectOnSuccess] = useState(false);
+  const [uploading, setUploading] = useState(false);
+
+  const [logoFile, setLogoFile] = useState<Blob | null>(null);
 
   const queryResult = useQuery(
     api.userAddOns.onlineEvents.getOnlineEvent,
@@ -105,35 +92,49 @@ export const OnlineEventDialog = ({
   const updateEvent = useMutation(
     api.userAddOns.onlineEvents.updateOnlineEvent,
   );
-
   const createEvent = useMutation(
     api.userAddOns.onlineEvents.createOnlineEvent,
   );
+
+  const uploadEventImage = useMutation(
+    api.userAddOns.onlineEvents.uploadOnlineEventImage,
+  );
+
+  const removeEventImage = useMutation(
+    api.userAddOns.onlineEvents.removeOnlineEventImage,
+  );
+
+  const generateUploadUrl = useMutation(api.uploads.files.generateUploadUrl);
   const userData = usePreloadedQuery(preloadedUserData);
   const user = userData?.user ?? null;
   const isAdmin = user?.role?.includes("admin") ?? false;
 
-  const { img, name, organizer } = eventData ?? {};
+  const { imgStorageId } = eventData ?? {};
 
   // console.log(eventData, eventId);
-  const defaultValues = {
-    name: "",
-    img: "",
-    description: "",
-    location: "",
-    startDate: Date.now(),
-    endDate: Date.now(),
-    regDeadline: Date.now(),
-    price: 15,
-    capacity: {
-      max: 20,
-      current: 0,
-    },
-    organizer: user?._id ?? "",
-    organizerBio: "",
-    terms: [],
-    requirements: [],
-  };
+
+  const defaultValues = useMemo(
+    () => ({
+      name: "",
+      img: "",
+      description: "",
+      location: isAdmin ? "google meet" : "",
+      startDate: Date.now(),
+      endDate: Date.now(),
+      regDeadline: Date.now(),
+      price: 15,
+      capacity: {
+        max: 20,
+        current: 0,
+      },
+      organizer: type === "create" ? user?._id : "",
+      organizerBio: "",
+      terms: isAdmin ? ["(placeholder - term)"] : [],
+
+      requirements: isAdmin ? ["(placeholder - requirement)"] : [],
+    }),
+    [user?._id, type, isAdmin],
+  );
 
   const form = useForm<ExtrasType>({
     resolver: zodResolver(extrasSchema),
@@ -141,13 +142,8 @@ export const OnlineEventDialog = ({
     mode: "onChange",
     delayError: 1000,
   });
-  const organizerData = useQuery(
-    api.users.getUserById,
-    organizer ? { id: organizer } : "skip",
-  );
-  const [currentUser, setCurrentUser] = useState<User | null>(
-    organizerData ?? null,
-  );
+
+  const [currentUser, setCurrentUser] = useState<User | null>(user ?? null);
   const {
     handleSubmit,
     watch,
@@ -158,6 +154,12 @@ export const OnlineEventDialog = ({
   const formData = watch();
   const formReqs = formData.requirements;
   const formTerms = formData.terms;
+  const organizer = formData.organizer;
+
+  const organizerData = useQuery(
+    api.users.getUserById,
+    organizer ? { id: organizer as Id<"users"> } : "skip",
+  );
 
   const startDateVal = formData.startDate;
   const regDeadlineVal = formData.regDeadline;
@@ -168,7 +170,11 @@ export const OnlineEventDialog = ({
     try {
       if (!user) throw new Error("User not found");
       setPending(true);
-      const newTab = window.open("about:blank");
+      let newTab: Window | null = null;
+      if (redirectOnSuccess) {
+        newTab = window.open("about:blank");
+      }
+      let onlineEventId: Id<"onlineEvents"> | undefined = eventId;
 
       if (type === "edit" && eventId) {
         await updateEvent({
@@ -181,7 +187,7 @@ export const OnlineEventDialog = ({
           },
         });
       } else {
-        await createEvent({
+        onlineEventId = await createEvent({
           ...data,
           organizer: (data.organizer ?? user._id) as Id<"users">,
           capacity: {
@@ -190,18 +196,28 @@ export const OnlineEventDialog = ({
           },
         });
       }
-
-      if (!newTab) {
-        toast.error("Failed to open new tab");
-        return;
+      if (logoFile) {
+        if (onlineEventId) {
+          await handleLogoUpload(logoFile, onlineEventId);
+          setLogoFile(null);
+        } else {
+          throw new Error("Error creating an event before uploading an image");
+        }
       }
-      const slug = slugify(data.name, { lower: true, strict: true });
-      const url = `/extras/${slug}`;
-      newTab.document.write(
-        getExternalRedirectHtml(url, 2, `the ${data.name} Event`),
-      );
-      newTab.document.close();
-      newTab.location.href = url;
+
+      if (redirectOnSuccess) {
+        if (!newTab) {
+          toast.error("Failed to open new tab");
+          return;
+        }
+        const slug = slugify(data.name, { lower: true, strict: true });
+        const url = `/extras/${slug}`;
+        newTab.document.write(
+          getExternalRedirectHtml(url, 2, `the ${data.name} Event`),
+        );
+        newTab.document.close();
+        newTab.location.href = url;
+      }
       form.reset({
         ...defaultValues,
       });
@@ -222,22 +238,132 @@ export const OnlineEventDialog = ({
     }, 100);
   };
 
-  useEffect(() => {
-    if (organizer) return;
-    if (currentUser && currentUser._id !== organizer) {
-      setValue("organizer", currentUser._id);
+  const handleLogoUpload = async (
+    file: Blob,
+    onlineEventId: Id<"onlineEvents">,
+  ) => {
+    setUploading(true);
+
+    if (!onlineEventId)
+      throw new Error("Create an event before uploading an image");
+    try {
+      const uploadUrl = await generateUploadUrl();
+      const response = await fetch(uploadUrl, {
+        method: "POST",
+        headers: { "Content-Type": file.type },
+        body: file,
+      });
+      if (!response.ok) throw new Error("Failed to upload event image");
+
+      const { storageId } = await response.json();
+
+      const result = await uploadEventImage({
+        storageId,
+        eventId: onlineEventId,
+      });
+      if (result.success) {
+        toast.success("Event image updated successfully!", {
+          autoClose: 2000,
+          pauseOnHover: false,
+          hideProgressBar: true,
+          closeButton: false,
+        });
+      } else {
+        throw new Error("Failed to update event image");
+      }
+    } catch (err: unknown) {
+      let message: string;
+      if (err instanceof Error) {
+        message = err.message;
+      } else {
+        message = "An unexpected error occurred";
+      }
+
+      console.error("Upload error:", err);
+      toast.error(message, {
+        autoClose: 2000,
+        pauseOnHover: false,
+        hideProgressBar: true,
+      });
+    } finally {
+      setUploading(false);
     }
-  }, [currentUser, setValue, organizer]);
+  };
+
+  const handleImgRemoval = async () => {
+    if (!eventData || !imgStorageId) return;
+
+    try {
+      setUploading(true);
+      await removeEventImage({
+        storageId: imgStorageId,
+        eventId: eventData._id,
+      });
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to remove event image", {
+        autoClose: 2000,
+        pauseOnHover: false,
+        hideProgressBar: true,
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
 
   useEffect(() => {
-    if (eventData) {
+    const createType = type === "create";
+
+    if (createType) {
+      if (!currentUser) {
+        setCurrentUser(user);
+        return;
+      } else if (currentUser._id !== organizer) {
+        setValue("organizer", currentUser._id, { shouldDirty: true });
+      }
+    } else {
+      if (!organizerData) return;
+      if (!organizerRef.current) {
+        organizerRef.current = organizerData;
+        setCurrentUser(organizerData);
+        return;
+      }
+
+      if (currentUser && currentUser !== organizerRef.current) {
+        organizerRef.current = currentUser;
+        setValue("organizer", currentUser._id, { shouldDirty: true });
+      }
+    }
+  }, [type, currentUser, user, organizerData, setValue, organizer]);
+
+  // useEffect(() => {
+  //   if (eventData) {
+  //     form.reset({
+  //       ...eventData,
+  //       requirements: eventData.requirements ?? [],
+  //       terms: eventData.terms ?? [],
+  //     });
+  //   }
+  // }, [eventData, form]);
+
+  useEffect(() => {
+    if (!open) {
+      form.reset(defaultValues);
+
+      setCurrentUser(null);
+      setUploading(false);
+      setRedirectOnSuccess(false);
+      setShowAllReqs(true);
+      setShowAllTerms(true);
+      organizerRef.current = null;
+    } else if (eventData) {
       form.reset({
         ...eventData,
         requirements: eventData.requirements ?? [],
         terms: eventData.terms ?? [],
       });
     }
-  }, [eventData, form]);
+  }, [open, defaultValues, form, eventData]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -255,7 +381,7 @@ export const OnlineEventDialog = ({
             className={cn("flex items-center justify-between gap-4 pl-2 pr-6")}
           >
             <DialogTitle>
-              {img ? (
+              {/* {img ? (
                 <Image
                   src={img}
                   alt={name ?? "Event Image"}
@@ -266,7 +392,26 @@ export const OnlineEventDialog = ({
                 <p className="my-3 text-center font-tanker text-4xl lowercase tracking-wide md:text-[3rem]">
                   {name}
                 </p>
-              )}
+              )} */}
+              <LogoUploader
+                imageOnly={isMobile}
+                id="logo-upload"
+                onChangeAction={(file) => setLogoFile(file)}
+                // onChangeAction={handleLogoUpload}
+                onRemoveAction={() => {
+                  if (logoFile) {
+                    setLogoFile(null);
+                  } else {
+                    handleImgRemoval();
+                  }
+                }}
+                initialImage={eventData?.img}
+                className="gap-4 pr-8"
+                size={200}
+                height={100}
+                showFullImage
+                loading={uploading}
+              />
             </DialogTitle>
             <div className={cn("flex items-center gap-4")}>
               <p>Organizer:</p>
@@ -284,7 +429,7 @@ export const OnlineEventDialog = ({
         <Form {...form}>
           <form
             onSubmit={handleSubmit(handleUpdate)}
-            className="items-start gap-4 sm:grid sm:grid-cols-[repeat(12,_minmax(0,1fr))] [@media(max-height:768px)]:space-y-2"
+            className="items-start gap-4 sm:grid sm:grid-cols-[repeat(12,_minmax(0,1fr))] [@media(max-height:620px)]:space-y-2"
           >
             <FormField
               control={form.control}
@@ -293,8 +438,9 @@ export const OnlineEventDialog = ({
                 <FormItem className="col-span-6 w-full">
                   <FormLabel className="font-bold">Name</FormLabel>
                   <FormControl>
-                    <Input
-                      {...field}
+                    <DebouncedControllerInput
+                      tabIndex={1}
+                      field={field}
                       placeholder="Name of event"
                       className="w-full"
                     />
@@ -460,6 +606,7 @@ export const OnlineEventDialog = ({
                       onChange={field.onChange}
                       placeholder="Full details about the event "
                       charLimit={5000}
+                      requiredChars={10}
                       formInputPreview
                       inputPreviewContainerClassName="rounded-lg border-gray-300"
                     />
@@ -504,35 +651,48 @@ export const OnlineEventDialog = ({
                   .slice(0, showAllReqs ? formReqs.length || 1 : 1)
                   .map((req, i) => {
                     const isFirst = i === 0;
+                    const isEmpty = !req?.trim();
+
                     return (
-                      <div key={i} className="flex w-full gap-y-1">
-                        <Textarea
-                          value={req}
-                          onChange={(e) => {
-                            const newReqs = [
-                              ...(formReqs.length === 0 ? [""] : formReqs),
-                            ];
-                            newReqs[i] = e.target.value;
-                            setValue("requirements", newReqs);
-                          }}
-                          className="w-full resize-none bg-card"
-                        />
-                        {!isFirst && (
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            onClick={() =>
-                              setValue(
-                                "requirements",
-                                formReqs.filter((_, j) => j !== i),
-                              )
-                            }
-                            className="hover:scale-105 hover:text-red-600 active:scale-95"
-                          >
-                            <Trash className="size-5" />
-                          </Button>
+                      <FormField
+                        key={i}
+                        control={form.control}
+                        name={`requirements.${i}`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <div className="flex w-full gap-y-1">
+                              <FormControl>
+                                <DebouncedFormTextarea
+                                  field={field}
+                                  maxLength={300}
+                                  placeholder="Enter requirement"
+                                  className={cn(
+                                    "max-h-15 min-h-10 w-full resize-none rounded-lg border-gray-300 bg-card",
+                                    isEmpty && "h-10",
+                                  )}
+                                />
+                              </FormControl>
+
+                              {!isFirst && (
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  onClick={() =>
+                                    setValue(
+                                      "requirements",
+                                      formReqs.filter((_, j) => j !== i),
+                                    )
+                                  }
+                                  className="hover:scale-105 hover:text-red-600 active:scale-95"
+                                >
+                                  <Trash className="size-5" />
+                                </Button>
+                              )}
+                            </div>
+                            <FormMessage />
+                          </FormItem>
                         )}
-                      </div>
+                      />
                     );
                   })}
 
@@ -561,41 +721,53 @@ export const OnlineEventDialog = ({
                   View {showAllTerms ? "Less" : "More"}
                 </span>{" "}
               </div>
-
               <div className="space-y-2">
                 {(formTerms.length === 0 ? [""] : formTerms)
                   .slice(0, showAllTerms ? formTerms.length || 1 : 1)
-                  .map((req, i) => {
+                  .map((term, i) => {
                     const isFirst = i === 0;
+                    const isEmpty = !term?.trim();
+
                     return (
-                      <div key={i} className="flex w-full gap-y-1">
-                        <Textarea
-                          value={req}
-                          onChange={(e) => {
-                            const newReqs = [
-                              ...(formTerms.length === 0 ? [""] : formTerms),
-                            ];
-                            newReqs[i] = e.target.value;
-                            setValue("terms", newReqs);
-                          }}
-                          className="w-full resize-none bg-card"
-                        />
-                        {!isFirst && (
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            onClick={() =>
-                              setValue(
-                                "terms",
-                                formTerms.filter((_, j) => j !== i),
-                              )
-                            }
-                            className="hover:scale-105 hover:text-red-600 active:scale-95"
-                          >
-                            <Trash className="size-5" />
-                          </Button>
+                      <FormField
+                        key={i}
+                        control={form.control}
+                        name={`terms.${i}`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <div className="flex w-full gap-y-1">
+                              <FormControl>
+                                <DebouncedFormTextarea
+                                  field={field}
+                                  maxLength={300}
+                                  placeholder="Enter term"
+                                  className={cn(
+                                    "max-h-15 min-h-10 w-full resize-none rounded-lg border-gray-300 bg-card",
+                                    isEmpty && "h-10",
+                                  )}
+                                />
+                              </FormControl>
+
+                              {!isFirst && (
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  onClick={() =>
+                                    setValue(
+                                      "terms",
+                                      formTerms.filter((_, j) => j !== i),
+                                    )
+                                  }
+                                  className="hover:scale-105 hover:text-red-600 active:scale-95"
+                                >
+                                  <Trash className="size-5" />
+                                </Button>
+                              )}
+                            </div>
+                            <FormMessage />
+                          </FormItem>
                         )}
-                      </div>
+                      />
                     );
                   })}
 
@@ -645,34 +817,48 @@ export const OnlineEventDialog = ({
                   : ""}
               </p>
 
-              <div
-                className={cn(
-                  "flex w-full items-center justify-end gap-2 sm:w-max",
-                )}
-              >
-                <Button
-                  disabled={pending}
-                  variant={pending ? "salWithShadowHidden" : "salWithShadow"}
-                  type="button"
-                  onClick={handleReset}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  disabled={!isValid || pending || !isDirty}
-                  variant={
-                    isValid && isDirty
-                      ? "salWithShadowYlw"
-                      : "salWithShadowHiddenYlw"
-                  }
-                  className="w-full sm:w-40"
-                >
-                  {pending ? (
-                    <LoaderCircle className="size-4 animate-spin" />
-                  ) : (
-                    `Save ${type === "create" ? "Event" : "Changes"}`
+              <div className="flex flex-col items-end gap-8">
+                <div
+                  className={cn(
+                    "flex w-full items-center justify-end gap-2 sm:w-max",
                   )}
-                </Button>
+                >
+                  <Button
+                    disabled={pending}
+                    variant={pending ? "salWithShadowHidden" : "salWithShadow"}
+                    type="button"
+                    onClick={handleReset}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    disabled={!isValid || pending || !isDirty}
+                    variant={
+                      isValid && isDirty
+                        ? "salWithShadowYlw"
+                        : "salWithShadowHiddenYlw"
+                    }
+                    className="w-full sm:w-40"
+                  >
+                    {pending ? (
+                      <LoaderCircle className="size-4 animate-spin" />
+                    ) : (
+                      `Save ${type === "create" ? "Event" : "Changes"}`
+                    )}
+                  </Button>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Checkbox
+                    id="redirect-on-success"
+                    checked={redirectOnSuccess}
+                    onCheckedChange={() =>
+                      setRedirectOnSuccess((prev) => !prev)
+                    }
+                  />
+                  <Label htmlFor="redirect-on-success">
+                    Redirect to event page after saving
+                  </Label>
+                </div>
               </div>
             </div>
           </form>

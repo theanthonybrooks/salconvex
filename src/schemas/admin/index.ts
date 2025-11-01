@@ -13,7 +13,7 @@ export const extrasSchema = z.object({
     max: z.number(),
     current: z.number().optional(),
   }),
-  organizer: z.string().optional(),
+  organizer: z.string(),
   organizerBio: z.string(),
   terms: z
     .array(z.string().trim().min(1, "Term cannot be empty"))

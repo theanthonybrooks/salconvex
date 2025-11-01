@@ -57,7 +57,7 @@ export function DebouncedFormTextarea<
   }, [localValue]);
 
   return (
-    <div className={cn("relative")}>
+    <div className={cn("relative w-full")}>
       <textarea
         {...field}
         ref={textareaRef}
@@ -75,7 +75,7 @@ export function DebouncedFormTextarea<
           className,
         )}
       />
-      <p className="absolute bottom-3 right-3 text-xs text-gray-400">
+      <p className="absolute bottom-3 right-3 bg-card/90 text-xs text-gray-400">
         {localValue.length}/{maxLength}
       </p>
     </div>

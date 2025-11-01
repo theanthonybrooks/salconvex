@@ -29,6 +29,7 @@ type DayPickerProps = {
 
 function generateTimeOptions(): string[] {
   const times: string[] = [];
+  times.push("11:59 PM");
   for (let h = 0; h < 24; h++) {
     for (let m = 0; m < 60; m += 30) {
       const hour12 = ((h + 11) % 12) + 1;
@@ -37,7 +38,7 @@ function generateTimeOptions(): string[] {
       times.push(`${hour12}:${minuteStr} ${suffix}`);
     }
   }
-  times.push("11:59 PM");
+
   return times;
 }
 

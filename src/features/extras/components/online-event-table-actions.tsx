@@ -1,3 +1,7 @@
+"use client";
+
+import { toast } from "react-toastify";
+
 import type { Id } from "~/convex/_generated/dataModel";
 import type { OnlineEventStateType } from "~/convex/schema";
 import { Button } from "@/components/ui/button";
@@ -6,6 +10,7 @@ import { SelectSimple } from "@/components/ui/select";
 
 import { api } from "~/convex/_generated/api";
 import { useMutation } from "convex/react";
+import { ConvexError } from "convex/values";
 
 type OnlineEventBaseProps = {
   eventId: Id<"onlineEvents">;
@@ -34,9 +39,21 @@ export const OnlineEventStatusBtn = ({
         { value: "published", label: "Published" },
       ]}
       value={state}
-      onChangeAction={(value) =>
-        updateEventState({ eventId, state: value as OnlineEventStateType })
-      }
+      onChangeAction={async (value) => {
+        try {
+          await updateEventState({
+            eventId,
+            state: value as OnlineEventStateType,
+          });
+        } catch (error) {
+          if (error instanceof ConvexError) {
+            toast.dismiss();
+            toast.error(error.data);
+          } else {
+            console.error("Failed to update event state:", error);
+          }
+        }
+      }}
       placeholder="Select status"
     />
   );

@@ -129,11 +129,18 @@ export const updateOnlineEventState = mutation({
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new ConvexError("Not authenticated");
-    const user = await ctx.db.get(userId);
+    // const user = await ctx.db.get(userId);
+    // const isAdmin = user?.role?.includes("admin") ?? false;
 
     const event = await ctx.db.get(args.eventId);
 
     if (!event) throw new ConvexError("Event not found");
+    const hasPlaceholderValues =
+      event.terms?.includes("(placeholder - term)") ||
+      event.requirements?.includes("(placeholder - requirement)");
+
+    if (hasPlaceholderValues && event.state === "draft")
+      throw new ConvexError("Event has placeholder values");
 
     await ctx.db.patch(event._id, {
       state: args.state,
@@ -512,5 +519,76 @@ export const getUserVoucher = query({
       .first();
 
     return voucher;
+  },
+});
+
+export const uploadOnlineEventImage = mutation({
+  args: {
+    storageId: v.id("_storage"),
+    eventId: v.id("onlineEvents"),
+  },
+  handler: async (ctx, { storageId, eventId }) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId)
+      return {
+        success: false,
+        message: "Not authenticated",
+        eventId,
+        imageUrl: "",
+      };
+    const fileUrl = await ctx.storage.getUrl(storageId);
+    if (!fileUrl)
+      return {
+        success: false,
+        message: "Failed to retrieve file URL",
+        eventId,
+        imageUrl: "",
+      };
+
+    const event = await ctx.db
+      .query("onlineEvents")
+      .withIndex("by_id", (q) => q.eq("_id", eventId))
+      .unique();
+
+    if (!event) {
+      await ctx.storage.delete(storageId);
+      return {
+        success: false,
+        message: "Event not found",
+        eventId,
+        imageUrl: "",
+      };
+    }
+    await ctx.db.patch(event._id, {
+      img: fileUrl,
+      imgStorageId: storageId,
+    });
+
+    return {
+      success: true,
+      message: "Image uploaded successfully",
+      imageUrl: fileUrl,
+      eventId,
+    };
+  },
+});
+
+export const removeOnlineEventImage = mutation({
+  args: {
+    storageId: v.id("_storage"),
+    eventId: v.optional(v.id("onlineEvents")),
+  },
+  handler: async (ctx, { storageId, eventId }) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+    const event = eventId ? await ctx.db.get(eventId) : null;
+    if (!event) throw new Error("Event not found");
+    await ctx.storage.delete(storageId);
+    await ctx.db.patch(event._id, {
+      img: undefined,
+      imgStorageId: undefined,
+    });
+
+    return { success: true };
   },
 });
