@@ -156,7 +156,7 @@ function Dial({ items, selected, onSelect }: DialProps) {
       >
         {canScrollUp && (
           <div className="pointer-events-none absolute top-0 flex h-8 w-full items-start justify-center bg-gradient-to-b from-card to-transparent">
-            <ChevronUp size={16} className="z-top" />
+            <ChevronUp size={16} className="z-top text-foreground/30" />
           </div>
         )}
         {/* top spacer so first can center */}
@@ -182,7 +182,7 @@ function Dial({ items, selected, onSelect }: DialProps) {
       {/* Bottom chevron */}
       {canScrollDown && (
         <div className="pointer-events-none absolute bottom-0 flex h-8 w-full items-end justify-center bg-gradient-to-t from-card to-transparent">
-          <ChevronDown size={16} className="z-top" />
+          <ChevronDown size={16} className="z-top text-foreground/30" />
         </div>
       )}
     </div>
