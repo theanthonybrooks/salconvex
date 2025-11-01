@@ -117,9 +117,9 @@ function Dial({ items, selected, onSelect }: DialProps) {
           behavior: "smooth",
         });
         if (newValue !== selected) onSelect(newValue);
-        setTimeout(() => setIsSnapping(false), 200);
+        setTimeout(() => setIsSnapping(false), 100);
       }
-    }, 120);
+    }, 50);
   };
 
   useEffect(() => {
