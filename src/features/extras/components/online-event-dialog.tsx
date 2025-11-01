@@ -378,7 +378,9 @@ export const OnlineEventDialog = ({
         </DialogDescription>
         <DialogHeader>
           <div
-            className={cn("flex items-center justify-between gap-4 pl-2 pr-6")}
+            className={cn(
+              "flex flex-col-reverse items-center justify-between gap-4 pl-2 pr-6 sm:flex-row",
+            )}
           >
             <DialogTitle>
               {/* {img ? (
@@ -465,7 +467,7 @@ export const OnlineEventDialog = ({
                       value={field.value ?? ""}
                       onChange={(e) => field.onChange(e.target.valueAsNumber)}
                       placeholder="ex. 15"
-                      className="w-full"
+                      className="w-full text-center"
                     />
                   </FormControl>
                   <FormMessage />
@@ -487,7 +489,7 @@ export const OnlineEventDialog = ({
                       value={field.value ?? ""}
                       onChange={(e) => field.onChange(e.target.valueAsNumber)}
                       placeholder="ex. 10"
-                      className="w-full"
+                      className="w-full text-center"
                     />
                   </FormControl>
                   <FormMessage />
@@ -508,7 +510,7 @@ export const OnlineEventDialog = ({
                       value={field.value ?? ""}
                       onChange={(e) => field.onChange(e.target.valueAsNumber)}
                       placeholder="ex. 10"
-                      className="w-full"
+                      className="w-full text-center"
                     />
                   </FormControl>
                   <FormMessage />
