@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 
+import { ChevronDown, ChevronUp } from "lucide-react";
+
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/helpers/utilsFns";
 
@@ -45,7 +47,7 @@ export function MobileTimePicker({
 
   return (
     <div className="h-30 relative flex w-full max-w-[80dvw] items-center justify-center gap-2 overflow-hidden rounded-xl border-1.5 bg-card p-2">
-      <div className="pointer-events-none absolute left-0 right-0 top-0 flex h-8 items-center justify-center bg-gradient-to-b from-card to-transparent" />
+      <div className="pointer-events-none absolute left-0 right-0 top-0 z-999 flex h-8 items-start justify-around bg-gradient-to-b from-card to-transparent"></div>
       <Dial
         items={hours}
         selected={hour12.toString()}
@@ -67,7 +69,7 @@ export function MobileTimePicker({
           updateDate(hour12.toString(), minute.toString().padStart(2, "0"), val)
         }
       />
-      <div className="pointer-events-none absolute bottom-0 left-0 right-0 flex h-8 items-center justify-center bg-gradient-to-t from-card to-transparent" />
+      <div className="pointer-events-none absolute bottom-0 left-0 right-0 flex h-8 items-end justify-around bg-gradient-to-t from-card to-transparent"></div>
     </div>
   );
 }
@@ -89,9 +91,21 @@ function Dial({ items, selected, onSelect }: DialProps) {
   const [isSnapping, setIsSnapping] = useState(false);
   const scrollTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const [canScrollUp, setCanScrollUp] = useState(false);
+  const [canScrollDown, setCanScrollDown] = useState(false);
+
+  const updateScrollIndicators = () => {
+    if (!ref.current) return;
+    const { scrollTop, scrollHeight, clientHeight } = ref.current;
+    setCanScrollUp(scrollTop > 0);
+    setCanScrollDown(scrollTop + clientHeight < scrollHeight);
+  };
+
   const handleScroll = () => {
     if (isSnapping) return;
     if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
+
+    updateScrollIndicators();
 
     scrollTimeout.current = setTimeout(() => {
       if (!ref.current) return;
@@ -121,7 +135,7 @@ function Dial({ items, selected, onSelect }: DialProps) {
         if (newValue !== selected) onSelect(newValue);
         setTimeout(() => setIsSnapping(false), 60);
       }
-    }, 50);
+    }, 120);
   };
 
   useEffect(() => {
@@ -140,6 +154,11 @@ function Dial({ items, selected, onSelect }: DialProps) {
         onScroll={handleScroll}
         className="scrollable mini invis block w-full scroll-smooth"
       >
+        {canScrollUp && (
+          <div className="pointer-events-none absolute top-0 flex h-8 w-full items-start justify-center bg-gradient-to-b from-card to-transparent">
+            <ChevronUp size={16} className="z-top" />
+          </div>
+        )}
         {/* top spacer so first can center */}
         <div style={{ minHeight: CENTER_Y - ITEM_HEIGHT / 2 }} />
         {items.map((item) => (
@@ -160,6 +179,12 @@ function Dial({ items, selected, onSelect }: DialProps) {
 
       {/* center indicator
       <div className="pointer-events-none absolute left-0 right-0 top-1/2 -translate-y-1/2 border-y border-foreground/30 py-2" /> */}
+      {/* Bottom chevron */}
+      {canScrollDown && (
+        <div className="pointer-events-none absolute bottom-0 flex h-8 w-full items-end justify-center bg-gradient-to-t from-card to-transparent">
+          <ChevronDown size={16} className="z-top" />
+        </div>
+      )}
     </div>
   );
 }

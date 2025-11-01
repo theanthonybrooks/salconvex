@@ -252,7 +252,7 @@ export function DateTimePickerField({
             />
           )}
         </div>
-        <DialogFooter className="flex w-full gap-2 px-4 pt-3 sm:max-w-lg md:items-end">
+        <DialogFooter className="flex w-full flex-row gap-2 px-4 pt-3 sm:max-w-lg md:items-end">
           <Button
             disabled={pending}
             variant="salWithShadowHidden"
