@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { Fragment, useRef, useState } from "react";
 import { motion, useMotionValueEvent, useScroll } from "framer-motion";
 
 import { ChevronDown, ChevronUp } from "lucide-react";
@@ -78,7 +78,7 @@ export function ScrollableTimeList({
           }
 
           return (
-            <>
+            <Fragment key={t}>
               <button
                 key={t}
                 onClick={() => !isDisabled && handleTimeSelect(t)}
@@ -94,7 +94,7 @@ export function ScrollableTimeList({
                 {t}
               </button>
               {isFirst && <Separator thickness={1} className={cn("my-1")} />}
-            </>
+            </Fragment>
           );
         })}
       </motion.div>
