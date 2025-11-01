@@ -38,7 +38,8 @@
     "Add-Ons",
     "Extras",
     "Stripe",
-    "Resend"
+    "Resend",
+    "Component"
   ],
   "typescript.tsdk": "node_modules\\typescript\\lib",
   "python.analysis.autoImportCompletions": true

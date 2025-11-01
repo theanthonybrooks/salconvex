@@ -44,7 +44,8 @@ export function MobileTimePicker({
   };
 
   return (
-    <div className="h-30 flex w-full max-w-[80dvw] items-center justify-center gap-2 rounded-xl border-1.5 bg-card p-2">
+    <div className="h-30 relative flex w-full max-w-[80dvw] items-center justify-center gap-2 overflow-hidden rounded-xl border-1.5 bg-card p-2">
+      <div className="pointer-events-none absolute left-0 right-0 top-0 flex h-8 items-center justify-center bg-gradient-to-b from-card to-transparent" />
       <Dial
         items={hours}
         selected={hour12.toString()}
@@ -66,6 +67,7 @@ export function MobileTimePicker({
           updateDate(hour12.toString(), minute.toString().padStart(2, "0"), val)
         }
       />
+      <div className="pointer-events-none absolute bottom-0 left-0 right-0 flex h-8 items-center justify-center bg-gradient-to-t from-card to-transparent" />
     </div>
   );
 }
@@ -82,7 +84,7 @@ function Dial({ items, selected, onSelect }: DialProps) {
   const VISIBLE_COUNT = 1;
   const CONTAINER_HEIGHT = ITEM_HEIGHT * VISIBLE_COUNT;
   const CENTER_Y = CONTAINER_HEIGHT / 2;
-  const SNAP_THRESHOLD = ITEM_HEIGHT - 10;
+  const SNAP_THRESHOLD = ITEM_HEIGHT - 2;
 
   const [isSnapping, setIsSnapping] = useState(false);
   const scrollTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -114,10 +116,10 @@ function Dial({ items, selected, onSelect }: DialProps) {
         setIsSnapping(true);
         ref.current.scrollTo({
           top: bounded * ITEM_HEIGHT - (CENTER_Y - ITEM_HEIGHT / 2),
-          behavior: "smooth",
+          behavior: "auto",
         });
         if (newValue !== selected) onSelect(newValue);
-        setTimeout(() => setIsSnapping(false), 100);
+        setTimeout(() => setIsSnapping(false), 60);
       }
     }, 50);
   };
@@ -132,10 +134,7 @@ function Dial({ items, selected, onSelect }: DialProps) {
   }, [selected, items, CENTER_Y]);
 
   return (
-    <div
-      className="relative flex w-fit flex-col items-center overflow-hidden"
-      style={{ height: CONTAINER_HEIGHT }}
-    >
+    <div className="h-30 relative flex w-fit flex-col items-center overflow-hidden">
       <div
         ref={ref}
         onScroll={handleScroll}

@@ -1,6 +1,6 @@
 import { useDayPicker } from "react-day-picker";
 
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -48,7 +48,7 @@ export function CustomDropdownNav() {
   };
 
   return (
-    <div className="richard mb-5 flex w-full items-center justify-between gap-2 px-3 py-2">
+    <div className="richard my-5 flex w-full items-center justify-between gap-2 px-3 py-2">
       <Button
         variant="ghost"
         type="button"
@@ -56,7 +56,7 @@ export function CustomDropdownNav() {
         onClick={() => goToMonth(new Date(year, month - 1))}
         className={cn("p-1 hover:text-foreground/80 disabled:opacity-20")}
       >
-        <ChevronLeft className="size-5" />
+        <FaArrowLeft className="size-5" />
       </Button>
 
       <div className="flex items-center gap-2">
@@ -67,7 +67,7 @@ export function CustomDropdownNav() {
             if (!isMonthDisabled(year, m)) goToMonth(new Date(year, m));
           }}
         >
-          <SelectTrigger className="w-[110px] text-sm">
+          <SelectTrigger className="w-[110px] text-base sm:text-sm">
             <SelectValue>{monthNames[month]}</SelectValue>
           </SelectTrigger>
           <SelectContent className="max-h-72">
@@ -86,7 +86,7 @@ export function CustomDropdownNav() {
           value={year.toString()}
           onValueChange={(val) => goToMonth(new Date(parseInt(val, 10), month))}
         >
-          <SelectTrigger className="w-[90px] text-sm">
+          <SelectTrigger className="w-[90px] text-base sm:text-sm">
             <SelectValue>{year}</SelectValue>
           </SelectTrigger>
           <SelectContent className="max-h-72">
@@ -106,7 +106,7 @@ export function CustomDropdownNav() {
         onClick={() => goToMonth(new Date(year, month + 1))}
         className={cn("p-1 hover:text-foreground/80 disabled:opacity-20")}
       >
-        <ChevronRight className="size-5" />
+        <FaArrowRight className="size-5" />
       </Button>
     </div>
   );

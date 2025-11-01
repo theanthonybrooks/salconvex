@@ -2,12 +2,17 @@ import { useEffect, useMemo, useState } from "react";
 import { format } from "date-fns";
 import { DayPicker } from "react-day-picker";
 
+import { LoaderCircle } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
 import { CustomDropdownNav } from "@/components/ui/date-picker/custom-caption";
 import { ScrollableTimeList } from "@/components/ui/date-picker/scrollable-time-list";
 import { MobileTimePicker } from "@/components/ui/date-picker/scrollable-time-list-mobile";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -22,7 +27,6 @@ type DayPickerProps = {
   minDate?: number;
 };
 
-// --- Helper to generate time list (every 30 min + 11:59 PM) ---
 function generateTimeOptions(): string[] {
   const times: string[] = [];
   for (let h = 0; h < 24; h++) {
@@ -45,6 +49,8 @@ export function DateTimePickerField({
 }: DayPickerProps) {
   const { isMobile } = useDevice();
   const [open, setOpen] = useState(false);
+  const [hasChanges, setHasChanges] = useState(false);
+  const [pending, setPending] = useState(false);
 
   const initialDate = initialValue ? new Date(initialValue) : undefined;
   const [date, setDate] = useState<Date | undefined>(initialDate);
@@ -62,7 +68,6 @@ export function DateTimePickerField({
   const thisYear = new Date().getFullYear();
   const inFiveYears = thisYear + 5;
 
-  // --- Handle date selection ---
   const handleDateSelect = (d: Date | undefined) => {
     setDate(d);
     if (d) {
@@ -81,9 +86,9 @@ export function DateTimePickerField({
     } else {
       onChange(undefined);
     }
+    setHasChanges(true);
   };
 
-  // --- Handle time selection from list ---
   const handleTimeSelect = (time: string) => {
     if (!date) return;
 
@@ -97,7 +102,6 @@ export function DateTimePickerField({
     updated.setHours(hour);
     updated.setMinutes(minute);
 
-    // enforce minDate (same logic you already had)
     if (minDate) {
       const min = new Date(minDate);
       const sameDay =
@@ -109,9 +113,17 @@ export function DateTimePickerField({
 
     setTimeStr(time);
     onChange(updated.getTime());
+    setHasChanges(true);
   };
 
-  // --- Sync external initial value ---
+  const handleClose = () => {
+    setTimeout(() => {
+      setPending(false);
+      setOpen(false);
+      setHasChanges(false);
+    }, 200);
+  };
+
   useEffect(() => {
     if (initialValue) {
       const newDate = new Date(initialValue);
@@ -138,16 +150,16 @@ export function DateTimePickerField({
             readOnly
             value={formattedDisplay}
             placeholder={label}
-            className="cursor-pointer"
+            className="cursor-pointer text-center"
           />
         </div>
       </DialogTrigger>
 
       <DialogContent
+        showCloseButton={false}
         zIndex="z-[33]"
-        className="flex flex-col items-center justify-center gap-6 bg-card px-4 pt-10 sm:max-w-lg md:flex-row md:items-end md:pt-5"
+        className="flex flex-col items-center justify-center gap-6 bg-card px-4 pt-5 sm:max-w-lg md:flex-row md:items-end"
         onOpenAutoFocus={() => {
-          // delay one frame so layout is ready
           requestAnimationFrame(() => {
             const selectedButton = document.querySelector(
               "button.selected-time",
@@ -161,7 +173,9 @@ export function DateTimePickerField({
           });
         }}
       >
-        {/* Date Picker */}
+        <DialogDescription className="sr-only">
+          Select date and time
+        </DialogDescription>
         <DayPicker
           mode="single"
           selected={date}
@@ -180,7 +194,6 @@ export function DateTimePickerField({
 
         {/* //note-to-self: has a timeZone prop. */}
 
-        {/* Time List */}
         {!isMobile && (
           <ScrollableTimeList
             timeOptions={timeOptions}
@@ -201,89 +214,38 @@ export function DateTimePickerField({
                 return;
               }
 
-              // enforce minDate
               if (minDate && newDate.getTime() < minDate) return;
 
               setDate(newDate);
               onChange(newDate.getTime());
+              setHasChanges(true);
             }}
           />
         )}
-
-        {/* <div className="relative w-full">
-          {canScrollUp && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="pointer-events-none absolute left-0 right-0 top-0 flex h-6 justify-center bg-gradient-to-b from-background/90 to-transparent"
-            >
-              <ChevronUp className="h-3 w-3 text-muted-foreground opacity-60" />
-            </motion.div>
-          )}
-
-          <motion.div
-            ref={timeListRef}
-            className="scrollable mini invis mt-5 flex max-h-80 w-fit flex-col items-center rounded-xl border-1.5 p-1 px-4 text-sm"
+        <DialogFooter className="flex w-full flex-col-reverse gap-2 px-4 pt-3 sm:max-w-lg md:flex-row md:items-end">
+          <Button
+            disabled={pending}
+            variant={
+              isMobile ? "salWithShadowHidden" : "salWithShadowHiddenLeft"
+            }
+            type="button"
+            onClick={handleClose}
           >
-            {timeOptions.map((t) => {
-              const isSelected = t === timeStr;
-              let isDisabled = false;
-
-              if (minDate && date) {
-                const min = new Date(minDate);
-                const sameDay =
-                  date.getFullYear() === min.getFullYear() &&
-                  date.getMonth() === min.getMonth() &&
-                  date.getDate() === min.getDate();
-
-                if (sameDay) {
-                  // Convert the candidate time string ("4:30 PM") to a comparable Date
-                  const [hourStr, minuteStr, period] = t.split(/[:\s]/);
-                  let hour = parseInt(hourStr);
-                  const minute = parseInt(minuteStr);
-                  if (period === "PM" && hour < 12) hour += 12;
-                  if (period === "AM" && hour === 12) hour = 0;
-
-                  const candidate = new Date(date);
-                  candidate.setHours(hour);
-                  candidate.setMinutes(minute);
-
-                  if (candidate.getTime() < min.getTime()) {
-                    isDisabled = true;
-                  }
-                }
-              }
-
-              return (
-                <button
-                  key={t}
-                  onClick={() => !isDisabled && handleTimeSelect(t)}
-                  disabled={isDisabled}
-                  className={cn(
-                    "rounded-lg border-1.5 border-transparent p-1 px-2 text-foreground transition-colors",
-                    isSelected
-                      ? "selected-time border-1.5 border-foreground bg-salPinkLt font-medium"
-                      : "hover:bg-salPinkLtHover",
-                    isDisabled && "pointer-events-none opacity-40",
-                  )}
-                >
-                  {t}
-                </button>
-              );
-            })}
-          </motion.div>
-          {canScrollDown && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="pointer-events-none absolute bottom-0 left-0 right-0 flex h-6 justify-center bg-gradient-to-t from-background/90 to-transparent"
-            >
-              <ChevronDown className="h-3 w-3 text-muted-foreground opacity-60" />
-            </motion.div>
-          )}
-        </div> */}
+            Cancel
+          </Button>
+          <Button
+            disabled={!hasChanges || pending}
+            variant={hasChanges ? "salWithShadowYlw" : "salWithShadowHiddenYlw"}
+            type="button"
+            onClick={handleClose}
+          >
+            {pending ? (
+              <LoaderCircle className="size-4 animate-spin" />
+            ) : (
+              "Confirm"
+            )}
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
