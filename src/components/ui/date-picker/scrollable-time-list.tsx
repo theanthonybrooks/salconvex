@@ -45,7 +45,7 @@ export function ScrollableTimeList({
       )}
       <motion.div
         ref={ref}
-        className="scrollable mini invis flex h-full max-h-[inherit] w-fit flex-col items-center p-1 px-4 text-sm"
+        className="scrollable mini invis flex h-full max-h-[inherit] w-fit flex-col items-center p-1 px-3 text-sm"
       >
         {timeOptions.map((t) => {
           const isSelected = t === timeStr;

@@ -68,24 +68,51 @@ export function DateTimePickerField({
   const thisYear = new Date().getFullYear();
   const inFiveYears = thisYear + 5;
 
-  const handleDateSelect = (d: Date | undefined) => {
-    setDate(d);
-    if (d) {
-      const match = timeStr.match(/^(\d{1,2}):(\d{2})\s?(AM|PM)$/i);
-      if (!match) return;
-      const [hourStr, minuteStr, period] = match;
-      let h = parseInt(hourStr, 10);
-      const m = parseInt(minuteStr, 10);
-      if (period.toUpperCase() === "PM" && h < 12) h += 12;
-      if (period.toUpperCase() === "AM" && h === 12) h = 0;
+  // const handleDateSelect = (d: Date | undefined) => {
+  //   console.log(date);
+  //   console.log("handleDateSelect", d);
+  //   setDate(d);
+  //   if (d) {
+  //     const match = timeStr.match(/^(\d{1,2}):(\d{2})\s?(AM|PM)$/i);
+  //     if (!match) return;
+  //     const [hourStr, minuteStr, period] = match;
+  //     let h = parseInt(hourStr, 10);
+  //     const m = parseInt(minuteStr, 10);
+  //     if (period.toUpperCase() === "PM" && h < 12) h += 12;
+  //     if (period.toUpperCase() === "AM" && h === 12) h = 0;
 
-      const updated = new Date(d);
-      updated.setHours(h);
-      updated.setMinutes(m);
-      onChange(updated.getTime());
-    } else {
+  //     const updated = new Date(d);
+  //     console.log("updated", updated);
+  //     updated.setHours(h);
+  //     updated.setMinutes(m);
+  //     onChange(updated.getTime());
+  //   } else {
+  //     onChange(undefined);
+  //   }
+  //   setHasChanges(true);
+  // };
+  const handleDateSelect = (d: Date | undefined) => {
+    if (!d) {
+      setDate(undefined);
       onChange(undefined);
+      return;
     }
+
+    const match = timeStr.split(/[:\s]/);
+    if (!match) return;
+    const [hourStr, minuteStr, period] = match;
+    let h = parseInt(hourStr, 10);
+    const m = parseInt(minuteStr, 10);
+    if (period.toUpperCase() === "PM" && h < 12) h += 12;
+    if (period.toUpperCase() === "AM" && h === 12) h = 0;
+
+    const updated = new Date(date ?? d);
+    updated.setFullYear(d.getFullYear(), d.getMonth(), d.getDate());
+    updated.setHours(h);
+    updated.setMinutes(m);
+
+    setDate(updated);
+    onChange(updated.getTime());
     setHasChanges(true);
   };
 
@@ -158,7 +185,7 @@ export function DateTimePickerField({
       <DialogContent
         showCloseButton={false}
         zIndex="z-[33]"
-        className="flex flex-col items-center justify-center gap-6 bg-card px-4 pt-5 sm:max-w-lg md:flex-row md:items-end"
+        className="flex flex-col items-center justify-center gap-6 bg-card px-4 pt-5 sm:max-w-lg"
         onOpenAutoFocus={() => {
           requestAnimationFrame(() => {
             const selectedButton = document.querySelector(
@@ -176,58 +203,58 @@ export function DateTimePickerField({
         <DialogDescription className="sr-only">
           Select date and time
         </DialogDescription>
-        <DayPicker
-          mode="single"
-          selected={date}
-          onSelect={handleDateSelect}
-          defaultMonth={date ?? new Date()}
-          captionLayout="dropdown"
-          startMonth={startMonth}
-          endMonth={new Date(inFiveYears, 0)}
-          disabled={{ before: new Date(minDate ?? 0) }}
-          required
-          hideNavigation
-          components={{
-            DropdownNav: CustomDropdownNav,
-          }}
-        />
-
-        {/* //note-to-self: has a timeZone prop. */}
-
-        {!isMobile && (
-          <ScrollableTimeList
-            timeOptions={timeOptions}
-            timeStr={timeStr}
-            handleTimeSelect={handleTimeSelect}
-            date={date}
-            minDate={minDate}
-          />
-        )}
-
-        {isMobile && (
-          <MobileTimePicker
-            date={date}
-            minDate={minDate}
-            onChange={(newDate) => {
-              if (!newDate) {
-                onChange(undefined);
-                return;
-              }
-
-              if (minDate && newDate.getTime() < minDate) return;
-
-              setDate(newDate);
-              onChange(newDate.getTime());
-              setHasChanges(true);
+        <div className="flex flex-col items-center justify-center gap-6 bg-card px-4 pt-5 sm:max-w-lg md:flex-row md:items-end">
+          <DayPicker
+            mode="single"
+            selected={date}
+            onSelect={handleDateSelect}
+            defaultMonth={date ?? new Date()}
+            captionLayout="dropdown"
+            startMonth={startMonth}
+            endMonth={new Date(inFiveYears, 0)}
+            disabled={{ before: new Date(minDate ?? 0) }}
+            required
+            hideNavigation
+            components={{
+              DropdownNav: CustomDropdownNav,
             }}
           />
-        )}
+
+          {/* //note-to-self: has a timeZone prop. */}
+
+          {!isMobile && (
+            <ScrollableTimeList
+              timeOptions={timeOptions}
+              timeStr={timeStr}
+              handleTimeSelect={handleTimeSelect}
+              date={date}
+              minDate={minDate}
+            />
+          )}
+
+          {isMobile && (
+            <MobileTimePicker
+              date={date}
+              minDate={minDate}
+              onChange={(newDate) => {
+                if (!newDate) {
+                  onChange(undefined);
+                  return;
+                }
+
+                if (minDate && newDate.getTime() < minDate) return;
+
+                setDate(newDate);
+                onChange(newDate.getTime());
+                setHasChanges(true);
+              }}
+            />
+          )}
+        </div>
         <DialogFooter className="flex w-full flex-col-reverse gap-2 px-4 pt-3 sm:max-w-lg md:flex-row md:items-end">
           <Button
             disabled={pending}
-            variant={
-              isMobile ? "salWithShadowHidden" : "salWithShadowHiddenLeft"
-            }
+            variant="salWithShadowHidden"
             type="button"
             onClick={handleClose}
           >
@@ -238,6 +265,7 @@ export function DateTimePickerField({
             variant={hasChanges ? "salWithShadowYlw" : "salWithShadowHiddenYlw"}
             type="button"
             onClick={handleClose}
+            className="w-full md:max-w-40"
           >
             {pending ? (
               <LoaderCircle className="size-4 animate-spin" />

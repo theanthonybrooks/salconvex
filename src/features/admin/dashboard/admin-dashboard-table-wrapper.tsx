@@ -79,8 +79,6 @@ export function AdminDashboardTableWrapper({
     extrasPage ? {} : "skip",
   );
 
-  console.log(extrasData);
-
   return (
     <>
       {submissionsPage && (
