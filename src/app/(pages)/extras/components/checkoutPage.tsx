@@ -3,7 +3,6 @@
 import type { EventRegistrationValues } from "@/schemas/public";
 import type { Preloaded } from "convex/react";
 
-import { useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { EventRegistrationSchema } from "@/schemas/public";
@@ -44,8 +43,7 @@ import { getUserFontSizePref } from "@/helpers/stylingFns";
 import { cn } from "@/helpers/utilsFns";
 
 import { api } from "~/convex/_generated/api";
-import { makeUseQueryWithStatus } from "convex-helpers/react";
-import { useQueries, useQuery } from "convex-helpers/react/cache";
+import { useQuery } from "convex-helpers/react/cache";
 import { useAction, useMutation, usePreloadedQuery } from "convex/react";
 import { ConvexError } from "convex/values";
 
@@ -57,30 +55,26 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
   const router = useRouter();
   const queryResult = usePreloadedQuery(preloaded);
   const event = queryResult?.data;
+  const userIsRegistered = queryResult?.userRegistration;
   const eventIsDraft = event?.state === "draft";
 
-  const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
   const { preloadedUserData, preloadedSubStatus } = useConvexPreload();
   const userData = usePreloadedQuery(preloadedUserData);
   const { user, userPref } = userData ?? {};
+  const isAdmin = user?.role?.includes("admin");
   const fontSizePref = getUserFontSizePref(userPref?.fontSize ?? "large");
   const fontSize = fontSizePref?.body;
 
   const subStatus = usePreloadedQuery(preloadedSubStatus);
   const { hasActiveSubscription, subPlan } = subStatus ?? {};
-  const premiumPlan = hasActiveSubscription && subPlan && subPlan >= 2;
+  const premiumPlan =
+    (hasActiveSubscription && subPlan && subPlan >= 2) || isAdmin;
   const getCheckoutUrl = useAction(
     api.stripe.stripeAddOns.createStripeAddOnCheckoutSession,
   );
   const eventPrice = event?.price ?? 0;
   const paidEvent = eventPrice > 0;
 
-  const { data: userIsRegistered, isPending } = useQueryWithStatus(
-    api.userAddOns.onlineEvents.checkRegistration,
-    user?._id && event?._id
-      ? { eventId: event._id, email: user.email }
-      : "skip",
-  );
   const voucher = useQuery(
     api.userAddOns.onlineEvents.getUserVoucher,
     user ? { userId: user?._id } : "skip",
@@ -89,7 +83,7 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
   const voucherCoversPrice = voucherTotal >= eventPrice;
   // console.log({ voucherTotal, eventPrice, voucherCoversPrice });
   const { paid, canceled, registration } = userIsRegistered ?? {};
-  const activeRegistration = paid && !canceled;
+  const activeRegistration = paid && !canceled && user;
   const unpaidRegistration = !paid && !canceled && Boolean(registration);
   const canceledRegistration = paid && canceled;
 
@@ -112,9 +106,6 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
     formState: { isValid },
   } = form;
 
-  const currentValues = form.getValues();
-  console.log({ currentValues, registration });
-
   const termsAgreement = watch("termsAgreement");
 
   const registerForEvent = useMutation(
@@ -125,18 +116,18 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
     api.userAddOns.onlineEvents.updateRegistration,
   );
 
-  useEffect(() => {
-    if (!user || isPending) return;
-    form.reset({
-      email: user.email ?? "",
-      name: user.name ?? "",
-      link: registration?.link ?? "",
-      notes: registration?.notes ?? "",
-      termsAgreement: unpaidRegistration,
-    });
-  }, [user, registration, unpaidRegistration, isPending, form]);
+  // useEffect(() => {
+  //   if (!user || isPending) return;
+  //   form.reset({
+  //     email: user.email ?? "",
+  //     name: user.name ?? "",
+  //     link: registration?.link ?? "",
+  //     notes: registration?.notes ?? "",
+  //     termsAgreement: unpaidRegistration,
+  //   });
+  // }, [user, registration, unpaidRegistration, isPending, form]);
 
-  if ((isPending && user) || !event) return <FullPageLoading />;
+  if (!event) return <FullPageLoading />;
   const {
     capacity,
     name,

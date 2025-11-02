@@ -130,8 +130,23 @@ export const getOnlineEvent = query({
     }
     if (event.state === "draft" && !isAdmin)
       return { success: false, message: "Event is draft", data: null };
+    const userRegistration = await ctx.db
+      .query("userAddOns")
+      .withIndex("by_userId_eventId", (q) =>
+        q.eq("userId", userId).eq("eventId", event._id),
+      )
+      .first();
 
-    return { success: true, message: "Success", data: event };
+    return {
+      success: true,
+      message: "Success",
+      data: event,
+      userRegistration: {
+        paid: userRegistration?.paid,
+        canceled: userRegistration?.canceled,
+        registration: userRegistration,
+      },
+    };
   },
 });
 
