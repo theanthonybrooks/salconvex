@@ -506,6 +506,7 @@ export const checkRegistration = query({
       userId,
       args.email,
     );
+    console.log({ registration });
     if (!registration) return null;
 
     return {
@@ -602,5 +603,23 @@ export const removeOnlineEventImage = mutation({
     });
 
     return { success: true };
+  },
+});
+
+export const getUserRegistrations = query({
+  args: {
+    eventId: v.id("onlineEvents"),
+  },
+  handler: async (ctx, args) => {
+    const activeRegistrations = await ctx.db
+      .query("userAddOns")
+      .withIndex("by_paid_canceled_eventId", (q) =>
+        q.eq("paid", true).eq("canceled", false).eq("eventId", args.eventId),
+      )
+      .collect();
+    if (!activeRegistrations)
+      return { status: "noRegistrations", registrations: null };
+
+    return { status: "success", registrations: activeRegistrations };
   },
 });

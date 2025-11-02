@@ -65,11 +65,9 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
   const fontSizePref = getUserFontSizePref(userPref?.fontSize ?? "large");
   const fontSize = fontSizePref?.body;
 
-  const isAdmin = user?.role?.includes("admin");
   const subStatus = usePreloadedQuery(preloadedSubStatus);
   const { hasActiveSubscription, subPlan } = subStatus ?? {};
-  const premiumPlan =
-    hasActiveSubscription && subPlan && subPlan >= 2 && !isAdmin;
+  const premiumPlan = hasActiveSubscription && subPlan && subPlan >= 2;
   const getCheckoutUrl = useAction(
     api.stripe.stripeAddOns.createStripeAddOnCheckoutSession,
   );
@@ -112,6 +110,9 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
     watch,
     formState: { isValid },
   } = form;
+
+  const currentValues = form.getValues();
+  console.log({ currentValues, registration });
 
   const termsAgreement = watch("termsAgreement");
 

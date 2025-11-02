@@ -83,7 +83,12 @@ export const extraColumns: ColumnDef<ExtraColumnsProps>[] = [
     size: 40,
     cell: ({ row }) => {
       return (
-        <div className="text-center text-sm text-muted-foreground">
+        <div
+          className="text-center text-sm text-muted-foreground"
+          onClick={() => {
+            row.toggleSelected();
+          }}
+        >
           {row.index + 1}
         </div>
       );

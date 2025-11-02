@@ -1403,6 +1403,7 @@ export default defineSchema({
   userAddOns: defineTable(userAddOnsSchema)
     .index("by_userId", ["userId"])
     .index("by_email", ["email"])
+    .index("by_paid_canceled_eventId", ["paid", "canceled", "eventId"])
     .index("by_userId_eventId", ["userId", "eventId"])
     .index("by_email_eventId", ["email", "eventId"])
     .index("by_eventId", ["eventId"]),
