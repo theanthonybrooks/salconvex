@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { CheckoutPage } from "@/app/(pages)/extras/components/checkoutPage";
 import { capitalize } from "lodash";
 
@@ -59,10 +59,12 @@ export default async function AddOnsPage({
       )
     : null;
 
-  const event = preloadedResult ? preloadedQueryResult(preloadedResult) : null;
+  const queryResult = preloadedResult
+    ? preloadedQueryResult(preloadedResult)
+    : null;
 
-  if (!preloadedResult || !event?.data) {
-    redirect("/404");
+  if (!preloadedResult || !queryResult?.success) {
+    notFound();
   }
 
   return <CheckoutPage preloaded={preloadedResult} />;

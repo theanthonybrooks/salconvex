@@ -1,12 +1,14 @@
-import { Metadata } from "next";
-import { redirect } from "next/navigation";
-import OpenCallSocials from "@/app/(pages)/(artist)/thelist/components/open-call-socials";
 import { OpenCallData } from "@/types/openCallTypes";
+
+import { Metadata } from "next";
+import { notFound, redirect } from "next/navigation";
+import OpenCallSocials from "@/app/(pages)/(artist)/thelist/components/open-call-socials";
+
+import { capitalize } from "@/helpers/utilsFns";
+
 import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
 import { api } from "~/convex/_generated/api";
 import { fetchQuery } from "convex/nextjs";
-
-import { capitalize } from "@/helpers/utilsFns";
 
 type Props = {
   params: Promise<{ slug: string; year: string }>;
@@ -84,7 +86,7 @@ export default async function OpenCallSocialsPage({
       ocData = data;
     }
   } catch {
-    redirect(`/404-not-found`);
+    notFound();
   }
 
   if (organizerId !== userId && !isAdmin) {

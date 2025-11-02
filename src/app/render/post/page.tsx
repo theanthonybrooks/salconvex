@@ -1,6 +1,8 @@
-import { redirect } from "next/navigation";
-import { OpenCallPost } from "@/app/(pages)/(artist)/thelist/components/open-call-post";
 import { OpenCallData } from "@/types/openCallTypes";
+
+import { notFound } from "next/navigation";
+import { OpenCallPost } from "@/app/(pages)/(artist)/thelist/components/open-call-post";
+
 import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
 import { api } from "~/convex/_generated/api";
 import { fetchQuery } from "convex/nextjs";
@@ -42,7 +44,7 @@ export default async function PostPreview({
       ocData = data;
     }
   } catch {
-    redirect(`/404-not-found`);
+    notFound();
   }
 
   return <OpenCallPost data={ocData} postSettings={postSettings} />;

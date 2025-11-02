@@ -126,7 +126,7 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
   //     termsAgreement: unpaidRegistration,
   //   });
   // }, [user, registration, unpaidRegistration, isPending, form]);
-
+  // if (queryResult?.success === false) router.push("/404");
   if (!event) return <FullPageLoading />;
   const {
     capacity,
