@@ -1,9 +1,12 @@
 import { SupportCategory } from "@/constants/supportConsts";
+
+import type { Id } from "~/convex/_generated/dataModel";
+
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { ShardedCounter } from "@convex-dev/sharded-counter";
-import { ConvexError, v } from "convex/values";
 import { components } from "~/convex/_generated/api";
 import { mutation, query } from "~/convex/_generated/server";
+import { ConvexError, v } from "convex/values";
 
 export const counter = new ShardedCounter(components.shardedCounter);
 
@@ -57,6 +60,13 @@ export const createSupportTicket = mutation({
       </a>
    </p>
     `;
+    let assignedUser: Id<"users"> | undefined = undefined;
+
+    const creator = await ctx.db
+      .query("userRoles")
+      .withIndex("by_role", (q) => q.eq("role", "creator"))
+      .first();
+    if (creator) assignedUser = creator.userId;
 
     await ctx.db.insert("todoKanban", {
       title: "Support Ticket #" + ticketNumber,
@@ -71,6 +81,7 @@ export const createSupportTicket = mutation({
       createdAt: Date.now(),
       lastUpdatedBy: userId ?? "guest",
       ticketNumber: support,
+      assignedId: assignedUser,
     });
 
     return { support, ticketNumber };

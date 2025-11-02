@@ -914,6 +914,7 @@ const userAddOnsSchema = {
   paid: v.boolean(),
   canceled: v.boolean(),
   file: v.optional(v.string()),
+  notes: v.optional(v.string()),
   link: v.optional(v.string()),
   plan: v.optional(v.number()),
 };
@@ -1412,6 +1413,7 @@ export default defineSchema({
     .index("by_slug", ["slug"])
     .index("by_slug_startDate", ["slug", "startDate"])
     .index("by_slug_endDate", ["slug", "endDate"])
+    .index("by_slug_state_endDate", ["slug", "state", "endDate"])
     .index("by_organizer", ["organizer"]),
 
   eventVouchers: defineTable(eventVoucherSchema)

@@ -17,6 +17,7 @@ import { FormSuccess } from "@/components/form-success";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DebouncedControllerInput } from "@/components/ui/debounced-form-input";
+import { DebouncedFormTextarea } from "@/components/ui/debounced-form-textarea";
 import {
   Form,
   FormControl,
@@ -98,6 +99,7 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
       email: user?.email ?? "",
       name: user?.name ?? "",
       link: registration?.link ?? "",
+      notes: registration?.notes ?? "",
       termsAgreement: false,
     },
     mode: "onChange",
@@ -131,6 +133,10 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
     regDeadline,
     organizerBio,
   } = event;
+  const now = Date.now();
+  const deadlineHasPassed = now > regDeadline;
+  const eventHasPassed = now > event.endDate;
+  console.log(eventHasPassed);
   const remainingCapacity = capacity.max - capacity.current;
   const remainingSpace = remainingCapacity > 0;
   const startDate = new Date(event.startDate);
@@ -192,6 +198,7 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
           name: registrationName,
           email: registrationEmail,
           link: values.link,
+          notes: values.notes,
         });
       }
       if (premiumPlan || !paidEvent) {
@@ -295,21 +302,39 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
         </h1>
         <h2 className="text-lg font-semibold">{`${datePart} @ ${timePart}`}</h2>
 
-        {remainingCapacity <= 3 && remainingSpace && (
-          <p className="-mt-6 text-balance text-center font-bold text-red-600">
-            Only {remainingCapacity} space{remainingCapacity > 1 ? "s" : ""}{" "}
-            left!
-          </p>
-        )}
-        {!remainingSpace && (
-          <p className="-mt-6 text-balance text-center font-bold text-red-600">
-            This event is fully booked!
-          </p>
-        )}
-        <p className="text-balance text-center font-medium">
-          <strong>Price:</strong> Free for users with Banana or Fatcap
-          memberships. ${eventPrice} otherwise.
-        </p>
+        <div className="flex flex-col items-center gap-6">
+          {remainingCapacity <= 3 && remainingSpace && !deadlineHasPassed && (
+            <p className="-mt-6 text-balance text-center font-bold text-red-600">
+              Only {remainingCapacity} space{remainingCapacity > 1 ? "s" : ""}{" "}
+              left!
+            </p>
+          )}
+          {!remainingSpace && !deadlineHasPassed && (
+            <p className="-mt-6 text-balance text-center font-bold text-red-600">
+              This event is fully booked!
+            </p>
+          )}
+          {eventHasPassed ? (
+            <p className="-mt-6 text-balance text-center font-bold text-red-600">
+              Event has ended!
+            </p>
+          ) : deadlineHasPassed ? (
+            <p className="-mt-6 text-balance text-center font-bold text-red-600">
+              Registration has closed!
+            </p>
+          ) : remainingSpace ? (
+            <span className="gap-1 sm:flex">
+              <strong>Registration Deadline:</strong>
+              <p>{deadlineOutput}</p>
+            </span>
+          ) : null}
+          {remainingSpace && (
+            <p className="text-balance text-center font-medium">
+              <strong>Price:</strong> Free for users with Banana or Fatcap
+              memberships. ${eventPrice} otherwise.
+            </p>
+          )}
+        </div>
       </section>
       <div className={cn("grid gap-5 px-8 pb-10 sm:grid-cols-[60%_50px_auto]")}>
         <Accordion type="multiple" defaultValue={["about"]}>
@@ -339,13 +364,9 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
             </AccordionContent>
           </AccordionItem>
           <AccordionItem value="deadline">
-            <AccordionTrigger title="Deadline & Terms:" fontSize={fontSize} />
+            <AccordionTrigger title="Terms & Conditions:" fontSize={fontSize} />
             <AccordionContent fontSize={fontSize} className={cn("space-y-2")}>
-              <strong>Registration Deadline:</strong>
-              <p> {deadlineOutput}</p>
-
-              <br />
-              <strong>Terms:</strong>
+              {/* <strong>Terms:</strong> */}
               <ol className={cn("list-inside list-decimal space-y-1 pl-4")}>
                 {terms?.map((term, i) => (
                   <li key={i + 1} className={cn("")}>
@@ -370,6 +391,18 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
                 <strong>When:</strong>
                 <p> {dateOutput}</p>
               </span>
+              <br />
+              <strong>Registration Deadline:</strong>
+              <span>
+                <p className={cn(deadlineHasPassed && "italic text-red-600")}>
+                  {deadlineOutput}
+                </p>
+                {deadlineHasPassed && (
+                  <p className="italic">(Registration Closed)</p>
+                )}
+              </span>
+
+              <br />
 
               <p className="text-sm italic">
                 All times are displayed in your local timezone.
@@ -553,6 +586,7 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
                               <FormLabel>Name</FormLabel>
                               <FormControl>
                                 <Input
+                                  disabled={deadlineHasPassed || eventHasPassed}
                                   {...field}
                                   placeholder="ex. Bob Bobson"
                                   className="w-full border-foreground bg-card text-base focus:outline-none focus:ring-1 focus:ring-ring focus:ring-offset-1 focus:ring-offset-ring"
@@ -570,6 +604,7 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
                               <FormLabel>Email</FormLabel>
                               <FormControl>
                                 <Input
+                                  disabled={deadlineHasPassed || eventHasPassed}
                                   {...field}
                                   placeholder="ex. email@example.com"
                                   className="w-full border-foreground bg-card text-base focus:outline-none focus:ring-1 focus:ring-ring focus:ring-offset-1 focus:ring-offset-ring"
@@ -589,6 +624,7 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
                           <FormLabel>Portfolio Link</FormLabel>
                           <FormControl>
                             <DebouncedControllerInput
+                              disabled={deadlineHasPassed || eventHasPassed}
                               transform={autoHttps}
                               field={field}
                               placeholder="ex. example.com"
@@ -602,11 +638,34 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
                     />
                     <FormField
                       control={form.control}
+                      name="notes"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Intention/Goal</FormLabel>
+                          <FormControl>
+                            <DebouncedFormTextarea
+                              disabled={deadlineHasPassed || eventHasPassed}
+                              field={field}
+                              maxLength={250}
+                              placeholder="Any specific area(s) you would like to focus on?"
+                              className={cn(
+                                "min-h-10 w-full resize-none rounded-lg border-foreground bg-card text-base focus:outline-none focus:ring-1 focus:ring-ring focus:ring-offset-1 focus:ring-offset-ring",
+                                // isEmpty && "h-10",
+                              )}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
                       name="termsAgreement"
                       render={({ field }) => (
                         <FormItem className="my-2 flex items-center gap-2 space-y-0">
                           <FormControl>
                             <Checkbox
+                              disabled={deadlineHasPassed || eventHasPassed}
                               checked={field.value || false}
                               onCheckedChange={field.onChange}
                               className="text-base"
@@ -640,7 +699,7 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
                       disabled={!isValid || !termsAgreement}
                       fontSize={fontSize}
                     >
-                      Register
+                      {deadlineHasPassed ? "Registration Closed" : "Register"}
                     </Button>
                   </form>
                   <p className="text-sm">

@@ -70,15 +70,15 @@ export const searchCards = query({
 
 export const getCards = query({
   args: {
-    purpose: v.optional(kanbanPurposeValidator),
+    purpose: kanbanPurposeValidator,
     category: v.array(supportCategoryValidator),
-    full: v.optional(v.boolean()),
     userRole: userRoleArrayValidator,
+    full: v.optional(v.boolean()),
     userId: v.optional(v.id("users")),
   },
   handler: async (ctx, args) => {
     // console.log("user id: ", args.userId);
-    // const userIsCreator = args.userRole.includes("creator");
+    const userIsCreator = args.userRole.includes("creator");
 
     const tableQuery: QueryInitializer<DataModel["todoKanban"]> =
       ctx.db.query("todoKanban");
@@ -132,7 +132,10 @@ export const getCards = query({
     }
 
     const collectedResults = await indexedQuery.collect();
-    if (args.userId) {
+    if (
+      args.userId &&
+      ((userIsCreator && args.purpose === "todo") || !userIsCreator)
+    ) {
       return collectedResults.filter((card) => card.assignedId === args.userId);
     } else {
       return collectedResults;

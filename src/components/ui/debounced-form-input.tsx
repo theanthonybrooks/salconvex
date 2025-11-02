@@ -1,3 +1,5 @@
+import type { InputHTMLAttributes } from "react";
+
 import { useEffect, useRef, useState } from "react";
 import { debounce } from "lodash";
 import { ControllerRenderProps, FieldValues, Path } from "react-hook-form";
@@ -5,14 +7,15 @@ import { ControllerRenderProps, FieldValues, Path } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/helpers/utilsFns";
 
+type DefaultInputProps = InputHTMLAttributes<HTMLInputElement>;
+
 interface DebouncedControllerInputProps<
   TFieldValues extends FieldValues,
   TName extends Path<TFieldValues>,
-> {
+> extends Omit<DefaultInputProps, "onChange" | "value" | "defaultValue"> {
   field: ControllerRenderProps<TFieldValues, TName>;
   debounceMs?: number;
   transform?: (value: string) => string | undefined;
-  [key: string]: unknown;
   onSchemaCheck?: () => void;
 }
 

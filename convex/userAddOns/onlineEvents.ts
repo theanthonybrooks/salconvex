@@ -112,8 +112,22 @@ export const getOnlineEvent = query({
           )
           .order("asc")
           .first();
-    if (!event)
+    if (!event) {
+      const lastEvent = await ctx.db
+        .query("onlineEvents")
+        .withIndex("by_slug_state_endDate", (q) =>
+          q
+            .eq("slug", args.slug ?? "")
+            .eq("state", "published")
+            .lte("endDate", now),
+        )
+        .order("desc")
+        .first();
+      if (lastEvent) {
+        return { success: true, message: "Past Event", data: lastEvent };
+      }
       return { success: false, message: "Event not found", data: null };
+    }
     if (event.state === "draft" && !isAdmin)
       return { success: false, message: "Event is draft", data: null };
 
@@ -239,8 +253,6 @@ export const updateOnlineEvent = mutation({
   },
 });
 
-
-
 export const deleteOnlineEvent = mutation({
   args: {
     eventId: v.id("onlineEvents"),
@@ -265,8 +277,9 @@ export const registerForOnlineEvent = mutation({
   args: {
     eventId: v.id("onlineEvents"),
     link: v.optional(v.string()),
-    email: v.optional(v.string()),
-    name: v.optional(v.string()),
+    notes: v.optional(v.string()),
+    email: v.string(),
+    name: v.string(),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
@@ -274,14 +287,7 @@ export const registerForOnlineEvent = mutation({
 
     if (!userId || !formattedEmail)
       throw new ConvexError("Requires userId or email");
-    const user = userId
-      ? await ctx.db.get(userId)
-      : args.email
-        ? await ctx.db
-            .query("users")
-            .withIndex("email", (q) => q.eq("email", formattedEmail ?? ""))
-            .first()
-        : null;
+    const user = userId ? await ctx.db.get(userId) : null;
     const subscription = user
       ? await ctx.db
           .query("userSubscriptions")

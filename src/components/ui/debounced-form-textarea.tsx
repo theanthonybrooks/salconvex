@@ -1,14 +1,18 @@
+import type { TextareaHTMLAttributes } from "react";
+
 import { useEffect, useMemo, useRef, useState } from "react";
 import debounce from "lodash/debounce";
 import { ControllerRenderProps, FieldPath, FieldValues } from "react-hook-form";
 
 import { cn } from "@/helpers/utilsFns";
 
+type DefaultTextareaProps = TextareaHTMLAttributes<HTMLTextAreaElement>;
 interface DebouncedTextareaProps<
   TFieldValues extends FieldValues,
   TName extends FieldPath<TFieldValues>,
-> {
+> extends Omit<DefaultTextareaProps, "onChange" | "value" | "defaultValue"> {
   field: ControllerRenderProps<TFieldValues, TName>;
+
   maxLength: number;
   placeholder?: string;
   className?: string;
@@ -26,6 +30,8 @@ export function DebouncedFormTextarea<
   className,
   delay = 300,
   tabIndex = 0,
+  disabled,
+  ...textareaProps
 }: DebouncedTextareaProps<TFieldValues, TName>) {
   const [localValue, setLocalValue] = useState(field.value ?? "");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -60,6 +66,8 @@ export function DebouncedFormTextarea<
     <div className={cn("relative w-full")}>
       <textarea
         {...field}
+        {...textareaProps}
+        disabled={disabled}
         ref={textareaRef}
         value={localValue}
         onChange={(e) => {
@@ -75,9 +83,11 @@ export function DebouncedFormTextarea<
           className,
         )}
       />
-      <p className="absolute bottom-3 right-3 bg-card/90 text-xs text-gray-400">
-        {localValue.length}/{maxLength}
-      </p>
+      {!disabled && (
+        <p className="absolute bottom-3 right-3 bg-card/90 text-xs text-gray-400">
+          {localValue.length}/{maxLength}
+        </p>
+      )}
     </div>
   );
 }
