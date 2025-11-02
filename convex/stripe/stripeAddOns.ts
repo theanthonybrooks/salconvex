@@ -205,7 +205,8 @@ export const addOnStoreWebhook = mutation({
         const paymentStatus = baseObject.payment_status === "paid";
         const eventId = baseObject.metadata.eventId as Id<"onlineEvents">;
         const registeredUserId = baseObject.metadata.userId as Id<"users">;
-        const voucherId = baseObject.metadata.voucherId as Id<"eventVouchers">;
+        const voucherId = baseObject.metadata
+          .voucherId as Id<"onlineEventVouchers">;
         const voucherAmount = baseObject.metadata.voucherTotal as number;
         const formattedEmail = metadata.email?.toLowerCase();
         const event = await ctx.db.get(eventId);

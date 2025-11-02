@@ -102,45 +102,65 @@ export const getOnlineEvent = query({
     const user = userId ? await ctx.db.get(userId) : null;
     const isAdmin = user?.role?.includes("admin");
     // const event = await ctx.db.query("onlineEvents").withIndex("by_slug_startDate", (q) => q.eq("slug", args.slug).gt("startDate", Date.now())).first();
+    let resultEvent: Doc<"onlineEvents"> | null = null;
     const now = Date.now();
-    const event = args.eventId
+    const currentEvent = args.eventId
       ? await ctx.db.get(args.eventId)
       : await ctx.db
           .query("onlineEvents")
-          .withIndex("by_slug_endDate", (q) =>
-            q.eq("slug", args.slug ?? "").gte("endDate", now),
+          .withIndex("by_slug_state_endDate", (q) =>
+            q
+              .eq("slug", args.slug ?? "")
+              .eq("state", "published")
+              .gt("endDate", now),
           )
+          .filter((q) => q.lte(q.field("startDate"), now))
           .order("asc")
           .first();
-    if (!event) {
-      const lastEvent = await ctx.db
-        .query("onlineEvents")
-        .withIndex("by_slug_state_endDate", (q) =>
-          q
-            .eq("slug", args.slug ?? "")
-            .eq("state", "published")
-            .lte("endDate", now),
-        )
-        .order("desc")
-        .first();
-      if (lastEvent) {
-        return { success: true, message: "Past Event", data: lastEvent };
-      }
+
+    if (currentEvent) resultEvent = currentEvent;
+
+    const futureEvent = !resultEvent
+      ? await ctx.db
+          .query("onlineEvents")
+          .withIndex("by_slug_startDate", (q) =>
+            q.eq("slug", args.slug ?? "").gt("startDate", now),
+          )
+          .order("asc")
+          .first()
+      : null;
+
+    if (futureEvent) resultEvent = futureEvent;
+
+    const lastEvent = !resultEvent
+      ? await ctx.db
+          .query("onlineEvents")
+          .withIndex("by_slug_state_endDate", (q) =>
+            q
+              .eq("slug", args.slug ?? "")
+              .eq("state", "published")
+              .lte("endDate", now),
+          )
+          .order("desc")
+          .first()
+      : null;
+    if (lastEvent) resultEvent = lastEvent;
+    if (!resultEvent)
       return { success: false, message: "Event not found", data: null };
-    }
-    if (event.state === "draft" && !isAdmin)
+
+    if (resultEvent.state === "draft" && !isAdmin)
       return { success: false, message: "Event is draft", data: null };
     const userRegistration = await ctx.db
       .query("userAddOns")
       .withIndex("by_userId_eventId", (q) =>
-        q.eq("userId", userId).eq("eventId", event._id),
+        q.eq("userId", userId).eq("eventId", resultEvent._id),
       )
       .first();
 
     return {
       success: true,
       message: "Success",
-      data: event,
+      data: resultEvent,
       userRegistration: {
         paid: userRegistration?.paid,
         canceled: userRegistration?.canceled,
@@ -387,6 +407,8 @@ export const updateRegistration = mutation({
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) return null;
+    const user = await ctx.db.get(userId);
+    const isAdmin = user?.role?.includes("admin") ?? false;
     const formattedEmail = args.email?.toLowerCase();
 
     const event = await ctx.db.get(args.eventId);
@@ -421,9 +443,9 @@ export const updateRegistration = mutation({
         },
       });
 
-      if (registration.plan && registration.plan < 2) {
+      if (registration.plan && registration.plan < 2 && !isAdmin) {
         const voucher = await ctx.db
-          .query("eventVouchers")
+          .query("onlineEventVouchers")
           .withIndex("by_userId", (q) => q.eq("userId", userId))
           .first();
         if (voucher) {
@@ -433,10 +455,8 @@ export const updateRegistration = mutation({
             amount: initialVoucherAmt + event.price,
           });
         } else {
-          await ctx.db.insert("eventVouchers", {
+          await ctx.db.insert("onlineEventVouchers", {
             userId,
-            registrationId: registration._id,
-            eventId: event._id,
             email: registration.email,
             amount: event.price,
             redeemed: false,
@@ -447,9 +467,9 @@ export const updateRegistration = mutation({
       if (event.capacity.current === event.capacity.max) {
         throw new ConvexError({ message: "No more spots available" });
       }
-      if (registration.plan && registration.plan < 2) {
+      if (registration.plan && registration.plan < 2 && !isAdmin) {
         const voucher = await ctx.db
-          .query("eventVouchers")
+          .query("onlineEventVouchers")
           .withIndex("by_userId", (q) => q.eq("userId", userId))
           .first();
 
@@ -521,7 +541,6 @@ export const checkRegistration = query({
       userId,
       args.email,
     );
-    console.log({ registration });
     if (!registration) return null;
 
     return {
@@ -542,7 +561,7 @@ export const getUserVoucher = query({
     if (!user) return null;
 
     const voucher = await ctx.db
-      .query("eventVouchers")
+      .query("onlineEventVouchers")
       .withIndex("by_userId", (q) => q.eq("userId", userId))
       .first();
 

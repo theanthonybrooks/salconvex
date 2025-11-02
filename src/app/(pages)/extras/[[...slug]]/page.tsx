@@ -61,7 +61,6 @@ export default async function AddOnsPage({
 
   const event = preloadedResult ? preloadedQueryResult(preloadedResult) : null;
 
-  console.log(event);
   if (!preloadedResult || !event?.data) {
     redirect("/404");
   }
