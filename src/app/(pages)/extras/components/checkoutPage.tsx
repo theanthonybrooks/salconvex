@@ -499,7 +499,7 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
             </div>
           ) : (
             <>
-              {canceledRegistration && voucherCoversPrice ? (
+              {canceledRegistration && (voucherCoversPrice || premiumPlan) ? (
                 <>
                   {/* <FormError
                     message={
