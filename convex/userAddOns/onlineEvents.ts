@@ -208,6 +208,7 @@ export const updateOnlineEvent = mutation({
     const slug = args.name
       ? slugify(args.name, { lower: true, strict: true })
       : event.slug;
+    console.log(args.organizer);
 
     const eventData = {
       name: args.name ?? event.name,
@@ -222,6 +223,7 @@ export const updateOnlineEvent = mutation({
       location: args.location ?? event.location ?? "",
       terms: args.terms ?? event.terms ?? [],
       organizer: args.organizer ?? event.organizer ?? userId,
+      organizerBio: args.organizerBio ?? event.organizerBio ?? "",
       price: args.price ?? event.price ?? 15,
       capacity: {
         ...event.capacity,
@@ -236,6 +238,8 @@ export const updateOnlineEvent = mutation({
     });
   },
 });
+
+
 
 export const deleteOnlineEvent = mutation({
   args: {

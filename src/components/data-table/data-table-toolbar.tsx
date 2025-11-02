@@ -155,7 +155,7 @@ export function DataTableToolbar<TData>({
           <OnlineEventDialog type="create">
             <Button
               variant="salWithShadowHidden"
-              className="w-full px-2 sm:w-fit lg:px-3"
+              className="w-full px-2 sm:h-10 sm:w-fit lg:px-3"
             >
               Add Event
             </Button>
