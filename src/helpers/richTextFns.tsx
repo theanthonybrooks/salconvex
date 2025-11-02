@@ -15,19 +15,6 @@ interface RichTextDisplayProps {
   fontSize?: string;
 }
 
-// export function cleanHtml(
-//   html: string = "",
-//   totalClean: boolean = false,
-// ): string {
-//   if (html === "") return "";
-//   if (totalClean) {
-//     return DOMPurify.sanitize(html, {
-//       ALLOWED_TAGS: [],
-//       ALLOWED_ATTR: [],
-//     });
-//   }
-//   return DOMPurify.sanitize(html, { ALLOWED_TAGS, ALLOWED_ATTR });
-// }
 export function cleanHtml(
   html: string = "",
   totalClean: boolean = false,
@@ -36,10 +23,22 @@ export function cleanHtml(
   if (totalClean) {
     return sanitizeHtml(html, { allowedTags: [], allowedAttributes: {} });
   }
-  return sanitizeHtml(html, {
+
+  const cleaned = sanitizeHtml(html, {
     allowedTags: ALLOWED_TAGS,
-    allowedAttributes: Object.fromEntries(ALLOWED_ATTR.map((a) => [a, []])),
+    allowedAttributes: {
+      "*": [
+        ...ALLOWED_ATTR,
+        "type",
+        "checked",
+        "data-type",
+        "data-checked",
+        "target",
+        "rel",
+      ],
+    },
   });
+  return cleaned;
 }
 
 export const RichTextDisplay = ({
@@ -48,18 +47,6 @@ export const RichTextDisplay = ({
   maxChars,
   fontSize = "text-sm",
 }: RichTextDisplayProps) => {
-  // const clean = DOMPurify.sanitize(html, {
-  //   ALLOWED_TAGS: [...ALLOWED_TAGS, "input"],
-  //   ALLOWED_ATTR: [
-  //     ...ALLOWED_ATTR,
-  //     "type",
-  //     "checked",
-  //     "data-type",
-  //     "data-checked",
-  //     "target",
-  //     "rel",
-  //   ],
-  // });
   const clean = sanitizeHtml(html, {
     allowedTags: [...ALLOWED_TAGS, "input"],
     allowedAttributes: {
@@ -89,7 +76,6 @@ export const RichTextDisplay = ({
       : normalized;
 
   function replace(domNode: DOMNode): JSX.Element | null {
-    // Task items
     if (
       domNode instanceof Element &&
       domNode.name === "li" &&
@@ -131,6 +117,11 @@ export const RichTextDisplay = ({
       const children = domToReact(domNode.children as DOMNode[], { replace });
 
       if (domNode.name === "a") {
+        const href = domNode.attribs?.href?.trim();
+        const target = domNode.attribs?.target;
+        const rel = domNode.attribs?.rel;
+        const hasValidHref = !!href && /^(https?:\/\/|\/)/i.test(href);
+
         const firstChild = domNode.children[0];
         if (
           domNode.children.length === 1 &&
@@ -147,9 +138,9 @@ export const RichTextDisplay = ({
             return (
               <a
                 className={cn("mr-1 font-semibold", commonClasses)}
-                href={domNode.attribs?.href}
-                target={domNode.attribs?.target}
-                rel={domNode.attribs?.rel}
+                href={href}
+                target={target}
+                rel={rel}
                 title={cleanedText}
               >
                 {displayText}
@@ -157,16 +148,18 @@ export const RichTextDisplay = ({
             );
           }
         }
-        return (
-          <Link
-            className={cn("font-semibold", commonClasses)}
-            href={domNode.attribs?.href}
-            target={domNode.attribs?.target}
-            rel={domNode.attribs?.rel}
-          >
-            {children}
-          </Link>
-        );
+        if (hasValidHref) {
+          return (
+            <Link
+              className={cn("font-semibold", commonClasses)}
+              href={domNode.attribs?.href}
+              target={domNode.attribs?.target}
+              rel={domNode.attribs?.rel}
+            >
+              {children}
+            </Link>
+          );
+        }
       }
 
       switch (domNode.name) {
