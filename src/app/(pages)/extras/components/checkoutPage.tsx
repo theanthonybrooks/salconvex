@@ -3,6 +3,7 @@
 import type { EventRegistrationValues } from "@/schemas/public";
 import type { Preloaded } from "convex/react";
 
+import { useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { EventRegistrationSchema } from "@/schemas/public";
@@ -123,6 +124,17 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
   const updateRegistration = useMutation(
     api.userAddOns.onlineEvents.updateRegistration,
   );
+
+  useEffect(() => {
+    if (!user || isPending) return;
+    form.reset({
+      email: user.email ?? "",
+      name: user.name ?? "",
+      link: registration?.link ?? "",
+      notes: registration?.notes ?? "",
+      termsAgreement: unpaidRegistration,
+    });
+  }, [user, registration, unpaidRegistration, isPending, form]);
 
   if ((isPending && user) || !event) return <FullPageLoading />;
   const {
@@ -655,6 +667,7 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
                               placeholder="ex. example.com"
                               className="w-full border-foreground bg-card text-base focus:outline-none focus:ring-1 focus:ring-ring focus:ring-offset-1 focus:ring-offset-ring"
                               debounceMs={50}
+                              tabIndex={1}
                             />
                           </FormControl>
                           <FormMessage />
@@ -681,6 +694,7 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
                                 "min-h-10 w-full resize-none rounded-lg border-foreground bg-card text-base focus:outline-none focus:ring-1 focus:ring-ring focus:ring-offset-1 focus:ring-offset-ring",
                                 // isEmpty && "h-10",
                               )}
+                              tabIndex={2}
                             />
                           </FormControl>
                           <FormMessage />
@@ -699,6 +713,7 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
                                 checked={field.value || false}
                                 onCheckedChange={field.onChange}
                                 className="text-base"
+                                tabIndex={3}
                               />
                             </FormControl>
                             <FormLabel className="hover:cursor-pointer">
@@ -729,6 +744,7 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
                       className="w-full"
                       disabled={!isValid || !termsAgreement}
                       fontSize={fontSize}
+                      tabIndex={4}
                     >
                       {deadlineHasPassed
                         ? "Registration Closed"
