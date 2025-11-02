@@ -91,6 +91,7 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
   // console.log({ voucherTotal, eventPrice, voucherCoversPrice });
   const { paid, canceled, registration } = userIsRegistered ?? {};
   const activeRegistration = paid && !canceled;
+  const unpaidRegistration = !paid && !canceled && Boolean(registration);
   const canceledRegistration = paid && canceled;
 
   const form = useForm<EventRegistrationValues>({
@@ -100,7 +101,7 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
       name: user?.name ?? "",
       link: registration?.link ?? "",
       notes: registration?.notes ?? "",
-      termsAgreement: false,
+      termsAgreement: unpaidRegistration,
     },
     mode: "onChange",
     delayError: 1000,
@@ -136,7 +137,6 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
   const now = Date.now();
   const deadlineHasPassed = now > regDeadline;
   const eventHasPassed = now > event.endDate;
-  console.log(eventHasPassed);
   const remainingCapacity = capacity.max - capacity.current;
   const remainingSpace = remainingCapacity > 0;
   const startDate = new Date(event.startDate);
@@ -303,36 +303,48 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
         <h2 className="text-lg font-semibold">{`${datePart} @ ${timePart}`}</h2>
 
         <div className="flex flex-col items-center gap-6">
-          {remainingCapacity <= 3 && remainingSpace && !deadlineHasPassed && (
-            <p className="-mt-6 text-balance text-center font-bold text-red-600">
-              Only {remainingCapacity} space{remainingCapacity > 1 ? "s" : ""}{" "}
-              left!
-            </p>
-          )}
-          {!remainingSpace && !deadlineHasPassed && (
+          {remainingCapacity <= 3 &&
+            remainingSpace &&
+            !deadlineHasPassed &&
+            !activeRegistration && (
+              <p className="-mt-6 text-balance text-center font-bold text-red-600">
+                Only {remainingCapacity} space{remainingCapacity > 1 ? "s" : ""}{" "}
+                left!
+              </p>
+            )}
+          {!remainingSpace && !deadlineHasPassed && !activeRegistration && (
             <p className="-mt-6 text-balance text-center font-bold text-red-600">
               This event is fully booked!
             </p>
           )}
-          {eventHasPassed ? (
-            <p className="-mt-6 text-balance text-center font-bold text-red-600">
-              Event has ended!
+          {activeRegistration ? (
+            <p className="-mt-6 text-balance text-center font-bold text-green-700">
+              You&apos;re registered for this event!
             </p>
-          ) : deadlineHasPassed ? (
-            <p className="-mt-6 text-balance text-center font-bold text-red-600">
-              Registration has closed!
-            </p>
-          ) : remainingSpace ? (
-            <span className="gap-1 sm:flex">
-              <strong>Registration Deadline:</strong>
-              <p>{deadlineOutput}</p>
-            </span>
-          ) : null}
-          {remainingSpace && (
-            <p className="text-balance text-center font-medium">
-              <strong>Price:</strong> Free for users with Banana or Fatcap
-              memberships. ${eventPrice} otherwise.
-            </p>
+          ) : (
+            <>
+              {eventHasPassed ? (
+                <p className="-mt-6 text-balance text-center font-bold text-red-600">
+                  Event has ended!
+                </p>
+              ) : deadlineHasPassed ? (
+                <p className="-mt-6 text-balance text-center font-bold text-red-600">
+                  Registration has closed!
+                </p>
+              ) : remainingSpace ? (
+                <span className="gap-1 sm:flex">
+                  <strong>Registration Deadline:</strong>
+                  <p>{deadlineOutput}</p>
+                </span>
+              ) : null}
+
+              {remainingSpace && (
+                <p className="text-balance text-center font-medium">
+                  <strong>Price:</strong> Free for users with Banana or Fatcap
+                  memberships. ${eventPrice} otherwise.
+                </p>
+              )}
+            </>
           )}
         </div>
       </section>
@@ -586,7 +598,11 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
                               <FormLabel>Name</FormLabel>
                               <FormControl>
                                 <Input
-                                  disabled={deadlineHasPassed || eventHasPassed}
+                                  disabled={
+                                    deadlineHasPassed ||
+                                    eventHasPassed ||
+                                    unpaidRegistration
+                                  }
                                   {...field}
                                   placeholder="ex. Bob Bobson"
                                   className="w-full border-foreground bg-card text-base focus:outline-none focus:ring-1 focus:ring-ring focus:ring-offset-1 focus:ring-offset-ring"
@@ -604,7 +620,11 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
                               <FormLabel>Email</FormLabel>
                               <FormControl>
                                 <Input
-                                  disabled={deadlineHasPassed || eventHasPassed}
+                                  disabled={
+                                    deadlineHasPassed ||
+                                    eventHasPassed ||
+                                    unpaidRegistration
+                                  }
                                   {...field}
                                   placeholder="ex. email@example.com"
                                   className="w-full border-foreground bg-card text-base focus:outline-none focus:ring-1 focus:ring-ring focus:ring-offset-1 focus:ring-offset-ring"
@@ -624,7 +644,11 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
                           <FormLabel>Portfolio Link</FormLabel>
                           <FormControl>
                             <DebouncedControllerInput
-                              disabled={deadlineHasPassed || eventHasPassed}
+                              disabled={
+                                deadlineHasPassed ||
+                                eventHasPassed ||
+                                unpaidRegistration
+                              }
                               transform={autoHttps}
                               field={field}
                               placeholder="ex. example.com"
@@ -644,7 +668,11 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
                           <FormLabel>Intention/Goal</FormLabel>
                           <FormControl>
                             <DebouncedFormTextarea
-                              disabled={deadlineHasPassed || eventHasPassed}
+                              disabled={
+                                deadlineHasPassed ||
+                                eventHasPassed ||
+                                unpaidRegistration
+                              }
                               field={field}
                               maxLength={250}
                               placeholder="Any specific area(s) you would like to focus on?"
@@ -658,26 +686,28 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
                         </FormItem>
                       )}
                     />
-                    <FormField
-                      control={form.control}
-                      name="termsAgreement"
-                      render={({ field }) => (
-                        <FormItem className="my-2 flex items-center gap-2 space-y-0">
-                          <FormControl>
-                            <Checkbox
-                              disabled={deadlineHasPassed || eventHasPassed}
-                              checked={field.value || false}
-                              onCheckedChange={field.onChange}
-                              className="text-base"
-                            />
-                          </FormControl>
-                          <FormLabel className="hover:cursor-pointer">
-                            I have read and agree to the terms of this event
-                            <sup>*</sup>
-                          </FormLabel>
-                        </FormItem>
-                      )}
-                    />
+                    {!unpaidRegistration && (
+                      <FormField
+                        control={form.control}
+                        name="termsAgreement"
+                        render={({ field }) => (
+                          <FormItem className="my-2 flex items-center gap-2 space-y-0">
+                            <FormControl>
+                              <Checkbox
+                                disabled={deadlineHasPassed || eventHasPassed}
+                                checked={field.value || false}
+                                onCheckedChange={field.onChange}
+                                className="text-base"
+                              />
+                            </FormControl>
+                            <FormLabel className="hover:cursor-pointer">
+                              I have read and agree to the terms of this event
+                              <sup>*</sup>
+                            </FormLabel>
+                          </FormItem>
+                        )}
+                      />
+                    )}
                     {/* <Label
                       htmlFor="termsAgreement"
                       className="inline-flex items-center gap-2"
@@ -699,7 +729,11 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
                       disabled={!isValid || !termsAgreement}
                       fontSize={fontSize}
                     >
-                      {deadlineHasPassed ? "Registration Closed" : "Register"}
+                      {deadlineHasPassed
+                        ? "Registration Closed"
+                        : unpaidRegistration
+                          ? "Finish Registration"
+                          : "Register"}
                     </Button>
                   </form>
                   <p className="text-sm">

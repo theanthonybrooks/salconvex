@@ -304,6 +304,7 @@ export const registerForOnlineEvent = mutation({
       args.email,
     );
     if (registration) {
+      //TODO: Check if this makes sense, or if it's better to just patch it and register? For cases where they've cancelled, then used that voucher elsewhere?
       if (registration.paid) {
         throw new ConvexError({
           message: `You're already registered for this event. ${userId ? "Log in to update, or c" : "Check your email for the event confirmation or c"}ontact support`,
@@ -336,6 +337,7 @@ export const registerForOnlineEvent = mutation({
       plan,
       canceled: false,
       link: args.link,
+      notes: args.notes,
       file: artistPortfolio,
     });
 
