@@ -293,7 +293,7 @@ export const eventBase = z.object({
   links: linksSchemaLoose,
   otherInfo: z.string().optional(),
   timeLine: z.string().optional(),
-  blurb: z.string().optional(),
+  blurb: z.string().min(10, "A blurb is required"),
   about: z.string().optional(),
   active: z.boolean().optional(),
   adminNote: z.string().optional(),

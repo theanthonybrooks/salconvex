@@ -819,7 +819,7 @@ export const checkEventNameExists = query({
     name: v.string(),
     organizationId: v.optional(v.id("organizations")),
     eventId: v.optional(v.id("events")),
-    edition: v.optional(v.number()),
+    edition: v.number(),
   },
   handler: async (ctx, args) => {
     // console.log(args);

@@ -31,10 +31,12 @@ export function DebouncedFormTextarea<
   delay = 300,
   tabIndex = 0,
   disabled,
+  required,
   ...textareaProps
 }: DebouncedTextareaProps<TFieldValues, TName>) {
   const [localValue, setLocalValue] = useState(field.value ?? "");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const emptyRequired = required && localValue.trim().length === 0;
 
   const debouncedOnChange = useMemo(
     () =>
@@ -80,6 +82,7 @@ export function DebouncedFormTextarea<
         placeholder={placeholder}
         className={cn(
           "scrollable justy mini w-full resize-none rounded-lg border border-foreground bg-card p-3 pb-6 text-base placeholder:italic focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 sm:text-sm",
+          emptyRequired && "invalid-field",
           className,
         )}
       />

@@ -441,25 +441,12 @@ const SubmissionFormEventStep1 = ({
                         name="event.blurb"
                         control={control}
                         render={({ field }) => (
-                          // <div className={cn("relative")}>
-                          //   <Textarea
-                          //     value={field.value ?? ""}
-                          //     onChange={field.onChange}
-                          //     placeholder="Short blurb about your project/event... (max 200 characters) "
-                          //     maxLength={200}
-                          //     className={cn(
-                          //       "scrollable justy mini h-25 w-full resize-none rounded-lg border border-foreground bg-card p-3 text-base focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 sm:text-sm",
-                          //     )}
-                          //   />
-                          //   <p className="absolute bottom-2 right-2 text-xs text-gray-400">
-                          //     {field.value?.length}/200
-                          //   </p>
-                          // </div>
                           <DebouncedFormTextarea
                             field={field}
                             maxLength={250}
+                            required
                             className="max-h-30 min-h-12"
-                            placeholder="Short blurb about your project/event... Limit 250 characters "
+                            placeholder="Short blurb about your project/event... Limit 250 characters (required) "
                           />
                         )}
                       />

@@ -396,12 +396,18 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
     validOrgWZod && isStepValidZod && eventChoiceMade && validStep2;
 
   const projectBudget = ocData?.compensation?.budget;
-  const projectMaxBudget = projectBudget?.max;
-  const projectMinBudget = projectBudget?.min;
-  const projectBudgetLg = ocBudget?.max && ocBudget.max > 1000;
+  const projectCurrency = ocBudget?.currency ?? "USD";
+  const projectMaxBudget = ocBudget?.max;
+  const projectMinBudget = ocBudget?.min;
+  // const projectBudgetLg = ocBudget?.max && ocBudget.max > 1000;
 
   const projectBudgetAmt = (projectMaxBudget || projectMinBudget) ?? 0;
-  const submissionCost = getOcPricing(projectBudgetAmt);
+  const [submissionCost, setSubmissionCost] = useState<
+    { name: string; price: number; converted: number } | undefined
+  >({ name: "base", price: 50, converted: 0 });
+  const projectBudgetLg =
+    submissionCost?.converted && submissionCost.converted > 1000;
+
   const alreadyPaid = !!openCallData?.paid;
   const alreadyApprovedOC = !!openCallData?.approvedBy;
   const alreadyApprovedEvent = !!eventData?.approvedBy;
@@ -571,6 +577,18 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
       setValue("event.hasOpenCall", "False");
     }
     handleFirstStep();
+    if (activeStep === 5) {
+      try {
+        const convertedSubmissionCost = await getOcPricing(
+          projectBudgetAmt,
+          projectCurrency,
+        );
+        setSubmissionCost(convertedSubmissionCost);
+      } catch (error) {
+        console.error("Failed to convert submission cost:", error);
+        throw new Error("submission_cost_conversion_failed");
+      }
+    }
     if (activeStep === 3) {
       if (!hasOpenCall) {
         unregister("openCall");

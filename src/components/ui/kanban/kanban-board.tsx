@@ -279,26 +279,26 @@ const Board = ({ purpose: initialPurpose }: KanbanBoardProps) => {
                 Reset
               </Button>
             </div>
-            {purpose === "todo" && (
-              <MultiSelect
-                options={[...supportCategoryOptions]}
-                onValueChange={(value) => {
-                  setCategory(value as SupportCategory[]);
-                }}
-                value={category}
-                placeholder="Select category"
-                variant="basic"
-                maxCount={1}
-                condensed
-                height={11}
-                hasSearch={false}
-                selectAll={false}
-                className={cn(
-                  "w-full max-w-md border-1.5 border-foreground/20 sm:h-11 md:min-w-64",
-                )}
-                listClassName="max-h-80"
-              />
-            )}
+
+            <MultiSelect
+              options={[...supportCategoryOptions]}
+              onValueChange={(value) => {
+                setCategory(value as SupportCategory[]);
+              }}
+              value={category}
+              placeholder="Select category"
+              variant="basic"
+              maxCount={1}
+              condensed
+              height={11}
+              hasSearch={false}
+              selectAll={false}
+              className={cn(
+                "w-full max-w-md border-1.5 border-foreground/20 sm:h-11 md:min-w-64",
+              )}
+              listClassName="max-h-80"
+            />
+
             {!isMobile && (
               <StaffUserSelector
                 setCurrentUser={setUserFilter}

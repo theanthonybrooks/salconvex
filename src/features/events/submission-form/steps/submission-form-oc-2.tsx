@@ -1,12 +1,17 @@
-import { useEffect, useRef, useState } from "react";
-import { currencies, Currency } from "@/app/data/currencies";
+import { openCallCategoryFields } from "@/constants/openCallConsts";
+import { siteUrl } from "@/constants/siteInfo";
+
 import { OpenCallCategoryKey } from "@/types/openCallTypes";
 import { User } from "@/types/user";
+
+import { useEffect, useRef, useState } from "react";
+import { currencies, Currency } from "@/app/data/currencies";
 import FilePondPluginFileValidateSize from "filepond-plugin-file-validate-size";
 import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type";
-import { ArrowRight } from "lucide-react";
 import { registerPlugin } from "react-filepond";
 import { Controller, useFormContext } from "react-hook-form";
+
+import { ArrowRight } from "lucide-react";
 
 import { MultiSelect } from "@/components/multi-select";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -25,8 +30,6 @@ import { Separator } from "@/components/ui/separator";
 import { EventOCFormValues } from "@/features/events/event-add-form";
 import { getCurrencySymbol } from "@/helpers/currencyFns";
 import { cn } from "@/helpers/utilsFns";
-import { openCallCategoryFields } from "@/constants/openCallConsts";
-import { siteUrl } from "@/constants/siteInfo";
 
 import "filepond/dist/filepond.min.css";
 
@@ -90,6 +93,7 @@ const SubmissionFormOC2 = ({
 
   const budgetMin = openCall?.compensation?.budget?.min;
   const budgetMax = openCall?.compensation?.budget?.max;
+
   const budgetRate = openCall?.compensation?.budget?.rate;
   const budgetUnit = openCall?.compensation?.budget?.unit;
   const validBudgetMin =
@@ -103,8 +107,6 @@ const SubmissionFormOC2 = ({
   const unknownBudget = openCall?.compensation?.budget?.unknownBudget;
   const prevBudgetMaxRef = useRef<number | undefined>(undefined);
   const budgetMaxRef = useRef(budgetMax);
-  // const wasFreeNowPaid = initialFormType === 2 && currentFormType === 3;
-  // const budgetLg = typeof budgetMax === "number" && budgetMax > 1000;
   const hasBudgetValues = budgetMin !== 0 || budgetMax !== 0 || allInclusive;
 
   const setValueRef = useRef(setValue);
@@ -116,21 +118,9 @@ const SubmissionFormOC2 = ({
     }
   }, [paidCall, setValue]);
 
-  // useEffect(() => {
-  //   if (!initialFormType) return;
-  //   if (currentFormType !== 3 && budgetLg) {
-  //     setValue("event.formType", 3);
-  //     setHasBudget("true");
-  //   } else if (currentFormType === 3 && !budgetLg && wasFreeNowPaid) {
-  //     setValue("event.formType", 2);
-  //   }
-  // }, [currentFormType, budgetLg, setValue, wasFreeNowPaid, initialFormType]);
-
   useEffect(() => {
     const formValue = hasBudget?.trim();
-    // console.log("hasBudget", hasBudget);
     const shouldBe = validBudgetMin ? "true" : "";
-    // console.log("shouldBe", shouldBe);
     if (!formValue && validBudgetMin) {
       setHasBudget(shouldBe);
       setValue("openCall.compensation.budget.max", budgetMin);
@@ -163,12 +153,6 @@ const SubmissionFormOC2 = ({
     return () => clearTimeout(timeout);
   }, [budgetMax, handleCheckSchema]);
 
-  // // Keep refs in sync
-  // useEffect(() => {
-  //   budgetMaxRef.current = budgetMax;
-  //   handleCheckSchema();
-  // }, [budgetMax, handleCheckSchema]);
-
   useEffect(() => {
     setValueRef.current = setValue;
   }, [setValue]);
@@ -184,9 +168,19 @@ const SubmissionFormOC2 = ({
     }
   }, [currentFormType, initialFormType, paidCall]);
 
+  // useEffect(() => {
+  //   if (initialFormType === 3) return;
+  //   if (budgetMax && budgetMax > 1000) {
+  //     setPriceAlert(
+  //       "Note: Budgets over $1,000 (USD) will convert this to a paid call",
+  //     );
+  //   } else {
+  //     setPriceAlert(null);
+  //   }
+  // }, [budgetMax, initialFormType]);
+
   useEffect(() => {
     const min = budgetMin;
-    // const max = budgetMaxRef.current;
     const max = budgetMax;
 
     if (typeof min !== "number") return;
@@ -201,17 +195,6 @@ const SubmissionFormOC2 = ({
     return () => clearTimeout(timeout);
   }, [budgetMin, budgetMax]);
 
-  // useEffect(() => {
-  //   const min = budgetMin;
-  //   const max = budgetMax;
-
-  //   if (typeof min === "number") {
-  //     if (typeof max !== "number" || max < min) {
-  //       setValue("openCall.compensation.budget.max", min);
-  //     }
-  //   }
-  // }, [budgetMin, budgetMax, setValue]);
-
   useEffect(() => {
     if (hasBudget === "true" || !hasBudgetValues) return;
     if (hasBudget === "false" && hasBudgetValues) {
@@ -223,9 +206,6 @@ const SubmissionFormOC2 = ({
         "openCall.compensation.budget.currency",
         orgCurrency?.code ?? "USD",
       );
-      // setValue("openCall.compensation.budget.currency", "USD");
-      // setValue("openCall.compensation.budget.allInclusive", false);
-      // setValue("openCall.compensation.budget.unit", "");
     }
   }, [hasBudgetValues, hasBudget, setValue, orgCurrency]);
 

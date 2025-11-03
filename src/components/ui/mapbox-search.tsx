@@ -338,14 +338,14 @@ export const MapboxInputFull = ({
 
       const results = await fetchMapboxSuggestionsFull(
         inputValue,
-        isEvent ? true : false,
+        !isArtist ? true : false,
       );
       setSuggestions(results);
       setHighlightedIndex(0);
     }, 500);
 
     return () => clearTimeout(timeout);
-  }, [inputValue, isEvent, isFocused]);
+  }, [inputValue, isArtist, isFocused]);
 
   useEffect(() => {
     if (fullLocation && newLocation) {

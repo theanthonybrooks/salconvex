@@ -150,7 +150,7 @@ export const getFilteredEventsPublic = query({
     // const endDay = endOfWeek(refDate, { weekStartsOn: 0 }); // or have it start on monday
     // const shiftedWeekEnd = addWeeks(endDay, targetWeekOffset);
     const shiftedWeekEnd = addDays(shiftedWeekStart, 8);
-
+    const nowISO = new Date().toISOString();
     const monthFromNow = addMonths(refDate, 1);
     const weekStartISO = shiftedWeekStart.toISOString();
     const weekEndISO = shiftedWeekEnd.toISOString();
@@ -181,7 +181,7 @@ export const getFilteredEventsPublic = query({
           .withIndex("by_ocState_ocEnd", (q) =>
             q
               .eq("ocState", "published")
-              .gte("ocEnd", weekStartISO)
+              .gte("ocEnd", nowISO)
               .lte("ocEnd", monthFromNowISO),
           )
           .take(10);
@@ -337,10 +337,13 @@ export const getFilteredEventsPublic = query({
           lookupResults = await ctx.db
             .query("eventLookup")
             .withIndex("by_ocState", (q) => q.eq("ocState", "published"))
+            .filter((q) =>
+              q.or(q.gte(q.field("ocEnd"), nowISO), q.eq(q.field("ocEnd"), "")),
+            )
             .collect();
         }
 
-        console.log(lookupResults);
+        // console.log(lookupResults);
       }
     } else if (thisWeekPg || nextWeekPg) {
       if (!hasActiveSubscription) {

@@ -470,15 +470,19 @@ export const EventOCForm = ({
     validOrgWZod && isStepValidZod && eventChoiceMade && validStep2;
 
   const hasErrors = !!errors && Object.keys(errors).length > 0;
-
   const projectBudget = ocData?.compensation?.budget;
-  const projectMaxBudget = projectBudget?.max;
-  const projectMinBudget = projectBudget?.min;
-  const projectBudgetLg = ocBudget?.max && ocBudget.max > 1000;
+  const projectCurrency = ocBudget?.currency ?? "USD";
+  const projectMaxBudget = ocBudget?.max;
+  const projectMinBudget = ocBudget?.min;
+  // const projectBudgetLg = ocBudget?.max && ocBudget.max > 1000;
 
   const projectBudgetAmt = (projectMaxBudget || projectMinBudget) ?? 0;
-  const submissionCost = getOcPricing(projectBudgetAmt);
+  const [submissionCost, setSubmissionCost] = useState<
+    { name: string; price: number; converted: number } | undefined
+  >({ name: "base", price: 50, converted: 0 });
 
+  const projectBudgetLg =
+    submissionCost?.converted && submissionCost.converted > 1000;
   // console.log(finalStep, acceptedTerms, isAdmin);
   // #endregion
   // #endregion
@@ -627,9 +631,21 @@ export const EventOCForm = ({
       await handleSave();
     }
     handleFirstStep();
-    console.log("savedCount: ", savedCount);
+    // console.log("savedCount: ", savedCount);
     if (savedCount > 0 && activeStep === steps.length - 1) {
       handleDraftUpdate();
+    }
+    if (activeStep === 5) {
+      try {
+        const convertedSubmissionCost = await getOcPricing(
+          projectBudgetAmt,
+          projectCurrency,
+        );
+        setSubmissionCost(convertedSubmissionCost);
+      } catch (error) {
+        console.error("Failed to convert submission cost:", error);
+        throw new Error("submission_cost_conversion_failed");
+      }
     }
     if (activeStep === 3) {
       if (!hasOpenCall) {
@@ -766,7 +782,6 @@ export const EventOCForm = ({
 
       const result = schema.safeParse(currentValues);
 
-      console.log("safeParse result: ", result);
       if (isAdmin) {
         console.log("safeParse result: ", result);
       }
@@ -776,7 +791,6 @@ export const EventOCForm = ({
         if (isAdmin) {
           console.log("issues: ", issues);
         }
-        console.log("issues: ", issues);
 
         issues.forEach((issue) => {
           const path = issue.path.join(".") as Path<EventOCFormValues>;
@@ -1562,7 +1576,10 @@ export const EventOCForm = ({
                     max: openCallData.compensation?.budget?.max ?? 0,
                     rate: openCallData.compensation?.budget?.rate ?? 0,
                     unit: openCallData.compensation?.budget?.unit ?? "",
-                    currency: orgData.location?.currency?.code ?? "",
+                    currency:
+                      openCallData.compensation?.budget?.currency ??
+                      orgData.location?.currency?.code ??
+                      "",
                     allInclusive:
                       openCallData.compensation?.budget?.allInclusive ?? false,
                     moreInfo: openCallData.compensation?.budget?.moreInfo,
@@ -1723,6 +1740,7 @@ export const EventOCForm = ({
     prevOrgRef.current = null;
     isFirstRun.current = true;
     lastChangedRef.current = null;
+    setSubmissionCost(undefined);
     setExistingEvent(null);
     setOpenCallId(null);
     setNewOrgEvent(true);
@@ -1856,11 +1874,11 @@ export const EventOCForm = ({
   }, [serializedErrors, schema, hasUserEditedForm]);
 
   useEffect(() => {
-    console.log({
-      isStepValidZod,
-      hasUserEditedForm,
-      canCheck: canCheckSchema.current,
-    });
+    // console.log({
+    //   isStepValidZod,
+    //   hasUserEditedForm,
+    //   canCheck: canCheckSchema.current,
+    // });
     if (!canCheckSchema.current) {
       if (isStepValidZod) {
         canCheckSchema.current = true;

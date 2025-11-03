@@ -21,15 +21,47 @@ export const OC_PRICING_TIERS = [
     price: 500,
   },
 ];
-export function getOcPricing(input: number | true) {
-  if (input === 0) return { name: "base", price: 50 };
-  if (input === true || input <= 10000) {
-    return OC_PRICING_TIERS.find((tier) => tier.name === "base")!;
-  } else if (input > 10000 && input <= 20000) {
-    return OC_PRICING_TIERS.find((tier) => tier.name === "mid")!;
-  } else if (input > 20000 && input <= 50000) {
-    return OC_PRICING_TIERS.find((tier) => tier.name === "large")!;
-  } else if (input > 50000) {
-    return OC_PRICING_TIERS.find((tier) => tier.name === "municipal")!;
+
+export async function convertToUSD(
+  amount: number,
+  currencyCode: string,
+): Promise<number> {
+  if (currencyCode.toUpperCase() === "USD") return amount;
+
+  try {
+    const res = await fetch(
+      `https://www.floatrates.com/daily/${currencyCode.toLowerCase()}.json`,
+    );
+    const data = await res.json();
+    const rate = data?.usd?.rate;
+    if (!rate) throw new Error("No USD rate found for " + currencyCode);
+    return amount * rate;
+  } catch (err) {
+    console.error("Currency conversion failed:", err);
+    return amount; // fallback: treat as USD
   }
+}
+
+export async function getOcPricing(input: number, currency: string = "USD") {
+  const amountInUSD = await convertToUSD(input, currency);
+  console.log(input, currency);
+  console.log(amountInUSD);
+  let tier = {
+    name: "base",
+    description: "Base Paid Open Call Price",
+    price: 50,
+  };
+  if (amountInUSD <= 10000) {
+    tier = OC_PRICING_TIERS.find((tier) => tier.name === "base")!;
+  } else if (amountInUSD > 10000 && amountInUSD <= 20000) {
+    tier = OC_PRICING_TIERS.find((tier) => tier.name === "mid")!;
+  } else if (amountInUSD > 20000 && amountInUSD <= 50000) {
+    tier = OC_PRICING_TIERS.find((tier) => tier.name === "large")!;
+  } else if (amountInUSD > 50000) {
+    tier = OC_PRICING_TIERS.find((tier) => tier.name === "municipal")!;
+  }
+  return {
+    ...tier,
+    converted: amountInUSD,
+  };
 }
