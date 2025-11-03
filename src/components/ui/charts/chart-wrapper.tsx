@@ -16,7 +16,6 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { LoadingBalls } from "@/components/ui/loading-balls";
 import { SelectSimple } from "@/components/ui/select";
 import { cn } from "@/helpers/utilsFns";
 
@@ -154,13 +153,18 @@ export const ChartWrapper = ({ eventId, className }: ChartContainerProps) => {
         />
       </CardHeader>
       <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
-        {loading || !filteredData.length ? (
-          <LoadingBalls numberOfBalls={6} scale={1} />
+        {loading ? (
+          // <LoadingBalls numberOfBalls={3} scale={1} />
+
+          <span className="flex h-full min-h-60 w-full items-center justify-center">
+            Loading Data...{" "}
+          </span>
+        ) : !filteredData.length ? (
+          <span className="flex h-full min-h-60 w-full items-center justify-center">
+            No data found
+          </span>
         ) : (
-          <ChartContainer
-            config={config}
-            className="aspect-auto h-[250px] w-full"
-          >
+          <ChartContainer config={config} className="aspect-auto h-60 w-full">
             <AreaChart data={filteredData}>
               <defs>
                 {Object.entries(config).map(([key, { color }]) => (

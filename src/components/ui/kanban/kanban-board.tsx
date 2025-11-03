@@ -830,7 +830,7 @@ export const TaskDialog = ({
       description: initialValues?.description || "",
       column: initialValues?.column || "todo",
       priority: initialValues?.priority || "medium",
-      category: "general",
+      category: initialValues?.category || "general",
       order:
         mode === "add" && initialValues?.order ? initialValues.order : "start",
       isPublic: initialValues?.isPublic ?? true,
@@ -866,21 +866,6 @@ export const TaskDialog = ({
       : null,
   );
 
-  // console.log(assignedUsers, assignedUsers?.length);
-
-  // const [images, setImages] = useState<Blob[]>([]);
-
-  // useEffect(() => {
-  //   if (prevRef.current === assignedUserData && assignedUser === null) {
-  //     prevRef.current = null;
-  //     return;
-  //   }
-  //   if (!prevRef.current && assignedUserData) {
-  //     prevRef.current = assignedUserData;
-  //     setAssignedUser(assignedUserData);
-  //   }
-  // }, [assignedUser, assignedUserData]);
-
   const handleOnSubmit = async (values: KanbanCardType) => {
     isSubmittingRef.current = true;
     try {
@@ -911,17 +896,6 @@ export const TaskDialog = ({
         });
       }
 
-      // Reset form
-      // setTitle(initialValues?.title || "");
-      // setDescription(initialValues?.description || "");
-      // setColumn(initialValues?.column || "todo");
-      // setPriority(initialValues?.priority || "high");
-      // setCategory(initialValues?.category || "general");
-
-      // setOrder(
-      //   mode === "add" && initialValues?.order ? initialValues.order : "end",
-      // );
-      // setIsPublic(initialValues?.isPublic ?? true);
       form.reset();
     } finally {
       isSubmittingRef.current = false;

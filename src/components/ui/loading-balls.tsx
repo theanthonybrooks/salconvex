@@ -19,14 +19,16 @@ const BallGroup = ({
 type LoadingBallsProps = {
   numberOfBalls?: number;
   scale?: number;
+  className?: string;
 };
 
 export const LoadingBalls = ({
   numberOfBalls = 2,
   scale,
+  className,
 }: LoadingBallsProps) => {
   return (
-    <StyledWrapper>
+    <StyledWrapper className={cn("min-h-50 h-full w-full gap-24", className)}>
       {Array.from({ length: numberOfBalls }, (_, i) => i + 1).map((_, i) => (
         <BallGroup key={i} scale={scale} delay={i * 0.2} />
       ))}
@@ -35,17 +37,14 @@ export const LoadingBalls = ({
 };
 
 const StyledWrapper = styled.div`
+  position: relative;
   display: flex;
   justify-content: center;
   align-items: flex-end;
-  gap: 6rem;
-  height: 200px;
-  position: relative;
 
   .ball-group {
     position: relative;
     width: 20px;
-    /* scale: 2; */
   }
 
   .circle {
