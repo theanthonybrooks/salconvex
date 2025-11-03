@@ -1,26 +1,51 @@
 import styled from "styled-components";
 
-export const LoadingBalls = () => {
+import { cn } from "@/helpers/utilsFns";
+
+const BallGroup = ({
+  scale = 1,
+  delay = 0,
+}: {
+  scale?: number;
+  delay?: number;
+}) => {
+  return (
+    <div className={cn("ball-group")} style={{ scale: `${scale}` }}>
+      <div className="circle" style={{ animationDelay: `${delay}s` }} />
+      <div className="shadow" style={{ animationDelay: `${delay}s` }} />
+    </div>
+  );
+};
+type LoadingBallsProps = {
+  numberOfBalls?: number;
+  scale?: number;
+};
+
+export const LoadingBalls = ({
+  numberOfBalls = 2,
+  scale,
+}: LoadingBallsProps) => {
   return (
     <StyledWrapper>
-      <div className="wrapper">
-        <div className="circle" />
-        <div className="circle" />
-        <div className="circle" />
-        <div className="shadow" />
-        <div className="shadow" />
-        <div className="shadow" />
-      </div>
+      {Array.from({ length: numberOfBalls }, (_, i) => i + 1).map((_, i) => (
+        <BallGroup key={i} scale={scale} delay={i * 0.2} />
+      ))}
     </StyledWrapper>
   );
 };
 
 const StyledWrapper = styled.div`
-  .wrapper {
-    width: 200px;
-    height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 6rem;
+  height: 200px;
+  position: relative;
+
+  .ball-group {
     position: relative;
-    z-index: 1;
+    width: 20px;
+    /* scale: 2; */
   }
 
   .circle {
@@ -28,40 +53,57 @@ const StyledWrapper = styled.div`
     height: 20px;
     position: absolute;
     border-radius: 50%;
-    background-color: #fff;
-    left: 15%;
+
+    background-color: #0e0e0e;
     transform-origin: 50%;
-    animation: circle7124 0.5s alternate infinite ease;
+    animation: bounce 0.5s alternate infinite ease;
   }
 
-  @keyframes circle7124 {
+  @keyframes bounce {
     0% {
-      top: 60px;
-      height: 5px;
+      bottom: 0%;
+      transform: scaleX(1.4) scaleY(0.6);
       border-radius: 50px 50px 25px 25px;
-      transform: scaleX(1.7);
     }
 
+    /* Launch — rapid stretch upward */
+    10% {
+      transform: scaleX(0.9) scaleY(1.2);
+      bottom: 10px;
+    }
+
+    /* Rising — slowing as it reaches the top */
     40% {
-      height: 20px;
+      bottom: 80px;
+      transform: scaleX(1.05) scaleY(0.95);
       border-radius: 50%;
-      transform: scaleX(1);
     }
 
+    /* Apex — slight hang time before falling */
+    50% {
+      bottom: 85px;
+      transform: scaleX(1) scaleY(1);
+    }
+
+    /* Fall — accelerating down, slight stretch */
+    60% {
+      bottom: 10px;
+      transform: scaleX(0.95) scaleY(1.1);
+    }
+
+    /* Impact — squash wider and shorter */
+    90% {
+      bottom: 0%;
+      transform: scaleX(1.6) scaleY(0.5);
+      border-radius: 50px 50px 25px 25px;
+    }
+
+    /* Settle — minor stretch recovery */
     100% {
-      top: 0%;
+      bottom: 0%;
+      transform: scaleX(1.3) scaleY(0.7);
+      border-radius: 50px 50px 25px 25px;
     }
-  }
-
-  .circle:nth-child(2) {
-    left: 45%;
-    animation-delay: 0.2s;
-  }
-
-  .circle:nth-child(3) {
-    left: auto;
-    right: 15%;
-    animation-delay: 0.3s;
   }
 
   .shadow {
@@ -70,38 +112,23 @@ const StyledWrapper = styled.div`
     border-radius: 50%;
     background-color: rgba(0, 0, 0, 0.9);
     position: absolute;
-    top: 62px;
-    transform-origin: 50%;
-    z-index: -1;
-    left: 15%;
+    bottom: 2px;
     filter: blur(1px);
-    animation: shadow046 0.5s alternate infinite ease;
+    animation: shadowAnim 0.5s alternate infinite ease;
   }
 
-  @keyframes shadow046 {
+  @keyframes shadowAnim {
     0% {
       transform: scaleX(1.5);
-    }
-
-    40% {
-      transform: scaleX(1);
       opacity: 0.7;
     }
-
-    100% {
+    50% {
       transform: scaleX(0.2);
-      opacity: 0.4;
+      opacity: 0;
     }
-  }
-
-  .shadow:nth-child(4) {
-    left: 45%;
-    animation-delay: 0.2s;
-  }
-
-  .shadow:nth-child(5) {
-    left: auto;
-    right: 15%;
-    animation-delay: 0.3s;
+    100% {
+      transform: scaleX(1.3);
+      opacity: 0.6;
+    }
   }
 `;

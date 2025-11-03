@@ -1,9 +1,4 @@
 import { useState } from "react";
-import { api } from "~/convex/_generated/api";
-import { Id } from "~/convex/_generated/dataModel";
-import { makeUseQueryWithStatus } from "convex-helpers/react";
-import { useQueries } from "convex-helpers/react/cache/hooks";
-import { LoaderCircle } from "lucide-react";
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 
 import {
@@ -21,8 +16,14 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { LoadingBalls } from "@/components/ui/loading-balls";
 import { SelectSimple } from "@/components/ui/select";
 import { cn } from "@/helpers/utilsFns";
+
+import { api } from "~/convex/_generated/api";
+import { Id } from "~/convex/_generated/dataModel";
+import { makeUseQueryWithStatus } from "convex-helpers/react";
+import { useQueries } from "convex-helpers/react/cache/hooks";
 
 export const chartTimeOptions = [
   { value: "90d", label: "Last 3 months" },
@@ -115,14 +116,9 @@ export const ChartWrapper = ({ eventId, className }: ChartContainerProps) => {
     return date >= startDate;
   });
 
-  if (loading || !filteredData.length) {
-    return (
-      <div className={cn("flex w-full items-center justify-center py-6")}>
-        <LoaderCircle className="animate-spin" />
-        Loading...
-      </div>
-    );
-  }
+  // if (loading || !filteredData.length) {
+  //   return <LoadingBalls numberOfBalls={6} scale={0.5} />;
+  // }
 
   const config =
     chartType === "application"
@@ -158,71 +154,75 @@ export const ChartWrapper = ({ eventId, className }: ChartContainerProps) => {
         />
       </CardHeader>
       <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
-        <ChartContainer
-          config={config}
-          className="aspect-auto h-[250px] w-full"
-        >
-          <AreaChart data={filteredData}>
-            <defs>
-              {Object.entries(config).map(([key, { color }]) => (
-                <linearGradient
-                  key={key}
-                  id={`fill-${key}`}
-                  x1="0"
-                  y1="0"
-                  x2="0"
-                  y2="1"
-                >
-                  <stop offset="5%" stopColor={color} stopOpacity={0.8} />
-                  <stop offset="95%" stopColor={color} stopOpacity={0.1} />
-                </linearGradient>
-              ))}
-            </defs>
+        {loading || !filteredData.length ? (
+          <LoadingBalls numberOfBalls={6} scale={1} />
+        ) : (
+          <ChartContainer
+            config={config}
+            className="aspect-auto h-[250px] w-full"
+          >
+            <AreaChart data={filteredData}>
+              <defs>
+                {Object.entries(config).map(([key, { color }]) => (
+                  <linearGradient
+                    key={key}
+                    id={`fill-${key}`}
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="1"
+                  >
+                    <stop offset="5%" stopColor={color} stopOpacity={0.8} />
+                    <stop offset="95%" stopColor={color} stopOpacity={0.1} />
+                  </linearGradient>
+                ))}
+              </defs>
 
-            <CartesianGrid vertical={false} />
-            <XAxis
-              dataKey="date"
-              tickLine={false}
-              axisLine={false}
-              tickMargin={8}
-              minTickGap={32}
-              tickFormatter={(value) => {
-                const date = new Date(value);
-                return date.toLocaleDateString("en-US", {
-                  month: "short",
-                  day: "numeric",
-                });
-              }}
-            />
-            <ChartTooltip
-              cursor={false}
-              content={
-                <ChartTooltipContent
-                  labelFormatter={(value) => {
-                    return new Date(value).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                    });
-                  }}
-                  indicator="dot"
-                />
-              }
-            />
-
-            {Object.entries(config).map(([key, { color }]) => (
-              <Area
-                key={key}
-                dataKey={key}
-                type="natural"
-                fill={`url(#fill-${key})`}
-                stroke={color}
-                stackId="a"
+              <CartesianGrid vertical={false} />
+              <XAxis
+                dataKey="date"
+                tickLine={false}
+                axisLine={false}
+                tickMargin={8}
+                minTickGap={32}
+                tickFormatter={(value) => {
+                  const date = new Date(value);
+                  return date.toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                  });
+                }}
               />
-            ))}
+              <ChartTooltip
+                cursor={false}
+                content={
+                  <ChartTooltipContent
+                    labelFormatter={(value) => {
+                      return new Date(value).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                      });
+                    }}
+                    indicator="dot"
+                  />
+                }
+              />
 
-            <ChartLegend content={<ChartLegendContent />} />
-          </AreaChart>
-        </ChartContainer>
+              {Object.entries(config).map(([key, { color }]) => (
+                <Area
+                  key={key}
+                  dataKey={key}
+                  type="natural"
+                  fill={`url(#fill-${key})`}
+                  stroke={color}
+                  stackId="a"
+                />
+              ))}
+
+              <ChartLegend content={<ChartLegendContent />} />
+            </AreaChart>
+          </ChartContainer>
+        )}
       </CardContent>
     </Card>
   );
