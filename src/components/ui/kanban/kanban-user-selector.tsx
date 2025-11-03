@@ -21,12 +21,12 @@ import { useMutation } from "convex/react";
 interface UserSelectorProps {
   currentUserIds: Id<"users">[] | null;
   cardId?: Id<"todoKanban">;
-  setCurrentUser?: Dispatch<SetStateAction<Id<"users">[] | null>>;
+  setCurrentUsers?: Dispatch<SetStateAction<Id<"users">[] | null>>;
   mode: "add" | "edit" | "view";
 }
 
 export const KanbanUserSelector = ({
-  setCurrentUser,
+  setCurrentUsers,
   currentUserIds,
 
   cardId,
@@ -42,8 +42,8 @@ export const KanbanUserSelector = ({
   const handleUserToggle = async (staff: Doc<"users">) => {
     const id = staff.userId as Id<"users">;
 
-    if (setCurrentUser) {
-      setCurrentUser((prev) => {
+    if (setCurrentUsers) {
+      setCurrentUsers((prev) => {
         if (!prev) return [id];
         return prev.includes(id)
           ? prev.filter((u) => u !== id)

@@ -854,14 +854,19 @@ export const TaskDialog = ({
     : mode === "add"
       ? (user?.userId as Id<"users"> | null)
       : null;
-  const initialSecondaryAssignedUser =
-    initialValues?.secondaryAssignedId ?? ("" as Id<"users">);
 
-  const [assignedUser, setAssignedUser] = useState<Id<"users">[] | null>(
+  const initialSecondaryAssignedUser: Id<"users"> | null =
+    (initialValues?.secondaryAssignedId as Id<"users"> | null) ?? null;
+
+  const [assignedUsers, setAssignedUsers] = useState<Id<"users">[] | null>(
     initialAssignedUser
-      ? [initialAssignedUser, initialSecondaryAssignedUser]
+      ? [initialAssignedUser, initialSecondaryAssignedUser].filter(
+          (id): id is Id<"users"> => Boolean(id),
+        )
       : null,
   );
+
+  // console.log(assignedUsers, assignedUsers?.length);
 
   // const [images, setImages] = useState<Blob[]>([]);
 
@@ -925,13 +930,13 @@ export const TaskDialog = ({
   };
 
   useEffect(() => {
-    console.log(assignedUser, assignedUser?.length, isOpen);
-    if (!assignedUser || assignedUser.length === 0 || !isOpen) return;
+    // console.log(assignedUsers, assignedUsers?.length, isOpen);
+    if (!assignedUsers || assignedUsers.length === 0 || !isOpen) return;
 
-    const [primary, secondary] = assignedUser;
-    console.table(assignedUser);
+    const [primary, secondary] = assignedUsers;
+    // console.table(assignedUsers);
     // Avoid unnecessary updates
-    const currentForm = form.getValues();
+    // const currentForm = form.getValues();
     const currentPrimary = form.getValues("assignedId");
     const currentSecondary = form.getValues("secondaryAssignedId");
 
@@ -939,8 +944,8 @@ export const TaskDialog = ({
 
     form.setValue("assignedId", primary, { shouldDirty: true });
     form.setValue("secondaryAssignedId", secondary, { shouldDirty: true });
-    console.log(currentForm);
-  }, [assignedUser, form, isOpen]);
+    // console.log(currentForm);
+  }, [assignedUsers, form, isOpen]);
 
   const onCloseDialog = () => {
     setTimeout(() => {
@@ -962,11 +967,10 @@ export const TaskDialog = ({
         <DialogHeader>
           <div className="flex items-baseline justify-between gap-3">
             <DialogTitle>{isEdit ? "Edit Task" : "Add New Task"}</DialogTitle>
-            {/* TODO: Make this possible for adding as well. Need to make it update some state for that, though. */}
 
             <KanbanUserSelector
-              setCurrentUser={setAssignedUser}
-              currentUserIds={assignedUser}
+              setCurrentUsers={setAssignedUsers}
+              currentUserIds={assignedUsers}
               mode={mode}
             />
           </div>
