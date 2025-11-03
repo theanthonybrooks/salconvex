@@ -261,10 +261,11 @@ export const getOpenCallStatusLabel = ({
     : null;
 
   if (hasOpenCall) {
+    const rollingOrEmail = hasOpenCall === "Rolling" || hasOpenCall === "Email";
     const isCurrent = ocStart && now > ocStart && ocEnd && now < ocEnd;
     const isComing = ocEnd && ocStart && now > ocStart && now < ocEnd;
     const isEnded = ocEnd && now > ocEnd;
-    if (isCurrent) {
+    if (isCurrent || rollingOrEmail) {
       return 2;
     } else if (isComing) {
       return 3;
