@@ -529,7 +529,7 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
                         {/* <span className="text-foreground/60">Loading...</span> */}
                       </Command.Empty>
                     ) : (
-                      <Command.Empty>
+                      <Command.Empty className="flex flex-col">
                         <span className="text-foreground/60">
                           Search for{" "}
                           {view === "event" || view === "openCall"
