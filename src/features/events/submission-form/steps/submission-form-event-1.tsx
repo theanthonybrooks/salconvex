@@ -1,11 +1,14 @@
-import { useEffect, useRef, useState } from "react";
+import {
+  eventCategoryOptions,
+  eventTypeOptions,
+  noEventCategories,
+  prodOnlyCategories,
+} from "@/constants/eventConsts";
+
 import { EventCategory } from "@/types/eventTypes";
 import { User } from "@/types/user";
-import { api } from "~/convex/_generated/api";
-import { Doc } from "~/convex/_generated/dataModel";
-import { makeUseQueryWithStatus } from "convex-helpers/react";
-import { useQueries } from "convex-helpers/react/cache/hooks";
-import { ConvexError } from "convex/values";
+
+import { useEffect, useRef, useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 
 import { MultiSelect } from "@/components/multi-select";
@@ -23,12 +26,12 @@ import { EventNameSearch } from "@/features/events/components/event-search";
 import { EventOCFormValues } from "@/features/events/event-add-form";
 import { getEventCategoryLabel } from "@/helpers/eventFns";
 import { cn } from "@/helpers/utilsFns";
-import {
-  eventCategoryOptions,
-  eventTypeOptions,
-  noEventCategories,
-  prodOnlyCategories,
-} from "@/constants/eventConsts";
+
+import { api } from "~/convex/_generated/api";
+import { Doc } from "~/convex/_generated/dataModel";
+import { makeUseQueryWithStatus } from "convex-helpers/react";
+import { useQueries } from "convex-helpers/react/cache/hooks";
+import { ConvexError } from "convex/values";
 
 interface SubmissionFormEventStep1Props {
   user: User | undefined;
@@ -454,9 +457,9 @@ const SubmissionFormEventStep1 = ({
                           // </div>
                           <DebouncedFormTextarea
                             field={field}
-                            maxLength={200}
+                            maxLength={250}
                             className="max-h-30 min-h-12"
-                            placeholder="Short blurb about your project/event... Limit 200 characters "
+                            placeholder="Short blurb about your project/event... Limit 250 characters "
                           />
                         )}
                       />

@@ -249,7 +249,7 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
                       <RichTextDisplay
                         html={event.about ?? ""}
                         fontSize={fontSize}
-                        maxChars={200}
+                        maxChars={250}
                       />
                     )}
                     <button

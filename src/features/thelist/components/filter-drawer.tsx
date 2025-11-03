@@ -64,6 +64,7 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
 }: FilterDrawerProps<T>) => {
   // const searchType = search.searchType ?? "all";
   const eventView = view === "event";
+  // const organizerView = view === "organizer";
   const router = useRouter();
   const { preloadedSubStatus, preloadedUserData } = useConvexPreload();
   const subData = usePreloadedQuery(preloadedSubStatus);
@@ -128,6 +129,25 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
     // onSearchChange({ searchTerm: newValue });
     setLocalValue(newValue);
   };
+
+  // const handleLinkPath = (
+  //   view: ViewOptions,
+  //   event: MergedEventPreviewData,
+  //   hasActiveSubscription: boolean,
+  // ) => {
+  //   const orgSlug = event.orgData?.orgSlug;
+  //   const orgView = view === "orgView";
+  //   const eventView = view === "event";
+  //   if (orgView) {
+  //     return `/thelist/organizer/${orgSlug}`;
+  //   } else if (eventView) {
+  //     return formatEventLink(
+  //       event,
+  //       hasActiveSubscription,
+  //       hasActiveSubscription && eventView,
+  //     );
+  //   }
+  // };
 
   // const handleLinkClick = () => {
   //   setOpen(false);
@@ -196,11 +216,7 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
       })
       .map((event) => ({
         name: event.orgData?.orgName ?? "",
-        path: formatEventLink(
-          event,
-          hasActiveSubscription,
-          hasActiveSubscription && eventView,
-        ),
+        path: `/thelist/organizer/${event.orgData?.orgSlug}`,
         meta:
           getSearchLocationString(
             event.orgData?.orgLocation ?? event.location,

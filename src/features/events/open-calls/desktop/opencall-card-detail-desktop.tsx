@@ -348,7 +348,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                       <RichTextDisplay
                         html={event.about ?? ""}
                         fontSize={fontSize}
-                        maxChars={200}
+                        maxChars={250}
                       />
                     )}
                     <button

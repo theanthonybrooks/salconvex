@@ -780,7 +780,7 @@ const ClientEventList = () => {
           </div>
         </div>
       )}
-      {/* NOTE: Do I need to make the full "List" available to public or is the calendar, map, and archive (tabs) enough? Plus the "This Week" tab? */}
+ 
       {publicView && (
         <div
           className={cn(
