@@ -965,7 +965,7 @@ export const TaskDialog = ({
       </DialogTrigger>
       <DialogContent className="w-full max-w-[max(50rem,100vw)] bg-card sm:max-w-[max(40rem,50vw)]">
         <DialogHeader>
-          <div className="flex items-baseline justify-between gap-3">
+          <div className="flex items-baseline justify-between gap-3 pr-4">
             <DialogTitle>{isEdit ? "Edit Task" : "Add New Task"}</DialogTitle>
 
             <KanbanUserSelector
@@ -974,7 +974,7 @@ export const TaskDialog = ({
               mode={mode}
             />
           </div>
-          <DialogDescription>
+          <DialogDescription className="sr-only">
             {isEdit
               ? "Update task details."
               : "Create a new task with priority and location."}
@@ -1074,7 +1074,8 @@ export const TaskDialog = ({
                     </FormItem>
                   )}
                 />
-
+              </div>
+              <div className="flex w-full items-center gap-3 sm:w-auto">
                 <FormField
                   control={form.control}
                   name="category"
@@ -1100,7 +1101,7 @@ export const TaskDialog = ({
                     control={form.control}
                     name="order"
                     render={({ field }) => (
-                      <FormItem className="w-full">
+                      <FormItem className="w-auto sm:w-full">
                         <FormLabel className="font-bold">Order</FormLabel>
                         <FormControl>
                           <SelectSimple
@@ -1111,8 +1112,8 @@ export const TaskDialog = ({
                             ]}
                             value={field.value}
                             onChangeAction={(value) => field.onChange(value)}
-                            placeholder="Select category"
-                            className="w-full"
+                            placeholder="Select order"
+                            className="w-auto"
                           />
                         </FormControl>
                         <FormMessage />
@@ -1129,7 +1130,7 @@ export const TaskDialog = ({
                 name="isPublic"
                 render={({ field }) => (
                   <FormItem className="flex flex-row-reverse items-center gap-2 space-y-0">
-                    <FormLabel className="font-bold">
+                    <FormLabel className="hidden font-bold sm:block">
                       {publicState ? "Public" : "Private"} Task
                     </FormLabel>
                     <FormControl>

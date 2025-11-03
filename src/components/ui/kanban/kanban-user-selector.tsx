@@ -70,7 +70,7 @@ export const KanbanUserSelector = ({
 
   return (
     <div className="flex items-center gap-3 pr-8 text-sm">
-      <div className="flex flex-col items-end gap-1">
+      <div className="hidden flex-col items-end gap-1 sm:flex">
         Assign{mode === "add" || assignedUsers.length === 0 ? " to" : "ed to"}:
         {/* <span className="font-semibold">{currentUserName}</span> */}
         <div className="flex flex-wrap gap-1 font-semibold">
