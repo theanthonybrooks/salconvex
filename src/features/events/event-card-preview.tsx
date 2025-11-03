@@ -75,7 +75,7 @@ const EventCardPreview = ({
 
   const isAdmin = user?.role?.includes("admin");
   const isArtist = user?.accountType?.includes("artist");
-  const hasValidSub = activeSub && isArtist;
+  const hasValidSub = (activeSub && isArtist) || isAdmin;
   const userTZ = !!userPref?.timezone ? userPref.timezone : undefined;
   const router = useRouter();
   const {

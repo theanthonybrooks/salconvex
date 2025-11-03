@@ -1,7 +1,18 @@
 "use client";
 
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import {
+  eventCategoryOptions,
+  eventTypeOptions,
+  PostStatusOptionValues,
+} from "@/constants/eventConsts";
+import { SearchType, TheListFilterCommandItem } from "@/constants/filterConsts";
+import { select_continents } from "@/constants/locationConsts";
+import {
+  callFormat_option_values,
+  callType_option_values,
+  eligibilityOptionValues,
+} from "@/constants/openCallConsts";
+
 import {
   EventCategory,
   EventType,
@@ -15,14 +26,10 @@ import {
   SearchParams,
   SortOptions,
 } from "@/types/thelist";
-import { usePreloadedQuery } from "convex/react";
-import {
-  ChevronDown,
-  ChevronUp,
-  LucideFilter,
-  LucideFilterX,
-  X,
-} from "lucide-react";
+
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+
 import { BiSolidQuoteLeft, BiSolidQuoteRight } from "react-icons/bi";
 import { FiCommand, FiSearch } from "react-icons/fi";
 import {
@@ -31,6 +38,13 @@ import {
   LiaSortNumericDownAltSolid,
   LiaSortNumericDownSolid,
 } from "react-icons/lia";
+import {
+  ChevronDown,
+  ChevronUp,
+  LucideFilter,
+  LucideFilterX,
+  X,
+} from "lucide-react";
 
 import { MultiSelect } from "@/components/multi-select";
 import { Button } from "@/components/ui/button";
@@ -49,18 +63,8 @@ import { Separator } from "@/components/ui/separator";
 import { ViewOptions } from "@/features/events/event-list-client";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { cn } from "@/helpers/utilsFns";
-import {
-  eventCategoryOptions,
-  eventTypeOptions,
-  PostStatusOptionValues,
-} from "@/constants/eventConsts";
-import { SearchType, TheListFilterCommandItem } from "@/constants/filterConsts";
-import { select_continents } from "@/constants/locationConsts";
-import {
-  callFormat_option_values,
-  callType_option_values,
-  eligibilityOptionValues,
-} from "@/constants/openCallConsts";
+
+import { usePreloadedQuery } from "convex/react";
 
 export interface FilterBaseProps {
   isMobile: boolean;
@@ -122,7 +126,7 @@ export const FilterBase = ({
   const hasActiveSubscription = subData?.hasActiveSubscription;
   const isArtist = userData?.user?.accountType?.includes("artist");
   const isAdmin = userData?.user?.role?.includes("admin");
-  const paidUser = isArtist && hasActiveSubscription;
+  const paidUser = (isArtist && hasActiveSubscription) || isAdmin;
   const limitOpenCalls = view === "event" || view === "orgView";
   const orgView = view === "orgView";
   const archiveView = view === "archive";
