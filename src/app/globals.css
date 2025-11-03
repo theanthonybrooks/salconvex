@@ -554,7 +554,9 @@ form {
     outline-offset: 0;
   }
   input:not(:placeholder-shown):valid {
-    background-color: rgb(255, 255, 255);
+    &:not(.kanban) {
+      background-color: rgb(255, 255, 255);
+    }
   }
 }
 text-area::placeholder,

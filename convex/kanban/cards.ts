@@ -23,6 +23,9 @@ export const searchCards = query({
     ),
   },
   handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    const user = userId ? await ctx.db.get(userId) : null;
+    const isCreator = user?.role?.includes("creator") ?? false;
     const searchTerm = args.searchTerm?.trim() ?? "";
 
     let q = ctx.db
@@ -61,7 +64,12 @@ export const searchCards = query({
       );
     }
     if (args.assignedId) {
-      output = output.filter((q) => q.assignedId === args.assignedId);
+      output = output.filter(
+        (q) =>
+          q.assignedId === args.assignedId ||
+          (isCreator && !q.assignedId) ||
+          q.secondaryAssignedId === args.assignedId,
+      );
     }
 
     return output;
@@ -94,7 +102,11 @@ export const getCards = query({
       );
       const flatResults = results.flat();
       if (args.userId) {
-        return flatResults.filter((card) => card.assignedId === args.userId);
+        return flatResults.filter(
+          (card) =>
+            card.assignedId === args.userId ||
+            card.secondaryAssignedId === args.userId,
+        );
       } else {
         return flatResults;
       }
@@ -136,7 +148,11 @@ export const getCards = query({
       args.userId &&
       ((userIsCreator && args.purpose === "todo") || !userIsCreator)
     ) {
-      return collectedResults.filter((card) => card.assignedId === args.userId);
+      return collectedResults.filter(
+        (card) =>
+          card.assignedId === args.userId ||
+          card.secondaryAssignedId === args.userId,
+      );
     } else {
       return collectedResults;
     }
@@ -165,6 +181,7 @@ export const addCard = mutation({
       ),
     ),
     assignedId: v.optional(v.id("users")),
+    secondaryAssignedId: v.optional(v.id("users")),
   },
   handler: async (ctx, args) => {
     const {
@@ -176,10 +193,26 @@ export const addCard = mutation({
       category,
       priority,
       isPublic,
+      assignedId,
+      secondaryAssignedId,
     } = args;
     const cardPurpose = category === "ui/ux" ? "design" : args.purpose;
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new Error("User not authenticated");
+    const user = await ctx.db.get(userId);
+    const isAdmin = user?.role?.includes("admin") ?? false;
+    const creatorUser = !isAdmin
+      ? await ctx.db
+          .query("userRoles")
+          .withIndex("by_role", (q) => q.eq("role", "creator"))
+          .first()
+      : null;
+    const defaultAssignedId = assignedId
+      ? assignedId
+      : isAdmin
+        ? userId
+        : creatorUser?.userId;
+
     if (column === "done") {
       return await ctx.db.insert("todoKanban", {
         title,
@@ -193,7 +226,8 @@ export const addCard = mutation({
         priority,
         public: isPublic,
         purpose: cardPurpose,
-        assignedId: args.assignedId,
+        assignedId: defaultAssignedId,
+        secondaryAssignedId,
         completedAt: Date.now(),
       });
     }
@@ -224,7 +258,8 @@ export const addCard = mutation({
         priority,
         public: isPublic,
         purpose: cardPurpose,
-        assignedId: args.assignedId,
+        assignedId: defaultAssignedId,
+        secondaryAssignedId,
         userId,
       });
     }
@@ -250,7 +285,8 @@ export const addCard = mutation({
       category: category ?? "general",
       public: isPublic,
       purpose: cardPurpose,
-      assignedId: args.assignedId,
+      assignedId: defaultAssignedId,
+      secondaryAssignedId,
     });
   },
 });
@@ -365,6 +401,8 @@ export const editCard = mutation({
         direction: v.union(v.literal("up"), v.literal("down")),
       }),
     ),
+    assignedId: v.optional(v.id("users")),
+    secondaryAssignedId: v.optional(v.id("users")),
     isPublic: v.optional(v.boolean()),
     purpose: v.string(),
   },
@@ -406,6 +444,8 @@ export const editCard = mutation({
       public: args.isPublic,
       category: args.category,
       voters: args.voters,
+      assignedId: args.assignedId,
+      secondaryAssignedId: args.secondaryAssignedId,
       ...(args.column !== undefined && { column: args.column }),
     });
   },
@@ -487,6 +527,7 @@ export const updateAssignedUser = mutation({
   args: {
     id: v.id("todoKanban"),
     userId: v.optional(v.id("users")),
+    secondaryUserId: v.optional(v.id("users")),
     isAdmin: v.boolean(),
   },
   handler: async (ctx, args) => {
@@ -498,6 +539,7 @@ export const updateAssignedUser = mutation({
 
     await ctx.db.patch(kanbanCard._id, {
       assignedId: args.userId,
+      secondaryAssignedId: args.secondaryUserId,
     });
   },
 });

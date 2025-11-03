@@ -1,7 +1,15 @@
 import { SupportCategory } from "@/constants/supportConsts";
 
 import { User } from "@/types/user";
-import { Id } from "~/convex/_generated/dataModel";
+
+import z from "zod";
+
+import {
+  FcHighPriority,
+  FcLowPriority,
+  FcMediumPriority,
+} from "react-icons/fc";
+import { MdOutlineDesignServices } from "react-icons/md";
 import {
   Calendar,
   Circle,
@@ -14,12 +22,8 @@ import {
   Scroll,
   Users2,
 } from "lucide-react";
-import {
-  FcHighPriority,
-  FcLowPriority,
-  FcMediumPriority,
-} from "react-icons/fc";
-import { MdOutlineDesignServices } from "react-icons/md";
+
+import { Id } from "~/convex/_generated/dataModel";
 
 export const PRIORITY_CONFIG: Record<
   "high" | "medium" | "low",
@@ -86,6 +90,7 @@ export const columnViewLimitMap: Record<string, number> = {
   backlog: 15,
   todo: 20,
   doing: 15,
+  ongoing: 10,
   done: 5,
   notPlanned: 5,
   default: 30,
@@ -96,9 +101,14 @@ export const ColumnTypeOptions = [
   { label: "Considering", value: "backlog" },
   { label: "To Do", value: "todo" },
   { label: "In Progress", value: "doing" },
+  { label: "Ongoing", value: "ongoing" },
   { label: "Completed", value: "done" },
   { label: "Not Planned", value: "notPlanned" },
 ] as const;
+
+export const columnTypeValidator = z.union(
+  ColumnTypeOptions.map((o) => z.literal(o.value)),
+);
 
 export type ColumnType = (typeof ColumnTypeOptions)[number]["value"];
 
@@ -125,6 +135,10 @@ export const priorityOptions = [
   { label: "Medium", value: "medium", icon: FcMediumPriority },
   { label: "Low", value: "low", icon: FcLowPriority },
 ] as const;
+
+export const priorityValidator = z.union(
+  priorityOptions.map((o) => z.literal(o.value)),
+);
 
 export type Priority = (typeof priorityOptions)[number]["value"];
 
@@ -156,6 +170,7 @@ export type CardBase = {
   isPublic: boolean;
   purpose: KanbanPurpose;
   assignedId?: Id<"users">;
+  secondaryAssignedId?: Id<"users">;
 };
 
 export type MoveCardArgs = {
@@ -182,6 +197,8 @@ export type AddCardArgs = {
   category: SupportCategory;
   isPublic: boolean;
   purpose: KanbanPurpose;
+  assignedId?: Id<"users">;
+  secondaryAssignedId?: Id<"users">;
 };
 
 export type DeleteCardArgs = {
@@ -233,6 +250,7 @@ export type BaseTaskValues = {
   category: SupportCategory;
   isPublic: boolean;
   assignedId?: Id<"users">;
+  secondaryAssignedId?: Id<"users">;
 };
 
 export type BaseTaskDialogSharedProps = {

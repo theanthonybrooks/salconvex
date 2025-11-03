@@ -1,3 +1,9 @@
+import {
+  columnTypeValidator,
+  priorityValidator,
+} from "@/constants/kanbanConsts";
+import { supportCategoryValidator } from "@/constants/supportConsts";
+
 import { z } from "zod";
 
 export const extrasSchema = z.object({
@@ -27,3 +33,17 @@ export const extrasSchema = z.object({
 });
 
 export type ExtrasType = z.infer<typeof extrasSchema>;
+
+export const kanbanCardSchema = z.object({
+  title: z.string().min(3, "Title is required"),
+  description: z.string().min(10, "Description is required"),
+  column: columnTypeValidator,
+  priority: priorityValidator,
+  category: supportCategoryValidator,
+  order: z.string(),
+  isPublic: z.boolean(),
+  assignedId: z.optional(z.string()),
+  secondaryAssignedId: z.optional(z.string()),
+});
+
+export type KanbanCardType = z.infer<typeof kanbanCardSchema>;

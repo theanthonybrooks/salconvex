@@ -1,5 +1,6 @@
-import { Eye, EyeOff } from "lucide-react";
 import styled from "styled-components";
+
+import { Eye, EyeOff } from "lucide-react";
 
 import { cn } from "@/helpers/utilsFns";
 
@@ -10,7 +11,7 @@ const PublicToggle = ({
   name,
 }: {
   checked: boolean;
-  onChange: () => void;
+  onChange: (value: boolean) => void;
   className?: string;
   name?: string;
 }) => {
@@ -22,7 +23,7 @@ const PublicToggle = ({
           className="toggle-checkbox"
           type="checkbox"
           checked={checked}
-          onChange={onChange}
+          onChange={(e) => onChange(e.target.checked)}
         />
         <div
           className={cn(

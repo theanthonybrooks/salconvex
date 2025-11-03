@@ -237,6 +237,7 @@ export const kanbanColumnValidator = v.union(
   v.literal("backlog"),
   v.literal("todo"),
   v.literal("doing"),
+  v.literal("ongoing"),
   v.literal("done"),
   v.literal("notPlanned"),
 );
@@ -801,6 +802,7 @@ export const kanbanCardSchema = v.object({
   purpose: kanbanPurposeValidator,
   userSuggestion: v.optional(v.string()),
   assignedId: v.optional(v.id("users")),
+  secondaryAssignedId: v.optional(v.id("users")),
   userId: v.optional(v.id("users")),
   ticketNumber: v.optional(v.id("support")),
 });

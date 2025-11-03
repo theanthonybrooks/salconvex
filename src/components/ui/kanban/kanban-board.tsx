@@ -31,15 +31,17 @@ import type {
   Voter,
 } from "@/constants/kanbanConsts";
 import type { SupportCategory } from "@/constants/supportConsts";
+import type { KanbanCardType } from "@/schemas/admin";
 import type { User } from "@/types/user";
 
 import { useEffect, useRef, useState } from "react";
-import { api } from "~/convex/_generated/api";
-import { useQuery } from "convex-helpers/react/cache";
-import { Id } from "convex/_generated/dataModel";
-import { useMutation, usePreloadedQuery } from "convex/react";
+import { kanbanCardSchema } from "@/schemas/admin";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
 import { capitalize, debounce } from "lodash";
+import { useForm } from "react-hook-form";
+
+import { FiPlus } from "react-icons/fi";
 import {
   Eye,
   Filter,
@@ -49,11 +51,11 @@ import {
   Pencil,
   X,
 } from "lucide-react";
-import { FiPlus } from "react-icons/fi";
 
 import { MultiSelect } from "@/components/multi-select";
 import { StaffUserSelector } from "@/components/ui/admin/userSelector";
 import { Button } from "@/components/ui/button";
+import { DebouncedControllerInput } from "@/components/ui/debounced-form-input";
 import {
   Dialog,
   DialogClose,
@@ -65,19 +67,30 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { FlairBadge } from "@/components/ui/flair-badge";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { KanbanUserSelector } from "@/components/ui/kanban/userSelector";
-import { Label } from "@/components/ui/label";
+import { KanbanUserSelector } from "@/components/ui/kanban/kanban-user-selector";
 import PublicToggle from "@/components/ui/public-toggle";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { SelectSimple } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { Textarea } from "@/components/ui/textarea";
 import { TooltipSimple } from "@/components/ui/tooltip";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { RichTextDisplay } from "@/helpers/richTextFns";
 import { cn } from "@/helpers/utilsFns";
 import { useDevice } from "@/providers/device-provider";
+
+import { api } from "~/convex/_generated/api";
+import { useQuery } from "convex-helpers/react/cache";
+import { Id } from "convex/_generated/dataModel";
+import { useMutation, usePreloadedQuery } from "convex/react";
 
 export const KanbanBoard = ({ purpose = "todo" }: KanbanBoardProps) => {
   return <Board purpose={purpose} />;
@@ -89,6 +102,7 @@ export const getColumnColor = (column: ColumnType) => {
     backlog: "bg-neutral-200/80",
     todo: "bg-salYellow/70",
     doing: "bg-blue-200",
+    ongoing: "bg-slate-200",
     done: "bg-emerald-200",
     notPlanned: "bg-red-200",
   };
@@ -211,12 +225,20 @@ const Board = ({ purpose: initialPurpose }: KanbanBoardProps) => {
     backlog: "Considering",
     todo: "To Do",
     doing: "In Progress",
+    ongoing: "Ongoing",
     done: "Complete",
     notPlanned: "Not Planned",
   };
 
-  const baseColumns: ColumnType[] = ["backlog", "todo", "doing", "done"];
+  const baseColumns: ColumnType[] = [
+    "backlog",
+    "todo",
+    "doing",
+    "ongoing",
+    "done",
+  ];
   const hasProposed = cards.some((card) => card.column === "proposed");
+
   const hasNotPlanned = cards.some((card) => card.column === "notPlanned");
 
   // const orderedColumns: ColumnType[] = hasProposed
@@ -575,6 +597,7 @@ const Card = ({
   isPublic,
   purpose,
   assignedId,
+  secondaryAssignedId,
 }: CardProps) => {
   const [newPriority, setNewPriority] = useState<Priority>(
     priority || "medium",
@@ -598,6 +621,7 @@ const Card = ({
     column,
     isPublic,
     assignedId,
+    secondaryAssignedId,
   };
 
   // Delete function
@@ -626,6 +650,8 @@ const Card = ({
         priority: updatedPriority,
         isPublic,
         purpose,
+        assignedId,
+        secondaryAssignedId,
       });
 
       return updatedPriority;
@@ -681,6 +707,7 @@ const Card = ({
               onSubmit={(data) => {
                 editCard({
                   id: id as Id<"todoKanban">,
+
                   ...data,
                   purpose,
                 });
@@ -794,98 +821,126 @@ export const TaskDialog = ({
   onClick,
   onClose,
   isOpen,
-  id,
+  // id,
 }: TaskDialogProps) => {
-  const prevRef = useRef<User | null>(null);
+  const form = useForm<KanbanCardType>({
+    resolver: zodResolver(kanbanCardSchema),
+    defaultValues: {
+      title: initialValues?.title || "",
+      description: initialValues?.description || "",
+      column: initialValues?.column || "todo",
+      priority: initialValues?.priority || "medium",
+      category: "general",
+      order:
+        mode === "add" && initialValues?.order ? initialValues.order : "start",
+      isPublic: initialValues?.isPublic ?? true,
+    },
+    mode: "onChange",
+    delayError: 1000,
+  });
+
+  const {
+    handleSubmit,
+    watch,
+
+    formState: { isValid, isSubmitting, isDirty },
+  } = form;
+  const publicState = watch("isPublic");
   const voters = initialValues?.voters || [];
-  const assignedId = initialValues?.assignedId;
-  const [title, setTitle] = useState(initialValues?.title || "");
-  const [description, setDescription] = useState(
-    initialValues?.description || "",
-  );
-  const [column, setColumn] = useState<ColumnType>(
-    initialValues?.column || "todo",
-  );
-  const [priority, setPriority] = useState<Priority>(
-    initialValues?.priority || "medium",
-  );
   const isSubmittingRef = useRef(false);
-  const [order, setOrder] = useState<"start" | "end">(
-    mode === "add" && initialValues?.order ? initialValues.order : "start",
-  );
-  const [category, setCategory] = useState<SupportCategory>(
-    initialValues?.category || "general",
-  );
 
-  const [isPublic, setIsPublic] = useState<boolean>(
-    initialValues?.isPublic ?? true,
-  );
-  const [assignedUser, setAssignedUser] = useState<User | null>(user);
+  const initialAssignedUser: Id<"users"> | null = initialValues?.assignedId
+    ? (initialValues.assignedId as Id<"users">)
+    : mode === "add"
+      ? (user?.userId as Id<"users"> | null)
+      : null;
+  const initialSecondaryAssignedUser =
+    initialValues?.secondaryAssignedId ?? ("" as Id<"users">);
 
-  const assignedUserData = useQuery(
-    api.users.getUserById,
-    assignedId ? { id: assignedId } : "skip",
+  const [assignedUser, setAssignedUser] = useState<Id<"users">[] | null>(
+    initialAssignedUser
+      ? [initialAssignedUser, initialSecondaryAssignedUser]
+      : null,
   );
 
-  useEffect(() => {
-    if (prevRef.current === assignedUserData && assignedUser === null) {
-      prevRef.current = null;
-      return;
-    }
-    if (!prevRef.current && assignedUserData) {
-      prevRef.current = assignedUserData;
-      setAssignedUser(assignedUserData);
-    }
-  }, [assignedUser, assignedUserData]);
+  // const [images, setImages] = useState<Blob[]>([]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!title.trim()) return;
+  // useEffect(() => {
+  //   if (prevRef.current === assignedUserData && assignedUser === null) {
+  //     prevRef.current = null;
+  //     return;
+  //   }
+  //   if (!prevRef.current && assignedUserData) {
+  //     prevRef.current = assignedUserData;
+  //     setAssignedUser(assignedUserData);
+  //   }
+  // }, [assignedUser, assignedUserData]);
 
+  const handleOnSubmit = async (values: KanbanCardType) => {
     isSubmittingRef.current = true;
     try {
       if (mode === "add") {
-        await onSubmit({
-          title: title.trim(),
-          description: description.trim(),
-          column,
-          priority,
-          order,
+        onSubmit({
+          title: values.title,
+          description: values.description,
+          column: values.column,
+          priority: values.priority,
+          order: values.order as "start" | "end",
+          isPublic: values.isPublic,
+          category: values.category,
+          assignedId: values.assignedId as Id<"users">,
+          secondaryAssignedId: values.secondaryAssignedId as Id<"users">,
           voters: [],
-          isPublic,
-          category,
-          assignedId: assignedUser?.userId
-            ? (assignedUser?.userId as Id<"users">)
-            : undefined,
         });
       } else {
-        await onSubmit({
-          title: title.trim(),
-          description: description.trim(),
-          column,
-          priority,
-          isPublic,
+        onSubmit({
+          title: values.title,
+          description: values.description,
+          column: values.column,
+          priority: values.priority,
+          isPublic: values.isPublic,
+          category: values.category,
+          assignedId: values.assignedId as Id<"users">,
+          secondaryAssignedId: values.secondaryAssignedId as Id<"users">,
           voters,
-          category,
         });
       }
 
       // Reset form
-      setTitle(initialValues?.title || "");
-      setDescription(initialValues?.description || "");
-      setColumn(initialValues?.column || "todo");
-      setPriority(initialValues?.priority || "high");
-      setCategory(initialValues?.category || "general");
-      setAssignedUser(null);
-      setOrder(
-        mode === "add" && initialValues?.order ? initialValues.order : "end",
-      );
-      setIsPublic(initialValues?.isPublic ?? true);
+      // setTitle(initialValues?.title || "");
+      // setDescription(initialValues?.description || "");
+      // setColumn(initialValues?.column || "todo");
+      // setPriority(initialValues?.priority || "high");
+      // setCategory(initialValues?.category || "general");
+
+      // setOrder(
+      //   mode === "add" && initialValues?.order ? initialValues.order : "end",
+      // );
+      // setIsPublic(initialValues?.isPublic ?? true);
+      form.reset();
     } finally {
       isSubmittingRef.current = false;
       onClose?.();
     }
   };
+
+  useEffect(() => {
+    console.log(assignedUser, assignedUser?.length, isOpen);
+    if (!assignedUser || assignedUser.length === 0 || !isOpen) return;
+
+    const [primary, secondary] = assignedUser;
+    console.table(assignedUser);
+    // Avoid unnecessary updates
+    const currentForm = form.getValues();
+    const currentPrimary = form.getValues("assignedId");
+    const currentSecondary = form.getValues("secondaryAssignedId");
+
+    if (currentPrimary === primary && currentSecondary === secondary) return;
+
+    form.setValue("assignedId", primary, { shouldDirty: true });
+    form.setValue("secondaryAssignedId", secondary, { shouldDirty: true });
+    console.log(currentForm);
+  }, [assignedUser, form, isOpen]);
 
   const onCloseDialog = () => {
     setTimeout(() => {
@@ -910,11 +965,8 @@ export const TaskDialog = ({
             {/* TODO: Make this possible for adding as well. Need to make it update some state for that, though. */}
 
             <KanbanUserSelector
-              type="staff"
               setCurrentUser={setAssignedUser}
-              currentUser={assignedUser}
-              isAdmin
-              cardId={id as Id<"todoKanban">}
+              currentUserIds={assignedUser}
               mode={mode}
             />
           </div>
@@ -924,152 +976,196 @@ export const TaskDialog = ({
               : "Create a new task with priority and location."}
           </DialogDescription>
         </DialogHeader>
-
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <Label htmlFor="title" className="sr-only">
-            Title
-          </Label>
-          <Textarea
-            tabIndex={1}
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            maxLength={60}
-            className="scrollable mini w-full resize-none rounded border border-violet-400 bg-violet-400/20 p-3 text-base placeholder-violet-300 focus:outline-none lg:text-sm"
-            placeholder="Task title..."
-          />
-          <Label htmlFor="description" className="sr-only">
-            Description
-          </Label>
-          <RichTextEditor
-            tabIndex={2}
-            value={description}
-            onChange={(e) => setDescription(e)}
-            placeholder="Task description..."
-            charLimit={5000}
-            asModal={true}
-            // bgClassName="bg-violet-400/10"
-            withTaskList={true}
-            inputPreview={false}
-            inputPreviewContainerClassName="scrollable mini h-[clamp(10rem,18rem,30dvh)]  w-full rounded border border-violet-400 bg-violet-400/20 p-3 text-base placeholder-violet-300 focus:outline-none lg:text-sm"
-          />
-
-          <div className="flex flex-col items-center gap-3 md:flex-row">
-            <div className="flex w-full items-center gap-3 sm:w-auto">
-              <div className="flex w-full flex-col gap-3 sm:w-auto">
-                <Label htmlFor="column">Column</Label>
-
-                <SelectSimple
-                  tabIndex={3}
-                  options={[...ColumnTypeOptions]}
-                  value={column}
-                  onChangeAction={(value) => setColumn(value as ColumnType)}
-                  placeholder="Select column"
-                  className="w-full min-w-30 max-w-sm sm:max-w-40"
-                />
-              </div>
-
-              <div className="flex flex-col gap-3">
-                <Label htmlFor="priority">Priority</Label>
-
-                <SelectSimple
-                  tabIndex={4}
-                  options={[...priorityOptions]}
-                  value={priority}
-                  onChangeAction={(value) => setPriority(value as Priority)}
-                  placeholder="Select priority"
-                  className="w-full min-w-30 max-w-sm sm:max-w-30"
-                />
-              </div>
-            </div>
-            <div className="flex w-full gap-3">
-              <div className="flex w-full flex-col gap-3 sm:w-auto">
-                <Label htmlFor="priority">Category</Label>
-
-                <SelectSimple
-                  tabIndex={5}
-                  options={[...supportCategoryOptions]}
-                  value={category}
-                  onChangeAction={(value) =>
-                    setCategory(value as SupportCategory)
-                  }
-                  placeholder="Select category"
-                  className="w-full min-w-40 max-w-sm sm:max-w-50"
-                  contentClassName="sm:max-h-80"
-                />
-              </div>
-
-              {!isEdit && (
-                <div className="flex flex-1 flex-col gap-3">
-                  <Label htmlFor="order">Order</Label>
-                  {/* <select
-                    name="order"
-                    value={order}
-                    onChange={(e) => setOrder(e.target.value as "start" | "end")}
-                    className="rounded border bg-card p-2 text-foreground"
-                  >
-                    <option value="start">Start</option>
-                    <option value="end">End</option>
-                  </select> */}
-                  <SelectSimple
-                    tabIndex={6}
-                    options={[
-                      { value: "start", label: "Start" },
-                      { value: "end", label: "End" },
-                    ]}
-                    value={order}
-                    onChangeAction={(value) =>
-                      setOrder(value as "start" | "end")
-                    }
-                    placeholder="Order"
-                    className="w-full max-w-md"
-                  />
-                </div>
+        <Form {...form}>
+          <form
+            onSubmit={handleSubmit(handleOnSubmit)}
+            className="flex flex-col gap-4"
+          >
+            <FormField
+              control={form.control}
+              name="title"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="sr-only">Title</FormLabel>
+                  <FormControl>
+                    <DebouncedControllerInput
+                      disabled={isSubmitting}
+                      field={field}
+                      placeholder="Task title..."
+                      className={cn(
+                        "kanban w-full rounded border border-violet-400 bg-violet-400/20 p-3 text-base placeholder-violet-300 focus:outline-none lg:text-sm",
+                        // isEmpty && "h-10",
+                      )}
+                      maxLength={60}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
-            </div>
-          </div>
+            />
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="sr-only">Description</FormLabel>
+                  <FormControl>
+                    <RichTextEditor
+                      value={field.value ?? ""}
+                      onChange={field.onChange}
+                      placeholder="Task description..."
+                      charLimit={5000}
+                      requiredChars={10}
+                      withTaskList={true}
+                      inputPreview={false}
+                      inputPreviewContainerClassName="scrollable mini 
+                        w-full rounded border border-violet-400 bg-violet-400/20 p-3 text-base placeholder-violet-300 focus:outline-none lg:text-sm"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          <DialogFooter className="flex w-full flex-row items-center justify-between sm:justify-between">
-            <div className="flex items-center gap-2">
-              {/* <input
-                type="checkbox"
-                id="public-toggle"
-                checked={isPublic}
-                onChange={(e) => setIsPublic(e.target.checked)}
-                className="size-4 border-foreground"
-              /> */}
-              <PublicToggle
-                name="public-toggle"
-                checked={isPublic}
-                onChange={() => setIsPublic(!isPublic)}
+            <div className="flex flex-col items-center gap-3 md:flex-row">
+              <div className="flex w-full items-center gap-3 sm:w-auto">
+                <FormField
+                  control={form.control}
+                  name="column"
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <FormLabel className="font-bold">Column</FormLabel>
+                      <FormControl>
+                        <SelectSimple
+                          disabled={isSubmitting}
+                          options={[...ColumnTypeOptions]}
+                          value={field.value}
+                          onChangeAction={(value) => field.onChange(value)}
+                          placeholder="Select column"
+                          className="w-full min-w-30 max-w-sm sm:max-w-40"
+                          contentClassName="sm:max-h-80"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="priority"
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <FormLabel className="font-bold">Priority</FormLabel>
+                      <FormControl>
+                        <SelectSimple
+                          disabled={isSubmitting}
+                          options={[...priorityOptions]}
+                          value={field.value}
+                          onChangeAction={(value) => field.onChange(value)}
+                          placeholder="Select priority"
+                          className="w-full min-w-30 max-w-sm sm:max-w-30"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="category"
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <FormLabel className="font-bold">Category</FormLabel>
+                      <FormControl>
+                        <SelectSimple
+                          disabled={isSubmitting}
+                          options={[...supportCategoryOptions]}
+                          value={field.value}
+                          onChangeAction={(value) => field.onChange(value)}
+                          placeholder="Select category"
+                          className="w-full min-w-40 max-w-sm sm:max-w-50"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                {!isEdit && (
+                  <FormField
+                    control={form.control}
+                    name="order"
+                    render={({ field }) => (
+                      <FormItem className="w-full">
+                        <FormLabel className="font-bold">Order</FormLabel>
+                        <FormControl>
+                          <SelectSimple
+                            disabled={isSubmitting}
+                            options={[
+                              { label: "Start", value: "start" },
+                              { label: "End", value: "end" },
+                            ]}
+                            value={field.value}
+                            onChangeAction={(value) => field.onChange(value)}
+                            placeholder="Select category"
+                            className="w-full"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+              </div>
+            </div>
+
+            <DialogFooter className="flex w-full flex-row items-center justify-between sm:justify-between">
+              <FormField
+                control={form.control}
+                name="isPublic"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row-reverse items-center gap-2 space-y-0">
+                    <FormLabel className="font-bold">
+                      {publicState ? "Public" : "Private"} Task
+                    </FormLabel>
+                    <FormControl>
+                      <PublicToggle
+                        name="public-toggle"
+                        checked={field.value}
+                        onChange={(value) => field.onChange(value)}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-              <Label htmlFor="public-toggle" className="hidden sm:block">
-                {isPublic ? "Public Task" : "Private Task"}
-              </Label>
-            </div>
-            <div className="flex justify-end gap-2">
-              <DialogClose asChild>
-                <Button
-                  type="button"
-                  variant="salWithShadowHiddenYlw"
-                  tabIndex={8}
-                  className="focus:scale-95"
-                >
-                  Cancel
-                </Button>
-              </DialogClose>
-              <DialogClose asChild>
-                <Button
-                  type="submit"
-                  variant="salWithShadowHidden"
-                  tabIndex={7}
-                  className="focus:scale-95 focus:bg-salYellow/20"
-                >
-                  {isEdit ? "Save Changes" : "Add Task"}
-                </Button>
-              </DialogClose>
-            </div>
-          </DialogFooter>
-        </form>
+
+              <div className="flex justify-end gap-2">
+                <DialogClose asChild>
+                  <Button
+                    type="button"
+                    variant="salWithShadowHiddenYlw"
+                    tabIndex={8}
+                    className="focus:scale-95"
+                  >
+                    Cancel
+                  </Button>
+                </DialogClose>
+                <DialogClose asChild>
+                  <Button
+                    disabled={!isValid || isSubmitting || !isDirty}
+                    type="submit"
+                    variant="salWithShadowHidden"
+                    tabIndex={7}
+                    className="focus:scale-95 focus:bg-salYellow/20"
+                  >
+                    {isEdit ? "Save Changes" : "Add Task"}
+                  </Button>
+                </DialogClose>
+              </div>
+            </DialogFooter>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );
@@ -1086,7 +1182,8 @@ export const DetailsDialog = ({
   onCloseAction,
   onEditAction,
 }: DetailsDialogProps) => {
-  const assignedId = initialValues?.assignedId;
+  const assignedId = initialValues?.assignedId || null;
+  const secondaryAssignedId = initialValues?.secondaryAssignedId || null;
   const title = initialValues?.title || "";
   const description = initialValues?.description || "";
   const category = initialValues?.category || "general";
@@ -1102,11 +1199,6 @@ export const DetailsDialog = ({
 
   const priorityConfig = PRIORITY_CONFIG[priority];
   const categoryConfig = CATEGORY_CONFIG[category];
-
-  const assignedUser = useQuery(
-    api.users.getUserById,
-    assignedId ? { id: assignedId } : "skip",
-  );
 
   const voteCard = useMutation(api.kanban.cards.voteCard);
 
@@ -1134,6 +1226,9 @@ export const DetailsDialog = ({
   const userVotedDown = !!initialValues.voters.find(
     (v) => v.userId === user?.userId && v.direction === "down",
   );
+  const assignedUsers = [assignedId, secondaryAssignedId].filter(
+    (u) => u !== null,
+  );
 
   return (
     <Dialog onOpenChange={(open) => !open && onCloseDialog()} open={isOpen}>
@@ -1145,12 +1240,10 @@ export const DetailsDialog = ({
           <div className="flex h-fit flex-col gap-4">
             <div className="flex items-baseline justify-between gap-3">
               <DialogTitle>{title}</DialogTitle>
-              {isAdmin && assignedUser && (
+              {isAdmin && assignedId && (
                 <div className="flex items-center gap-3 pr-8 text-sm">
                   <KanbanUserSelector
-                    type="staff"
-                    currentUser={assignedUser}
-                    isAdmin
+                    currentUserIds={assignedUsers}
                     cardId={id}
                     mode="view"
                   />

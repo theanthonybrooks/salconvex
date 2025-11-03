@@ -27,6 +27,7 @@ export function DebouncedControllerInput<
   debounceMs = 500,
   transform,
   onSchemaCheck,
+  className,
   ...inputProps
 }: DebouncedControllerInputProps<TFieldValues, TName>) {
   // const { setValue } = useFormContext();
@@ -73,9 +74,7 @@ export function DebouncedControllerInput<
       {...inputProps}
       className={cn(
         "bg-card text-base placeholder:text-sm placeholder:text-foreground/50 sm:text-sm",
-        typeof inputProps.className === "string"
-          ? inputProps.className
-          : undefined,
+        className,
       )}
       value={localValue ?? ""}
       onChange={(e) => {

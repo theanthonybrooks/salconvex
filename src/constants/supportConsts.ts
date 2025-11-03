@@ -9,6 +9,7 @@ import {
   Scroll,
   Users2,
 } from "lucide-react";
+import z from "zod";
 
 export const supportCategoryOptions = [
   { label: "General", value: "general", icon: Construction },
@@ -23,6 +24,11 @@ export const supportCategoryOptions = [
 ] as const;
 
 export type SupportCategory = (typeof supportCategoryOptions)[number]["value"];
+
+
+export const supportCategoryValidator = z.union(
+  supportCategoryOptions.map((opt) => z.literal(opt.value)),
+);
 
 export function getSupportCategoryLabel(value: SupportCategory): string {
   const option = supportCategoryOptions.find((opt) => opt.value === value);
