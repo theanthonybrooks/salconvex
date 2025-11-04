@@ -444,7 +444,7 @@ const SubmissionFormEventStep1 = ({
                           <DebouncedFormTextarea
                             field={field}
                             maxLength={250}
-                            required
+                            required={!isAdmin}
                             className="max-h-30 min-h-12"
                             placeholder="Short blurb about your project/event... Limit 250 characters (required) "
                           />

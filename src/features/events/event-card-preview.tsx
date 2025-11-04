@@ -657,21 +657,22 @@ const EventCardPreview = ({
                   .join(" | ")}
               </span>
             )}
-            {(event.about || event.blurb) && (
-              <div className={cn("flex flex-col gap-y-1 text-sm", fontSize)}>
-                <span className="font-semibold">About:</span>
-                {event.blurb ? (
-                  <p>{event.blurb}</p>
-                ) : (
-                  <RichTextDisplay
-                    html={event.about ?? ""}
-                    className="line-clamp-3 max-h-20 text-sm"
-                    maxChars={100}
-                    fontSize={fontSize}
-                  />
-                )}
-              </div>
-            )}
+            {event.about ||
+              (event.blurb && (
+                <div className={cn("flex flex-col gap-y-1 text-sm", fontSize)}>
+                  <span className="font-semibold">About:</span>
+                  {event.blurb ? (
+                    <p>{event.blurb}</p>
+                  ) : (
+                    <RichTextDisplay
+                      html={event.about ?? ""}
+                      className="line-clamp-3 max-h-20 text-sm"
+                      maxChars={100}
+                      fontSize={fontSize}
+                    />
+                  )}
+                </div>
+              ))}
           </div>
         </div>
         <div className={cn("flex flex-col gap-y-6 pb-3 pt-8", fontSize)}>

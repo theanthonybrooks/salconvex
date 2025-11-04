@@ -293,7 +293,7 @@ export const eventBase = z.object({
   links: linksSchemaLoose,
   otherInfo: z.string().optional(),
   timeLine: z.string().optional(),
-  blurb: z.string().min(10, "A blurb is required"),
+  blurb: z.string().optional(),
   about: z.string().optional(),
   active: z.boolean().optional(),
   adminNote: z.string().optional(),
@@ -774,11 +774,23 @@ export const getEventSchema = (isAdmin: boolean = false) => {
 
 export const getEventOnlySchema = (isAdmin: boolean = false) => {
   // console.log("isAdmin", isAdmin);
-  void isAdmin;
-  return z.object({
-    organization: organizationSchema,
-    event: getEventSchema(isAdmin),
-  });
+
+  return z
+    .object({
+      organization: organizationSchema,
+      event: getEventSchema(isAdmin),
+    })
+    .superRefine((data, ctx) => {
+      const event = data.event;
+
+      if (event.blurb && event.blurb.length < 10 && !isAdmin) {
+        ctx.addIssue({
+          code: "custom",
+          message: "Blurb is required",
+          path: ["event", "blurb"],
+        });
+      }
+    });
 };
 
 export const getEventDetailsSchema = (isAdmin: boolean = false) => {
