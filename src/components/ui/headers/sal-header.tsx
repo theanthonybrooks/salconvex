@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { Source } from "@/hooks/use-filtered-events-query";
@@ -10,8 +12,24 @@ interface SalHeaderProps {
 }
 
 const SalHeader = ({ source }: SalHeaderProps) => {
-  // const theListPg = source === "thelist";
+  // const pathname = usePathname();
+  // const [view, setView] = useState<ViewOptions | null>(null);
+
+  // useEffect(() => {
+  //   if (typeof window !== "undefined") {
+  //     setView(sessionStorage.getItem("salView") as ViewOptions);
+  //   }
+  // }, [pathname]);
+
+  // console.log(view);
+
+  // const archivePg = source === "thelist" && view === "archive";
+
+  // console.log(archivePg);
+
   const thisWeekPg = source === "thisweek";
+  const archivePg = source === "archive";
+
   return (
     <div
       className={cn(
@@ -20,7 +38,13 @@ const SalHeader = ({ source }: SalHeaderProps) => {
       )}
     >
       <Image
-        src={thisWeekPg ? "/thisweek_logo.png" : "/saltext.png"}
+        src={
+          thisWeekPg
+            ? "/thisweek_logo.png"
+            : archivePg
+              ? "/branding/archive.png"
+              : "/saltext.png"
+        }
         alt="The Street Art List"
         width={300}
         height={100}

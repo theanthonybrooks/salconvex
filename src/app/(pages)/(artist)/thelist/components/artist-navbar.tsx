@@ -292,7 +292,6 @@ export default function TheListNavBar(
                           onPointerEnter={(event) => event.preventDefault()}
                           onPointerLeave={(event) => event.preventDefault()}
                         >
-                          {/* TODO: put this back to xl:grid-cols-3 when I add more menu items */}
                           <div className="flex w-[400px] flex-col gap-1 p-3 lg:w-max xl:max-w-[700px]">
                             {filteredNavbarMenuTheList
                               .filter(
@@ -300,8 +299,6 @@ export default function TheListNavBar(
                                   !component.title.includes("Old Site"),
                               )
                               .map((component) => {
-                                console.log(fullPagePath);
-                                console.log(currentPage, component.href);
                                 const activeLink =
                                   component.href.includes(currentPage) &&
                                   currentPage !== "";

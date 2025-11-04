@@ -22,6 +22,7 @@ import { useFilteredEventsQuery } from "@/hooks/use-filtered-events-query";
 import { motion } from "framer-motion";
 
 import { Button } from "@/components/ui/button";
+import SalHeader from "@/components/ui/headers/sal-header";
 import { BasicPagination } from "@/components/ui/pagination2";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -449,6 +450,7 @@ const ClientEventList = () => {
   // }, [page]);
   return (
     <>
+      <SalHeader source={view !== "archive" ? "thelist" : "archive"} />
       {publicView && (
         <PublicHeader
           subStatus={userSubStatus}
@@ -780,7 +782,7 @@ const ClientEventList = () => {
           </div>
         </div>
       )}
- 
+
       {publicView && (
         <div
           className={cn(

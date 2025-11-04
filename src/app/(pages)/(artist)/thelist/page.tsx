@@ -1,6 +1,5 @@
 import { Metadata } from "next";
 
-import SalHeader from "@/components/ui/headers/sal-header";
 import ClientEventList from "@/features/events/event-list-client";
 
 export const metadata: Metadata = {
@@ -33,7 +32,6 @@ export const metadata: Metadata = {
 const TheList = async () => {
   return (
     <>
-      <SalHeader source="thelist" />
       <ClientEventList />
     </>
   );
