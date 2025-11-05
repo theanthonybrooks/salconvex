@@ -43,13 +43,12 @@ import { useForm } from "react-hook-form";
 
 import { FiPlus } from "react-icons/fi";
 import {
-  Eye,
   Filter,
   FilterX,
   LucideThumbsDown,
   LucideThumbsUp,
   Pencil,
-  X,
+  Trash2,
 } from "lucide-react";
 
 import { MultiSelect } from "@/components/multi-select";
@@ -605,6 +604,8 @@ const Card = ({
   const [isHovered, setIsHovered] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [isPreviewing, setIsPreviewing] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+
   // const [hasChanges, setHasChanges] = useState(false);
   const isAdmin = user?.role?.includes("admin");
 
@@ -624,7 +625,6 @@ const Card = ({
     secondaryAssignedId,
   };
 
-  // Delete function
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
     deleteCard({ id: id as Id<"todoKanban"> });
@@ -665,7 +665,9 @@ const Card = ({
         layout
         layoutId={id}
         draggable="true"
-        onDragStart={(e) =>
+        onClick={() => setIsPreviewing(true)}
+        onDragStart={(e) => {
+          setIsDragging(true);
           handleDragStart(e as unknown as React.DragEvent<HTMLDivElement>, {
             title,
             description,
@@ -676,10 +678,13 @@ const Card = ({
             priority,
             isPublic,
             purpose,
-          })
-        }
+          });
+        }}
+        onDragEnd={() => setIsDragging(false)}
+        animate={{ scale: isDragging ? 0.95 : 1 }}
+        transition={{ type: "spring", stiffness: 250, damping: 20 }}
         className={cn(
-          "relative grid cursor-grab grid-cols-[30px_minmax(0,1fr)] rounded-lg border border-foreground/20 p-3 text-primary-foreground active:cursor-grabbing",
+          "relative grid grid-cols-[30px_minmax(0,1fr)] rounded-lg border border-foreground/20 p-3 text-primary-foreground hover:cursor-pointer active:cursor-grabbing",
           getColumnColor(column),
         )}
         onMouseEnter={() => setIsHovered(true)}
@@ -688,7 +693,7 @@ const Card = ({
         }
       >
         {isHovered && (
-          <div className="absolute right-0 top-0 flex items-center justify-center gap-x-3 rounded-lg border border-primary bg-card/90 p-3 dark:bg-foreground sm:gap-x-2">
+          <div className="absolute right-0.5 top-0.5 flex items-center justify-center gap-x-3 rounded-lg border border-primary bg-card/90 p-2.5 dark:bg-foreground sm:gap-x-2">
             <TaskDialog
               id={id}
               user={user}
@@ -701,7 +706,7 @@ const Card = ({
                 setIsHovered(false);
               }}
               trigger={
-                <Pencil className="size-7 cursor-pointer text-gray-500 hover:text-gray-700 sm:size-4" />
+                <Pencil className="size-7 cursor-pointer text-gray-500 hover:scale-105 hover:text-gray-700 active:scale-95 sm:size-4" />
               }
               initialValues={detailValues}
               onSubmit={(data) => {
@@ -728,16 +733,16 @@ const Card = ({
                 setIsPreviewing(false);
                 setIsEditing(true);
               }}
-              trigger={
-                <Eye className="size-7 cursor-pointer text-gray-500 hover:text-gray-700 sm:size-4" />
-              }
+              // trigger={
+              //   <Eye className="size-7 cursor-pointer text-gray-500 hover:text-gray-700 sm:size-4" />
+              // }
               initialValues={detailValues}
               id={id as Id<"todoKanban">}
             />
 
-            <X
+            <Trash2
               onClick={handleDelete}
-              className="size-7 cursor-pointer text-red-500 hover:text-red-700 sm:size-4"
+              className="size-7 cursor-pointer text-red-500 hover:scale-105 hover:text-red-700 active:scale-95 sm:size-4"
             />
           </div>
         )}
@@ -753,9 +758,6 @@ const Card = ({
           )}
         />
 
-        {/* <p className="text-sm text-foreground dark:text-primary-foreground">
-          {title}
-        </p> */}
         <RichTextDisplay
           html={title}
           className="text-sm text-foreground dark:text-primary-foreground"
@@ -813,7 +815,7 @@ const AddCard = ({ column, addCard, user, purpose }: AddCardProps) => {
 };
 
 export const TaskDialog = ({
-  user,
+  // user,
   mode,
   trigger,
   initialValues,
@@ -834,6 +836,8 @@ export const TaskDialog = ({
       order:
         mode === "add" && initialValues?.order ? initialValues.order : "start",
       isPublic: initialValues?.isPublic ?? true,
+      assignedId: initialValues?.assignedId ?? "",
+      secondaryAssignedId: initialValues?.secondaryAssignedId ?? "",
     },
     mode: "onChange",
     delayError: 1000,
@@ -846,25 +850,10 @@ export const TaskDialog = ({
     formState: { isValid, isSubmitting, isDirty },
   } = form;
   const publicState = watch("isPublic");
+  const assignedUsers = watch("assignedId");
+  const secondaryAssignedUsers = watch("secondaryAssignedId");
   const voters = initialValues?.voters || [];
   const isSubmittingRef = useRef(false);
-
-  const initialAssignedUser: Id<"users"> | null = initialValues?.assignedId
-    ? (initialValues.assignedId as Id<"users">)
-    : mode === "add"
-      ? (user?.userId as Id<"users"> | null)
-      : null;
-
-  const initialSecondaryAssignedUser: Id<"users"> | null =
-    (initialValues?.secondaryAssignedId as Id<"users"> | null) ?? null;
-
-  const [assignedUsers, setAssignedUsers] = useState<Id<"users">[] | null>(
-    initialAssignedUser
-      ? [initialAssignedUser, initialSecondaryAssignedUser].filter(
-          (id): id is Id<"users"> => Boolean(id),
-        )
-      : null,
-  );
 
   const handleOnSubmit = async (values: KanbanCardType) => {
     isSubmittingRef.current = true;
@@ -903,24 +892,6 @@ export const TaskDialog = ({
     }
   };
 
-  useEffect(() => {
-    // console.log(assignedUsers, assignedUsers?.length, isOpen);
-    if (!assignedUsers || assignedUsers.length === 0 || !isOpen) return;
-
-    const [primary, secondary] = assignedUsers;
-    // console.table(assignedUsers);
-    // Avoid unnecessary updates
-    // const currentForm = form.getValues();
-    const currentPrimary = form.getValues("assignedId");
-    const currentSecondary = form.getValues("secondaryAssignedId");
-
-    if (currentPrimary === primary && currentSecondary === secondary) return;
-
-    form.setValue("assignedId", primary, { shouldDirty: true });
-    form.setValue("secondaryAssignedId", secondary, { shouldDirty: true });
-    // console.log(currentForm);
-  }, [assignedUsers, form, isOpen]);
-
   const onCloseDialog = () => {
     setTimeout(() => {
       if (!isSubmittingRef.current) {
@@ -942,10 +913,29 @@ export const TaskDialog = ({
           <div className="flex items-baseline justify-between gap-3 pr-4">
             <DialogTitle>{isEdit ? "Edit Task" : "Add New Task"}</DialogTitle>
 
-            <KanbanUserSelector
+            {/* <KanbanUserSelector
               setCurrentUsers={setAssignedUsers}
               currentUserIds={assignedUsers}
               mode={mode}
+            /> */}
+            <KanbanUserSelector
+              mode={mode}
+              currentUserIds={
+                [assignedUsers, secondaryAssignedUsers].filter(
+                  (id): id is Id<"users"> => !!id,
+                ) || null
+              }
+              setCurrentUsers={(users) => {
+                const [primary, secondary] = users ?? [];
+                form.setValue("assignedId", (primary ?? "") as Id<"users">, {
+                  shouldDirty: true,
+                });
+                form.setValue(
+                  "secondaryAssignedId",
+                  (secondary ?? "") as Id<"users">,
+                  { shouldDirty: true },
+                );
+              }}
             />
           </div>
           <DialogDescription className="sr-only">
@@ -1154,7 +1144,7 @@ export const DetailsDialog = ({
   id,
   user,
   isAdmin,
-  trigger,
+  // trigger,
   initialValues,
   isOpen,
   onClickAction,
@@ -1211,8 +1201,9 @@ export const DetailsDialog = ({
 
   return (
     <Dialog onOpenChange={(open) => !open && onCloseDialog()} open={isOpen}>
-      <DialogTrigger asChild onClick={onClickAction}>
-        {trigger}
+      <DialogTrigger asChild onClick={onClickAction} className="sr-only">
+        {/* {trigger} */}
+        Click to open dialog
       </DialogTrigger>
       <DialogContent className="flex h-[90dvh] w-full max-w-[max(60rem,60vw)] flex-col bg-card sm:max-h-[max(40rem,70vh)]">
         <DialogHeader>

@@ -1,7 +1,10 @@
 import type { VariantProps } from "class-variance-authority";
+
 import * as React from "react";
 import { useCallback, useEffect } from "react";
 import { cva } from "class-variance-authority";
+
+import { FaCheck } from "react-icons/fa";
 import {
   ChevronDown,
   ChevronUp,
@@ -11,7 +14,6 @@ import {
   XCircle,
   XIcon,
 } from "lucide-react";
-import { FaCheck } from "react-icons/fa";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";

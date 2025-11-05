@@ -1,5 +1,3 @@
-import type { Dispatch, SetStateAction } from "react";
-
 import { Fragment } from "react";
 
 import { CheckIcon } from "lucide-react";
@@ -21,7 +19,9 @@ import { useMutation } from "convex/react";
 interface UserSelectorProps {
   currentUserIds: Id<"users">[] | null;
   cardId?: Id<"todoKanban">;
-  setCurrentUsers?: Dispatch<SetStateAction<Id<"users">[] | null>>;
+  // setCurrentUsers?: Dispatch<SetStateAction<Id<"users">[] | null>>;
+  setCurrentUsers?: (users: Id<"users">[] | null) => void;
+
   mode: "add" | "edit" | "view";
 }
 
@@ -43,12 +43,11 @@ export const KanbanUserSelector = ({
     const id = staff.userId as Id<"users">;
 
     if (setCurrentUsers) {
-      setCurrentUsers((prev) => {
-        if (!prev) return [id];
-        return prev.includes(id)
-          ? prev.filter((u) => u !== id)
-          : [...prev, id].slice(0, 2);
-      });
+      const newUsers = currentUserIds?.includes(id)
+        ? (currentUserIds ?? []).filter((u) => u !== id)
+        : [...(currentUserIds ?? []), id].slice(0, 2);
+
+      setCurrentUsers(newUsers.length > 0 ? newUsers : null);
     } else if (cardId) {
       const isSelected = currentUserIds?.includes(id);
 

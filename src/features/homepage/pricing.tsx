@@ -82,24 +82,24 @@ const pricingIntervals = [
 
 //--------------------- Existing Subscription  ----------------------//
 
-const ExistingSubscription = ({ onClick }: { onClick: () => void }) => {
-  return (
-    <div className="mt-[1rem] flex w-full flex-col items-center justify-center gap-y-6 p-3">
-      <div className="flex flex-col items-center">
-        <p className="font-tanker text-[2.5em] lowercase tracking-wide text-foreground lg:text-[4em]">
-          Your Membership
-        </p>
-        <p className="text-balance text-center">
-          Want to upgrade or cancel your membership?
-        </p>
-      </div>
+// const ExistingSubscription = ({ onClick }: { onClick: () => void }) => {
+//   return (
+//     <div className="mt-[1rem] flex w-full flex-col items-center justify-center gap-y-6 p-3">
+//       <div className="flex flex-col items-center">
+//         <p className="font-tanker text-[2.5em] lowercase tracking-wide text-foreground lg:text-[4em]">
+//           Your Membership
+//         </p>
+//         <p className="text-balance text-center">
+//           Want to upgrade or cancel your membership?
+//         </p>
+//       </div>
 
-      <Button variant="salWithShadow" onClick={onClick}>
-        Manage Membership
-      </Button>
-    </div>
-  );
-};
+//       <Button variant="salWithShadow" onClick={onClick}>
+//         Manage Membership
+//       </Button>
+//     </div>
+//   );
+// };
 
 //--------------------- Pricing Header  ----------------------//
 
@@ -605,7 +605,7 @@ export default function Pricing() {
   const subInterval = subscription?.intervalNext ?? subscription?.interval;
 
   const userSubPriceId = subscription?.stripePriceId;
-  const handleManageSubscription = useManageSubscription({ subscription });
+  // const handleManageSubscription = useManageSubscription({ subscription });
   const user = userData?.user;
   const [urlAccountType, setUrlAccountType] = useState<AccountTypeBase | null>(
     null,
