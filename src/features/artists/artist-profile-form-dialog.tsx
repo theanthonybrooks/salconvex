@@ -30,6 +30,7 @@ import LogoUploader from "@/components/ui/logo-uploader";
 import { MapboxInputFull } from "@/components/ui/mapbox-search";
 import { SearchMappedMultiSelect } from "@/components/ui/mapped-select-multi";
 import { Separator } from "@/components/ui/separator";
+import { TooltipSimple } from "@/components/ui/tooltip";
 import { autoHttps, formatHandleInput } from "@/helpers/linkFns";
 import { sortedGroupedCountries } from "@/helpers/locationFns";
 import { cn } from "@/helpers/utilsFns";
@@ -110,7 +111,7 @@ export const ArtistProfileForm = ({
   const {
     control,
     // setValue,
-    // watch,
+    watch,
     // getValues,
     handleSubmit: handleSubmit,
     formState: {
@@ -120,6 +121,10 @@ export const ArtistProfileForm = ({
     },
     reset,
   } = form;
+
+  const website = watch("artistContact.website");
+  const insta = watch("artistContact.instagram");
+  const hasSocials = Boolean(website || insta);
 
   // const newUser = isValid && !hasCurrentSub;
   // const existingUser = isValid && hasCurrentSub;
@@ -256,11 +261,10 @@ export const ArtistProfileForm = ({
         if (hasCurrentSub) {
           toast.success("Successfully updated profile!");
         } else {
-          toast.success("Successfully created profile!");
+          toast.success(
+            "Successfully created profile! Opening Stripe in new tab...",
+          );
         }
-      }
-      if (!hasCurrentSub) {
-        toast.info("Opening Stripe in new tab...");
       }
 
       reset();
@@ -463,12 +467,18 @@ export const ArtistProfileForm = ({
             render={({ field }) => (
               <FormItem className="my-3 flex items-center gap-2 space-y-0">
                 <FormControl>
-                  <Checkbox
-                    checked={field.value || false}
-                    onCheckedChange={field.onChange}
-                    className="text-base"
-                    tabIndex={7}
-                  />
+                  <TooltipSimple
+                    disabled={hasSocials}
+                    content="At least one social link is required to be considered for our artist feature"
+                  >
+                    <Checkbox
+                      disabled={!hasSocials}
+                      checked={hasSocials ? field.value || false : false}
+                      onCheckedChange={field.onChange}
+                      className="text-base"
+                      tabIndex={7}
+                    />
+                  </TooltipSimple>
                 </FormControl>
                 <FormLabel className="hidden font-bold leading-6 hover:cursor-pointer sm:block sm:leading-normal">
                   Would you like to be considered for our artist feature?

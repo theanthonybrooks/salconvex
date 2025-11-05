@@ -77,12 +77,6 @@ export const getFilteredEventsPublic = query({
       v.literal("nextweek"),
     ),
     viewType: v.optional(viewTypeSchema),
-    // artistData: v.optional(
-    //   v.object({
-    //     bookmarked: v.array(v.id("events")),
-    //     hidden: v.array(v.id("events")),
-    //   }),
-    // ),
     userAccountData: v.optional(
       v.object({
         subscription: v.optional(doc(schema, "userSubscriptions")),
@@ -122,10 +116,16 @@ export const getFilteredEventsPublic = query({
     const userName = user?.firstName + " " + user?.lastName;
     const isAdmin = user?.role?.includes("admin");
 
+    const hasActiveSubscription =
+      subscription?.status === "active" ||
+      subscription?.status === "trialing" ||
+      isAdmin;
+
     console.log({
       event: "getFilteredEventsPublic",
       userId,
       userName: user ? userName : null,
+      activeSub: hasActiveSubscription,
       source,
       view,
       sortBy: sortOptions.sortBy,
@@ -133,12 +133,6 @@ export const getFilteredEventsPublic = query({
       filters,
       search,
     });
-
-    const hasActiveSubscription =
-      subscription?.status === "active" ||
-      subscription?.status === "trialing" ||
-      isAdmin;
-
     if (thisWeekPg && refDate.getDay() === 0) {
       refDate = addDays(refDate, 1);
     }

@@ -718,7 +718,7 @@ export default function Pricing() {
 
         {(isArtist && !hasSub) ||
         (isAdmin && !isOrganizer) ||
-        (isArtist && hasSub && orgAccountType) ? (
+        (isArtist && hasSub) ? (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -774,8 +774,6 @@ export default function Pricing() {
                 );
               })}
           </motion.div>
-        ) : isArtist && hasSub && !orgAccountType ? (
-          <ExistingSubscription onClick={handleManageSubscription} />
         ) : (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
