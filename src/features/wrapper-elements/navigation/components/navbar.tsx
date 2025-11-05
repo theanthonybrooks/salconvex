@@ -253,7 +253,7 @@ export default function NavBar(
               {/* Desktop Logo & Navigation */}
               <motion.div
                 id="logo-text-container"
-                className="box-border hidden h-15 items-center gap-2 overflow-hidden rounded-full p-[5px] ring-2 ring-foreground lg:flex"
+                className="box-border hidden h-15 items-center gap-2 overflow-hidden rounded-full border-2 border-foreground p-[5px] lg:flex"
                 initial={{
                   width: 60,
                   backgroundColor: "rgba(255, 255, 255, 1)",
@@ -273,8 +273,8 @@ export default function NavBar(
                   <Image
                     src="/logotransparency.png"
                     alt="The Street Art List"
-                    width={50}
-                    height={50}
+                    width={46}
+                    height={46}
                     priority={true}
                     className="shrink-0"
                   />
