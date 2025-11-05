@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import {
@@ -16,6 +16,7 @@ import { FaEnvelope, FaGlobe, FaInstagram } from "react-icons/fa6";
 import { Plus } from "lucide-react";
 
 import { AnimatedCounter } from "@/components/ui/animate-counter";
+import { Button } from "@/components/ui/button";
 import {
   Carousel,
   CarouselContent,
@@ -53,6 +54,7 @@ export default function Home() {
   const subStatus = usePreloadedQuery(preloadedSubStatus);
   const hasActiveSubscription = subStatus?.hasActiveSubscription;
   const userPref = userData?.userPref;
+  const videoRef = useRef<HTMLVideoElement | null>(null);
 
   // const user = userData?.user ?? null;
   // const isAdmin = user?.role?.includes("admin");
@@ -64,6 +66,7 @@ export default function Home() {
   const { data: totalEventsData } = useQueryWithStatus(
     api.events.event.getTotalNumberOfEvents,
   );
+  const [paused, setPaused] = useState(false);
 
   const [currentSlide, setCurrentSlide] = useState(1);
   const [popoverOpen, setPopoverOpen] = useState(false);
@@ -135,6 +138,18 @@ export default function Home() {
     }, 100);
   }, []);
 
+  const handleVideoToggle = () => {
+    const video = videoRef.current;
+    if (!video) return;
+    if (video.paused) {
+      void video.play();
+      setPaused(false);
+    } else {
+      void video.pause();
+      setPaused(true);
+    }
+  };
+
   return (
     <>
       {/* <div className="sticky inset-0 h-dvh">
@@ -142,14 +157,6 @@ export default function Home() {
       </div> */}
       <section className="home-page relative w-full">
         <div className="sticky top-0 z-0 h-[60dvh] sm:h-dvh">
-          {/* <video
-            src="/artist-highlight/nov25/oldhues-video.mp4"
-            // autoPlay
-            muted
-            loop
-            playsInline
-            className="absolute inset-0 h-full w-full object-cover"
-          /> */}
           <motion.div
             initial={{ y: 0, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
@@ -163,8 +170,9 @@ export default function Home() {
               <CarouselContent rounded="sm">
                 <CarouselItem className="relative w-full bg-transparent">
                   <video
+                    ref={videoRef}
                     src="/artist-highlight/nov25/oldhues-video.mp4"
-                    autoPlay
+                    autoPlay={!paused}
                     playsInline
                     muted
                     loop
@@ -203,6 +211,16 @@ export default function Home() {
 
               <CarouselDots className="md:hidden" />
             </Carousel>
+            <Button
+              variant="icon"
+              onClick={handleVideoToggle}
+              className={cn(
+                "absolute bottom-[60px] right-8 z-10 hidden text-sm text-card sm:inline-flex sm:text-base",
+                currentSlide !== 1 && "hidden",
+              )}
+            >
+              {paused ? "Play" : "Pause"} Video
+            </Button>
 
             <Popover onOpenChange={setPopoverOpen} open={popoverOpen}>
               <PopoverTrigger asChild>
