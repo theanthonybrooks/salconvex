@@ -10,7 +10,7 @@ import {
 
 import { User } from "@/types/user";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 // import { useQuery } from "convex-helpers/react/cache"
@@ -72,6 +72,13 @@ export default function NavBar(
 
   const [isScrolled, setIsScrolled] = useState(false);
   const [navBgScroll, setNavBgScroll] = useState(false);
+  const [bgColor, setBgColor] = useState("rgba(0,0,0,0)");
+
+  useEffect(() => {
+    const root = getComputedStyle(document.documentElement);
+    const background = root.getPropertyValue("--background");
+    setBgColor(`hsl(${background.trim()})`);
+  }, []);
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     const scrollThreshold = isMobile ? 50 : 150;
@@ -135,25 +142,22 @@ export default function NavBar(
         id="navbar"
         initial={{
           boxShadow: "none",
-          backgroundColor: homePage
-            ? "rgba(0,0,0,0)"
-            : "hsl(var(--background))",
+          backgroundColor: homePage ? "rgba(0,0,0,0)" : bgColor,
         }}
         animate={{
           boxShadow: isScrolled ? "var(--nav-shadow)" : "none",
           height: isScrolled || homePage ? "80px" : "100px",
-          backgroundColor:
-            !navBgScroll && homePage
-              ? "rgba(0,0,0,0)"
-              : "hsl(var(--background))",
+          backgroundColor: !navBgScroll && homePage ? "rgba(0,0,0,0)" : bgColor,
         }}
         // transition={{ duration: 0.3, ease: "easeInOut" }}
         transition={{
-          backgroundColor: { duration: 0.5, ease: "easeInOut" },
+          backgroundColor: { duration: 0.25, ease: "linear" },
           boxShadow: { duration: 0.25, ease: "easeInOut" },
           height: { duration: 0.3, ease: "easeInOut" },
         }}
-        className="fixed left-0 right-0 top-0 z-20 h-25 w-screen [@media(max-width:720px)]:!bg-background"
+        className={cn(
+          "fixed left-0 right-0 top-0 z-20 h-25 w-screen [@media(max-width:720px)]:!bg-background",
+        )}
       >
         <div className="relative mx-auto flex h-full w-screen items-center justify-between px-8 lg:grid lg:grid-cols-[300px_auto_200px]">
           {/* Mobile Logo and Navigation */}
