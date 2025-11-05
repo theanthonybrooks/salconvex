@@ -15,6 +15,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 // import { useQuery } from "convex-helpers/react/cache"
 import { motion, useMotionValueEvent, useScroll } from "framer-motion";
+import { useTheme } from "next-themes";
 
 import FullPageNav from "@/components/full-page-nav";
 import { Button } from "@/components/ui/button";
@@ -52,6 +53,7 @@ export default function NavBar(
   }: NavBarProps,
 ) {
   const { isMobile } = useDevice();
+  const { theme } = useTheme();
   const { preloadedUserData, preloadedSubStatus } = useConvexPreload();
   const userData = usePreloadedQuery(preloadedUserData);
   const subData = usePreloadedQuery(preloadedSubStatus);
@@ -75,10 +77,15 @@ export default function NavBar(
   const [bgColor, setBgColor] = useState("rgba(0,0,0,0)");
 
   useEffect(() => {
-    const root = getComputedStyle(document.documentElement);
-    const background = root.getPropertyValue("--background");
-    setBgColor(`hsl(${background.trim()})`);
-  }, []);
+    const updateColor = () => {
+      const root = getComputedStyle(document.documentElement);
+      const background = root.getPropertyValue("--background");
+      setBgColor(`hsl(${background.trim()})`);
+    };
+
+    const id = requestAnimationFrame(updateColor);
+    return () => cancelAnimationFrame(id);
+  }, [theme]);
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     const scrollThreshold = isMobile ? 50 : 150;
