@@ -69,7 +69,7 @@ export default function NavBar(
   // useMotionValueEvent(scrollY, "change", (latest) => {
   //   console.log("Page scroll: ", latest)
   // })
-
+  const homePage = pathname === "/";
   const currentPage = pathname.split("/")[1];
 
   const [isScrolled, setIsScrolled] = useState(false);
@@ -77,6 +77,7 @@ export default function NavBar(
   const [bgColor, setBgColor] = useState("rgba(0,0,0,0)");
 
   useEffect(() => {
+    if (!homePage) return;
     const updateColor = () => {
       const root = getComputedStyle(document.documentElement);
       const background = root.getPropertyValue("--background");
@@ -85,7 +86,7 @@ export default function NavBar(
 
     const id = requestAnimationFrame(updateColor);
     return () => cancelAnimationFrame(id);
-  }, [theme]);
+  }, [theme, homePage]);
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     const scrollThreshold = isMobile ? 50 : 150;
@@ -141,7 +142,6 @@ export default function NavBar(
   const activeMainItemClasses =
     "border-foreground/50   hover:border-foreground/70 data-[state=open]:border-foreground/70";
 
-  const homePage = pathname === "/";
   return (
     <>
       {/* ------ Desktop & Mobile: Main Navbar ----- */}
@@ -149,19 +149,21 @@ export default function NavBar(
         id="navbar"
         initial={{
           boxShadow: "none",
-          backgroundColor: homePage ? "rgba(0,0,0,0)" : bgColor,
+          backgroundColor: homePage
+            ? "rgba(0,0,0,0)"
+            : "hsl(var(--background))",
         }}
         animate={{
           boxShadow: isScrolled ? "var(--nav-shadow)" : "none",
           height: isScrolled || homePage ? "80px" : "100px",
-          backgroundColor: !navBgScroll && homePage ? "rgba(0,0,0,0)" : bgColor,
+          backgroundColor:
+            !navBgScroll && homePage
+              ? "rgba(0,0,0,0)"
+              : homePage && navBgScroll
+                ? bgColor
+                : "hsl(var(--background))",
         }}
-        // transition={{ duration: 0.3, ease: "easeInOut" }}
-        transition={{
-          backgroundColor: { duration: 0.25, ease: "linear" },
-          boxShadow: { duration: 0.25, ease: "easeInOut" },
-          height: { duration: 0.3, ease: "easeInOut" },
-        }}
+        transition={{ duration: 0.3, ease: "easeInOut" }}
         className={cn(
           "fixed left-0 right-0 top-0 z-20 h-25 w-screen [@media(max-width:720px)]:!bg-background",
         )}
@@ -338,8 +340,8 @@ export default function NavBar(
                         <NavigationMenuTrigger
                           isCurrent={isActiveResources}
                           className={cn(
-                            "hidden border-2 border-transparent bg-background hover:border-foreground/70 data-[state=open]:border-foreground xl:flex",
-                            homePage && "bg-transparent",
+                            "hidden border-2 border-transparent bg-transparent hover:border-foreground/70 data-[state=open]:border-foreground xl:flex",
+                            // homePage && "bg-transparent",
                             isActiveResources && activeMainItemClasses,
                           )}
                           onPointerMove={(event) => event.preventDefault()}
@@ -382,8 +384,8 @@ export default function NavBar(
                       <NavigationMenuTrigger
                         isCurrent={isActiveTheList}
                         className={cn(
-                          "border-2 border-transparent bg-background hover:border-foreground/70 data-[state=open]:border-foreground",
-                          homePage && "bg-transparent",
+                          "border-2 border-transparent bg-transparent hover:border-foreground/70 data-[state=open]:border-foreground",
+                          // homePage && "bg-transparent",
                           isActiveTheList && activeMainItemClasses,
                         )}
                         onPointerMove={(event) => event.preventDefault()}
@@ -460,8 +462,8 @@ export default function NavBar(
                       <NavigationMenuTrigger
                         isCurrent={isActiveAbout}
                         className={cn(
-                          "hidden border-2 border-transparent bg-background hover:border-foreground/70 data-[state=open]:border-foreground xl:flex",
-                          homePage && "bg-transparent",
+                          "hidden border-2 border-transparent bg-transparent hover:border-foreground/70 data-[state=open]:border-foreground xl:flex",
+                          // homePage && "bg-transparent",
                           isActiveAbout && activeMainItemClasses,
                         )}
                         onPointerMove={(event) => event.preventDefault()}

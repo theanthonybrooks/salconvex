@@ -9,7 +9,7 @@ import { useManageSubscription } from "@/hooks/use-manage-subscription";
 import { motion } from "framer-motion";
 import { toast } from "react-toastify";
 
-import { CheckCircle2, CircleX } from "lucide-react";
+import { CheckCircle2, CircleX, LoaderCircle } from "lucide-react";
 
 import type { FeatureMap } from "~/convex/schema";
 import { Button } from "@/components/ui/button";
@@ -338,6 +338,7 @@ const PricingCard = ({
   stripePriceId,
   subscription,
 }: PricingCardProps) => {
+  const [pending, setPending] = useState(false);
   const [comingSoon, setComingSoon] = useState(false);
   const monthlyFeatures = featureMap
     ? [...featureMap.base, ...featureMap.monthly]
@@ -382,6 +383,7 @@ const PricingCard = ({
     interval: "month" | "year",
     hadTrial: boolean,
   ) => {
+    setPending(true);
     try {
       const { url } = await getCheckoutUrl({
         interval,
@@ -396,6 +398,8 @@ const PricingCard = ({
     } catch (error) {
       console.error("Failed to get checkout URL:", error);
       toast.error("Failed to redirect. Please contact support");
+    } finally {
+      setPending(false);
     }
   };
 
@@ -556,7 +560,7 @@ const PricingCard = ({
           isCurrentUserPlan={isCurrentUserPlan}
         >
           <Button
-            // disabled={!isCurrentUserPlan && activeSub}
+            disabled={pending}
             onClick={() => {
               if (!activeSub || isCurrentUserPlan) return;
               handleManageSubscription();
@@ -568,9 +572,13 @@ const PricingCard = ({
             }
             className={cn("h-14 w-full text-lg sm:h-11 sm:text-base")}
           >
-            {isCurrentUserPlan && activeSub
-              ? "Update My Plan"
-              : `${isArtist ? "Get" : "List"} ${title}`}
+            {pending ? (
+              <LoaderCircle className="size-4 animate-spin" />
+            ) : isCurrentUserPlan && activeSub ? (
+              "Update My Plan"
+            ) : (
+              `${isArtist ? "Get" : "List"} ${title}`
+            )}
           </Button>
         </AccountSubscribeForm>
       </CardFooter>

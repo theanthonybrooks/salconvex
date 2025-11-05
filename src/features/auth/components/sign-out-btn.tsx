@@ -1,5 +1,5 @@
 import React from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 import { cn } from "@/helpers/utilsFns";
 
@@ -16,6 +16,7 @@ interface SignOutBtnProps {
 const SignOutBtn = ({ children, email, className }: SignOutBtnProps) => {
   const { signOut } = useAuthActions();
   const router = useRouter();
+  const pathname = usePathname();
   const updateLastActive = useMutation(api.users.updateUserLastActive);
   return (
     <span
@@ -29,7 +30,10 @@ const SignOutBtn = ({ children, email, className }: SignOutBtnProps) => {
         localStorage.clear();
 
         await signOut();
-        router.push("/auth/sign-in");
+        console.log({ pathname, thelist: pathname.includes("/thelist") });
+        if (pathname.includes("/thelist")) {
+          router.push("/auth/sign-in");
+        }
       }}
     >
       {children}

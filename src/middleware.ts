@@ -1,13 +1,15 @@
+import { NextResponse } from "next/server";
+import { UAParser } from "ua-parser-js";
+
 import {
   convexAuthNextjsMiddleware,
   createRouteMatcher,
 } from "@convex-dev/auth/nextjs/server";
-import { NextResponse } from "next/server";
-import { UAParser } from "ua-parser-js";
 
 // const isPublicPage = createRouteMatcher(["/", "/archive", "/pricing"])
 
 const isAuthPage = createRouteMatcher(["/auth/:path*"]);
+const isDashboardPage = createRouteMatcher(["/dashboard/:path*"]);
 // const isOpenCallPage = createRouteMatcher([
 //   "/thelist/event/:slug/:year/call",
 //   "/thelist/event/:slug/:year/call/:path*",
@@ -44,6 +46,12 @@ export default convexAuthNextjsMiddleware(
 
       // fallback for any other /auth/* page
       return NextResponse.redirect(new URL("/", request.url));
+    }
+
+    if (!isAuthenticated) {
+      if (isDashboardPage(request)) {
+        return NextResponse.redirect(new URL("/auth/sign-in", request.url));
+      }
     }
 
     if (isSubmitPage(request)) {

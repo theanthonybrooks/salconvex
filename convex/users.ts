@@ -48,17 +48,19 @@ export const updateUserLastActive = mutation({
   handler: async (ctx, args) => {
     let userId = null;
     const identity = await getAuthUserId(ctx);
-    const userByEmail = await ctx.db
-      .query("users")
-      .withIndex("email", (q) => q.eq("email", args.email))
-      .first();
+    const userByEmail = !identity
+      ? await ctx.db
+          .query("users")
+          .withIndex("email", (q) => q.eq("email", args.email))
+          .first()
+      : null;
     if (identity) {
       userId = identity;
     } else {
       userId = userByEmail?._id;
     }
     if (!userId) {
-      console.log("User not found");
+      console.log("User not found", args.email ?? "No email provided");
       // throw new Error("User not found");
       return null;
     }
