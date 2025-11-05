@@ -230,7 +230,9 @@ export const SelectSimple = ({
 }: SelectSimpleProps) => {
   const selectOptions = [
     ...options,
-    ...(hasReset && value !== "-" ? [{ value: "-", label: "--Reset--" }] : []),
+    ...(hasReset && value !== "-" && value
+      ? [{ value: "-", label: "--Reset--" }]
+      : []),
   ];
   const groupedOptions = selectOptions.reduce<
     Record<string, typeof selectOptions>

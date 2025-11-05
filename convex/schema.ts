@@ -1460,7 +1460,11 @@ export default defineSchema({
     ),
     cookiePrefs: v.optional(v.union(v.literal("all"), v.literal("required"))),
     lastUpdated: v.optional(v.number()),
-  }).index("by_userId", ["userId"]),
+  })
+    .index("by_notifications_general", ["notifications.general"])
+    .index("by_notifications_newsletter", ["notifications.newsletter"])
+    .index("by_notifications_applications", ["notifications.applications"])
+    .index("by_userId", ["userId"]),
 
   newsletter: defineTable(newsletterSchema)
     .index("by_userId", ["userId"])

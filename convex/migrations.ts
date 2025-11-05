@@ -315,17 +315,21 @@ export const runBackfillOCA = migrations.runner(
   internal.migrations.backfillOCAggregate2,
 );
 
-// export const addDefaultNewsletterTypeandFrequency = migrations.define({
-//   table: "newsletter",
-//   migrateOne: async (ctx, user) => {
-//     //gather all newsletter subscriptions
-//     //everyone gets a monthly frequency and general newsletter type
-//     await ctx.db.patch(user._id, {
-//       type: ["general"],
-//       frequency: "monthly",
-//     });
-//   },
-// });
+export const addDefaultCommPref = migrations.define({
+  table: "userPreferences",
+  migrateOne: async (ctx, userPref) => {
+    if (userPref.notifications) return;
+    //gather all newsletter subscriptions
+    //everyone gets a monthly frequency and general newsletter type
+    await ctx.db.patch(userPref._id, {
+      notifications: {
+        general: true,
+      },
+    });
+  },
+});
+
+export const runDCP = migrations.runner(internal.migrations.addDefaultCommPref);
 
 // export const findUsersWithActiveNewsletterAndUpdateUserPref = migrations.define(
 //   {
