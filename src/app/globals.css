@@ -337,6 +337,14 @@ body {
   }
 }
 
+main.public-content {
+  &:not(:has(section.home-page)) {
+    @apply px-4 pt-36 lg:pt-25;
+
+    /* @apply pt-0 lg:pt-0; */
+  }
+}
+
 .group\/trigger[data-state="open"][data-side="right"] .rotate-icon {
   transform: rotate(-90deg);
 }

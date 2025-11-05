@@ -12,6 +12,7 @@ import { redirect } from "next/navigation";
 
 import Footer from "@/features/wrapper-elements/navigation/components/footer";
 import { NavbarWrapper } from "@/features/wrapper-elements/navigation/components/navbar-wrapper";
+import { cn } from "@/helpers/utilsFns";
 
 import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
 import { api } from "~/convex/_generated/api";
@@ -66,7 +67,12 @@ export default async function HomeLayout({
     <>
       <NavbarWrapper type="public" />
       {/* <div className="flex h-full flex-col"> */}
-      <main className="flex flex-1 flex-col px-4 pt-36 lg:pt-25">
+      <main
+        className={cn(
+          "public-content relative flex flex-1 flex-col",
+          // notHomePage && "pt-36 lg:pt-25",
+        )}
+      >
         {children}
       </main>
 

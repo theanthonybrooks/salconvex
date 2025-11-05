@@ -169,6 +169,7 @@ export default {
         "20": "5rem",
         "25": "100px",
       },
+     
       margin: {
         "10": "2.5rem",
         "12": "3rem",

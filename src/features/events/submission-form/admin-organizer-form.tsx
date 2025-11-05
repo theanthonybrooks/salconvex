@@ -72,16 +72,16 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   const { isMobile } = useDevice();
   const { isSidebarCollapsed } = useDashboard();
 
+  const isAdmin = user?.role?.includes("admin") || false;
   const router = useRouter();
   const [activeStep, setActiveStep] = useState(0);
-  const [formType, setFormType] = useState<number>(0);
+  const [formType, setFormType] = useState<number>(isAdmin ? 1 : 0);
   const [editedSections, setEditedSections] = useState<
     ("event" | "openCall")[]
   >([]);
   const [savedCount, setSavedCount] = useState(0);
 
   const eventOnly = formType === 1;
-  const isAdmin = user?.role?.includes("admin") || false;
   const steps = getSteps(isAdmin);
   const finalStep = activeStep === steps.length - 1;
   const paidCall = formType === 3 && !isAdmin;

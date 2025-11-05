@@ -3,16 +3,23 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
-import { motion } from "framer-motion";
+import {
+  motion,
+  useMotionValueEvent,
+  useScroll,
+  useSpring,
+  useTransform,
+} from "framer-motion";
 import { useTheme } from "next-themes";
 
-import { FaEnvelope, FaFacebook, FaGlobe, FaInstagram } from "react-icons/fa6";
+import { FaEnvelope, FaGlobe, FaInstagram } from "react-icons/fa6";
 import { Plus } from "lucide-react";
 
 import { AnimatedCounter } from "@/components/ui/animate-counter";
 import {
   Carousel,
   CarouselContent,
+  CarouselDots,
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
@@ -59,24 +66,29 @@ export default function Home() {
   );
 
   const [currentSlide, setCurrentSlide] = useState(1);
-  // const [expanded, setExpanded] = useState(false);
   const [popoverOpen, setPopoverOpen] = useState(false);
-  // const toggleReadMore = () => setExpanded((prev) => !prev);
-  // const { scrollY, scrollYProgress } = useScroll();
-  // const smoothScrollY = useSpring(scrollY, {
-  //   stiffness: 100,
-  //   damping: 20,
-  //   mass: 0.4,
-  // })
+  const [titleOpacity, setTitleOpacity] = useState(0.85);
+  const { scrollY } = useScroll();
+  const smoothScrollY = useSpring(scrollY, {
+    stiffness: 50,
+    damping: 20,
+    mass: 0.4,
+  });
 
   // useMotionValueEvent(scrollY, "change", (latest) => {
-  //   console.log("Page scroll: ", latest);
+  //   console.log(latest);
   // });
 
-  // useMotionValueEvent(scrollYProgress, "change", (latest) => {
-  //   console.log("Page scroll progress: ", latest);
-  // });
-  // const borderRadius = useTransform(smoothScrollY, [0, 150, 450], [0, 0, 150])
+  const titleOpacityScrollProgress = useTransform(
+    smoothScrollY,
+    [0, 25, 200], //note-to-self: input range (scroll positions)
+    [0.85, 0.85, 0], //note-to-self: output range (opacity values)
+  );
+  useMotionValueEvent(titleOpacityScrollProgress, "change", (latest) => {
+    // console.log("Current opacity:", latest);
+    if (popoverOpen) setPopoverOpen(false);
+    setTitleOpacity(latest);
+  });
 
   const { isMobile } = useDevice();
 
@@ -125,394 +137,286 @@ export default function Home() {
 
   return (
     <>
-      <motion.div
-        initial={{ y: 0, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.5, ease: "easeInOut" }}
-        className="relative flex h-full flex-col items-center justify-center overflow-hidden rounded-3xl sm:mt-auto"
-        style={{
-          maxHeight: "calc(100dvh - 8.5rem)",
-        }}
-      >
-        <div
-          className={cn(
-            "absolute left-5 top-5 z-10 font-tanker lowercase tracking-wide text-background transition-transform duration-700 ease-in-out [text-shadow:0_0_10px_rgba(0,0,0,0.3)] md:left-7",
+      {/* <div className="sticky inset-0 h-dvh">
+     
+      </div> */}
+      <section className="home-page relative w-full">
+        <div className="sticky top-0 z-0 h-[60dvh] sm:h-dvh">
+          {/* <video
+            src="/artist-highlight/nov25/oldhues-video.mp4"
+            // autoPlay
+            muted
+            loop
+            playsInline
+            className="absolute inset-0 h-full w-full object-cover"
+          /> */}
+          <motion.div
+            initial={{ y: 0, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 1, ease: "easeInOut" }}
+            className="home-page relative flex h-full max-h-[90%] flex-col items-center justify-center sm:mt-auto sm:max-h-dvh"
+          >
+            <Carousel
+              className="h-full w-full px-4 sm:px-0 [@media(max-width:720px)]:pt-20"
+              onSelectIndexChange={setCurrentSlide}
+            >
+              <CarouselContent rounded="sm">
+                <CarouselItem className="relative w-full bg-transparent">
+                  <video
+                    src="/artist-highlight/nov25/oldhues-video.mp4"
+                    autoPlay
+                    playsInline
+                    muted
+                    loop
+                    preload="metadata"
+                    disablePictureInPicture
+                    controlsList="nodownload nofullscreen noremoteplayback noplaybackrate"
+                    className="absolute inset-0 h-full w-full object-cover object-[50%_32%]"
+                  />
+                </CarouselItem>
 
-            currentSlide === 1
-              ? "scale-100"
-              : "-translate-x-[20%] -translate-y-3 scale-[.6] lg:-translate-y-0 lg:translate-x-0 lg:scale-100",
-          )}
-        >
+                <CarouselItem className="relative w-full bg-transparent">
+                  <Image
+                    src="/artist-highlight/nov25/oldhues-1.jpg"
+                    alt="The Street Art List - Megan Oldhues @oldhues"
+                    loading="eager"
+                    width={1920}
+                    height={1080}
+                    className="h-full w-full object-cover object-[50%_66%] [@media(max-height:620px)]:object-[50%_30%]"
+                  />
+                </CarouselItem>
+                <CarouselItem className="relative w-full bg-transparent">
+                  <Image
+                    src="/artist-highlight/nov25/oldhues-3.jpg"
+                    alt="The Street Art List - Megan Oldhues @oldhues"
+                    loading="eager"
+                    width={1920}
+                    height={1080}
+                    className="h-full w-full object-cover object-[50%_51%]"
+                  />
+                </CarouselItem>
+              </CarouselContent>
+
+              <CarouselPrevious className="bg-transparent text-card hover:bg-card hover:text-foreground/50" />
+
+              <CarouselNext className="bg-transparent text-card hover:bg-card hover:text-foreground/50" />
+
+              <CarouselDots className="md:hidden" />
+            </Carousel>
+
+            <Popover onOpenChange={setPopoverOpen} open={popoverOpen}>
+              <PopoverTrigger asChild>
+                <motion.span
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.5, ease: "easeInOut" }}
+                  className="absolute bottom-5 right-1/2 z-0 flex w-max translate-x-1/2 flex-col gap-1 rounded-3xl bg-card px-6 py-2 text-foreground transition-all ease-in-out hover:cursor-pointer hover:bg-salYellowLt sm:right-10 sm:w-auto sm:translate-x-0 sm:px-6"
+                >
+                  <div className="group flex cursor-pointer flex-col items-center gap-2 sm:flex-row">
+                    <span className={cn("flex items-center gap-2")}>
+                      <i className={cn("text-base")}>
+                        {currentSlide === 1
+                          ? "Fireside (2025)"
+                          : currentSlide === 2
+                            ? "Pocket Cars (2024)"
+                            : "Hua Sheng Supermarket (2023)"}
+                      </i>
+                      <span
+                        className={cn(
+                          "block text-xs sm:hidden",
+                          currentSlide === 3 && "hidden",
+                        )}
+                      >
+                        |
+                      </span>{" "}
+                      {currentSlide < 3 && (
+                        <span className="font-bold sm:hidden">
+                          {/* @oldhues */}
+                          Megan Oldhues
+                        </span>
+                      )}
+                    </span>
+                    <Separator
+                      thickness={2}
+                      orientation={isMobile ? "horizontal" : "vertical"}
+                      className={cn(
+                        "mx-1 h-5",
+                        "[@media(max-width:768px)]:hidden",
+                      )}
+                    />
+                    <span
+                      className={cn(
+                        "flex items-center gap-1 text-sm hover:cursor-pointer group-hover:font-semibold",
+                        "[@media(max-width:768px)]:hidden",
+                      )}
+                    >
+                      {popoverOpen ? (
+                        <>View less... </>
+                      ) : (
+                        <>
+                          View more
+                          <Plus className="size-4" />
+                        </>
+                      )}
+                    </span>
+                  </div>
+                </motion.span>
+              </PopoverTrigger>
+              <PopoverContent className="w-80 border-1.5" align="center">
+                <div className="grid gap-4">
+                  <div className="space-y-2">
+                    <h4 className="font-medium leading-none">More info:</h4>
+                    <p className="text-base text-muted-foreground">
+                      Canadian artist based in Toronto
+                    </p>
+                  </div>
+                  <ul className="flex flex-col gap-2 sm:gap-1 [&*svg]:size-4">
+                    <li className="flex items-center gap-x-3">
+                      <FaInstagram />
+                      <Link
+                        href="https://instagram.com/oldhues"
+                        className="text-base text-muted-foreground"
+                        target="_blank"
+                      >
+                        @oldhues
+                      </Link>
+                    </li>
+
+                    <li className="flex items-center gap-x-3">
+                      <FaGlobe />
+                      <Link
+                        href="https://oldhues.com"
+                        className="text-base text-muted-foreground"
+                        target="_blank"
+                      >
+                        www.oldhues.com
+                      </Link>
+                    </li>
+                    <li className="flex items-center gap-x-3">
+                      <FaEnvelope />
+                      <Link
+                        href="https://www.oldhues.com/contact"
+                        className="text-base text-muted-foreground"
+                        target="_blank"
+                      >
+                        Contact
+                      </Link>
+                    </li>
+                  </ul>
+                </div>
+              </PopoverContent>
+            </Popover>
+          </motion.div>
           <div
             className={cn(
-              currentSlide !== 1 && "opacity-0 transition-opacity ease-in-out",
+              "absolute bottom-5 left-5 z-10 hidden origin-bottom-left select-none flex-col items-start gap-1 font-tanker lowercase tracking-wide text-card transition-transform duration-700 ease-in-out [text-shadow:0_0_10px_rgba(0,0,0,0.3)] sm:left-7 sm:flex",
+
+              currentSlide === 1
+                ? "sm:scale-[1.2] lg:scale-[1.75] 2xl:scale-[2]"
+                : "scale-[.6] lg:scale-100",
             )}
+            style={{
+              opacity: titleOpacity,
+              // transition: "opacity 0.5s ease-in-out",
+            }}
           >
-            <h1
+            <div
               className={cn(
-                "text-[4rem] leading-[3.5rem] md:text-[6.9rem] md:leading-[6rem] lg:text-[8.5rem] lg:leading-[8.5rem]",
-                currentSlide === 1
-                  ? "scale-100"
-                  : "-translate-x-[20%] -translate-y-3 scale-[.6] lg:-translate-y-0 lg:translate-x-0 lg:scale-100",
+                "flex flex-col items-start transition-opacity ease-in-out [&_h1]:leading-[0.9]",
               )}
             >
-              Nick
-            </h1>
-            <h1
-              className={cn(
-                "text-3xl md:text-[3.25rem] md:leading-[3rem] lg:text-[4.125rem] lg:leading-[4.25rem]",
-                currentSlide === 1
-                  ? "scale-100"
-                  : "-translate-x-[20%] -translate-y-3 scale-[.6] lg:-translate-y-0 lg:translate-x-0 lg:scale-100",
-              )}
-            >
-              Abstract
-            </h1>
-          </div>
-          <h2
-            className={cn(
-              "border-t-4 border-background pt-1 text-center text-lg md:text-3xl lg:text-4xl",
-              currentSlide === 1 ? "scale-100" : "hidden",
-            )}
-          >
-            July / Aug 2025
-          </h2>
-        </div>
-
-        <Carousel className="h-full w-full">
-          <CarouselContent>
-            <CarouselItem className="relative w-full">
-              <Image
-                src="/artist-highlight/nick_artwork.jpg"
-                alt="The Street Art List - Nick Abstract @nick.abstract"
-                loading="eager"
-                width={1920}
-                height={1080}
-                className="h-full w-full object-cover object-[50%_10%] [@media(max-height:768px)]:object-[50%_38%]"
-
-                // style={{
-                //   borderBottomLeftRadius: borderRadius,
-                //   borderBottomRightRadius: borderRadius,
-                // }}
-              />
-            </CarouselItem>
-
-            <CarouselItem className="relative w-full">
-              <Image
-                src="/artist-highlight/nick_profile.jpg"
-                alt="The Street Art List - Nick Abstract @nick.abstract"
-                loading="eager"
-                width={1920}
-                height={1080}
-                className="h-full w-full object-cover object-[50%_63%] [@media(max-height:768px)]:object-[50%_30%]"
-
-                // style={{
-                //   borderBottomLeftRadius: borderRadius,
-                //   borderBottomRightRadius: borderRadius,
-                // }}
-              />
-            </CarouselItem>
-            <CarouselItem className="relative w-full">
-              <Image
-                src="/artist-highlight/nick_artwork2.jpg"
-                alt="The Street Art List - Nick Abstract @nick.abstract"
-                loading="eager"
-                width={1920}
-                height={1080}
-                className="h-full w-full object-cover object-[50%_32%]"
-
-                // style={{
-                //   borderBottomLeftRadius: borderRadius,
-                //   borderBottomRightRadius: borderRadius,
-                // }}
-              />
-            </CarouselItem>
-          </CarouselContent>
-          <div onClick={() => setCurrentSlide(currentSlide - 1)}>
-            <CarouselPrevious />
-          </div>
-          <div onClick={() => setCurrentSlide(currentSlide + 1)}>
-            <CarouselNext />
-          </div>
-        </Carousel>
-
-        <Popover onOpenChange={setPopoverOpen} open={popoverOpen}>
-          <PopoverTrigger asChild>
-            <motion.span
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, ease: "easeInOut" }}
-              className="absolute bottom-5 left-1/2 z-0 flex w-max -translate-x-1/2 flex-col gap-1 rounded-3xl bg-white px-6 py-2 text-foreground transition-all ease-in-out hover:cursor-pointer hover:bg-yellow-100 sm:left-5 sm:w-auto sm:translate-x-0 sm:px-6"
-              // onClick={() => setPopoverOpen((prev) => !prev)}
-            >
-              <div className="flex flex-col items-center gap-2 sm:flex-row">
-                <span className={cn("flex items-center gap-2")}>
-                  <i
-                    className={cn("text-base", currentSlide === 2 && "hidden")}
-                  >
-                    6th Street{" "}
-                  </i>
-                  {/* <span className="block sm:hidden">-</span>{" "} */}
-                  <span
-                    className={cn(
-                      "block text-xs",
-                      currentSlide === 2 && "hidden",
-                    )}
-                  >
-                    by
-                  </span>{" "}
-                  <span className={cn("font-bold")}>Nick Abstract</span>{" "}
-                  <span
-                    className={cn(
-                      "text-base text-muted-foreground",
-                      currentSlide !== 2 && "hidden",
-                    )}
-                  >
-                    @nick.abstract
-                  </span>{" "}
-                </span>
-                <Separator
-                  thickness={2}
-                  orientation={isMobile ? "horizontal" : "vertical"}
-                  className={cn("mx-1 h-5", "[@media(max-width:768px)]:hidden")}
-                />
-                <span
-                  className={cn(
-                    "flex items-center gap-1 text-sm hover:cursor-pointer hover:font-semibold",
-                    "[@media(max-width:768px)]:hidden",
-                  )}
-                >
-                  {popoverOpen ? (
-                    <>View less... </>
-                  ) : (
-                    <>
-                      View more
-                      <Plus className="size-4" />
-                    </>
-                  )}
-                </span>
-              </div>
-              {/* <span
-                className={cn(
-                  "flex items-center justify-between gap-2",
-                  currentSlide !== 1 && "hidden",
-                )}
-              >
-                <p className="text-xs text-muted-foreground">Italy (2024)</p>
-
-                <span className="flex items-center gap-1 text-xs italic underline-offset-2 hover:underline">
-                  {popoverOpen ? (
-                    <p> View less </p>
-                  ) : (
-                    <p>View more details... </p>
-                  )}
-                </span>
-              </span> */}
-            </motion.span>
-          </PopoverTrigger>
-          <PopoverContent className="w-80 border-1.5" align="center">
-            <div className="grid gap-4">
-              {/* <div className="space-y-2">
-                <h3 className="italic">6th Street</h3>
-                <p className="text-base text-muted-foreground">
-                  Pieve Santo Stefano, Tuscany (IT)
-                </p>
-              </div> */}
-              <div className="space-y-2">
-                <h4 className="font-medium leading-none">More info:</h4>
-                <p className="text-base text-muted-foreground">
-                  Colorblind artist/designer based in the Midwestern United
-                  States
-                </p>
-              </div>
-              <ul className="flex flex-col gap-2 sm:gap-1 [&*svg]:size-4">
-                <li className="flex items-center gap-x-3">
-                  <FaInstagram />
-                  <Link
-                    href="https://instagram.com/nick.abstract"
-                    className="text-base text-muted-foreground"
-                    target="_blank"
-                  >
-                    @nick.abstract
-                  </Link>
-                </li>
-                <li className="flex items-center gap-x-3">
-                  <FaFacebook />
-                  <Link
-                    href="https://www.facebook.com/chungwii21/"
-                    className="text-base text-muted-foreground"
-                    target="_blank"
-                  >
-                    Nick Smith (Nick Abstract)
-                  </Link>
-                </li>
-                <li className="flex items-center gap-x-3">
-                  <FaGlobe />
-                  <Link
-                    href="https://nickabstract.com"
-                    className="text-base text-muted-foreground"
-                    target="_blank"
-                  >
-                    www.nickabstract.com
-                  </Link>
-                </li>
-                <li className="flex items-center gap-x-3">
-                  <FaEnvelope />
-                  <Link
-                    href="mailto:info@nickabstract.com"
-                    className="text-base text-muted-foreground"
-                    target="_blank"
-                  >
-                    info@nickabstract.com
-                  </Link>
-                </li>
-              </ul>
+              <h1 className={cn("text-[5.1rem]")}>Megan</h1>
+              <h1 className={cn("text-[4rem]")}>Oldhues</h1>
             </div>
-          </PopoverContent>
-        </Popover>
-      </motion.div>
-      <div className="-mx-4 mt-10 flex w-screen items-center justify-center gap-3 bg-foreground/90 p-6 font-tanker lowercase text-background">
-        <div className="flex w-[clamp(300px,70vw,1000px)] flex-col items-center justify-around gap-3 sm:flex-row">
-          <span className="flex flex-col items-center gap-2">
-            <p className="text-[3.25em] leading-[3rem]">Currently,</p>
-            <p className="text-2xl">on The Street Art List:</p>
-          </span>
-          <div className="flex w-full items-center justify-around gap-3">
-            <span className="flex flex-col items-center gap-2 text-nowrap">
-              <AnimatedCounter
-                to={totalOpenCallsData?.activeOpenCalls ?? 0}
-                className="text-4xl sm:text-5xl md:text-[5em] md:leading-[4rem]"
-              />
-              <p className="font-spaceGrotesk text-sm font-semibold sm:text-base">
-                {" "}
-                Open Calls
-              </p>
-            </span>
-            <span className="flex flex-col items-center gap-2 text-nowrap">
-              <AnimatedCounter
-                to={
-                  1131 +
-                  ((totalEventsData?.activeEvents ?? 0) +
-                    (totalEventsData?.archivedEvents ?? 0))
-                }
-                className="text-4xl sm:text-5xl md:text-[5em] md:leading-[4rem]"
-                duration={2}
-                plus={false}
-              />
-              <p className="font-spaceGrotesk text-sm font-semibold sm:text-base">
-                {" "}
-                Events & Projects
-              </p>
-            </span>
-            <span className="flex flex-col items-center gap-2 text-nowrap">
-              <AnimatedCounter
-                to={92}
-                duration={3}
-                className="text-4xl sm:text-5xl md:text-[5em] md:leading-[4rem]"
-              />
-              <p className="font-spaceGrotesk text-sm font-semibold sm:text-base">
-                {" "}
-                Countries
-              </p>
-            </span>
+            <h2
+              className={cn("mt-1 border-t-4 border-card text-center text-4xl")}
+            >
+              Nov / Dec 2025
+            </h2>
           </div>
         </div>
-      </div>
-      {/* {!hasActiveSubscription ? (
-        <>
-          <Card className="mx-auto mt-10 max-w-[90dvw] border-1.5 p-6 text-left shadow-md sm:max-w-[70dvw]">
-            <CardContent className="space-y-4 !p-0 text-base text-foreground sm:!p-6">
-              <h2 className="text-center font-tanker text-4xl text-foreground">
-                Welcome!
-              </h2>
-              <div
-                className={cn(
-                  !expanded && "line-clamp-3 lg:line-clamp-none",
-                  "transition-all",
-                )}
-              >
-                <p>
-                  For those that are new to The Street Art List, here&apos;s a
-                  quick overview of what it is and how it works.
-                </p>
-                &nbsp;
-                <p>
-                  The Street Art List is a platform that I started in 2019 with
-                  the goal of making a public archive/database of street
-                  art-related projects and events. Over the years, that list
-                  continued to grow until last year when I decided to bite the
-                  bullet and code a site. Needless to say, it was a huge
-                  undertaking, but was also a bit rushed and I really wanted to
-                  make something better.
-                </p>
-                &nbsp;
-                <p>
-                  So, for the past year and a half, I&apos;ve been working on
-                  this shiny new site that allows users to have an account, to
-                  bookmark, to hide events, to keep track of applications, to
-                  view deadlines in their local timezone, and much more! Lots of
-                  functionalities that I have in the works, and I&apos;m happy
-                  to finally get to share what so much of my time has gone into.
-                </p>
-                &nbsp;
-                <p>
-                  {" "}
-                  If you used previous versions of The List (when it was a
-                  spreadsheet), or the old version of the site, I promise that
-                  this has just... so much more. Full detail pages with
-                  breakdowns of the budget, mobile-friendly layouts, submission
-                  forms that allow saving drafts and coming back to them later.
-                  Organizer accounts. Really, just so much more. I&apos;m
-                  excited to share this with you and hope you&apos;ll find it
-                  useful :){" "}
-                </p>
-                &nbsp;
-                <p>
-                  P.s. I&apos;m constantly updating the site, so if you come
-                  across any bugs, please let me know!
-                </p>
-              </div>
-              <Button
-                variant="salWithShadowHidden"
-                onClick={toggleReadMore}
-                className="mt-3 w-full lg:hidden"
-              >
-                {expanded ? "Read Less" : "Read More"}
-              </Button>
-            </CardContent>
-          </Card>
 
-          <Pricing />
-        </>
-      ) : (
-        <> */}
-      <div className="mx-auto mt-10 flex w-full max-w-[clamp(300px,80vw,1000px)] flex-col items-start justify-center gap-2 py-4">
-        <span className="inline items-center">
-          <strong>The Street Art List&nbsp; </strong> is an initiative created
-          and run by&nbsp;
-          <Link
-            href="https://instagram.com/anthonybrooksart"
-            target="_blank"
-            className="lg:text-base"
-          >
-            Anthony Brooks
-          </Link>
-          , a Serbian-American artist based in Berlin, Germany.
-        </span>
-        <p>
-          {" "}
-          The List is the result (years in the making) of my frustration with
-          the lack of a centralized place to find open calls and to know
-          what&apos;s happening elsewhere in the street art world — a real
-          <i>
-            &quot;If what you want doesn&apos;t exist, create it&quot;&nbsp;
-          </i>
-          sort of situation. It&apos;s been an ongoing project since 2019, and
-          over time, has grown from an extensive spreadsheet to a fully-fledged
-          database of street art-related projects and events.{" "}
-        </p>
-      </div>
-      {!hasActiveSubscription && <Pricing />}
+        <div className="relative z-10 bg-background pt-4 sm:pt-10">
+          <div className="flex w-screen items-center justify-center gap-3 bg-foreground/90 p-6 font-tanker lowercase text-background">
+            <div className="flex w-[clamp(300px,70vw,1000px)] flex-col items-center justify-around gap-3 sm:flex-row">
+              <span className="flex flex-col items-center gap-2">
+                <p className="text-[3.25em] leading-[3rem]">Currently,</p>
+                <p className="text-2xl">on The Street Art List:</p>
+              </span>
+              <div className="flex w-full items-center justify-around gap-3">
+                <span className="flex flex-col items-center gap-2 text-nowrap">
+                  <AnimatedCounter
+                    to={totalOpenCallsData?.activeOpenCalls ?? 0}
+                    className="text-4xl sm:text-5xl md:text-[5em] md:leading-[4rem]"
+                  />
+                  <p className="font-spaceGrotesk text-sm font-semibold sm:text-base">
+                    {" "}
+                    Open Calls
+                  </p>
+                </span>
+                <span className="flex flex-col items-center gap-2 text-nowrap">
+                  <AnimatedCounter
+                    to={
+                      1131 +
+                      ((totalEventsData?.activeEvents ?? 0) +
+                        (totalEventsData?.archivedEvents ?? 0))
+                    }
+                    className="text-4xl sm:text-5xl md:text-[5em] md:leading-[4rem]"
+                    duration={2}
+                    plus={false}
+                  />
+                  <p className="font-spaceGrotesk text-sm font-semibold sm:text-base">
+                    {" "}
+                    Events & Projects
+                  </p>
+                </span>
+                <span className="flex flex-col items-center gap-2 text-nowrap">
+                  <AnimatedCounter
+                    to={92}
+                    duration={3}
+                    className="text-4xl sm:text-5xl md:text-[5em] md:leading-[4rem]"
+                  />
+                  <p className="font-spaceGrotesk text-sm font-semibold sm:text-base">
+                    {" "}
+                    Countries
+                  </p>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className="mx-auto mt-10 flex w-full max-w-[clamp(300px,80vw,1000px)] flex-col items-start justify-center gap-2 py-4">
+            <span className="inline items-center">
+              <strong>The Street Art List&nbsp; </strong> is an initiative
+              created and run by&nbsp;
+              <Link
+                href="https://instagram.com/anthonybrooksart"
+                target="_blank"
+                className="lg:text-base"
+              >
+                Anthony Brooks
+              </Link>
+              , a Serbian-American artist based in Berlin, Germany.
+            </span>
+            <p>
+              {" "}
+              The List is the result (years in the making) of my frustration
+              with the lack of a centralized place to find open calls and to
+              know what&apos;s happening elsewhere in the street art world — a
+              real
+              <i>
+                &quot;If what you want doesn&apos;t exist, create it&quot;&nbsp;
+              </i>
+              sort of situation. It&apos;s been an ongoing project since 2019,
+              and over time, has grown from an extensive spreadsheet to a
+              fully-fledged database of street art-related projects and
+              events.{" "}
+            </p>
+          </div>
+          {!hasActiveSubscription && <Pricing />}
+        </div>
+      </section>
+
       {/* </>
       )} */}
     </>

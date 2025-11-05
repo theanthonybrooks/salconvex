@@ -1,9 +1,24 @@
 "use client";
 
+import { dashboardNavItems } from "@/constants/links";
+import {
+  landingPageNavbarMenuLinksAbout as aboutItems,
+  landingPageNavbarLinks,
+  landingPageNavbarMenuLinksResources as resources,
+  theListNavbarMenuLinks as thelistitems,
+} from "@/constants/navbarsLinks";
+
+import { User } from "@/types/user";
+
+import React, { useState } from "react";
+import Image from "next/image";
+import { usePathname } from "next/navigation";
+// import { useQuery } from "convex-helpers/react/cache"
+import { motion, useMotionValueEvent, useScroll } from "framer-motion";
+
 import FullPageNav from "@/components/full-page-nav";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/components/ui/custom-link";
-
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -14,26 +29,14 @@ import {
 } from "@/components/ui/navigation-menu";
 import { Separator } from "@/components/ui/separator";
 import { UserProfile } from "@/components/ui/user-profile";
-import { dashboardNavItems } from "@/constants/links";
-import {
-  landingPageNavbarMenuLinksAbout as aboutItems,
-  landingPageNavbarLinks,
-  landingPageNavbarMenuLinksResources as resources,
-  theListNavbarMenuLinks as thelistitems,
-} from "@/constants/navbarsLinks";
 import { Search } from "@/features/Sidebar/Search";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { NavbarSigninSection } from "@/features/wrapper-elements/navigation/components/navbar-signin-section";
 import { cn } from "@/helpers/utilsFns";
 import { useDevice } from "@/providers/device-provider";
-import { User } from "@/types/user";
-import { usePreloadedQuery } from "convex/react";
-// import { useQuery } from "convex-helpers/react/cache"
-import { motion, useMotionValueEvent, useScroll } from "framer-motion";
-import Image from "next/image";
-import { usePathname } from "next/navigation";
-import React, { useState } from "react";
+
 import { AccountTypeBase } from "~/convex/schema";
+import { usePreloadedQuery } from "convex/react";
 
 interface NavBarProps {
   userId?: string;
@@ -64,14 +67,17 @@ export default function NavBar(
   // useMotionValueEvent(scrollY, "change", (latest) => {
   //   console.log("Page scroll: ", latest)
   // })
-  const fullPagePath = pathname;
+
   const currentPage = pathname.split("/")[1];
 
   const [isScrolled, setIsScrolled] = useState(false);
+  const [navBgScroll, setNavBgScroll] = useState(false);
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     const scrollThreshold = isMobile ? 50 : 150;
+    const bgScrollThreshold = 10;
     setIsScrolled(latest > scrollThreshold);
+    setNavBgScroll(latest > bgScrollThreshold);
   });
 
   const statusKey = subStatus ? subStatus : "none";
@@ -121,18 +127,33 @@ export default function NavBar(
   const activeMainItemClasses =
     "border-foreground/50   hover:border-foreground/70 data-[state=open]:border-foreground/70";
 
+  const homePage = pathname === "/";
   return (
     <>
       {/* ------ Desktop & Mobile: Main Navbar ----- */}
       <motion.nav
         id="navbar"
-        initial={{ boxShadow: "none" }}
+        initial={{
+          boxShadow: "none",
+          backgroundColor: homePage
+            ? "rgba(0,0,0,0)"
+            : "hsl(var(--background))",
+        }}
         animate={{
           boxShadow: isScrolled ? "var(--nav-shadow)" : "none",
-          height: isScrolled ? "80px" : "100px",
+          height: isScrolled || homePage ? "80px" : "100px",
+          backgroundColor:
+            !navBgScroll && homePage
+              ? "rgba(0,0,0,0)"
+              : "hsl(var(--background))",
         }}
-        transition={{ duration: 0.3, ease: "easeOut" }}
-        className="fixed left-0 right-0 top-0 z-20 h-25 w-screen bg-background"
+        // transition={{ duration: 0.3, ease: "easeInOut" }}
+        transition={{
+          backgroundColor: { duration: 0.5, ease: "easeInOut" },
+          boxShadow: { duration: 0.25, ease: "easeInOut" },
+          height: { duration: 0.3, ease: "easeInOut" },
+        }}
+        className="fixed left-0 right-0 top-0 z-20 h-25 w-screen [@media(max-width:720px)]:!bg-background"
       >
         <div className="relative mx-auto flex h-full w-screen items-center justify-between px-8 lg:grid lg:grid-cols-[300px_auto_200px]">
           {/* Mobile Logo and Navigation */}
@@ -148,18 +169,23 @@ export default function NavBar(
               "absolute bottom-0 left-1/2 z-0 flex -translate-x-1/2 translate-y-[24px] items-center justify-center rounded-full bg-background lg:hidden",
             )}
           />
-          <div className="absolute bottom-0 left-1/2 h-full w-25 -translate-x-1/2 bg-background" />
+          <motion.div
+            initial={{ backgroundColor: "rgba(0, 0, 0, 0)" }}
+            animate={{
+              backgroundColor:
+                isScrolled || !homePage
+                  ? "hsl(var(--background))"
+                  : "rgba(0, 0, 0, 0)",
+            }}
+            className="absolute bottom-0 left-1/2 h-full w-25 -translate-x-1/2 lg:hidden"
+          />
           <div className="flex items-center gap-2 lg:hidden">
             <motion.div
               id="logo-background-front"
               initial={{
-                // translateX: "-50%",
-                // translateY: 14,
                 backgroundColor: "rgba(255, 255, 255, 1)",
               }}
               animate={{
-                // translateX: "-50%",
-                // translateY: 14,
                 backgroundColor: isScrolled
                   ? "rgba(255, 255, 255, 0)"
                   : "rgba(255, 255, 255, 1)",
@@ -274,10 +300,25 @@ export default function NavBar(
               </motion.div>
 
               {/* Desktop Navigation */}
-              <div
-                // animate={{ opacity: isScrolled ? 0 : 1 }}
-                // transition={{ duration: 0.3, ease: "easeOut" }}
-                className="z-0 hidden items-center justify-center gap-2 lg:flex"
+              <motion.div
+                initial={{
+                  backgroundColor: homePage ? "hsl(var(--card))" : "",
+                  padding: homePage ? "0.25em 1.25em" : "0",
+                  height: homePage ? "60px" : "",
+                  border: homePage ? "2px solid hsl(var(--foreground))" : "",
+                }}
+                animate={{
+                  backgroundColor:
+                    homePage && !navBgScroll ? "hsl(var(--card))" : "",
+                  padding: homePage && !navBgScroll ? "0.25em 1.25em" : "0",
+                  height: homePage && !navBgScroll ? "60px" : "",
+                  border:
+                    homePage && !navBgScroll
+                      ? "2px solid hsl(var(--foreground))"
+                      : "",
+                }}
+                transition={{ duration: 0.3, ease: "easeOut" }}
+                className="z-0 hidden items-center justify-center gap-2 rounded-full lg:flex"
               >
                 <NavigationMenu delayDuration={Infinity}>
                   <NavigationMenuList className="gap-2">
@@ -286,7 +327,8 @@ export default function NavBar(
                         <NavigationMenuTrigger
                           isCurrent={isActiveResources}
                           className={cn(
-                            "border-2 border-transparent hover:border-foreground data-[state=open]:border-foreground",
+                            "hidden border-2 border-transparent bg-background hover:border-foreground/70 data-[state=open]:border-foreground xl:flex",
+                            homePage && "bg-transparent",
                             isActiveResources && activeMainItemClasses,
                           )}
                           onPointerMove={(event) => event.preventDefault()}
@@ -302,7 +344,7 @@ export default function NavBar(
                             {filteredNavbarMenuResources.map((component) => {
                               const activeLink =
                                 component.href.includes(currentPage) &&
-                                fullPagePath === component.href;
+                                pathname === component.href;
                               return (
                                 <ListItem
                                   key={component.title}
@@ -329,7 +371,8 @@ export default function NavBar(
                       <NavigationMenuTrigger
                         isCurrent={isActiveTheList}
                         className={cn(
-                          "border-2 border-transparent hover:border-foreground data-[state=open]:border-foreground",
+                          "border-2 border-transparent bg-background hover:border-foreground/70 data-[state=open]:border-foreground",
+                          homePage && "bg-transparent",
                           isActiveTheList && activeMainItemClasses,
                         )}
                         onPointerMove={(event) => event.preventDefault()}
@@ -406,7 +449,8 @@ export default function NavBar(
                       <NavigationMenuTrigger
                         isCurrent={isActiveAbout}
                         className={cn(
-                          "border-2 border-transparent hover:border-foreground/70 data-[state=open]:border-foreground/50",
+                          "hidden border-2 border-transparent bg-background hover:border-foreground/70 data-[state=open]:border-foreground xl:flex",
+                          homePage && "bg-transparent",
                           isActiveAbout && activeMainItemClasses,
                         )}
                         onPointerMove={(event) => event.preventDefault()}
@@ -447,13 +491,15 @@ export default function NavBar(
                 {filteredNavbarLinks.map((link) => (
                   <Link key={link.title} href={link.href} prefetch={true}>
                     {!link.isIcon ? (
-                      <Button className="h-9 border-2 border-transparent bg-background font-semibold text-foreground hover:border-foreground/70 hover:bg-card/20 sm:text-base">
+                      <Button className="h-9 border-2 border-transparent bg-transparent font-semibold text-foreground hover:border-foreground/70 hover:bg-card/20 sm:text-base">
                         {link.title}
                       </Button>
                     ) : (
                       <Button
                         variant="icon"
-                        className="bg-background text-foreground hover:scale-110 hover:bg-background"
+                        className={cn(
+                          "text-foreground transition-all duration-200 ease-in-out hover:scale-110 hover:border-foreground",
+                        )}
                         size="icon"
                       >
                         {link.icon}
@@ -461,12 +507,55 @@ export default function NavBar(
                     )}
                   </Link>
                 ))}
-              </div>
+              </motion.div>
 
-              {!user && <NavbarSigninSection />}
+              {!user && (
+                <motion.div
+                  className="h-15 rounded-full px-1.5"
+                  initial={{
+                    backgroundColor: homePage ? "hsl(var(--card))" : "",
+
+                    border: homePage ? "2px solid hsl(var(--foreground))" : "",
+                  }}
+                  animate={{
+                    backgroundColor:
+                      homePage && !navBgScroll ? "hsl(var(--card))" : "",
+                    border:
+                      homePage && !navBgScroll
+                        ? "2px solid hsl(var(--foreground))"
+                        : "2px solid rgba(0, 0, 0, 0)",
+                  }}
+                  transition={{
+                    border: { duration: 0.5, ease: "easeInOut" },
+                  }}
+                >
+                  <NavbarSigninSection className={cn("h-full")} />
+                </motion.div>
+              )}
 
               {user && (
-                <div className="hidden h-15 w-fit items-center gap-4 justify-self-end pr-5 lg:flex">
+                <motion.div
+                  initial={{
+                    backgroundColor: homePage ? "hsl(var(--card))" : "",
+
+                    borderColor: homePage
+                      ? "hsl(var(--foreground))"
+                      : "rgba(0, 0, 0, 0)",
+                  }}
+                  animate={{
+                    backgroundColor:
+                      homePage && !navBgScroll ? "hsl(var(--card))" : "",
+
+                    borderColor:
+                      homePage && !navBgScroll
+                        ? "hsl(var(--foreground))"
+                        : "rgba(0, 0, 0, 0)",
+                  }}
+                  className={cn(
+                    "hidden h-15 w-fit items-center gap-4 justify-self-end rounded-full border-2 py-1 pl-2 pr-5 lg:flex",
+                    isAdmin && "pl-5",
+                  )}
+                >
                   <UserProfile className="size-10" />
 
                   <FullPageNav
@@ -483,7 +572,7 @@ export default function NavBar(
                       placeholder="Search..."
                     />
                   )}
-                </div>
+                </motion.div>
               )}
             </>
           )}
