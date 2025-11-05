@@ -1,3 +1,5 @@
+import z from "zod";
+
 import {
   Calendar,
   Circle,
@@ -9,22 +11,30 @@ import {
   Scroll,
   Users2,
 } from "lucide-react";
-import z from "zod";
 
 export const supportCategoryOptions = [
-  { label: "General", value: "general", icon: Construction },
-  { label: "UI/UX", value: "ui/ux", icon: Palette },
-  { label: "Account/Billing", value: "account", icon: CreditCard },
-  { label: "Artist", value: "artist", icon: PaintRoller },
-  { label: "Organization", value: "organization", icon: Users2 },
-  { label: "The List", value: "theList", icon: Scroll },
-  { label: "Event", value: "event", icon: Calendar },
-  { label: "Open Call", value: "openCall", icon: Megaphone },
+  { label: "General", value: "general", icon: Construction, group: "General" },
+  { label: "UI/UX", value: "ui/ux", icon: Palette, group: "General" },
+  {
+    label: "Account/Billing",
+    value: "account",
+    icon: CreditCard,
+    group: "Account",
+  },
+  { label: "Artist", value: "artist", icon: PaintRoller, group: "Account" },
+  {
+    label: "Organization",
+    value: "organization",
+    icon: Users2,
+    group: "Account",
+  },
+  { label: "The List", value: "theList", icon: Scroll, group: "The List" },
+  { label: "Event", value: "event", icon: Calendar, group: "The List" },
+  { label: "Open Call", value: "openCall", icon: Megaphone, group: "The List" },
   { label: "Other", value: "other", icon: Circle },
 ] as const;
 
 export type SupportCategory = (typeof supportCategoryOptions)[number]["value"];
-
 
 export const supportCategoryValidator = z.union(
   supportCategoryOptions.map((opt) => z.literal(opt.value)),

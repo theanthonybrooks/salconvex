@@ -3,6 +3,8 @@
 //TODO: Add the userPref check to this component (and others) to ensure that the fontSize is set to the user's preference
 import * as React from "react";
 import * as SelectPrimitive from "@radix-ui/react-select";
+import { IconType } from "react-icons";
+
 import {
   Check,
   ChevronDown,
@@ -10,7 +12,6 @@ import {
   DollarSign,
   LucideIcon,
 } from "lucide-react";
-import { IconType } from "react-icons";
 
 import { cn } from "@/helpers/utilsFns";
 
@@ -194,6 +195,7 @@ interface SelectSimpleProps {
     icon?: IconType | LucideIcon;
     disabled?: boolean;
     premium?: boolean;
+    group?: string;
   }[];
   onChangeAction: (value: string) => void;
   value: string;
@@ -207,6 +209,7 @@ interface SelectSimpleProps {
   disabled?: boolean;
   fontSize?: string;
   hasReset?: boolean;
+  center?: boolean;
 }
 
 export const SelectSimple = ({
@@ -223,11 +226,20 @@ export const SelectSimple = ({
   id,
   fontSize,
   hasReset,
+  center,
 }: SelectSimpleProps) => {
   const selectOptions = [
     ...options,
     ...(hasReset && value !== "-" ? [{ value: "-", label: "--Reset--" }] : []),
   ];
+  const groupedOptions = selectOptions.reduce<
+    Record<string, typeof selectOptions>
+  >((acc, option) => {
+    const key = option.group || "_ungrouped";
+    if (!acc[key]) acc[key] = [];
+    acc[key].push(option);
+    return acc;
+  }, {});
   return (
     <Select
       value={value}
@@ -254,34 +266,49 @@ export const SelectSimple = ({
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
       <SelectContent className={cn("z-top max-h-64", contentClassName)}>
-        {selectOptions.map((option) => {
-          return (
-            <SelectItem
-              key={option.value}
-              value={option.value}
-              disabled={option.disabled}
-              className={cn(
-                itemClassName,
-                option.disabled &&
-                  "pointer-events-none rounded-sm text-center opacity-50",
-                option.value === "-" && "bg-salPinkLt/30 text-destructive",
-              )}
-              fontSize={fontSize}
-            >
-              <span className="flex items-center gap-x-1">
-                {option.premium && (
-                  <span className="flex items-center gap-0">
-                    (<DollarSign className="size-3" />)
-                  </span>
+        {Object.entries(groupedOptions).map(([groupName, opts]) => (
+          <div key={groupName}>
+            {groupName !== "_ungrouped" && (
+              <div
+                className={cn(
+                  "px-4 py-1 text-sm font-medium text-foreground/30",
+                  fontSize,
                 )}
-                {option.icon && <option.icon className="size-4" />}
-                <p className={cn(option.disabled && "line-through")}>
-                  {option.label}
-                </p>
-              </span>
-            </SelectItem>
-          );
-        })}
+              >
+                {groupName}
+              </div>
+            )}
+
+            {opts.map((option) => (
+              <SelectItem
+                key={option.value}
+                value={option.value}
+                disabled={option.disabled}
+                className={cn(
+                  itemClassName,
+                  option.disabled &&
+                    "pointer-events-none rounded-sm opacity-50",
+                  option.value === "-" && "bg-salPinkLt/30 text-destructive",
+                  option.group && "pl-8",
+                )}
+                center={center}
+                fontSize={fontSize}
+              >
+                <span className="flex items-center gap-x-1">
+                  {option.premium && (
+                    <span className="flex items-center gap-0">
+                      (<DollarSign className="size-3" />)
+                    </span>
+                  )}
+                  {option.icon && <option.icon className="size-4" />}
+                  <p className={cn(option.disabled && "line-through")}>
+                    {option.label}
+                  </p>
+                </span>
+              </SelectItem>
+            ))}
+          </div>
+        ))}
       </SelectContent>
     </Select>
   );

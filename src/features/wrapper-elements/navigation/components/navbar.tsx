@@ -8,12 +8,13 @@ import {
   theListNavbarMenuLinks as thelistitems,
 } from "@/constants/navbarsLinks";
 
+import type { Variants } from "framer-motion";
 import { User } from "@/types/user";
 
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-// import { useQuery } from "convex-helpers/react/cache"
+import { useViewportHeight } from "@/hooks/use-viewPort-Height";
 import { motion, useMotionValueEvent, useScroll } from "framer-motion";
 import { useTheme } from "next-themes";
 
@@ -39,12 +40,47 @@ import { useDevice } from "@/providers/device-provider";
 import { AccountTypeBase } from "~/convex/schema";
 import { usePreloadedQuery } from "convex/react";
 
+// import { useQuery } from "convex-helpers/react/cache"
+
 interface NavBarProps {
   userId?: string;
   user?: User | null;
 
   subStatus?: string;
 }
+
+// const getNavBarVariants = (
+//   navBgScroll: boolean | undefined,
+//   isScrolled: boolean | undefined,
+//   homePage: boolean,
+// ): Variants => {
+//   const homePageHiddenNav = homePage && !navBgScroll;
+
+//   return {
+//     visible: {
+//       height: isScrolled || homePage ? "80px" : "100px",
+//       backgroundColor: homePage ? "hsl(var(--background))" : "",
+//       boxShadow: homePage ? "var(--nav-shadow)" : "",
+//       transition: {
+//         duration: 0.75,
+//         ease: "easeInOut",
+//       },
+//     },
+//     hidden: {
+//       height: homePage ? "80px" : "100px",
+//       backgroundColor: !homePageHiddenNav ? "hsl(var(--background))" : "",
+//       boxShadow: "",
+//       transition: {
+//         backgroundColor: {
+//           duration: 0,
+//         },
+
+//         duration: 0.75,
+//         ease: "easeInOut",
+//       },
+//     },
+//   };
+// };
 
 export default function NavBar(
   {
@@ -54,6 +90,7 @@ export default function NavBar(
 ) {
   const { isMobile } = useDevice();
   const { theme } = useTheme();
+  const viewportHeight = useViewportHeight();
   const { preloadedUserData, preloadedSubStatus } = useConvexPreload();
   const userData = usePreloadedQuery(preloadedUserData);
   const subData = usePreloadedQuery(preloadedSubStatus);
@@ -73,8 +110,8 @@ export default function NavBar(
   const currentPage = pathname.split("/")[1];
 
   const [isScrolled, setIsScrolled] = useState(false);
-  const [navBgScroll, setNavBgScroll] = useState(false);
-  const [bgColor, setBgColor] = useState("rgba(0,0,0,0)");
+  // const [navBgScroll, setNavBgScroll] = useState(false);
+  const [bgColor, setBgColor] = useState("hsl(var(--background))");
 
   useEffect(() => {
     if (!homePage) return;
@@ -90,9 +127,13 @@ export default function NavBar(
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     const scrollThreshold = isMobile ? 50 : 150;
-    const bgScrollThreshold = 10;
-    setIsScrolled(latest > scrollThreshold);
-    setNavBgScroll(latest > bgScrollThreshold);
+    const bgScrollThreshold = viewportHeight ? viewportHeight - 80 : 500;
+    if (homePage && !isMobile) {
+      // setNavBgScroll(latest > bgScrollThreshold);
+      setIsScrolled(latest > bgScrollThreshold);
+    } else {
+      setIsScrolled(latest > scrollThreshold);
+    }
   });
 
   const statusKey = subStatus ? subStatus : "none";
@@ -142,10 +183,45 @@ export default function NavBar(
   const activeMainItemClasses =
     "border-foreground/50   hover:border-foreground/70 data-[state=open]:border-foreground/70";
 
+  const getNavBarVariants = (
+    scrolled: boolean | undefined,
+    homePage: boolean,
+  ): Variants => {
+    const homePageHiddenNav = homePage && !scrolled;
+
+    return {
+      visible: {
+        height: scrolled || homePage ? "80px" : "100px",
+        backgroundColor: bgColor,
+
+        boxShadow: "var(--nav-shadow)",
+        transition: {
+          backgroundColor: {
+            duration: 0,
+          },
+          duration: 0.3,
+          ease: "easeInOut",
+        },
+      },
+      hidden: {
+        height: homePage ? "80px" : "100px",
+        backgroundColor: !homePageHiddenNav ? bgColor : "rgba(0, 0, 0, 0)",
+        boxShadow: "",
+        transition: {
+          backgroundColor: {
+            duration: 0,
+          },
+          duration: 0.3,
+          ease: "easeInOut",
+        },
+      },
+    };
+  };
+
   return (
     <>
       {/* ------ Desktop & Mobile: Main Navbar ----- */}
-      <motion.nav
+      {/* <motion.nav
         id="navbar"
         initial={{
           boxShadow: "none",
@@ -163,9 +239,25 @@ export default function NavBar(
                 ? bgColor
                 : "hsl(var(--background))",
         }}
-        transition={{ duration: 0.3, ease: "easeInOut" }}
+        // transition={{ duration: 0.3, ease: "easeInOut" }}
+        transition={{
+          backgroundColor: { duration: 2.0, ease: "easeIn" },
+          boxShadow: { duration: 0.3, ease: "easeInOut" },
+          height: { duration: 0.3, ease: "easeInOut" },
+        }}
         className={cn(
           "fixed left-0 right-0 top-0 z-20 h-25 w-screen [@media(max-width:720px)]:!bg-background",
+        )}
+      > */}
+      <motion.nav
+        id="navbar"
+        key="navbar"
+        variants={getNavBarVariants(isScrolled, homePage)}
+        initial="hidden"
+        animate={isScrolled ? "visible" : "hidden"}
+        className={cn(
+          "fixed left-0 right-0 top-0 z-20 h-25 w-screen [@media(max-width:720px)]:!bg-background",
+          // (isMobile || !homePage) && "bg-background",
         )}
       >
         <div className="relative mx-auto flex h-full w-screen items-center justify-between px-8 lg:grid lg:grid-cols-[300px_auto_200px]">
@@ -322,11 +414,11 @@ export default function NavBar(
                 }}
                 animate={{
                   backgroundColor:
-                    homePage && !navBgScroll ? "hsl(var(--card))" : "",
-                  padding: homePage && !navBgScroll ? "0.25em 1.25em" : "0",
-                  height: homePage && !navBgScroll ? "60px" : "",
+                    homePage && !isScrolled ? "hsl(var(--card))" : "",
+                  padding: homePage && !isScrolled ? "0.25em 1.25em" : "0",
+                  height: homePage && !isScrolled ? "60px" : "",
                   border:
-                    homePage && !navBgScroll
+                    homePage && !isScrolled
                       ? "2px solid hsl(var(--foreground))"
                       : "",
                 }}
@@ -532,9 +624,9 @@ export default function NavBar(
                   }}
                   animate={{
                     backgroundColor:
-                      homePage && !navBgScroll ? "hsl(var(--card))" : "",
+                      homePage && !isScrolled ? "hsl(var(--card))" : "",
                     border:
-                      homePage && !navBgScroll
+                      homePage && !isScrolled
                         ? "2px solid hsl(var(--foreground))"
                         : "2px solid rgba(0, 0, 0, 0)",
                   }}
@@ -557,10 +649,10 @@ export default function NavBar(
                   }}
                   animate={{
                     backgroundColor:
-                      homePage && !navBgScroll ? "hsl(var(--card))" : "",
+                      homePage && !isScrolled ? "hsl(var(--card))" : "",
 
                     borderColor:
-                      homePage && !navBgScroll
+                      homePage && !isScrolled
                         ? "hsl(var(--foreground))"
                         : "rgba(0, 0, 0, 0)",
                   }}

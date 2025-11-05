@@ -298,7 +298,7 @@ const SupportPage = () => {
                         onChangeAction={field.onChange}
                         placeholder="Select a category"
                         className="w-full bg-card placeholder:text-foreground sm:h-11"
-                        itemClassName="justify-center"
+                        // itemClassName="justify-center"
                         invalid={
                           (fieldHasError("category") || !categoryValid) ?? false
                         }

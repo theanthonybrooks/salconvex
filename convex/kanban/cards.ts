@@ -207,6 +207,12 @@ export const addCard = mutation({
           .withIndex("by_role", (q) => q.eq("role", "creator"))
           .first()
       : null;
+    console.log({
+      assignedId,
+      isAdmin,
+      userId,
+      creatorUser: creatorUser?.userId,
+    });
     const defaultAssignedId = assignedId
       ? assignedId
       : isAdmin
@@ -434,6 +440,8 @@ export const editCard = mutation({
         updatedBy: userId,
       });
     }
+    const updatedPurpose =
+      args.category === "ui/ux" ? "design" : supportTicket ? "support" : "todo";
 
     return await ctx.db.patch(args.id, {
       title: args.title,
@@ -445,6 +453,7 @@ export const editCard = mutation({
       category: args.category,
       voters: args.voters,
       assignedId: args.assignedId,
+      purpose: updatedPurpose,
       secondaryAssignedId: args.secondaryAssignedId,
       ...(args.column !== undefined && { column: args.column }),
     });
