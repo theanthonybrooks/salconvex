@@ -285,7 +285,8 @@ export default function Home() {
                   <div className="space-y-2">
                     <h4 className="font-medium leading-none">More info:</h4>
                     <p className="text-base text-muted-foreground">
-                      Canadian artist based in Toronto
+                      Megan Oldhues is a Toronto-based painter specializing in
+                      large-scale murals
                     </p>
                   </div>
                   <ul className="flex flex-col gap-2 sm:gap-1 [&*svg]:size-4">
