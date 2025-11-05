@@ -215,7 +215,7 @@ export default function Home() {
               variant="icon"
               onClick={handleVideoToggle}
               className={cn(
-                "absolute bottom-[60px] right-8 z-10 hidden text-sm text-card sm:inline-flex sm:text-base",
+                "absolute bottom-[60px] right-8 z-10 hidden !text-sm text-card sm:inline-flex",
                 currentSlide !== 1 && "hidden",
               )}
             >
