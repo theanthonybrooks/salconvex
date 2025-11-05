@@ -325,7 +325,10 @@ export default function Home() {
               </PopoverContent>
             </Popover>
           </motion.div>
-          <div
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1, ease: "easeInOut" }}
             className={cn(
               "absolute bottom-5 left-5 z-10 hidden origin-bottom-left select-none flex-col items-start gap-1 font-tanker lowercase tracking-wide text-card transition-transform duration-700 ease-in-out [text-shadow:0_0_10px_rgba(0,0,0,0.3)] sm:left-7 sm:flex",
 
@@ -351,7 +354,7 @@ export default function Home() {
             >
               Nov / Dec 2025
             </h2>
-          </div>
+          </motion.div>
         </div>
 
         <div className="relative z-10 bg-background pt-4 sm:pt-10">
