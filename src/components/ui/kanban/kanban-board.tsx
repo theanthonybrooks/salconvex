@@ -718,6 +718,19 @@ const Card = ({
             className="text-sm text-foreground dark:text-primary-foreground"
           />
         </motion.div>
+        <DetailsDialog
+          isOpen={isPreviewing}
+          onCloseAction={() => {
+            setActiveDialog({ mode: null, cardId: null });
+            setIsHovered(false);
+          }}
+          onEditAction={() => setActiveDialog({ mode: "edit", cardId: id })}
+          initialValues={detailValues}
+          trigger={
+            <Eye className="size-7 cursor-pointer text-gray-500 hover:text-gray-700 sm:size-4" />
+          }
+          id={id as Id<"todoKanban">}
+        />
         {isHovered && (
           <div className="absolute right-0.5 top-0.5 flex items-center justify-center gap-x-3 rounded-lg border border-primary bg-card/90 p-2.5 dark:bg-foreground sm:gap-x-2">
             <TaskDialog
@@ -744,19 +757,6 @@ const Card = ({
                 });
                 setNewPriority(data.priority);
               }}
-            />
-            <DetailsDialog
-              isOpen={isPreviewing}
-              onCloseAction={() => {
-                setActiveDialog({ mode: null, cardId: null });
-                setIsHovered(false);
-              }}
-              onEditAction={() => setActiveDialog({ mode: "edit", cardId: id })}
-              initialValues={detailValues}
-              trigger={
-                <Eye className="size-7 cursor-pointer text-gray-500 hover:text-gray-700 sm:size-4" />
-              }
-              id={id as Id<"todoKanban">}
             />
 
             <Trash2
