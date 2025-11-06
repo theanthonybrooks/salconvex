@@ -1,4 +1,5 @@
 import { JSX } from "react";
+
 import { FaInstagram } from "react-icons/fa";
 
 export const landingPageNavbarMenuLinksResources: {

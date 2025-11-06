@@ -1,21 +1,26 @@
+import { SOCIAL_MEDIA_LINKS } from "@/constants/links";
+import { infoEmail } from "@/constants/siteInfo";
+
 import Link from "next/link";
+
 import { FaRegEnvelope } from "react-icons/fa6";
+import { Globe } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/helpers/utilsFns";
-import { SOCIAL_MEDIA_LINKS } from "@/constants/links";
-import { infoEmail } from "@/constants/siteInfo";
 
 interface SocialsRowProps {
   size?: number;
   className?: string;
   contClassName?: string;
+  linktree?: boolean;
 }
 
 export default function SocialsRow({
   size = 7,
   className,
   contClassName,
+  linktree,
 }: SocialsRowProps) {
   return (
     <div
@@ -44,6 +49,18 @@ export default function SocialsRow({
           <FaRegEnvelope className={cn(`size-${size}`, className)} />
         </Button>
       </Link>
+      {linktree && (
+        <Link href="/">
+          <Button
+            variant="icon"
+            size="icon"
+            aria-label="website link"
+            className="h-auto w-auto"
+          >
+            <Globe className={cn(`size-${size}`, className)} />
+          </Button>
+        </Link>
+      )}
     </div>
   );
 }

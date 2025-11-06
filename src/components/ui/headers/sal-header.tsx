@@ -8,10 +8,11 @@ import SocialsRow from "@/components/ui/socials";
 import { cn } from "@/helpers/utilsFns";
 
 interface SalHeaderProps {
-  source: Source;
+  source: Source | "links";
+  className?: string;
 }
 
-const SalHeader = ({ source }: SalHeaderProps) => {
+const SalHeader = ({ source, className }: SalHeaderProps) => {
   // const pathname = usePathname();
   // const [view, setView] = useState<ViewOptions | null>(null);
 
@@ -35,6 +36,7 @@ const SalHeader = ({ source }: SalHeaderProps) => {
       className={cn(
         "mb-12 flex w-full flex-col items-center justify-center gap-2",
         thisWeekPg && "mb-4",
+        className,
       )}
     >
       <Image
@@ -53,7 +55,12 @@ const SalHeader = ({ source }: SalHeaderProps) => {
       />
       {!thisWeekPg && (
         <>
-          <p className="mb-4 mt-2 text-center text-sm">
+          <p
+            className={cn(
+              "mb-4 mt-2 text-center text-sm",
+              source === "links" && "text-base",
+            )}
+          >
             List of street art, graffiti, & mural projects.
             <br /> Info gathered and shared by{" "}
             <Link
@@ -65,7 +72,11 @@ const SalHeader = ({ source }: SalHeaderProps) => {
             </Link>
           </p>
 
-          <SocialsRow className="size-8 md:size-6" contClassName="gap-8" />
+          <SocialsRow
+            className="size-8 md:size-6"
+            contClassName="gap-8"
+            linktree={source === "links"}
+          />
         </>
       )}
     </div>

@@ -29,10 +29,8 @@ export default convexAuthNextjsMiddleware(
       return NextResponse.next();
     }
 
-    const hostname = request.headers.get("host") || "";
     const userAgent = request.headers.get("user-agent") || "";
     const ua = new UAParser(userAgent).getResult();
-    const url = request.nextUrl.clone();
 
     // const isAuthenticated = await isAuthenticatedNextjs()
     const isAuthenticated = await convexAuth.isAuthenticated();
@@ -55,18 +53,9 @@ export default convexAuthNextjsMiddleware(
     }
 
     if (!isAuthenticated) {
-      if (isDashboardPage(request) || hostname.startsWith("dashboard.")) {
+      if (isDashboardPage(request)) {
         return NextResponse.redirect(new URL("/auth/sign-in", request.url));
       }
-    } else {
-      if (hostname.startsWith("dashboard.")) {
-        url.pathname = `/dashboard${url.pathname}`;
-        return NextResponse.rewrite(url);
-      }
-    }
-    if (hostname.startsWith("links.")) {
-      url.pathname = "/_subdomains/links";
-      return NextResponse.rewrite(url);
     }
 
     if (isSubmitPage(request)) {

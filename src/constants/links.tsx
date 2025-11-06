@@ -3,6 +3,7 @@ import { IconType } from "react-icons";
 
 import { BsPersonVcard } from "react-icons/bs";
 import { FaFacebookF, FaInstagram, FaThreads } from "react-icons/fa6";
+import { LuMegaphone } from "react-icons/lu";
 import { PiGraph } from "react-icons/pi";
 import {
   Banana,
@@ -15,6 +16,7 @@ import {
   EyeOff,
   FileText,
   Gift,
+  Heart,
   HelpCircle,
   Home,
   HomeIcon,
@@ -29,6 +31,7 @@ import {
   LucidePaintRoller,
   LucideUsers,
   Newspaper,
+  Pencil,
   Scroll,
   Settings,
   Shield,
@@ -578,5 +581,41 @@ export const dashboardNavItems: DashNavItem[] = [
     desc: "View event calendar",
     sub: ["all"],
     userType: ["public"],
+  },
+];
+type LinktreeProps = SocialProps & {
+  group?: string;
+};
+
+export const linktreeLinks: LinktreeProps[] = [
+  {
+    label: "Portfolio Reviews - Registration",
+    icon: LuMegaphone,
+    path: "/extras/portfolio-reviews",
+    group: "Current Events",
+  },
+  {
+    label: "The List - Events & Open Calls",
+    icon: Scroll,
+    path: "/thelist",
+    group: "The List",
+  },
+  {
+    label: "Open calls ending this week",
+    icon: Calendar1,
+    path: "/thisweek",
+    group: "The List",
+  },
+  {
+    label: "Submit New Event/Open Call",
+    icon: Pencil,
+    path: "/submit",
+    group: "The List",
+  },
+  {
+    label: "Become a member",
+    icon: Heart,
+    path: "/pricing",
+    group: "Membership",
   },
 ];
