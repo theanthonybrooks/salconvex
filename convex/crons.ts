@@ -21,9 +21,9 @@ crons.cron(
   internal.openCalls.openCall.archiveExpiredOpenCalls,
 );
 
-crons.cron(
+crons.hourly(
   "archive past online events every 60 min",
-  "*/60 * * * *", // Every 60 minutes
+  { minuteUTC: 0 }, // Run hourly  UTC (-1 from Berlin)
   internal.userAddOns.onlineEvents.archivePastEvents,
 );
 
