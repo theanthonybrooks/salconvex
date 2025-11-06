@@ -731,7 +731,7 @@ const Card = ({
           }
           id={id as Id<"todoKanban">}
         />
-        {isHovered && (
+        {(isHovered || isEditing) && (
           <div className="absolute right-0.5 top-0.5 flex items-center justify-center gap-x-3 rounded-lg border border-primary bg-card/90 p-2.5 dark:bg-foreground sm:gap-x-2">
             <TaskDialog
               id={id}
