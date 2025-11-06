@@ -363,7 +363,7 @@ export const dashboardNavItems: DashNavItem[] = [
   },
   {
     label: "Extras",
-    href: "/dashboard/admin/extras",
+    href: "/dashboard/admin/extras?state=published,draft",
     icon: Gift,
     subsection: true,
     sectionCat: "admin",

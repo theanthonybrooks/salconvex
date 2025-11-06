@@ -20,38 +20,19 @@ import { Id } from "~/convex/_generated/dataModel";
 
 export const newsletterColumnLabels: Record<string, string> = {
   name: "Name",
-  email: "Email",
-  active: "Active",
-  type: "Type",
-  frequency: "Frequency",
-  userPlan: "Plan",
-  timesAttempted: "Attempts",
-  lastAttempt: "Last Attempt",
-  createdAt: "Created",
+  state: "Status",
+  img: "Image",
+  startDate: "Start Date",
+  endDate: "End Date",
+  price: "Price",
+  regDeadline: "Deadline",
+  capacity: "Capacity",
+  location: "Location",
+  updatedAt: "Last Updated",
+  createdAt: "Created At",
+  terms: "Terms",
+  requirements: "Requirements",
 };
-
-// const getAllOnlineEvents: RegisteredQuery<"public", EmptyObject, Promise<{
-//  [x]   _id: Id<"onlineEvents">;
-//  [x]   _creationTime: number;
-//  [x]   updatedAt?: number | undefined;
-//  [x]   location?: string | undefined;
-//  [x]   img?: string | undefined;
-//  []   updatedBy?: Id<"users"> | undefined;
-//  [x]   name: string;
-//  [x]   organizer: Id<"users">;
-//  []   slug: string;
-//  [x]   requirements: string[];
-//  [x]   description: string;
-//  [x]   regDeadline: number;
-//  [x]   startDate: number;
-//  [x]   endDate: number;
-//  [x]   price: number;
-//  [x]   capacity: {
-//  [x]       max: number;
-//  [x]       current: number;
-//  []   };
-//  [x]   terms: string[];
-// }[]>>
 
 interface ExtraColumnsProps {
   _id: Id<"onlineEvents">;
