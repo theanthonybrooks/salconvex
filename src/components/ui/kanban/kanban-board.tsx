@@ -76,6 +76,10 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import {
+  KanbanProvider,
+  useKanbanContext,
+} from "@/components/ui/kanban/kanban-context-provider";
 import { KanbanUserSelector } from "@/components/ui/kanban/kanban-user-selector";
 import PublicToggle from "@/components/ui/public-toggle";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
@@ -254,150 +258,149 @@ const Board = ({ purpose: initialPurpose }: KanbanBoardProps) => {
     orderedColumns = [...orderedColumns, "notPlanned"];
   }
   return (
-    <div className="flex h-full max-h-full w-full flex-col gap-3 overflow-hidden overflow-x-auto p-6">
-      <div
-        className={cn(
-          "mb-6 flex flex-col-reverse items-center justify-between gap-3 md:mb-0 lg:flex-row lg:pr-4",
-        )}
-      >
-        {((isMobile && showFilters) || !isMobile) && (
-          <div className="flex flex-col items-center gap-3 lg:flex-row">
-            <div className="flex items-center gap-3">
-              <Input
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search"
-                className="w-full min-w-60 max-w-md"
+    <KanbanProvider user={user} purpose={purpose}>
+      <div className="flex h-full max-h-full w-full flex-col gap-3 overflow-hidden overflow-x-auto p-6">
+        <div
+          className={cn(
+            "mb-6 flex flex-col-reverse items-center justify-between gap-3 md:mb-0 lg:flex-row lg:pr-4",
+          )}
+        >
+          {((isMobile && showFilters) || !isMobile) && (
+            <div className="flex flex-col items-center gap-3 lg:flex-row">
+              <div className="flex items-center gap-3">
+                <Input
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Search"
+                  className="w-full min-w-60 max-w-md"
+                />
+
+                <Button
+                  variant="salWithShadowHidden"
+                  onClick={() => setSearchTerm("")}
+                  className={"h-11 disabled:border-foreground/40"}
+                  disabled={debouncedSearch === ""}
+                >
+                  Reset
+                </Button>
+              </div>
+
+              <MultiSelect
+                options={[...supportCategoryOptions]}
+                onValueChange={(value) => {
+                  setCategory(value as SupportCategory[]);
+                }}
+                value={category}
+                placeholder="Select category"
+                variant="basic"
+                maxCount={1}
+                condensed
+                height={11}
+                hasSearch={false}
+                selectAll={false}
+                className={cn(
+                  "w-full max-w-md border-1.5 border-foreground/20 sm:h-11 md:min-w-64",
+                )}
+                listClassName="max-h-80"
               />
 
-              <Button
-                variant="salWithShadowHidden"
-                onClick={() => setSearchTerm("")}
-                className={"h-11 disabled:border-foreground/40"}
-                disabled={debouncedSearch === ""}
-              >
-                Reset
-              </Button>
-            </div>
-
-            <MultiSelect
-              options={[...supportCategoryOptions]}
-              onValueChange={(value) => {
-                setCategory(value as SupportCategory[]);
-              }}
-              value={category}
-              placeholder="Select category"
-              variant="basic"
-              maxCount={1}
-              condensed
-              height={11}
-              hasSearch={false}
-              selectAll={false}
-              className={cn(
-                "w-full max-w-md border-1.5 border-foreground/20 sm:h-11 md:min-w-64",
+              {!isMobile && (
+                <StaffUserSelector
+                  setCurrentUser={setUserFilter}
+                  isAdmin={isAdmin}
+                  currentUser={userFilter}
+                  type="staff"
+                  minimal
+                />
               )}
-              listClassName="max-h-80"
-            />
-
-            {!isMobile && (
-              <StaffUserSelector
-                setCurrentUser={setUserFilter}
-                isAdmin={isAdmin}
-                currentUser={userFilter}
-                type="staff"
-                minimal
-              />
-            )}
-          </div>
-        )}
-        <div className={cn("flex items-center gap-3 sm:flex-row-reverse")}>
-          <div
-            className={cn(
-              "relative inset-y-0 z-10 my-3 flex w-50 items-center justify-between overflow-hidden rounded-full border bg-card p-2 shadow-inner lg:my-0 lg:p-0 xl:w-[23rem]",
-              // isSidebarCollapsed && "lg:w-60 xl:",
-            )}
-          >
-            {/* Thumb indicator */}
+            </div>
+          )}
+          <div className={cn("flex items-center gap-3 sm:flex-row-reverse")}>
             <div
               className={cn(
-                "absolute left-0 top-0 z-1 h-full w-1/3 bg-background transition-all duration-200 ease-out",
-                purpose === "todo" && "translate-x-0",
-                purpose === "design" && "translate-x-full bg-orange-200",
-                purpose === "support" && "translate-x-[200%] bg-red-200",
+                "relative inset-y-0 z-10 my-3 flex w-50 items-center justify-between overflow-hidden rounded-full border bg-card p-2 shadow-inner lg:my-0 lg:p-0 xl:w-[23rem]",
+                // isSidebarCollapsed && "lg:w-60 xl:",
               )}
-            />
-
-            {/* Icon buttons */}
-
-            {KanbanPurposeOptions?.map(({ value, Icon, label }) => (
-              <button
-                key={value}
-                onClick={() => setPurpose(value)}
+            >
+              {/* Thumb indicator */}
+              <div
                 className={cn(
-                  "relative z-10 flex h-8 w-1/3 items-center justify-center rounded-full px-2 py-1 text-muted-foreground transition-colors hover:text-foreground sm:h-11",
-                  purpose === value && "text-foreground",
+                  "absolute left-0 top-0 z-1 h-full w-1/3 bg-background transition-all duration-200 ease-out",
+                  purpose === "todo" && "translate-x-0",
+                  purpose === "design" && "translate-x-full bg-orange-200",
+                  purpose === "support" && "translate-x-[200%] bg-red-200",
                 )}
-                type="button"
+              />
+
+              {/* Icon buttons */}
+
+              {KanbanPurposeOptions?.map(({ value, Icon, label }) => (
+                <button
+                  key={value}
+                  onClick={() => setPurpose(value)}
+                  className={cn(
+                    "relative z-10 flex h-8 w-1/3 items-center justify-center rounded-full px-2 py-1 text-muted-foreground transition-colors hover:text-foreground sm:h-11",
+                    purpose === value && "text-foreground",
+                  )}
+                  type="button"
+                >
+                  <span className="flex items-center gap-1">
+                    <Icon className="6 size-5 shrink-0" />
+                    <p className="hidden xl:block">{label}</p>
+                  </span>
+                </button>
+              ))}
+            </div>
+
+            {isMobile && (
+              <Button
+                onClick={() => setShowFilters((prev) => !prev)}
+                className={cn(showFilters && "text-foreground")}
+                variant="icon"
               >
                 <span className="flex items-center gap-1">
-                  <Icon className="6 size-5 shrink-0" />
-                  <p className="hidden xl:block">{label}</p>
+                  {showFilters ? (
+                    <Filter className="6 size-5 shrink-0" />
+                  ) : (
+                    <FilterX className="6 size-5 shrink-0" />
+                  )}
+                  <p className="hidden xl:block">Filters</p>
                 </span>
-              </button>
-            ))}
+              </Button>
+            )}
           </div>
-
-          {isMobile && (
-            <Button
-              onClick={() => setShowFilters((prev) => !prev)}
-              className={cn(showFilters && "text-foreground")}
-              variant="icon"
-            >
-              <span className="flex items-center gap-1">
-                {showFilters ? (
-                  <Filter className="6 size-5 shrink-0" />
-                ) : (
-                  <FilterX className="6 size-5 shrink-0" />
-                )}
-                <p className="hidden xl:block">Filters</p>
-              </span>
-            </Button>
-          )}
+        </div>
+        <div className="scrollable mini flex h-full max-h-full w-full gap-3 overflow-hidden overflow-x-auto">
+          {orderedColumns.map((column) => (
+            <Column
+              key={column}
+              title={columnDisplayNames[column]}
+              column={column}
+              headingColor={getColumnColor(column)}
+              cards={cards.filter((card) => card.column === column)}
+              moveCard={moveCard}
+              addCard={addCard}
+              deleteCard={deleteCard}
+              activeColumn={activeColumn}
+              setActiveColumn={setActiveColumn}
+            />
+          ))}
         </div>
       </div>
-      <div className="scrollable mini flex h-full max-h-full w-full gap-3 overflow-hidden overflow-x-auto">
-        {orderedColumns.map((column) => (
-          <Column
-            key={column}
-            title={columnDisplayNames[column]}
-            column={column}
-            headingColor={getColumnColor(column)}
-            cards={cards.filter((card) => card.column === column)}
-            user={user}
-            moveCard={moveCard}
-            addCard={addCard}
-            purpose={purpose}
-            deleteCard={deleteCard}
-            activeColumn={activeColumn}
-            setActiveColumn={setActiveColumn}
-          />
-        ))}
-      </div>
-    </div>
+    </KanbanProvider>
   );
 };
 
 const Column = ({
-  purpose,
   title,
   headingColor,
   column,
   cards,
-  user,
   deleteCard,
   moveCard,
   addCard,
 }: ColumnProps) => {
+  const { user, purpose } = useKanbanContext();
   const userRole = user?.role ?? [];
   const [active, setActive] = useState(false);
   const [viewFull, setViewFull] = useState(false);
@@ -508,12 +511,7 @@ const Column = ({
             {title}
           </h3>
           {userRole.includes("admin") && (
-            <AddCard
-              user={user}
-              purpose={purpose}
-              column={column}
-              addCard={addCard}
-            />
+            <AddCard column={column} addCard={addCard} />
           )}
           <span className="rounded pr-4 text-sm text-foreground dark:text-primary-foreground">
             {cards.length}
@@ -550,7 +548,6 @@ const Column = ({
             <Card
               key={c.id}
               {...c}
-              user={user}
               deleteCard={deleteCard}
               handleDragStart={handleDragStart}
               handleDragEnd={handleDragEnd}
@@ -584,7 +581,6 @@ const Column = ({
 };
 
 const Card = ({
-  user,
   title,
   description,
   id,
@@ -595,20 +591,21 @@ const Card = ({
   voters,
   category,
   isPublic,
-  purpose,
+
   assignedId,
   secondaryAssignedId,
 }: CardProps) => {
+  const { purpose, mode, cardId, setActiveDialog } = useKanbanContext();
+  // const isAdmin = user?.role?.includes("admin") ?? false;
   const [newPriority, setNewPriority] = useState<Priority>(
     priority || "medium",
   );
   const [isHovered, setIsHovered] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
-  const [isPreviewing, setIsPreviewing] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
+  // const [isEditing, setIsEditing] = useState(false);
+  // const [isPreviewing, setIsPreviewing] = useState(false);
 
   // const [hasChanges, setHasChanges] = useState(false);
-  const isAdmin = user?.role?.includes("admin");
 
   const editCard = useMutation(api.kanban.cards.editCard);
 
@@ -625,6 +622,9 @@ const Card = ({
     assignedId,
     secondaryAssignedId,
   };
+
+  const isPreviewing = mode === "preview" && cardId === id;
+  const isEditing = mode === "edit" && cardId === id;
 
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -660,51 +660,76 @@ const Card = ({
   };
 
   return (
-    <motion.div layout className="relative flex flex-col">
+    <motion.div
+      layout
+      className="relative flex flex-col"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       <DropIndicator beforeId={id} column={column} />
-      <motion.div
-        layout
-        layoutId={id}
-        draggable="true"
-        // onClick={() => setIsPreviewing(true)}
-        onDragStart={(e) => {
-          setIsDragging(true);
-          handleDragStart(e as unknown as React.DragEvent<HTMLDivElement>, {
-            title,
-            description,
-            id,
-            column,
-            voters,
-            category,
-            priority,
-            isPublic,
-            purpose,
-          });
-        }}
-        onDragEnd={() => setIsDragging(false)}
-        animate={{ scale: isDragging ? 0.95 : 1 }}
-        transition={{ type: "spring", stiffness: 250, damping: 20 }}
-        className={cn(
-          "relative grid grid-cols-[30px_minmax(0,1fr)] rounded-lg border border-foreground/20 p-3 text-primary-foreground hover:cursor-pointer active:scale-95 active:cursor-grabbing",
-          getColumnColor(column),
-        )}
+      <div
+        className="relative"
         onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={
-          !isEditing && !isPreviewing ? () => setIsHovered(false) : () => {}
-        }
+        onMouseLeave={() => setIsHovered(false)}
       >
+        <motion.div
+          layout
+          layoutId={id}
+          draggable="true"
+          onClick={() => {
+            setActiveDialog({ mode: "preview", cardId: id });
+          }}
+          onDragStart={(e) => {
+            setIsDragging(true);
+            handleDragStart(e as unknown as React.DragEvent<HTMLDivElement>, {
+              title,
+              description,
+              id,
+              column,
+              voters,
+              category,
+              priority,
+              isPublic,
+              purpose,
+            });
+          }}
+          onDragEnd={() => setIsDragging(false)}
+          animate={{ scale: isDragging ? 0.95 : 1 }}
+          transition={{ type: "spring", stiffness: 250, damping: 20 }}
+          className={cn(
+            "relative grid grid-cols-[30px_minmax(0,1fr)] rounded-lg border border-foreground/20 p-3 text-primary-foreground hover:cursor-pointer active:scale-95 active:cursor-grabbing",
+            getColumnColor(column),
+          )}
+        >
+          <span
+            onClick={handleTogglePriority}
+            className={cn(
+              "mt-1 size-2 rounded-full border border-transparent p-[5px] hover:scale-105 hover:cursor-pointer hover:border-foreground active:scale-95",
+              newPriority === "low" || column === "done"
+                ? "bg-green-500"
+                : newPriority === "high"
+                  ? "bg-red-500"
+                  : "bg-yellow-500",
+            )}
+          />
+
+          <RichTextDisplay
+            html={title}
+            className="text-sm text-foreground dark:text-primary-foreground"
+          />
+        </motion.div>
         {isHovered && (
           <div className="absolute right-0.5 top-0.5 flex items-center justify-center gap-x-3 rounded-lg border border-primary bg-card/90 p-2.5 dark:bg-foreground sm:gap-x-2">
             <TaskDialog
               id={id}
-              user={user}
-              purpose={purpose}
               mode="edit"
               isOpen={isEditing}
-              onClick={() => setIsEditing(true)}
+              onClick={() => {
+                setActiveDialog({ mode: "edit", cardId: id });
+              }}
               onClose={() => {
-                setIsEditing(false);
                 setIsHovered(false);
+                setActiveDialog({ mode: null, cardId: null });
               }}
               trigger={
                 <Pencil className="size-7 cursor-pointer text-gray-500 hover:scale-105 hover:text-gray-700 active:scale-95 sm:size-4" />
@@ -722,22 +747,15 @@ const Card = ({
             />
             <DetailsDialog
               isOpen={isPreviewing}
-              user={user}
-              isAdmin={isAdmin ?? false}
-              onClickAction={() => setIsPreviewing(true)}
               onCloseAction={() => {
-                setIsPreviewing(false);
+                setActiveDialog({ mode: null, cardId: null });
                 setIsHovered(false);
               }}
-              onEditAction={() => {
-                if (!isAdmin) return;
-                setIsPreviewing(false);
-                setIsEditing(true);
-              }}
+              onEditAction={() => setActiveDialog({ mode: "edit", cardId: id })}
+              initialValues={detailValues}
               trigger={
                 <Eye className="size-7 cursor-pointer text-gray-500 hover:text-gray-700 sm:size-4" />
               }
-              initialValues={detailValues}
               id={id as Id<"todoKanban">}
             />
 
@@ -747,23 +765,7 @@ const Card = ({
             />
           </div>
         )}
-        <span
-          onClick={handleTogglePriority}
-          className={cn(
-            "mt-1 size-2 rounded-full p-[5px] hover:cursor-pointer",
-            newPriority === "low" || column === "done"
-              ? "bg-green-500"
-              : newPriority === "high"
-                ? "bg-red-500"
-                : "bg-yellow-500",
-          )}
-        />
-
-        <RichTextDisplay
-          html={title}
-          className="text-sm text-foreground dark:text-primary-foreground"
-        />
-      </motion.div>
+      </div>
     </motion.div>
   );
 };
@@ -778,15 +780,14 @@ const DropIndicator = ({ beforeId, column }: DropIndicatorProps) => {
   );
 };
 
-const AddCard = ({ column, addCard, user, purpose }: AddCardProps) => {
+const AddCard = ({ column, addCard }: AddCardProps) => {
+  const { user, purpose } = useKanbanContext();
   const userRole = user?.role ?? [];
   if (!userRole.includes("admin")) return null;
 
   return (
     <TaskDialog
-      user={user}
       mode="add"
-      purpose={purpose}
       trigger={
         <motion.button
           layout
@@ -804,6 +805,7 @@ const AddCard = ({ column, addCard, user, purpose }: AddCardProps) => {
         isPublic: true,
         voters: [],
         category: purpose === "design" ? "ui/ux" : "general",
+        assignedId: user?._id,
       }}
       onSubmit={(data) => {
         addCard({
@@ -837,8 +839,8 @@ export const TaskDialog = ({
       order:
         mode === "add" && initialValues?.order ? initialValues.order : "start",
       isPublic: initialValues?.isPublic ?? true,
-      assignedId: initialValues?.assignedId ?? "",
-      secondaryAssignedId: initialValues?.secondaryAssignedId ?? "",
+      assignedId: initialValues?.assignedId,
+      secondaryAssignedId: initialValues?.secondaryAssignedId,
     },
     mode: "onChange",
     delayError: 1000,
@@ -1145,15 +1147,14 @@ export const TaskDialog = ({
 
 export const DetailsDialog = ({
   id,
-  user,
-  isAdmin,
-  trigger,
+
   initialValues,
   isOpen,
-  onClickAction,
   onCloseAction,
   onEditAction,
 }: DetailsDialogProps) => {
+  const { user } = useKanbanContext();
+  const isAdmin = user?.role?.includes("admin") ?? false;
   const assignedId = initialValues?.assignedId || null;
   const secondaryAssignedId = initialValues?.secondaryAssignedId || null;
   const title = initialValues?.title || "";
@@ -1176,10 +1177,9 @@ export const DetailsDialog = ({
 
   const onCloseDialog = () => {
     setTimeout(() => {
-      console.log("closing dialog");
       onCloseAction?.();
       return;
-    }, 500);
+    }, 10);
   };
 
   const handleVote = async (direction: "up" | "down") => {
@@ -1205,10 +1205,10 @@ export const DetailsDialog = ({
 
   return (
     <Dialog onOpenChange={(open) => !open && onCloseDialog()} open={isOpen}>
-      <DialogTrigger asChild onClick={onClickAction}>
+      {/*      <DialogTrigger asChild onClick={onClickAction}>
         {trigger}
-        {/* Click to open dialog */}
-      </DialogTrigger>
+        /~ Click to open dialog ~/
+      </DialogTrigger>*/}
       <DialogContent className="flex h-[90dvh] w-full max-w-[max(60rem,60vw)] flex-col bg-card sm:max-h-[max(40rem,70vh)]">
         <DialogHeader>
           <div className="flex h-fit flex-col gap-4">

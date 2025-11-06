@@ -1,7 +1,5 @@
 import { SupportCategory } from "@/constants/supportConsts";
 
-import { User } from "@/types/user";
-
 import z from "zod";
 
 import {
@@ -176,14 +174,12 @@ export type CardBase = {
 export type MoveCardArgs = {
   id: Id<"todoKanban">;
   column: ColumnType;
-  beforeId?: Id<"todoKanban">;
   purpose: KanbanPurpose;
+  beforeId?: Id<"todoKanban">;
 };
 
 export type AddCardProps = {
-  user: User | null;
   column: ColumnType;
-  purpose: KanbanPurpose;
   addCard: (args: AddCardArgs) => void;
 };
 
@@ -208,12 +204,10 @@ export type DeleteCardArgs = {
 // type ConvexCard = Omit<Card, "id"> & { _id: string }
 
 export type ColumnProps = {
-  user: User | null;
   title: string;
   headingColor: string;
   column: ColumnType;
   cards: CardBase[];
-  purpose: KanbanPurpose;
   activeColumn: string | null;
   setActiveColumn: (col: string | null) => void;
   moveCard: (args: MoveCardArgs) => void;
@@ -222,7 +216,7 @@ export type ColumnProps = {
 };
 
 export interface CardProps extends CardBase {
-  user: User | null;
+  // user: User | null;
   handleDragStart: (e: React.DragEvent<HTMLDivElement>, card: CardBase) => void;
   handleDragEnd: (e: React.DragEvent<HTMLDivElement>, card: CardBase) => void;
   deleteCard: (args: DeleteCardArgs) => void;
@@ -260,7 +254,6 @@ export type BaseTaskDialogSharedProps = {
 };
 
 export type AddTaskDialogProps = {
-  purpose: KanbanPurpose;
   mode: "add";
   initialValues?: BaseTaskValues & { order: "start" | "end" };
   onSubmit: (values: BaseTaskValues & { order: "start" | "end" }) => void;
@@ -268,7 +261,6 @@ export type AddTaskDialogProps = {
 } & BaseTaskDialogSharedProps;
 
 export type EditTaskDialogProps = {
-  purpose: KanbanPurpose;
   mode: "edit";
   isOpen: boolean;
   initialValues?: BaseTaskValues;
@@ -277,7 +269,6 @@ export type EditTaskDialogProps = {
 
 export type TaskDialogProps = (AddTaskDialogProps | EditTaskDialogProps) & {
   id?: Id<"todoKanban">;
-  user: User | null;
 };
 
 export type DetailsDialogProps = {
@@ -285,9 +276,6 @@ export type DetailsDialogProps = {
   trigger?: React.ReactNode;
   isOpen: boolean;
   initialValues: BaseTaskValues;
-  onClickAction?: () => void;
   onCloseAction: () => void;
   onEditAction: () => void;
-  isAdmin: boolean;
-  user: User | null;
 };
