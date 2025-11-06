@@ -1,12 +1,10 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import slugify from "slugify";
 
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Link } from "@/components/ui/custom-link";
-import { GoToOnlineEvent } from "@/features/extras/components/online-event-table-actions";
 
 import { Id } from "~/convex/_generated/dataModel";
 
@@ -17,7 +15,7 @@ export const newsletterColumnLabels: Record<string, string> = {
   notes: "Notes",
   paid: "Paid",
   canceled: "Canceled",
-  _creationTime: "Created",
+  createdAt: "Created",
 };
 
 // const getAllOnlineEvents: RegisteredQuery<"public", EmptyObject, Promise<{
@@ -116,12 +114,7 @@ export const userAddOnColumns: ColumnDef<UserAddOnColumnsProps>[] = [
     ),
     cell: ({ row }) => {
       const { name } = row.original;
-      const slug = slugify(name, { lower: true, strict: true });
-      return (
-        <div className="truncate font-medium">
-          <GoToOnlineEvent slug={slug}>{name}</GoToOnlineEvent>
-        </div>
-      );
+      return <div className="truncate font-medium">{name}</div>;
     },
   },
   {
@@ -135,9 +128,13 @@ export const userAddOnColumns: ColumnDef<UserAddOnColumnsProps>[] = [
       const { email } = row.original;
       // return <OnlineEventStatusBtn eventId={row.original._id} state={state} />;
       return (
-        <div className="truncate px-3 text-sm text-muted-foreground">
+        <Link
+          href={`mailto:${email ?? ""}`}
+          target="_blank"
+          className="truncate text-sm text-muted-foreground"
+        >
           {email}
-        </div>
+        </Link>
       );
     },
   },
