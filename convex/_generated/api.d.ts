@@ -14,6 +14,7 @@ import type * as actions_sendOtpEmail from "../actions/sendOtpEmail.js";
 import type * as admin from "../admin.js";
 import type * as aggregates_eventAggregates from "../aggregates/eventAggregates.js";
 import type * as analytics_eventAnalytics from "../analytics/eventAnalytics.js";
+import type * as analytics_socialAnalytics from "../analytics/socialAnalytics.js";
 import type * as artists_applications from "../artists/applications.js";
 import type * as artists_artistActions from "../artists/artistActions.js";
 import type * as artists_artistProfile from "../artists/artistProfile.js";
@@ -72,6 +73,7 @@ declare const fullApi: ApiFromModules<{
   admin: typeof admin;
   "aggregates/eventAggregates": typeof aggregates_eventAggregates;
   "analytics/eventAnalytics": typeof analytics_eventAnalytics;
+  "analytics/socialAnalytics": typeof analytics_socialAnalytics;
   "artists/applications": typeof artists_applications;
   "artists/artistActions": typeof artists_artistActions;
   "artists/artistProfile": typeof artists_artistProfile;

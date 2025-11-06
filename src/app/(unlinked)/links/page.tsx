@@ -3,6 +3,8 @@
 import { linktreeLinks } from "@/constants/links";
 import { footerCRText } from "@/constants/text";
 
+import type { LinktreeProps } from "@/constants/links";
+
 import { motion } from "framer-motion";
 
 import { PiHeartBold } from "react-icons/pi";
@@ -10,10 +12,22 @@ import { PiHeartBold } from "react-icons/pi";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/components/ui/custom-link";
 import SalHeader from "@/components/ui/headers/sal-header";
+import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
+import { hashString } from "@/helpers/privacyFns";
 import { cn } from "@/helpers/utilsFns";
 
+import { api } from "~/convex/_generated/api";
+import { useMutation, usePreloadedQuery } from "convex/react";
+
 const LinksPage = () => {
+  const { preloadedSubStatus } = useConvexPreload();
+  const subStatus = usePreloadedQuery(preloadedSubStatus);
+  const { hasActiveSubscription } = subStatus ?? {};
+
   const footerText = footerCRText();
+  const updateAnalytics = useMutation(
+    api.analytics.socialAnalytics.updateLinktreeAnalytics,
+  );
   const groupedLinks = linktreeLinks.reduce<
     Record<string, typeof linktreeLinks>
   >((acc, link) => {
@@ -22,14 +36,21 @@ const LinksPage = () => {
     acc[group].push(link);
     return acc;
   }, {});
+
+  const handleLinkClick = async (link: LinktreeProps) => {
+    const hashedKey = await hashString(`linktree-${link.label}`);
+    if (sessionStorage.getItem(hashedKey)) return;
+    sessionStorage.setItem(hashedKey, "true");
+    updateAnalytics({
+      link: link.type,
+      hasSub: hasActiveSubscription,
+    });
+  };
+
   return (
     <>
       <div className="bottom-0 left-1/2 rounded-full bg-card">
-        {/* <div className='bg-background h-[80px] w-[80px] rounded-full absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2' /> */}
-
         <Link href="/" prefetch={true}>
-          {/* <span className='font-semibold'>The Street Art List</span> */}
-
           <motion.img
             whileTap={{
               rotate: 180,
@@ -76,6 +97,7 @@ const LinksPage = () => {
                   variant="salWithShadow"
                   className="w-full max-w-sm rounded-full py-7"
                   key={link.label}
+                  onClick={() => handleLinkClick(link)}
                 >
                   <Link
                     href={link.path}

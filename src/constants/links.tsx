@@ -1,3 +1,5 @@
+import type { Infer } from "convex/values";
+
 import { JSX } from "react";
 import { IconType } from "react-icons";
 
@@ -38,6 +40,8 @@ import {
   Star,
   User,
 } from "lucide-react";
+
+import type { linktreeLinkTypeValidator } from "~/convex/schema";
 
 export type MenuProps = {
   id: number;
@@ -583,8 +587,9 @@ export const dashboardNavItems: DashNavItem[] = [
     userType: ["public"],
   },
 ];
-type LinktreeProps = SocialProps & {
+export type LinktreeProps = SocialProps & {
   group?: string;
+  type: Infer<typeof linktreeLinkTypeValidator>;
 };
 
 export const linktreeLinks: LinktreeProps[] = [
@@ -593,29 +598,34 @@ export const linktreeLinks: LinktreeProps[] = [
     icon: LuMegaphone,
     path: "/extras/portfolio-reviews",
     group: "Current Events",
+    type: "onlineEvent",
   },
   {
     label: "The List - Events & Open Calls",
     icon: Scroll,
     path: "/thelist",
     group: "The List",
+    type: "theList",
   },
   {
     label: "Open calls ending this week",
     icon: Calendar1,
     path: "/thisweek",
     group: "The List",
+    type: "thisWeek",
   },
   {
     label: "Submit New Event/Open Call",
     icon: Pencil,
     path: "/submit",
     group: "The List",
+    type: "submit",
   },
   {
     label: "Become a member",
     icon: Heart,
-    path: "/pricing",
+    path: "/pricing?type=artist",
     group: "Membership",
+    type: "becomeMember",
   },
 ];

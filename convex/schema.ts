@@ -885,6 +885,22 @@ const eventAnalyticsSchema = {
   hasSub: v.optional(v.boolean()),
 };
 
+export const linktreeLinkTypeValidator = v.union(
+  v.literal("onlineEvent"),
+  v.literal("theList"),
+  v.literal("thisWeek"),
+  v.literal("submit"),
+  v.literal("becomeMember"),
+);
+
+const linktreeAnalyticsSchema = {
+  userId: v.union(v.id("users"), v.null()),
+  eventId: v.optional(v.id("onlineEvents")),
+  link: linktreeLinkTypeValidator,
+  plan: v.number(),
+  hasSub: v.boolean(),
+};
+
 const featureMapSchema = v.object({
   base: v.array(v.string()),
   monthly: v.array(v.string()),
@@ -976,6 +992,10 @@ export default defineSchema({
     .index("by_eventId_action", ["eventId", "action"])
     .index("by_plan", ["plan"])
     .index("by_action", ["action"]),
+  linktreeAnalytics: defineTable(linktreeAnalyticsSchema)
+    .index("by_userId", ["userId"])
+    .index("by_link", ["link"])
+    .index("by_eventId", ["eventId"]),
   users: defineTable(customUserSchema)
     .index("email", ["email"])
     .index("by_userId", ["userId"])

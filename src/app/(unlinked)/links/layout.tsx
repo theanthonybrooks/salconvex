@@ -1,6 +1,34 @@
+import type { Metadata } from "next";
+
 import { cn } from "@/helpers/utilsFns";
 
-// app/(public)/links/layout.tsx
+export const metadata: Metadata = {
+  title: "Links | The Street Art List",
+  description: "Social media links for The Street Art List",
+  openGraph: {
+    title: "Links | The Street Art List",
+    description: "Social media links for The Street Art List",
+    url: "https://thestreetartlist.com/links",
+    siteName: "The Street Art List",
+    images: [
+      {
+        url: "/saltext.png",
+        width: 1200,
+        height: 630,
+        alt: "The Street Art List Links Page",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Links | The Street Art List",
+    description: "Social media links for The Street Art List",
+    images: "/saltext.png",
+  },
+};
+
 export default function LinksLayout({
   children,
 }: {
