@@ -14,7 +14,7 @@ export const updateLinktreeAnalytics = mutation({
     const isAdmin = user?.role?.includes("admin") ?? false;
     const userPlan = user?.plan ?? 0;
     const { link, hasSub } = args;
-    // if (isAdmin) return;
+    if (isAdmin) return;
     await ctx.db.insert("linktreeAnalytics", {
       userId,
       link,

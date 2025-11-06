@@ -171,7 +171,7 @@ export default function Home() {
                 <CarouselItem className="relative w-full bg-transparent">
                   <video
                     ref={videoRef}
-                    src="/artist-highlight/nov25/oldhues-video.mp4"
+                    src="/artist-highlight/nov25/oldhues-video-edit2.mp4"
                     autoPlay={!paused}
                     playsInline
                     muted
@@ -182,10 +182,19 @@ export default function Home() {
                     className="absolute inset-0 h-full w-full object-cover object-[50%_32%]"
                   />
                 </CarouselItem>
-
                 <CarouselItem className="relative w-full bg-transparent">
                   <Image
-                    src="/artist-highlight/nov25/oldhues-1.jpg"
+                    src="/artist-highlight/nov25/oldhues-25.jpg"
+                    alt="The Street Art List - Megan Oldhues @oldhues"
+                    loading="eager"
+                    width={1920}
+                    height={1080}
+                    className="h-full w-full object-cover object-[50%_51%]"
+                  />
+                </CarouselItem>
+                <CarouselItem className="relative w-full bg-transparent">
+                  <Image
+                    src="/artist-highlight/nov25/oldhues-15.jpg"
                     alt="The Street Art List - Megan Oldhues @oldhues"
                     loading="eager"
                     width={1920}
@@ -193,6 +202,18 @@ export default function Home() {
                     className="h-full w-full object-cover object-[50%_66%] [@media(max-height:620px)]:object-[50%_30%]"
                   />
                 </CarouselItem>
+
+                <CarouselItem className="relative w-full bg-transparent">
+                  <Image
+                    src="/artist-highlight/nov25/oldhues-35.jpg"
+                    alt="The Street Art List - Megan Oldhues @oldhues"
+                    loading="eager"
+                    width={1920}
+                    height={1080}
+                    className="h-full w-full object-cover object-[50%_51%]"
+                  />
+                </CarouselItem>
+
                 <CarouselItem className="relative w-full bg-transparent">
                   <Image
                     src="/artist-highlight/nov25/oldhues-3.jpg"
@@ -216,7 +237,7 @@ export default function Home() {
               onClick={handleVideoToggle}
               className={cn(
                 "absolute bottom-[60px] right-8 z-10 hidden !text-sm text-card sm:inline-flex",
-                currentSlide !== 1 && "hidden",
+                currentSlide !== 1 && "sm:hidden",
               )}
             >
               {paused ? "Play" : "Pause"} Video
@@ -235,9 +256,11 @@ export default function Home() {
                       <i className={cn("text-base")}>
                         {currentSlide === 1
                           ? "Fireside (2025)"
-                          : currentSlide === 2
-                            ? "Pocket Cars (2024)"
-                            : "Hua Sheng Supermarket (2023)"}
+                          : currentSlide === 2 || currentSlide === 3
+                            ? "In Bloom (2023)"
+                            : currentSlide === 4
+                              ? "Mess Mess Mess (2024)"
+                              : "Hua Sheng Supermarket (2023)"}
                       </i>
                       <span
                         className={cn(
