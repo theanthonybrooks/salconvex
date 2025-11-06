@@ -3,8 +3,8 @@
 import { ColumnDef } from "@tanstack/react-table";
 
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Link } from "@/components/ui/custom-link";
+import { TooltipSimple } from "@/components/ui/tooltip";
 
 import { Id } from "~/convex/_generated/dataModel";
 
@@ -55,32 +55,6 @@ interface UserAddOnColumnsProps {
 
 export const userAddOnColumns: ColumnDef<UserAddOnColumnsProps>[] = [
   {
-    id: "select",
-    size: 30,
-    minSize: 30,
-    maxSize: 30,
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={() => table.toggleAllRowsSelected(false)}
-        aria-label="Deselect all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-    enableResizing: false,
-  },
-  {
     accessorKey: "rowNumber",
     id: "rowNumber",
     header: ({ column }) => <DataTableColumnHeader column={column} title="#" />,
@@ -91,7 +65,6 @@ export const userAddOnColumns: ColumnDef<UserAddOnColumnsProps>[] = [
           className="text-center text-sm text-muted-foreground"
           onClick={() => {
             row.toggleSelected();
-            console.log(row.original._id);
           }}
         >
           {row.index + 1}
@@ -169,9 +142,13 @@ export const userAddOnColumns: ColumnDef<UserAddOnColumnsProps>[] = [
     cell: ({ row }) => {
       const { notes } = row.original;
       return (
-        <div className="truncate text-sm text-muted-foreground">
-          {notes ?? ""}
-        </div>
+        <>
+          <TooltipSimple content={notes}>
+            <div className="truncate text-sm text-muted-foreground">
+              {notes ?? ""}
+            </div>
+          </TooltipSimple>
+        </>
       );
     },
   },

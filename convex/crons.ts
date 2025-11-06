@@ -21,6 +21,12 @@ crons.cron(
   internal.openCalls.openCall.archiveExpiredOpenCalls,
 );
 
+crons.cron(
+  "archive past online events every 60 min",
+  "*/60 * * * *", // Every 60 minutes
+  internal.userAddOns.onlineEvents.archivePastEvents,
+);
+
 // crons.hourly(
 //   "Delete unconfirmed users",
 //   { minuteUTC: 0 }, // Run hourly  UTC (-1 from Berlin)

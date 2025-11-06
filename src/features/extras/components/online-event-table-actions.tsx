@@ -1,5 +1,7 @@
 "use client";
 
+import { onlineEventCategories } from "@/constants/extrasConsts";
+
 import { toast } from "react-toastify";
 
 import type { Id } from "~/convex/_generated/dataModel";
@@ -32,12 +34,13 @@ export const OnlineEventStatusBtn = ({
     api.userAddOns.onlineEvents.updateOnlineEventState,
   );
 
+  const mappedOptions = onlineEventCategories.map((opt) =>
+    opt.value === "archived" ? { ...opt, disabled: true } : opt,
+  );
+
   return (
     <SelectSimple
-      options={[
-        { value: "draft", label: "Draft" },
-        { value: "published", label: "Published" },
-      ]}
+      options={[...mappedOptions]}
       value={state}
       onChangeAction={async (value) => {
         try {

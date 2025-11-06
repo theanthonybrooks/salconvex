@@ -9,7 +9,7 @@ import type {
 
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { internal } from "~/convex/_generated/api";
-import { mutation, query } from "~/convex/_generated/server";
+import { internalMutation, mutation, query } from "~/convex/_generated/server";
 import { onlineEventsSchema, onlineEventStateValues } from "~/convex/schema";
 import { ConvexError, v } from "convex/values";
 
@@ -138,7 +138,7 @@ export const getOnlineEvent = query({
           .withIndex("by_slug_state_endDate", (q) =>
             q
               .eq("slug", args.slug ?? "")
-              .eq("state", "published")
+              .eq("state", "archived")
               .lte("endDate", now),
           )
           .order("desc")
@@ -669,5 +669,29 @@ export const getAllRegistrationsForEvent = query({
       .collect();
 
     return registrations;
+  },
+});
+
+export const archivePastEvents = internalMutation({
+  args: {},
+  handler: async (ctx) => {
+    const now = Date.now();
+    const events = await ctx.db
+      .query("onlineEvents")
+      .withIndex("by_state_endDate", (q) =>
+        q.eq("state", "published").lte("endDate", now),
+      )
+      .collect();
+    try {
+      for (const event of events) {
+        await ctx.db.patch(event._id, {
+          state: "archived",
+          updatedAt: Date.now(),
+          updatedBy: "system",
+        });
+      }
+    } catch (error) {
+      console.error("Error archiving past events:", error);
+    }
   },
 });

@@ -924,6 +924,7 @@ const userAddOnsSchema = {
 export const onlineEventStateValues = v.union(
   v.literal("draft"),
   v.literal("published"),
+  v.literal("archived"),
 );
 
 export type OnlineEventStateType = Infer<typeof onlineEventStateValues>;
@@ -949,7 +950,7 @@ export const onlineEventsSchema = {
 
   terms: v.array(v.string()),
   updatedAt: v.optional(v.number()),
-  updatedBy: v.optional(v.id("users")),
+  updatedBy: v.optional(v.union(v.id("users"), v.literal("system"))),
   state: onlineEventStateValues,
 };
 export const onlineEventsSchemaValidator = v.object(onlineEventsSchema);
@@ -1411,6 +1412,7 @@ export default defineSchema({
   onlineEvents: defineTable(onlineEventsSchema)
     .index("by_startDate", ["startDate"])
     .index("by_endDate", ["endDate"])
+    .index("by_state_endDate", ["state", "endDate"])
     .index("by_slug", ["slug"])
     .index("by_slug_startDate", ["slug", "startDate"])
     .index("by_slug_endDate", ["slug", "endDate"])

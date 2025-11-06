@@ -1,6 +1,11 @@
 "use client";
 
 import {
+  onlineEventStatusBgColorMap,
+  onlineEventStatusColorMap,
+} from "@/constants/extrasConsts";
+
+import {
   ApplicationStatus,
   NonNullApplicationStatus,
   positiveApplicationStatuses,
@@ -27,6 +32,7 @@ import {
   VisibilityState,
 } from "@tanstack/react-table";
 
+import type { OnlineEventStateType } from "~/convex/schema";
 import {
   Table,
   TableBody,
@@ -61,7 +67,6 @@ export const selectableTableTypes = [
   // "applications",
   "openCalls",
   "extras",
-  "userAddOns",
 ];
 
 export const numberedTableTypes = [
@@ -131,10 +136,11 @@ export function DataTable<TData, TValue>({
 
     const validColumnIds = columns.map((c) => c.id).filter(Boolean);
 
-    // console.log(validColumnIds);
+    console.log(validColumnIds);
 
     searchParams.forEach((value, key) => {
       if (!value) return;
+      console.log(key, value);
       if (!validColumnIds.includes(key)) return;
 
       const values = value
@@ -397,6 +403,13 @@ export function DataTable<TData, TValue>({
                       applicationStatus as NonNullApplicationStatus
                     ];
                   bgStatusClass = `${statusColor} ${textColor}`;
+                } else if (tableType === "extras") {
+                  const { state } = row.original as {
+                    state: OnlineEventStateType;
+                  };
+                  const statusColor = onlineEventStatusBgColorMap[state];
+                  const textColor = onlineEventStatusColorMap[state];
+                  bgStatusClass = `${statusColor} ${textColor}`;
                 }
 
                 return (
@@ -411,6 +424,8 @@ export function DataTable<TData, TValue>({
                         "hover:cursor-pointer hover:bg-salYellow/10",
 
                       bgStatusClass,
+                      // tableType === "extras" &&
+                      //   "data-[state=selected]:bg-slate-100",
                     )}
                   >
                     {row.getVisibleCells().map((cell) => (

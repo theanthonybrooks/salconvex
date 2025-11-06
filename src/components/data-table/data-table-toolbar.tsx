@@ -1,6 +1,7 @@
 "use client";
 
 import { eventTypeOptions } from "@/constants/eventConsts";
+import { onlineEventCategories } from "@/constants/extrasConsts";
 
 import { TableTypes } from "@/types/tanstack-table";
 
@@ -152,14 +153,26 @@ export function DataTableToolbar<TData>({
           className="mx-auto h-12 w-full sm:h-10 sm:w-[150px] lg:w-[200px]"
         />
         {extrasTable && isAdmin && (
-          <OnlineEventDialog type="create">
-            <Button
-              variant="salWithShadowHidden"
-              className="w-full px-2 sm:h-10 sm:w-fit lg:px-3"
-            >
-              Add Event
-            </Button>
-          </OnlineEventDialog>
+          <div className="flex items-center gap-3 [@media(max-width:640px)]:w-full [@media(max-width:640px)]:flex-col">
+            <OnlineEventDialog type="create">
+              <Button
+                variant="salWithShadowHidden"
+                className="w-full px-2 sm:h-10 sm:w-fit lg:px-3"
+              >
+                Add Event
+              </Button>
+            </OnlineEventDialog>
+            {table.getColumn("state") && (
+              <DataTableFacetedFilter
+                isMobile={isMobile}
+                forDashboard={forDashboard}
+                column={table.getColumn("state")}
+                title="Status"
+                options={onlineEventCategories}
+                minimalView={minimalView}
+              />
+            )}
+          </div>
         )}
         {eventAndOC && (
           <div className="flex items-center gap-3 [@media(max-width:640px)]:w-full [@media(max-width:640px)]:flex-col">

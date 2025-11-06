@@ -166,7 +166,7 @@ export function AdminDashboardTableWrapper({
                 // defaultVisibility={{
 
                 // }}
-                onRowSelect={(row) => setSelectedRow(row?._id ?? null)}
+
                 adminActions={adminActions}
                 tableType="userAddOns"
                 pageType="dashboard"

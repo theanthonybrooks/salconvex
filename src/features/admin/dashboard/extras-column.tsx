@@ -4,12 +4,11 @@ import Image from "next/image";
 import { ColumnDef } from "@tanstack/react-table";
 import slugify from "slugify";
 
-import { Pencil } from "lucide-react";
+import { Check, Pencil } from "lucide-react";
 
 import type { OnlineEventStateType } from "~/convex/schema";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { OnlineEventDialog } from "@/features/extras/components/online-event-dialog";
 import {
   GoToOnlineEvent,
@@ -78,32 +77,6 @@ interface ExtraColumnsProps {
 
 export const extraColumns: ColumnDef<ExtraColumnsProps>[] = [
   {
-    id: "select",
-    size: 30,
-    minSize: 30,
-    maxSize: 30,
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={() => table.toggleAllRowsSelected(false)}
-        aria-label="Deselect all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-    enableResizing: false,
-  },
-  {
     accessorKey: "rowNumber",
     id: "rowNumber",
     header: ({ column }) => <DataTableColumnHeader column={column} title="#" />,
@@ -147,6 +120,7 @@ export const extraColumns: ColumnDef<ExtraColumnsProps>[] = [
   },
   {
     accessorKey: "state",
+    id: "state",
     minSize: 150,
     maxSize: 150,
     header: ({ column }) => (
@@ -156,6 +130,12 @@ export const extraColumns: ColumnDef<ExtraColumnsProps>[] = [
       const { state } = row.original;
       return <OnlineEventStatusBtn eventId={row.original._id} state={state} />;
     },
+    filterFn: (row, columnId, filterValue) => {
+      if (!Array.isArray(filterValue)) return true;
+      return filterValue.includes(row.getValue(columnId));
+    },
+    enableMultiSort: true,
+    sortUndefined: "last",
   },
   {
     accessorKey: "img",
@@ -173,22 +153,6 @@ export const extraColumns: ColumnDef<ExtraColumnsProps>[] = [
       );
     },
   },
-  {
-    accessorKey: "description",
-    minSize: 150,
-    maxSize: 400,
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Description" />
-    ),
-    cell: ({ row }) => {
-      const { description } = row.original;
-      return (
-        <div className="truncate text-sm text-muted-foreground">
-          {description}
-        </div>
-      );
-    },
-  },
 
   {
     accessorKey: "startDate",
@@ -200,7 +164,7 @@ export const extraColumns: ColumnDef<ExtraColumnsProps>[] = [
     cell: ({ row }) => {
       const { startDate } = row.original;
       return (
-        <div className="truncate text-center text-sm capitalize text-muted-foreground">
+        <div className="truncate text-center text-sm capitalize">
           {new Date(startDate).toLocaleString("en-US", {
             month: "short",
             day: "numeric",
@@ -223,7 +187,7 @@ export const extraColumns: ColumnDef<ExtraColumnsProps>[] = [
     cell: ({ row }) => {
       const { endDate } = row.original;
       return (
-        <div className="truncate text-center text-sm capitalize text-muted-foreground">
+        <div className="truncate text-center text-sm capitalize">
           {new Date(endDate).toLocaleString("en-US", {
             month: "short",
             day: "numeric",
@@ -272,7 +236,7 @@ export const extraColumns: ColumnDef<ExtraColumnsProps>[] = [
     cell: ({ row }) => {
       const { price } = row.original;
       return (
-        <div className="truncate text-center text-sm text-muted-foreground">
+        <div className="truncate text-center text-sm">
           {price ? `$${price.toLocaleString()}` : "-"}
         </div>
       );
@@ -292,9 +256,16 @@ export const extraColumns: ColumnDef<ExtraColumnsProps>[] = [
     ),
     cell: ({ row }) => {
       const { capacity } = row.original;
+      const fullCapacity = capacity.current === capacity.max;
       return (
-        <div className="truncate text-center text-sm text-muted-foreground">
+        <div
+          className={cn(
+            "flex items-center justify-center gap-1 truncate text-center text-sm",
+            fullCapacity && "font-bold text-green-700",
+          )}
+        >
           {capacity.current}/{capacity.max}
+          {fullCapacity && <Check className="size-5" />}
         </div>
       );
     },
