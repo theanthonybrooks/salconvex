@@ -10,12 +10,11 @@ import {
 
 const isAuthPage = createRouteMatcher(["/auth/:path*"]);
 const isDashboardPage = createRouteMatcher(["/dashboard/:path*"]);
+const isSubmitPage = createRouteMatcher(["/submit"]);
 // const isOpenCallPage = createRouteMatcher([
 //   "/thelist/event/:slug/:year/call",
 //   "/thelist/event/:slug/:year/call/:path*",
 // ]);
-
-const isSubmitPage = createRouteMatcher(["/submit"]);
 
 export default convexAuthNextjsMiddleware(
   async (request, { convexAuth }) => {
@@ -25,8 +24,15 @@ export default convexAuthNextjsMiddleware(
     // if (loginUrl) {
     //   console.log("loginUrl:", loginUrl);
     // }
+    const pathname = request.nextUrl.pathname;
+    if (/\.(ico|png|jpg|jpeg|svg|gif|webp|txt|xml)$/.test(pathname)) {
+      return NextResponse.next();
+    }
+
+    const hostname = request.headers.get("host") || "";
     const userAgent = request.headers.get("user-agent") || "";
     const ua = new UAParser(userAgent).getResult();
+    const url = request.nextUrl.clone();
 
     // const isAuthenticated = await isAuthenticatedNextjs()
     const isAuthenticated = await convexAuth.isAuthenticated();
@@ -49,9 +55,18 @@ export default convexAuthNextjsMiddleware(
     }
 
     if (!isAuthenticated) {
-      if (isDashboardPage(request)) {
+      if (isDashboardPage(request) || hostname.startsWith("dashboard.")) {
         return NextResponse.redirect(new URL("/auth/sign-in", request.url));
       }
+    } else {
+      if (hostname.startsWith("dashboard.")) {
+        url.pathname = `/dashboard${url.pathname}`;
+        return NextResponse.rewrite(url);
+      }
+    }
+    if (hostname.startsWith("links.")) {
+      url.pathname = "/_subdomains/links";
+      return NextResponse.rewrite(url);
     }
 
     if (isSubmitPage(request)) {
