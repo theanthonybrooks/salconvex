@@ -282,12 +282,12 @@ export type TaskDialogProps = (AddTaskDialogProps | EditTaskDialogProps) & {
 
 export type DetailsDialogProps = {
   id: Id<"todoKanban">;
-  // trigger: React.ReactNode;
+  trigger?: React.ReactNode;
   isOpen: boolean;
   initialValues: BaseTaskValues;
   onClickAction?: () => void;
-  onCloseAction?: () => void;
-  onEditAction?: () => void;
+  onCloseAction: () => void;
+  onEditAction: () => void;
   isAdmin: boolean;
   user: User | null;
 };

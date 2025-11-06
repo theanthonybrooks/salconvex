@@ -43,6 +43,7 @@ import { useForm } from "react-hook-form";
 
 import { FiPlus } from "react-icons/fi";
 import {
+  Eye,
   Filter,
   FilterX,
   LucideThumbsDown,
@@ -665,7 +666,7 @@ const Card = ({
         layout
         layoutId={id}
         draggable="true"
-        onClick={() => setIsPreviewing(true)}
+        // onClick={() => setIsPreviewing(true)}
         onDragStart={(e) => {
           setIsDragging(true);
           handleDragStart(e as unknown as React.DragEvent<HTMLDivElement>, {
@@ -684,7 +685,7 @@ const Card = ({
         animate={{ scale: isDragging ? 0.95 : 1 }}
         transition={{ type: "spring", stiffness: 250, damping: 20 }}
         className={cn(
-          "relative grid grid-cols-[30px_minmax(0,1fr)] rounded-lg border border-foreground/20 p-3 text-primary-foreground hover:cursor-pointer active:cursor-grabbing",
+          "relative grid grid-cols-[30px_minmax(0,1fr)] rounded-lg border border-foreground/20 p-3 text-primary-foreground hover:cursor-pointer active:scale-95 active:cursor-grabbing",
           getColumnColor(column),
         )}
         onMouseEnter={() => setIsHovered(true)}
@@ -733,9 +734,9 @@ const Card = ({
                 setIsPreviewing(false);
                 setIsEditing(true);
               }}
-              // trigger={
-              //   <Eye className="size-7 cursor-pointer text-gray-500 hover:text-gray-700 sm:size-4" />
-              // }
+              trigger={
+                <Eye className="size-7 cursor-pointer text-gray-500 hover:text-gray-700 sm:size-4" />
+              }
               initialValues={detailValues}
               id={id as Id<"todoKanban">}
             />
@@ -868,7 +869,9 @@ export const TaskDialog = ({
           isPublic: values.isPublic,
           category: values.category,
           assignedId: values.assignedId as Id<"users">,
-          secondaryAssignedId: values.secondaryAssignedId as Id<"users">,
+          ...(values.secondaryAssignedId && {
+            secondaryAssignedId: values.secondaryAssignedId as Id<"users">,
+          }),
           voters: [],
         });
       } else {
@@ -880,7 +883,9 @@ export const TaskDialog = ({
           isPublic: values.isPublic,
           category: values.category,
           assignedId: values.assignedId as Id<"users">,
-          secondaryAssignedId: values.secondaryAssignedId as Id<"users">,
+          ...(values.secondaryAssignedId && {
+            secondaryAssignedId: values.secondaryAssignedId as Id<"users">,
+          }),
           voters,
         });
       }
@@ -927,14 +932,12 @@ export const TaskDialog = ({
               }
               setCurrentUsers={(users) => {
                 const [primary, secondary] = users ?? [];
-                form.setValue("assignedId", (primary ?? "") as Id<"users">, {
+                form.setValue("assignedId", primary ?? undefined, {
                   shouldDirty: true,
                 });
-                form.setValue(
-                  "secondaryAssignedId",
-                  (secondary ?? "") as Id<"users">,
-                  { shouldDirty: true },
-                );
+                form.setValue("secondaryAssignedId", secondary ?? undefined, {
+                  shouldDirty: true,
+                });
               }}
             />
           </div>
@@ -1144,7 +1147,7 @@ export const DetailsDialog = ({
   id,
   user,
   isAdmin,
-  // trigger,
+  trigger,
   initialValues,
   isOpen,
   onClickAction,
@@ -1173,6 +1176,7 @@ export const DetailsDialog = ({
 
   const onCloseDialog = () => {
     setTimeout(() => {
+      console.log("closing dialog");
       onCloseAction?.();
       return;
     }, 500);
@@ -1201,9 +1205,9 @@ export const DetailsDialog = ({
 
   return (
     <Dialog onOpenChange={(open) => !open && onCloseDialog()} open={isOpen}>
-      <DialogTrigger asChild onClick={onClickAction} className="sr-only">
-        {/* {trigger} */}
-        Click to open dialog
+      <DialogTrigger asChild onClick={onClickAction}>
+        {trigger}
+        {/* Click to open dialog */}
       </DialogTrigger>
       <DialogContent className="flex h-[90dvh] w-full max-w-[max(60rem,60vw)] flex-col bg-card sm:max-h-[max(40rem,70vh)]">
         <DialogHeader>
