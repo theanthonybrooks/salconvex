@@ -60,6 +60,8 @@ export const selectableTableTypes = [
   // "newsletter",
   // "applications",
   "openCalls",
+  "extras",
+  "userAddOns",
 ];
 
 export const numberedTableTypes = [
@@ -69,6 +71,7 @@ export const numberedTableTypes = [
   "applications",
   "bookmarks",
   "hidden",
+  "extras",
 ];
 
 interface DataTableProps<TData, TValue> {

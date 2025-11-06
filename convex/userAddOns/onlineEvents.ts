@@ -657,3 +657,17 @@ export const getUserRegistrations = query({
     return { status: "success", registrations: activeRegistrations };
   },
 });
+
+export const getAllRegistrationsForEvent = query({
+  args: {
+    eventId: v.id("onlineEvents"),
+  },
+  handler: async (ctx, args) => {
+    const registrations = await ctx.db
+      .query("userAddOns")
+      .withIndex("by_eventId", (q) => q.eq("eventId", args.eventId))
+      .collect();
+
+    return registrations;
+  },
+});

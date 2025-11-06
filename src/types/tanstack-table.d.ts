@@ -25,6 +25,7 @@ export const tableTypes = [
   "newsletter",
   "artists",
   "extras",
+  "userAddOns",
 ] as const;
 
 export const pageTypes = ["form", "dashboard"] as const;

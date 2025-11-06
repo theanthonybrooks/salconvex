@@ -2,8 +2,10 @@
 
 import { TableTypes } from "@/types/tanstack-table";
 
+import { useState } from "react";
 import { useDashboard } from "@/app/(pages)/dashboard/_components/dashboard-context";
 
+import type { Id } from "~/convex/_generated/dataModel";
 import { DataTable } from "@/components/data-table/data-table";
 import { useAdminPreload } from "@/features/admin/admin-preload-context";
 import {
@@ -13,6 +15,7 @@ import {
 import { extraColumns } from "@/features/admin/dashboard/extras-column";
 import { newsletterColumns } from "@/features/admin/dashboard/newsletter-columns";
 import { userColumns } from "@/features/admin/dashboard/user-columns";
+import { userAddOnColumns } from "@/features/admin/dashboard/userAddon-columns";
 import { applicationColumns } from "@/features/artists/applications/components/events-data-table/application-columns";
 import { getColumns } from "@/features/events/components/events-data-table/columns";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
@@ -38,6 +41,7 @@ export function AdminDashboardTableWrapper({
 
   const { preloadedEventData } = useAdminPreload();
   const { preloadedUserData } = useConvexPreload();
+  const [selectedRow, setSelectedRow] = useState<string | null>(null);
   const userData = usePreloadedQuery(preloadedUserData);
   const userRole = userData?.user?.role;
   const isAdmin = userRole?.includes("admin") ?? false;
@@ -77,6 +81,13 @@ export function AdminDashboardTableWrapper({
   const extrasData = useQuery(
     api.userAddOns.onlineEvents.getAllOnlineEvents,
     extrasPage ? {} : "skip",
+  );
+
+  const eventRegistrations = useQuery(
+    api.userAddOns.onlineEvents.getAllRegistrationsForEvent,
+    extrasPage && selectedRow
+      ? { eventId: selectedRow as Id<"onlineEvents"> }
+      : "skip",
   );
 
   return (
@@ -141,12 +152,27 @@ export function AdminDashboardTableWrapper({
                 createdAt: false,
                 img: false,
               }}
+              onRowSelect={(row) => setSelectedRow(row?._id ?? null)}
               adminActions={adminActions}
               tableType="extras"
               pageType="dashboard"
               defaultSort={{ id: `startDate`, desc: true }}
-              pageSize={50}
+              pageSize={10}
             />
+            {eventRegistrations && (
+              <DataTable
+                columns={userAddOnColumns}
+                data={eventRegistrations ?? []}
+                // defaultVisibility={{
+
+                // }}
+                onRowSelect={(row) => setSelectedRow(row?._id ?? null)}
+                adminActions={adminActions}
+                tableType="userAddOns"
+                pageType="dashboard"
+                pageSize={10}
+              />
+            )}
           </div>
           <div className="flex flex-col items-center justify-center gap-4 py-7 lg:hidden">
             <DataTable
@@ -161,6 +187,7 @@ export function AdminDashboardTableWrapper({
                 createdAt: false,
                 img: false,
               }}
+              onRowSelect={(row) => console.log(row?._id)}
               defaultSort={{ id: `startDate`, desc: true }}
               adminActions={adminActions}
               tableType="extras"
@@ -168,6 +195,7 @@ export function AdminDashboardTableWrapper({
               className="mx-auto w-full max-w-[80dvw] overflow-x-auto sm:max-w-[90vw]"
               outerContainerClassName={cn("lg:hidden")}
             />
+            <p className={cn("h-screen")}>{selectedRow}</p>
           </div>
         </>
       )}

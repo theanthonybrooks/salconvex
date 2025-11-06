@@ -9,6 +9,7 @@ import { Pencil } from "lucide-react";
 import type { OnlineEventStateType } from "~/convex/schema";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { OnlineEventDialog } from "@/features/extras/components/online-event-dialog";
 import {
   GoToOnlineEvent,
@@ -77,6 +78,32 @@ interface ExtraColumnsProps {
 
 export const extraColumns: ColumnDef<ExtraColumnsProps>[] = [
   {
+    id: "select",
+    size: 30,
+    minSize: 30,
+    maxSize: 30,
+    header: ({ table }) => (
+      <Checkbox
+        checked={
+          table.getIsAllPageRowsSelected() ||
+          (table.getIsSomePageRowsSelected() && "indeterminate")
+        }
+        onCheckedChange={() => table.toggleAllRowsSelected(false)}
+        aria-label="Deselect all"
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        aria-label="Select row"
+      />
+    ),
+    enableSorting: false,
+    enableHiding: false,
+    enableResizing: false,
+  },
+  {
     accessorKey: "rowNumber",
     id: "rowNumber",
     header: ({ column }) => <DataTableColumnHeader column={column} title="#" />,
@@ -87,6 +114,7 @@ export const extraColumns: ColumnDef<ExtraColumnsProps>[] = [
           className="text-center text-sm text-muted-foreground"
           onClick={() => {
             row.toggleSelected();
+            console.log(row.original._id);
           }}
         >
           {row.index + 1}
