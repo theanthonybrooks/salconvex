@@ -2,11 +2,10 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { Id } from "~/convex/_generated/dataModel";
-import { AccountType, UserRole } from "~/convex/schema";
-import { LucideClipboardCopy, MoreHorizontal, User } from "lucide-react";
+
 import { BsRobot } from "react-icons/bs";
 import { FaEnvelope } from "react-icons/fa6";
+import { LucideClipboardCopy, MoreHorizontal, User } from "lucide-react";
 
 import { DeleteUser } from "@/components/data-table/actions/data-table-admin-user-actions";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
@@ -29,6 +28,9 @@ import {
 } from "@/features/admin/dashboard/components/admin-user-actions";
 import { ConvexDashboardLink } from "@/features/events/ui/convex-dashboard-link";
 import { cn } from "@/helpers/utilsFns";
+
+import { Id } from "~/convex/_generated/dataModel";
+import { AccountType, UserRole } from "~/convex/schema";
 
 export const userColumnLabels: Record<string, string> = {
   name: "Name",
@@ -316,7 +318,15 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
             !canceledAt && "text-center",
           )}
         >
-          {canceledAt ? new Date(canceledAt).toLocaleString() : "-"}
+          {canceledAt
+            ? new Date(canceledAt).toLocaleString(undefined, {
+                month: "short",
+                day: "numeric",
+                year: "2-digit",
+                hour: "numeric",
+                minute: "2-digit",
+              })
+            : "-"}
         </div>
       );
     },
@@ -338,7 +348,15 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
             !lastActive && "text-center",
           )}
         >
-          {lastActive ? new Date(lastActive).toLocaleString() : "-"}
+          {lastActive
+            ? new Date(lastActive).toLocaleString(undefined, {
+                month: "numeric",
+                day: "numeric",
+                year: "2-digit",
+                hour: "numeric",
+                minute: "2-digit",
+              })
+            : "-"}
         </div>
       );
     },
@@ -356,7 +374,15 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
       const { lastUpdated } = row.original;
       return (
         <span className="text-sm text-muted-foreground">
-          {lastUpdated ? new Date(lastUpdated).toLocaleString() : "-"}
+          {lastUpdated
+            ? new Date(lastUpdated).toLocaleString(undefined, {
+                month: "numeric",
+                day: "numeric",
+                year: "2-digit",
+                hour: "numeric",
+                minute: "2-digit",
+              })
+            : "-"}
         </span>
       );
     },
@@ -544,7 +570,15 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
       const { createdAt: value } = row.original;
       return (
         <span className="text-sm text-muted-foreground">
-          {value ? new Date(value).toLocaleString() : "-"}
+          {value
+            ? new Date(value).toLocaleString(undefined, {
+                month: "numeric",
+                day: "numeric",
+                year: "2-digit",
+                hour: "numeric",
+                minute: "2-digit",
+              })
+            : "-"}
         </span>
       );
     },

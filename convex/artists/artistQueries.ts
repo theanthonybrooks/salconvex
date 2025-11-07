@@ -26,28 +26,30 @@ export const getActiveArtists = query({
     const mergedSubs = mergedStream(activeSubs, ["status"]);
     const subs = await mergedSubs.collect();
     const filteredSubs = subs.filter((sub) => sub.cancelAt === undefined);
-    const artists = await Promise.all(
-      filteredSubs.map(async (sub) => {
-        const artist = await ctx.db
-          .query("artists")
-          .withIndex("by_artistId", (q) =>
-            q.eq("artistId", sub.userId as Id<"users">),
-          )
-          .first();
-        if (!artist) return null;
-        return {
-          artistId: artist._id,
-          name: artist.artistName,
-          nationality: artist.artistNationality,
-          instagram: artist.contact?.instagram,
-          website: artist.contact?.website,
-          canFeature: artist.canFeature,
-          feature: artist.feature ?? "none",
-          notes: artist.notes,
-          createdAt: artist._creationTime,
-        };
-      }),
-    );
+    const artists = (
+      await Promise.all(
+        filteredSubs.map(async (sub) => {
+          const artist = await ctx.db
+            .query("artists")
+            .withIndex("by_artistId", (q) =>
+              q.eq("artistId", sub.userId as Id<"users">),
+            )
+            .first();
+          if (!artist) return null;
+          return {
+            artistId: artist._id,
+            name: artist.artistName ?? "",
+            nationality: artist.artistNationality ?? [],
+            instagram: artist.contact?.instagram ?? "",
+            website: artist.contact?.website ?? "",
+            canFeature: artist.canFeature ?? false,
+            feature: artist.feature ?? "none",
+            notes: artist.notes ?? "",
+            createdAt: artist._creationTime,
+          };
+        }),
+      )
+    ).filter((a) => a !== null);
 
     return artists;
   },

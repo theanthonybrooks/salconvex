@@ -32,6 +32,7 @@ const fontSizeOptions = [
   { label: "16 px", value: "16" },
   { label: "18 px", value: "18" },
   { label: "20 px", value: "20" },
+  { label: "22 px", value: "22" },
   { label: "24 px", value: "24" },
   { label: "26 px", value: "26" },
   { label: "28 px", value: "28" },

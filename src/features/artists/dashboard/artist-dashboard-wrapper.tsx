@@ -123,7 +123,7 @@ export function ArtistDashboardTableWrapper({
               minimalView={!isSidebarCollapsed}
               tableType="bookmarks"
               pageType="dashboard"
-              defaultSort={{ id: "deadline", desc: true }}
+              defaultSort={{ id: "deadline", desc: false }}
               pageSize={50}
             />
           </div>
@@ -145,7 +145,7 @@ export function ArtistDashboardTableWrapper({
               pageType="dashboard"
               className="mx-auto w-full max-w-[80dvw] overflow-x-auto sm:max-w-[90vw]"
               outerContainerClassName={cn("lg:hidden")}
-              defaultSort={{ id: "deadline", desc: true }}
+              defaultSort={{ id: "deadline", desc: false }}
             />
           </div>
         </>

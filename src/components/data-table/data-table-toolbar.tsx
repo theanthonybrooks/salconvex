@@ -1,8 +1,5 @@
 "use client";
 
-import { eventTypeOptions } from "@/constants/eventConsts";
-import { onlineEventCategories } from "@/constants/extrasConsts";
-
 import { TableTypes } from "@/types/tanstack-table";
 
 import { useEffect, useState } from "react";
@@ -13,16 +10,7 @@ import { toast } from "react-toastify";
 import { TbFilterX } from "react-icons/tb";
 import { X } from "lucide-react";
 
-import {
-  accountTypeOptions,
-  appStatusOptions,
-  bookmarkIntents,
-  eventCategories,
-  eventStates,
-  openCallStates,
-  subscriptionOptions,
-  subscriptionStatusOptions,
-} from "@/components/data-table/data-table-constants";
+import { TABLE_FILTERS } from "@/components/data-table/data-table-constants";
 import { DataTableViewOptions } from "@/components/data-table/data-table-view-options";
 import { AlertDialogSimple } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
@@ -64,17 +52,21 @@ export function DataTableToolbar<TData>({
   const onlySearch = oneFilter && searchActive;
   const isAdmin = table.options.meta?.isAdmin;
   const tableType = table.options.meta?.tableType;
+  const filters = tableType ? (TABLE_FILTERS[tableType] ?? []) : [];
+
+  // const tableType = table.options.meta?.tableType;
   const pageType = table.options.meta?.pageType;
   const minimalView = table.options.meta?.minimalView;
   const forDashboard = pageType === "dashboard";
   const eventAndOC = tableType === "events" || tableType === "openCalls";
   const extrasTable = tableType === "extras";
-  const appsTable = tableType === "applications";
-  const artistsTable = tableType === "artists";
-  const bookmarksTable = tableType === "bookmarks";
-  const usersTable = tableType === "users";
+  // const userAddOnsTable = tableType === "userAddOns";
+  // const appsTable = tableType === "applications";
+  // const artistsTable = tableType === "artists";
+  // const bookmarksTable = tableType === "bookmarks";
+  // const usersTable = tableType === "users";
   // const organizersTable = tableType === "organizations";
-  const orgEventsTable = tableType === "orgEvents";
+  // const orgEventsTable = tableType === "orgEvents";
   const selectedRowCount = Object.keys(table.getState().rowSelection).length;
   const handleDeleteSelected = async () => {
     const selectedRows = table.getSelectedRowModel().rows;
@@ -162,219 +154,25 @@ export function DataTableToolbar<TData>({
                 Add Event
               </Button>
             </OnlineEventDialog>
-            {table.getColumn("state") && (
-              <DataTableFacetedFilter
-                isMobile={isMobile}
-                forDashboard={forDashboard}
-                column={table.getColumn("state")}
-                title="Status"
-                options={onlineEventCategories}
-                minimalView={minimalView}
-              />
-            )}
           </div>
         )}
-        {eventAndOC && (
+        {filters.length > 0 && (
           <div className="flex items-center gap-3 [@media(max-width:640px)]:w-full [@media(max-width:640px)]:flex-col">
-            {table.getColumn("state") && (
-              <DataTableFacetedFilter
-                isMobile={isMobile}
-                forDashboard={forDashboard}
-                column={table.getColumn("state")}
-                title="State"
-                options={eventStates}
-                minimalView={minimalView}
-              />
-            )}
-            {table.getColumn("openCallState") && !minimalView && (
-              <DataTableFacetedFilter
-                isMobile={isMobile}
-                forDashboard={forDashboard}
-                column={table.getColumn("openCallState")}
-                title="Open Call"
-                options={eventStates}
-                className={cn(
-                  "2xl:flex",
-                  forDashboard && "flex",
-                  !forDashboard && "not-ipad md:hidden",
-                )}
-              />
-            )}
-
-            {table.getColumn("category") && !minimalView && (
-              <DataTableFacetedFilter
-                isMobile={isMobile}
-                forDashboard={forDashboard}
-                column={table.getColumn("category")}
-                title="Category"
-                options={eventCategories}
-              />
-            )}
-          </div>
-        )}
-        {artistsTable && (
-          <div className="flex items-center gap-3 [@media(max-width:640px)]:w-full [@media(max-width:640px)]:flex-col">
-            {table.getColumn("feature") && (
-              <DataTableFacetedFilter
-                isMobile={isMobile}
-                forDashboard={forDashboard}
-                column={table.getColumn("feature")}
-                title="Feature"
-                minimalView={minimalView}
-                options={[
-                  { value: true, label: "Feature" },
-                  { value: false, label: "Don't Feature" },
-                  { value: "none", label: "Unchecked" },
-                ]}
-              />
-            )}
-            {table.getColumn("canFeature") && (
-              <DataTableFacetedFilter
-                isMobile={isMobile}
-                forDashboard={forDashboard}
-                column={table.getColumn("canFeature")}
-                title="Can Feature"
-                minimalView={minimalView}
-                options={[
-                  { value: true, label: "Can Feature" },
-                  { value: false, label: "Can't Feature" },
-                ]}
-              />
-            )}
-            {table.getColumn("instagram") && (
-              <DataTableFacetedFilter
-                isMobile={isMobile}
-                forDashboard={forDashboard}
-                column={table.getColumn("instagram")}
-                title="Insta"
-                minimalView={minimalView}
-                options={[
-                  { value: true, label: "Has Instagram" },
-                  { value: false, label: "No Instagram" },
-                ]}
-              />
-            )}
-          </div>
-        )}
-        {orgEventsTable && (
-          <div className="flex items-center gap-3 [@media(max-width:640px)]:w-full [@media(max-width:640px)]:flex-col">
-            {table.getColumn("category") && (
-              <DataTableFacetedFilter
-                isMobile={isMobile}
-                forDashboard={forDashboard}
-                column={table.getColumn("category")}
-                title="Category"
-                minimalView={minimalView}
-                options={eventCategories}
-              />
-            )}
-            {table.getColumn("type") && (
-              <DataTableFacetedFilter
-                isMobile={isMobile}
-                forDashboard={forDashboard}
-                column={table.getColumn("type")}
-                title="Event Type"
-                minimalView={minimalView}
-                options={[...eventTypeOptions]}
-              />
-            )}
-            {table.getColumn("state") && (
-              <DataTableFacetedFilter
-                isMobile={isMobile}
-                forDashboard={forDashboard}
-                column={table.getColumn("state")}
-                title="State"
-                options={eventStates}
-                minimalView={minimalView}
-              />
-            )}
-            {table.getColumn("openCallState") && (
-              <DataTableFacetedFilter
-                isMobile={isMobile}
-                forDashboard={forDashboard}
-                column={table.getColumn("openCallState")}
-                title="Open Call"
-                options={openCallStates}
-                minimalView={minimalView}
-              />
-            )}
-          </div>
-        )}
-        {usersTable && (
-          <div className="flex items-center gap-3 [@media(max-width:640px)]:w-full [@media(max-width:640px)]:flex-col">
-            {table.getColumn("subscription") && (
-              <DataTableFacetedFilter
-                isMobile={isMobile}
-                forDashboard={forDashboard}
-                column={table.getColumn("subscription")}
-                title="Subscription"
-                options={subscriptionOptions}
-                minimalView={minimalView}
-              />
-            )}
-            {table.getColumn("subStatus") && (
-              <DataTableFacetedFilter
-                isMobile={isMobile}
-                forDashboard={forDashboard}
-                column={table.getColumn("subStatus")}
-                title="Status"
-                options={subscriptionStatusOptions}
-                minimalView={minimalView}
-              />
-            )}
-            {table.getColumn("accountType") && (
-              <DataTableFacetedFilter
-                isMobile={isMobile}
-                forDashboard={forDashboard}
-                column={table.getColumn("accountType")}
-                title="Account Type"
-                options={accountTypeOptions}
-                minimalView={minimalView}
-              />
-            )}
-
-            {/* {table.getColumn("openCallState") && !minimalView && (
-              <DataTableFacetedFilter
-              isMobile={isMobile}
-              forDashboard={forDashboard}
-                column={table.getColumn("openCallState")}
-                title="Open Call"
-                options={eventStates}
-                className={cn(
-                  "2xl:flex",
-                  forDashboard && "flex",
-                  !forDashboard && "not-ipad md:hidden",
-                )}
-              />
-            )} */}
-          </div>
-        )}
-        {appsTable && (
-          <div className="flex flex-row items-center justify-between gap-3 md:flex-row [@media(max-width:768px)]:w-full">
-            {table.getColumn("applicationStatus") && (
-              <DataTableFacetedFilter
-                isMobile={isMobile}
-                forDashboard={forDashboard}
-                column={table.getColumn("applicationStatus")}
-                title="Status"
-                options={appStatusOptions}
-                minimalView={minimalView}
-              />
-            )}
-          </div>
-        )}
-        {bookmarksTable && (
-          <div className="flex flex-row items-center justify-between gap-3 md:flex-row [@media(max-width:768px)]:w-full">
-            {table.getColumn("eventIntent") && (
-              <DataTableFacetedFilter
-                isMobile={isMobile}
-                forDashboard={forDashboard}
-                column={table.getColumn("eventIntent")}
-                title="Intent"
-                options={bookmarkIntents}
-                minimalView={minimalView}
-              />
-            )}
+            {filters.map((filter) => {
+              const column = table.getColumn(filter.columnId);
+              if (!column) return null;
+              return (
+                <DataTableFacetedFilter
+                  key={filter.columnId}
+                  isMobile={isMobile}
+                  forDashboard={forDashboard}
+                  column={column}
+                  title={filter.title}
+                  options={filter.options}
+                  minimalView={minimalView}
+                />
+              );
+            })}
           </div>
         )}
 

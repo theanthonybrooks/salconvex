@@ -1,14 +1,16 @@
 "use client";
 
 import { ApplicationStatus } from "@/types/applications";
+
 import { ColumnDef } from "@tanstack/react-table";
-import { Id } from "~/convex/_generated/dataModel";
 
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 import { Link } from "@/components/ui/custom-link";
 import { AppNotesInput } from "@/features/artists/applications/components/events-data-table/app-notes-input";
 import { AppStatusSelector } from "@/features/artists/applications/components/events-data-table/app-status-selector";
 import { cn } from "@/helpers/utilsFns";
+
+import { Id } from "~/convex/_generated/dataModel";
 
 export const applicationColumnLabels: Record<string, string> = {
   name: "Event Name",
@@ -46,7 +48,8 @@ export const applicationColumns: ColumnDef<ApplicationColumnsProps>[] = [
     accessorKey: "rowNumber",
     id: "rowNumber",
     header: ({ column }) => <DataTableColumnHeader column={column} title="#" />,
-    size: 40,
+    minSize: 30,
+    maxSize: 40,
     cell: ({ row }) => {
       // console.log(row.index, totalRows, descending);
 
@@ -167,10 +170,16 @@ export const applicationColumns: ColumnDef<ApplicationColumnsProps>[] = [
       <DataTableColumnHeader column={column} title="Applied At" />
     ),
     cell: ({ row }) => {
-      const value = row.getValue("applicationTime") as number;
+      const { applicationTime: value } = row.original;
       return (
         <span className="text-sm">
-          {value ? new Date(value).toLocaleString() : "-"}
+          {new Date(value).toLocaleString(undefined, {
+            month: "numeric",
+            day: "numeric",
+            year: "2-digit",
+            hour: "numeric",
+            minute: "2-digit",
+          })}
         </span>
       );
     },
@@ -205,10 +214,18 @@ export const applicationColumns: ColumnDef<ApplicationColumnsProps>[] = [
       <DataTableColumnHeader column={column} title="Response Time" />
     ),
     cell: ({ row }) => {
-      const value = row.getValue("responseTime") as number;
+      const { responseTime: value } = row.original;
       return (
         <span className="block text-center text-sm">
-          {value ? new Date(value).toLocaleString() : "-"}
+          {value
+            ? new Date(value).toLocaleString(undefined, {
+                month: "numeric",
+                day: "numeric",
+                year: "2-digit",
+                hour: "numeric",
+                minute: "2-digit",
+              })
+            : "-"}
         </span>
       );
     },

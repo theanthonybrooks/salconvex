@@ -141,6 +141,7 @@ export const FOOTER_LINKS: FooterSection[] = [
       // { name: "Documentation", href: "/docs" },
       // { name: "Examples", href: "/examples" },
       { name: "Pricing", href: "/pricing" },
+      { name: "Extras", href: "/extras/portfolio-reviews" },
     ],
   },
 
@@ -363,7 +364,7 @@ export const dashboardNavItems: DashNavItem[] = [
   },
   {
     label: "Extras",
-    href: "/dashboard/admin/extras?state=published,draft",
+    href: "/dashboard/admin/extras",
     icon: Gift,
     subsection: true,
     sectionCat: "admin",

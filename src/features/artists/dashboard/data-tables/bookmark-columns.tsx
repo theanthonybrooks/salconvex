@@ -1,8 +1,6 @@
 "use client";
 
-import { ApplicationStatus } from "@/types/applications";
 import { ColumnDef } from "@tanstack/react-table";
-import { Id } from "~/convex/_generated/dataModel";
 import { formatInTimeZone } from "date-fns-tz";
 
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
@@ -13,6 +11,8 @@ import {
   BookmarkNotesInput,
 } from "@/features/artists/dashboard/data-tables/bookmark-list-actions";
 import { cn } from "@/helpers/utilsFns";
+
+import { Id } from "~/convex/_generated/dataModel";
 
 export const bookmarkColumnLabels: Record<string, string> = {
   name: "Event Name",
@@ -117,8 +117,7 @@ export const bookmarkColumns: ColumnDef<BookmarkColumnsProps>[] = [
       <DataTableColumnHeader column={column} title="Deadline" />
     ),
     cell: ({ row }) => {
-      const value = row.getValue("deadline") as string;
-      const timeZone = row.original.timeZone;
+      const { deadline: value, timeZone } = row.original;
       const now = new Date();
       const deadlineDate = new Date(value);
       const isValid = !isNaN(deadlineDate.getTime());
@@ -126,7 +125,7 @@ export const bookmarkColumns: ColumnDef<BookmarkColumnsProps>[] = [
       if (!isValid) {
         return (
           <span className="block text-center text-sm text-foreground/50">
-            {/* Invalid value: {value} */}-
+            -
           </span>
         );
       }
@@ -149,6 +148,39 @@ export const bookmarkColumns: ColumnDef<BookmarkColumnsProps>[] = [
         </span>
       );
     },
+    sortingFn: (rowA, rowB, columnId) => {
+      const now = new Date().getTime();
+
+      const aVal = rowA.getValue(columnId) as string | undefined;
+      const bVal = rowB.getValue(columnId) as string | undefined;
+
+      const aTime = aVal ? new Date(aVal).getTime() : NaN;
+      const bTime = bVal ? new Date(bVal).getTime() : NaN;
+
+      const aValid = !isNaN(aTime);
+      const bValid = !isNaN(bTime);
+
+      // helper to categorize: upcoming (0), none (1), past (2)
+      const cat = (time: number, valid: boolean) => {
+        if (!valid) return 1;
+        if (time >= now) return 0;
+        return 2;
+      };
+
+      const aCat = cat(aTime, aValid);
+      const bCat = cat(bTime, bValid);
+
+      // first by category (upcoming → none → past)
+      if (aCat !== bCat) return aCat - bCat;
+
+      // within category, order by soonest/upcoming ascending,
+      // but for past ones, most recent first (descending)
+      if (aCat === 0) return aTime - bTime; // upcoming soonest first
+      if (aCat === 2) return bTime - aTime; // past most recent first
+
+      return 0;
+    },
+    enableMultiSort: true,
   },
   {
     accessorKey: "eventStart",
@@ -215,8 +247,7 @@ export const bookmarkColumns: ColumnDef<BookmarkColumnsProps>[] = [
       <DataTableColumnHeader column={column} title="Status" />
     ),
     cell: ({ row }) => {
-      const value = row.getValue("bookmarkStatus") as boolean;
-      // return <span className="text-sm">{value ? "Yes" : "No"}</span>;
+      const { bookmarkStatus: value } = row.original;
       return (
         <ListActionSelector
           key={row.original._id}
@@ -234,16 +265,18 @@ export const bookmarkColumns: ColumnDef<BookmarkColumnsProps>[] = [
     filterFn: (row, columnId, filterValue) => {
       if (!Array.isArray(filterValue)) return true;
       const value = row.getValue(columnId);
+      if (!value && filterValue.includes("-")) return true;
       return filterValue.includes(value);
     },
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Intent" />
     ),
     cell: ({ row }) => {
-      const value = row.getValue("eventIntent") as string;
-      const appStatus = row.original.applicationStatus as ApplicationStatus;
-      const isPast = row.original.isPast as boolean;
-
+      const {
+        eventIntent: value,
+        applicationStatus: appStatus,
+        isPast,
+      } = row.original;
       return (
         <BookmarkListActionSelector
           key={row.original._id}
@@ -254,6 +287,8 @@ export const bookmarkColumns: ColumnDef<BookmarkColumnsProps>[] = [
         />
       );
     },
+    enableMultiSort: true,
+    sortUndefined: "last",
   },
   {
     accessorKey: "bookmarkNote",
@@ -264,12 +299,12 @@ export const bookmarkColumns: ColumnDef<BookmarkColumnsProps>[] = [
       <DataTableColumnHeader column={column} title="Notes" />
     ),
     cell: ({ row }) => {
-      const bookmark = row.original;
+      const { _id: bookmark } = row.original;
       // return <span className="text-sm">{value ? "Yes" : "No"}</span>;
       return (
         <BookmarkNotesInput
           notes={row.getValue("bookmarkNote")}
-          bookmark={bookmark._id}
+          bookmark={bookmark}
         />
       );
     },

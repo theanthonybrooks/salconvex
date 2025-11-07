@@ -1,8 +1,8 @@
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
+
 import { api } from "~/convex/_generated/api";
 import { Id } from "~/convex/_generated/dataModel";
 import { useMutation } from "convex/react";
-
-import { RichTextEditor } from "@/components/ui/rich-text-editor";
 
 interface AppNotesInputProps {
   notes: string;
@@ -26,7 +26,7 @@ export const AppNotesInput = ({ notes, application }: AppNotesInputProps) => {
       onChange={handleChange}
       inputPreview
       // placeholder="(optional)"
-      formInputPreviewClassName="line-clamp-1 min-h-5 max-h-20"
+      formInputPreviewClassName="line-clamp-1 min-h-5 max-h-10"
     />
   );
 };

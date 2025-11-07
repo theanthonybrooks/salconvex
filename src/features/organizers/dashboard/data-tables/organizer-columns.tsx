@@ -142,7 +142,7 @@ export const orgColumns: ColumnDef<OrgEventData>[] = [
       // const isAdmin = table.options.meta?.isAdmin;
       return (
         <div className="flex space-x-2">
-          <span className="max-w-[20ch] truncate pl-1 font-medium capitalize sm:max-w-[500px] sm:pl-0">
+          <span className="max-w-[20ch] truncate pl-1 capitalize sm:max-w-[500px] sm:pl-0">
             <OrgEventActions event={row.original} field="orgName" />
           </span>
         </div>
@@ -164,7 +164,7 @@ export const orgColumns: ColumnDef<OrgEventData>[] = [
       // const isAdmin = table.options.meta?.isAdmin;
       return (
         <div className="flex space-x-2">
-          <span className="max-w-[20ch] truncate pl-1 font-medium capitalize sm:max-w-[500px] sm:pl-0">
+          <span className="max-w-[20ch] truncate pl-1 capitalize sm:max-w-[500px] sm:pl-0">
             <OrgEventActions event={row.original} field="eventName" />
           </span>
         </div>
@@ -186,7 +186,7 @@ export const orgColumns: ColumnDef<OrgEventData>[] = [
 
       return (
         <div className="flex justify-center space-x-2">
-          <span className="max-w-[60px] truncate font-medium">
+          <span className="max-w-[60px] truncate">
             {row.getValue("dates_edition")}
           </span>
         </div>
@@ -204,7 +204,7 @@ export const orgColumns: ColumnDef<OrgEventData>[] = [
   //     cell: ({ row }) => {
   //       return (
   //         <div className="flex space-x-2">
-  //           <span className="max-w-[500px] truncate font-medium">
+  //           <span className="max-w-[500px] truncate">
   //             {row.getValue("eventType")}
   //           </span>
   //         </div>
@@ -274,29 +274,6 @@ export const orgColumns: ColumnDef<OrgEventData>[] = [
   },
 
   {
-    accessorKey: "lastEditedAt",
-    id: "lastEditedAt",
-    size: 180,
-    minSize: 180,
-    maxSize: 180,
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Last Edited" />
-    ),
-    cell: ({ getValue }) => {
-      const value = getValue() as string;
-      return (
-        <div className="flex justify-center space-x-2">
-          <span className="max-w-[175px] truncate font-medium capitalize">
-            {!isNaN(new Date(value).getTime())
-              ? new Date(value).toLocaleString()
-              : "-"}
-          </span>
-        </div>
-      );
-    },
-    enableMultiSort: true,
-  },
-  {
     accessorKey: "category",
     id: "category",
     size: 80,
@@ -308,7 +285,7 @@ export const orgColumns: ColumnDef<OrgEventData>[] = [
     cell: ({ row }) => {
       return (
         <div className="flex justify-center space-x-2">
-          <span className="min-w-20 max-w-[500px] truncate text-center font-medium capitalize">
+          <span className="min-w-20 max-w-[500px] truncate text-center capitalize">
             {getEventCategoryLabel(row.getValue("category"), true)}
           </span>
         </div>
@@ -347,9 +324,38 @@ export const orgColumns: ColumnDef<OrgEventData>[] = [
 
       return (
         <div className="flex justify-center space-x-2">
-          <span className="min-w-20 max-w-[500px] truncate font-medium capitalize">
+          <span className="min-w-20 max-w-[500px] truncate capitalize">
             {Array.isArray(types) && types.length > 0
               ? types.map((type) => getEventTypeLabel(type)).join(", ")
+              : "-"}
+          </span>
+        </div>
+      );
+    },
+    enableMultiSort: true,
+  },
+  {
+    accessorKey: "lastEditedAt",
+    id: "lastEditedAt",
+
+    minSize: 180,
+    maxSize: 180,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Last Edited" />
+    ),
+    cell: ({ row }) => {
+      const { lastEditedAt: value } = row.original;
+      return (
+        <div className="flex justify-center space-x-2">
+          <span className="max-w-[175px] truncate capitalize">
+            {value
+              ? new Date(value).toLocaleString(undefined, {
+                  month: "numeric",
+                  day: "numeric",
+                  year: "2-digit",
+                  hour: "numeric",
+                  minute: "2-digit",
+                })
               : "-"}
           </span>
         </div>

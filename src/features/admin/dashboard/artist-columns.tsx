@@ -2,7 +2,7 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { Id } from "~/convex/_generated/dataModel";
+
 import { LucideClipboardCopy, MoreHorizontal } from "lucide-react";
 
 import { ArtistFeatureSelect } from "@/components/data-table/actions/data-table-admin-artist-actions";
@@ -23,6 +23,8 @@ import { TooltipSimple } from "@/components/ui/tooltip";
 import { ConvexDashboardLink } from "@/features/events/ui/convex-dashboard-link";
 import { cn } from "@/helpers/utilsFns";
 
+import { Id } from "~/convex/_generated/dataModel";
+
 export const artistColumnLabels: Record<string, string> = {
   name: "Name",
   nationality: "Nationality",
@@ -42,7 +44,7 @@ export interface ArtistColumnProps {
   instagram: string;
   website: string;
   canFeature: boolean;
-  feature: boolean | "none";
+  feature: boolean | string;
   notes: string;
   createdAt: number;
 }
@@ -115,7 +117,7 @@ export const artistColumns: ColumnDef<ArtistColumnProps>[] = [
   {
     accessorKey: "instagram",
     id: "instagram",
-    minSize: 120,
+    minSize: 90,
     maxSize: 200,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Instagram" />
@@ -152,7 +154,7 @@ export const artistColumns: ColumnDef<ArtistColumnProps>[] = [
   {
     accessorKey: "website",
     id: "website",
-    minSize: 120,
+    minSize: 90,
     maxSize: 200,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Website" />
@@ -182,10 +184,10 @@ export const artistColumns: ColumnDef<ArtistColumnProps>[] = [
   {
     accessorKey: "canFeature",
     id: "canFeature",
-    minSize: 80,
-    maxSize: 80,
+    minSize: 60,
+    maxSize: 60,
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Can Feature" />
+      <DataTableColumnHeader column={column} title="Can?" />
     ),
     cell: ({ row }) => {
       const { canFeature } = row.original;
@@ -243,7 +245,7 @@ export const artistColumns: ColumnDef<ArtistColumnProps>[] = [
     accessorKey: "createdAt",
     id: "createdAt",
     minSize: 120,
-    maxSize: 180,
+    maxSize: 220,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Created" />
     ),
@@ -251,7 +253,15 @@ export const artistColumns: ColumnDef<ArtistColumnProps>[] = [
       const { createdAt: value } = row.original;
       return (
         <span className="text-sm">
-          {value ? new Date(value).toLocaleString() : "-"}
+          {value
+            ? new Date(value).toLocaleString(undefined, {
+                month: "numeric",
+                day: "numeric",
+                year: "2-digit",
+                hour: "numeric",
+                minute: "2-digit",
+              })
+            : "-"}
         </span>
       );
     },

@@ -1,14 +1,19 @@
 "use client";
 
+import {
+  NewsletterFrequency,
+  NewsletterType,
+} from "@/constants/newsletterConsts";
+
 import { ColumnDef } from "@tanstack/react-table";
-import { Id } from "~/convex/_generated/dataModel";
+
+import { FaEnvelope } from "react-icons/fa6";
 import {
   CheckCircle2,
   LucideClipboardCopy,
   MoreHorizontal,
   X,
 } from "lucide-react";
-import { FaEnvelope } from "react-icons/fa6";
 
 import { DeleteNewsletterSubscription } from "@/components/data-table/actions/data-table-admin-user-actions";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
@@ -24,10 +29,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/helpers/utilsFns";
-import {
-  NewsletterFrequency,
-  NewsletterType,
-} from "@/constants/newsletterConsts";
+
+import { Id } from "~/convex/_generated/dataModel";
 
 export const newsletterColumnLabels: Record<string, string> = {
   name: "Name",
@@ -100,6 +103,7 @@ export const newsletterColumns: ColumnDef<NewsletterColumnsProps>[] = [
   },
   {
     accessorKey: "active",
+    id: "active",
     minSize: 60,
     maxSize: 90,
     header: ({ column }) => (
@@ -116,6 +120,11 @@ export const newsletterColumns: ColumnDef<NewsletterColumnsProps>[] = [
           )}
         </div>
       );
+    },
+    filterFn: (row, columnId, filterValue) => {
+      if (!Array.isArray(filterValue)) return true;
+      const value = row.getValue(columnId);
+      return filterValue.includes(String(value));
     },
   },
   {
@@ -155,8 +164,8 @@ export const newsletterColumns: ColumnDef<NewsletterColumnsProps>[] = [
   },
   {
     accessorKey: "userPlan",
-    minSize: 80,
-    maxSize: 120,
+    minSize: 60,
+    maxSize: 80,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Plan" />
     ),
@@ -173,7 +182,7 @@ export const newsletterColumns: ColumnDef<NewsletterColumnsProps>[] = [
             !plan && "italic text-muted-foreground",
           )}
         >
-          <p className="capitalize"> {plan || "none"}</p>
+          <p className="text-center capitalize"> {plan || "none"}</p>
         </div>
       );
     },
@@ -194,7 +203,15 @@ export const newsletterColumns: ColumnDef<NewsletterColumnsProps>[] = [
       const value = row.getValue("createdAt") as number | undefined;
       return (
         <span className="text-sm">
-          {value ? new Date(value).toLocaleString() : "-"}
+          {value
+            ? new Date(value).toLocaleString(undefined, {
+                month: "numeric",
+                day: "numeric",
+                year: "2-digit",
+                hour: "numeric",
+                minute: "2-digit",
+              })
+            : "-"}
         </span>
       );
     },

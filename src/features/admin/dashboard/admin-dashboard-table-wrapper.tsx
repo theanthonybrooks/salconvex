@@ -8,10 +8,7 @@ import { useDashboard } from "@/app/(pages)/dashboard/_components/dashboard-cont
 import type { Id } from "~/convex/_generated/dataModel";
 import { DataTable } from "@/components/data-table/data-table";
 import { useAdminPreload } from "@/features/admin/admin-preload-context";
-import {
-  ArtistColumnProps,
-  artistColumns,
-} from "@/features/admin/dashboard/artist-columns";
+import { artistColumns } from "@/features/admin/dashboard/artist-columns";
 import { extraColumns } from "@/features/admin/dashboard/extras-column";
 import { newsletterColumns } from "@/features/admin/dashboard/newsletter-columns";
 import { userColumns } from "@/features/admin/dashboard/user-columns";
@@ -153,6 +150,7 @@ export function AdminDashboardTableWrapper({
                 img: false,
               }}
               onRowSelect={(row) => setSelectedRow(row?._id ?? null)}
+              defaultFilters={[{ id: `state`, value: ["published", "draft"] }]}
               adminActions={adminActions}
               tableType="extras"
               pageType="dashboard"
@@ -163,10 +161,12 @@ export function AdminDashboardTableWrapper({
               <DataTable
                 columns={userAddOnColumns}
                 data={eventRegistrations ?? []}
-                // defaultVisibility={{
-
-                // }}
-
+                defaultVisibility={{
+                  paid: false,
+                  canceled: false,
+                }}
+                defaultFilters={[{ id: `canceled`, value: ["false"] }]}
+                defaultSort={{ id: `createdAt`, desc: true }}
                 adminActions={adminActions}
                 tableType="userAddOns"
                 pageType="dashboard"
@@ -187,6 +187,7 @@ export function AdminDashboardTableWrapper({
                 createdAt: false,
                 img: false,
               }}
+              defaultFilters={[{ id: `state`, value: ["published", "draft"] }]}
               onRowSelect={(row) => console.log(row?._id)}
               defaultSort={{ id: `startDate`, desc: true }}
               adminActions={adminActions}
@@ -195,7 +196,23 @@ export function AdminDashboardTableWrapper({
               className="mx-auto w-full max-w-[80dvw] overflow-x-auto sm:max-w-[90vw]"
               outerContainerClassName={cn("lg:hidden")}
             />
-            <p className={cn("h-screen")}>{selectedRow}</p>
+            {eventRegistrations && (
+              <DataTable
+                columns={userAddOnColumns}
+                data={eventRegistrations ?? []}
+                defaultVisibility={{
+                  paid: false,
+                  canceled: false,
+                  createdAt: false,
+                }}
+                defaultFilters={[{ id: `canceled`, value: ["false"] }]}
+                defaultSort={{ id: `createdAt`, desc: true }}
+                adminActions={adminActions}
+                tableType="userAddOns"
+                pageType="dashboard"
+                pageSize={10}
+              />
+            )}
           </div>
         </>
       )}
@@ -214,6 +231,7 @@ export function AdminDashboardTableWrapper({
                   // role: false,
                 }
               }
+              defaultFilters={[{ id: `active`, value: ["true"] }]}
               adminActions={adminActions}
               tableType="newsletter"
               pageType="dashboard"
@@ -234,6 +252,7 @@ export function AdminDashboardTableWrapper({
                   // dates_edition: false,
                 }
               }
+              defaultFilters={[{ id: `active`, value: ["true"] }]}
               defaultSort={{ id: `createdAt`, desc: true }}
               adminActions={adminActions}
               tableType="newsletter"
@@ -316,7 +335,7 @@ export function AdminDashboardTableWrapper({
             <h3 className="mb-3 text-xl">Artists</h3>
             <DataTable
               columns={artistColumns}
-              data={(artistsData ?? []) as ArtistColumnProps[]}
+              data={artistsData ?? []}
               defaultFilters={[
                 {
                   id: `canFeature`,
@@ -342,7 +361,7 @@ export function AdminDashboardTableWrapper({
           <div className="flex flex-col items-center justify-center gap-4 py-7 lg:hidden">
             <DataTable
               columns={artistColumns}
-              data={(artistsData ?? []) as ArtistColumnProps[]}
+              data={artistsData ?? []}
               defaultFilters={[
                 {
                   id: `canFeature`,

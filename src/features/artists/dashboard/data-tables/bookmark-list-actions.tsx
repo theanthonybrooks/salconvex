@@ -1,21 +1,15 @@
-import { useState } from "react";
 import {
   ApplicationStatus,
   positiveApplicationStatuses,
 } from "@/types/applications";
+
+import { bookmarkIntents } from "@/components/data-table/data-table-constants";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
+import { SelectSimple } from "@/components/ui/select";
+
 import { api } from "~/convex/_generated/api";
 import { Id } from "~/convex/_generated/dataModel";
 import { useMutation } from "convex/react";
-
-import { RichTextEditor } from "@/components/ui/rich-text-editor";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { cn } from "@/helpers/utilsFns";
 
 interface BookmarkListActionSelectorProps {
   eventId: Id<"events">;
@@ -26,12 +20,10 @@ interface BookmarkListActionSelectorProps {
 
 export const BookmarkListActionSelector = ({
   eventId,
-  initialValue,
+  initialValue: value,
   appStatus,
   isPast,
 }: BookmarkListActionSelectorProps) => {
-  const [value, setValue] = useState(initialValue);
-
   const updateListAction = useMutation(api.artists.listActions.updateBookmark);
   const disabledValue =
     (typeof appStatus === "string" &&
@@ -45,41 +37,30 @@ export const BookmarkListActionSelector = ({
     });
   };
 
-  return (
-    <Select
-      disabled={disabledValue}
-      value={value}
-      onValueChange={(newValue) => {
-        setValue(newValue);
-        handleChange(newValue);
-      }}
-    >
-      <SelectTrigger
-        className={cn("mx-auto w-fit min-w-40 font-medium capitalize")}
-      >
-        <SelectValue placeholder={"Select..."} />
-      </SelectTrigger>
-      <SelectContent>
-        {!["planned", "missed", "nextYear", "contact", "-"].includes(
-          initialValue ?? "",
-        ) &&
-          initialValue && (
-            <SelectItem
-              value={initialValue}
-              className="capitalize text-foreground/30"
-              disabled
-            >
-              {initialValue}
-            </SelectItem>
-          )}
+  const options = [
+    ...bookmarkIntents.filter(
+      (opt) => opt.value !== "-" && !(isPast && opt.value === "planned"),
+    ),
+    ...(value && !bookmarkIntents.some((opt) => opt.value === value)
+      ? [
+          {
+            value,
+            label: value,
+            disabled: true,
+          },
+        ]
+      : []),
+  ];
 
-        {!isPast && <SelectItem value="planned">Planned</SelectItem>}
-        <SelectItem value="nextYear">Next Year</SelectItem>
-        <SelectItem value="contact">Contact</SelectItem>
-        <SelectItem value="missed">Missed</SelectItem>
-        <SelectItem value="-">-</SelectItem>
-      </SelectContent>
-    </Select>
+  return (
+    <SelectSimple
+      hasReset
+      placeholder="Select..."
+      disabled={disabledValue}
+      value={value ?? ""}
+      onChangeAction={handleChange}
+      options={options}
+    />
   );
 };
 

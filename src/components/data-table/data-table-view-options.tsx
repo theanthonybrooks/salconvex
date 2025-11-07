@@ -2,6 +2,7 @@
 
 import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
 import { Table } from "@tanstack/react-table";
+
 import { Settings2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -12,8 +13,10 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import { extrasColumnLabels } from "@/features/admin/dashboard/extras-column";
 import { newsletterColumnLabels } from "@/features/admin/dashboard/newsletter-columns";
 import { userColumnLabels } from "@/features/admin/dashboard/user-columns";
+import { userAddOnColumnLabels } from "@/features/admin/dashboard/userAddon-columns";
 import { applicationColumnLabels } from "@/features/artists/applications/components/events-data-table/application-columns";
 import { bookmarkColumnLabels } from "@/features/artists/dashboard/data-tables/bookmark-columns";
 import { hiddenColumnLabels } from "@/features/artists/dashboard/data-tables/hidden-columns";
@@ -24,17 +27,25 @@ interface DataTableViewOptionsProps<TData> {
   table: Table<TData>;
 }
 
+const labelMaps: Record<string, Record<string, string>> = {
+  bookmarks: bookmarkColumnLabels,
+  applications: applicationColumnLabels,
+  hidden: hiddenColumnLabels,
+  events: columnLabels,
+  orgEvents: orgEventColumnLabels,
+  users: userColumnLabels,
+  newsletter: newsletterColumnLabels,
+  userAddOns: userAddOnColumnLabels,
+  extras: extrasColumnLabels,
+};
+
 export function DataTableViewOptions<TData>({
   table,
 }: DataTableViewOptionsProps<TData>) {
-  const tableType = table.options.meta?.tableType;
-  const bookMarks = tableType === "bookmarks";
-  const applications = tableType === "applications";
-  const hidden = tableType === "hidden";
-  const events = tableType === "events";
-  const orgEvents = tableType === "orgEvents";
-  const usersTable = tableType === "users";
-  const newsletterTable = tableType === "newsletter";
+  const tableType = table.options.meta?.tableType as
+    | keyof typeof labelMaps
+    | undefined;
+  const labels = tableType ? labelMaps[tableType] : undefined;
 
   return (
     <DropdownMenu>
@@ -58,33 +69,16 @@ export function DataTableViewOptions<TData>({
               (column) =>
                 typeof column.accessorFn !== "undefined" && column.getCanHide(),
             )
-            .map((column) => {
-              const label = events
-                ? columnLabels[column.id]
-                : bookMarks
-                  ? bookmarkColumnLabels[column.id]
-                  : orgEvents
-                    ? orgEventColumnLabels[column.id]
-                    : applications
-                      ? applicationColumnLabels[column.id]
-                      : usersTable
-                        ? userColumnLabels[column.id]
-                        : hidden
-                          ? hiddenColumnLabels[column.id]
-                          : newsletterTable
-                            ? newsletterColumnLabels[column.id]
-                            : column.id;
-              return (
-                <DropdownMenuCheckboxItem
-                  key={column.id}
-                  className="capitalize"
-                  checked={column.getIsVisible()}
-                  onCheckedChange={(value) => column.toggleVisibility(!!value)}
-                >
-                  {label}
-                </DropdownMenuCheckboxItem>
-              );
-            })}
+            .map((column) => (
+              <DropdownMenuCheckboxItem
+                key={column.id}
+                className="capitalize"
+                checked={column.getIsVisible()}
+                onCheckedChange={(value) => column.toggleVisibility(!!value)}
+              >
+                {labels?.[column.id] ?? column.id}
+              </DropdownMenuCheckboxItem>
+            ))}
         </div>
       </DropdownMenuContent>
     </DropdownMenu>

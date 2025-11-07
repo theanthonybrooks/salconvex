@@ -1,6 +1,11 @@
 "use client";
 
-import { EventStateType } from "~/convex/schema";
+import { eventTypeOptions } from "@/constants/eventConsts";
+import { onlineEventCategories } from "@/constants/extrasConsts";
+
+import type { DataTableFacetedFilterOption } from "@/components/data-table/data-table-faceted-filter";
+
+import { FaMoneyBill } from "react-icons/fa6";
 import {
   ArrowDown,
   ArrowRight,
@@ -10,6 +15,7 @@ import {
   CalendarHeart,
   CheckCircle,
   CircleCheck,
+  CircleX,
   Clock,
   DollarSign,
   House,
@@ -32,7 +38,8 @@ import {
   Users,
   X,
 } from "lucide-react";
-import { FaMoneyBill } from "react-icons/fa6";
+
+import { EventStateType } from "~/convex/schema";
 
 // interface DataTableRowActionsProps<TData> {
 //   row: Row<TData>;
@@ -77,7 +84,7 @@ export const bookmarkIntents = [
   {
     value: "rejected",
     label: "Rejected",
-    icon: Banana,
+    icon: CircleX,
   },
   {
     value: "applied",
@@ -88,6 +95,7 @@ export const bookmarkIntents = [
     value: "-",
     label: "None",
     icon: X,
+    disabled: true,
   },
 ];
 
@@ -319,3 +327,112 @@ export const accountTypeOptions = [
   { value: "organizer", label: "Organizer", icon: User2 },
   { value: "both", label: "Both", icon: Users },
 ];
+
+interface FilterConfig {
+  columnId: string;
+  title: string;
+  options: DataTableFacetedFilterOption[];
+  showWhenMinimal?: boolean; // optional flag
+}
+
+type TableFilterConfig = Record<string, FilterConfig[]>;
+
+export const TABLE_FILTERS: TableFilterConfig = {
+  extras: [
+    { columnId: "state", title: "Status", options: onlineEventCategories },
+  ],
+  userAddOns: [
+    {
+      columnId: "canceled",
+      title: "Status",
+      options: [
+        { value: "true", label: "Canceled" },
+        { value: "false", label: "Active" },
+      ],
+    },
+  ],
+  newsletter: [
+    {
+      columnId: "active",
+      title: "Active",
+      options: [
+        { value: true, label: "Active" },
+        { value: false, label: "Inactive" },
+      ],
+    },
+  ],
+  events: [
+    { columnId: "state", title: "State", options: eventStates },
+    { columnId: "openCallState", title: "Open Call", options: eventStates },
+    { columnId: "category", title: "Category", options: eventCategories },
+  ],
+  openCalls: [
+    { columnId: "state", title: "State", options: eventStates },
+    { columnId: "openCallState", title: "Open Call", options: eventStates },
+    { columnId: "category", title: "Category", options: eventCategories },
+  ],
+  orgEvents: [
+    { columnId: "category", title: "Category", options: eventCategories },
+    { columnId: "type", title: "Event Type", options: [...eventTypeOptions] },
+    { columnId: "state", title: "State", options: eventStates },
+    { columnId: "openCallState", title: "Open Call", options: openCallStates },
+  ],
+  artists: [
+    {
+      columnId: "feature",
+      title: "Feature",
+      options: [
+        { value: true, label: "Feature" },
+        { value: false, label: "Don't Feature" },
+        { value: "none", label: "Unchecked" },
+      ],
+    },
+    {
+      columnId: "canFeature",
+      title: "Can Feature",
+      options: [
+        { value: true, label: "Can Feature" },
+        { value: false, label: "Can't Feature" },
+      ],
+    },
+    {
+      columnId: "instagram",
+      title: "Insta",
+      options: [
+        { value: true, label: "Has Instagram" },
+        { value: false, label: "No Instagram" },
+      ],
+    },
+  ],
+  users: [
+    {
+      columnId: "subscription",
+      title: "Subscription",
+      options: subscriptionOptions,
+    },
+    {
+      columnId: "subStatus",
+      title: "Status",
+      options: subscriptionStatusOptions,
+    },
+    {
+      columnId: "accountType",
+      title: "Account Type",
+      options: accountTypeOptions,
+    },
+  ],
+  applications: [
+    {
+      columnId: "applicationStatus",
+      title: "Status",
+      options: appStatusOptions,
+    },
+  ],
+  bookmarks: [
+    {
+      columnId: "eventIntent",
+      title: "Intent",
+      options: bookmarkIntents,
+    },
+  ],
+};

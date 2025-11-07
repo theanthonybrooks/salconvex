@@ -8,7 +8,7 @@ import { TooltipSimple } from "@/components/ui/tooltip";
 
 import { Id } from "~/convex/_generated/dataModel";
 
-export const newsletterColumnLabels: Record<string, string> = {
+export const userAddOnColumnLabels: Record<string, string> = {
   name: "Name",
   email: "Email",
   link: "Link",
@@ -17,29 +17,6 @@ export const newsletterColumnLabels: Record<string, string> = {
   canceled: "Canceled",
   createdAt: "Created",
 };
-
-// const getAllOnlineEvents: RegisteredQuery<"public", EmptyObject, Promise<{
-//  [x]   _id: Id<"onlineEvents">;
-//  [x]   _creationTime: number;
-//  [x]   updatedAt?: number | undefined;
-//  [x]   location?: string | undefined;
-//  [x]   img?: string | undefined;
-//  []   updatedBy?: Id<"users"> | undefined;
-//  [x]   name: string;
-//  [x]   organizer: Id<"users">;
-//  []   slug: string;
-//  [x]   requirements: string[];
-//  [x]   description: string;
-//  [x]   regDeadline: number;
-//  [x]   startDate: number;
-//  [x]   endDate: number;
-//  [x]   price: number;
-//  [x]   capacity: {
-//  [x]       max: number;
-//  [x]       current: number;
-//  []   };
-//  [x]   terms: string[];
-// }[]>>
 
 interface UserAddOnColumnsProps {
   _id: Id<"userAddOns">;
@@ -58,7 +35,8 @@ export const userAddOnColumns: ColumnDef<UserAddOnColumnsProps>[] = [
     accessorKey: "rowNumber",
     id: "rowNumber",
     header: ({ column }) => <DataTableColumnHeader column={column} title="#" />,
-    size: 40,
+    size: 30,
+
     cell: ({ row }) => {
       return (
         <div
@@ -81,7 +59,7 @@ export const userAddOnColumns: ColumnDef<UserAddOnColumnsProps>[] = [
   {
     accessorKey: "name",
     minSize: 120,
-    maxSize: 400,
+    maxSize: 150,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Name" />
     ),
@@ -92,8 +70,7 @@ export const userAddOnColumns: ColumnDef<UserAddOnColumnsProps>[] = [
   },
   {
     accessorKey: "email",
-    minSize: 150,
-    maxSize: 150,
+    size: 120,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Email" />
     ),
@@ -113,8 +90,7 @@ export const userAddOnColumns: ColumnDef<UserAddOnColumnsProps>[] = [
   },
   {
     accessorKey: "link",
-    minSize: 150,
-    maxSize: 400,
+    size: 100,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Link" />
     ),
@@ -134,7 +110,7 @@ export const userAddOnColumns: ColumnDef<UserAddOnColumnsProps>[] = [
 
   {
     accessorKey: "notes",
-    minSize: 150,
+    minSize: 220,
     maxSize: 400,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Notes" />
@@ -176,6 +152,7 @@ export const userAddOnColumns: ColumnDef<UserAddOnColumnsProps>[] = [
   },
   {
     accessorKey: "canceled",
+    id: "canceled",
     minSize: 50,
     maxSize: 60,
     header: ({ column }) => (
@@ -189,11 +166,16 @@ export const userAddOnColumns: ColumnDef<UserAddOnColumnsProps>[] = [
         </div>
       );
     },
+    filterFn: (row, columnId, filterValue) => {
+      if (!Array.isArray(filterValue)) return true;
+      const value = row.getValue(columnId);
+      return filterValue.includes(String(value));
+    },
   },
   {
     accessorKey: "plan",
-    minSize: 50,
-    maxSize: 60,
+    minSize: 40,
+    maxSize: 40,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Plan" />
     ),
@@ -209,7 +191,8 @@ export const userAddOnColumns: ColumnDef<UserAddOnColumnsProps>[] = [
 
   {
     accessorKey: "createdAt",
-    minSize: 120,
+    id: "createdAt",
+    minSize: 90,
     maxSize: 180,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Created" />
@@ -218,7 +201,15 @@ export const userAddOnColumns: ColumnDef<UserAddOnColumnsProps>[] = [
       const { _creationTime: value } = row.original;
       return (
         <span className="text-sm">
-          {value ? new Date(value).toLocaleString() : "-"}
+          {value
+            ? new Date(value).toLocaleString(undefined, {
+                month: "numeric",
+                day: "numeric",
+                year: "2-digit",
+                hour: "numeric",
+                minute: "2-digit",
+              })
+            : "-"}
         </span>
       );
     },

@@ -1,5 +1,6 @@
 import * as React from "react";
 import { Column } from "@tanstack/react-table";
+
 import { FaCheck } from "react-icons/fa";
 import { TbFilterPlus } from "react-icons/tb";
 
@@ -22,6 +23,14 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/helpers/utilsFns";
 
+export type DataTableFacetedFilterOption = {
+  label: string;
+  value: string | boolean;
+  icon?: React.ComponentType<{ className?: string }>;
+  abbr?: string;
+  disabled?: boolean;
+};
+
 interface DataTableFacetedFilterProps<TData, TValue> {
   className?: string;
   column?: Column<TData, TValue>;
@@ -29,12 +38,7 @@ interface DataTableFacetedFilterProps<TData, TValue> {
   isMobile?: boolean;
   minimalView?: boolean;
   title?: string;
-  options: {
-    label: string;
-    value: string | boolean;
-    icon?: React.ComponentType<{ className?: string }>;
-    abbr?: string;
-  }[];
+  options: DataTableFacetedFilterOption[];
 }
 
 export function DataTableFacetedFilter<TData, TValue>({
@@ -125,6 +129,7 @@ export function DataTableFacetedFilter<TData, TValue>({
                 const isSelected = selectedValues.has(optionKey);
                 return (
                   <CommandItem
+                    disabled={option.disabled}
                     key={optionKey}
                     onSelect={() => {
                       if (isSelected) {

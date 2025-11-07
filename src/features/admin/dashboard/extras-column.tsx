@@ -18,7 +18,7 @@ import { cn } from "@/helpers/utilsFns";
 
 import { Id } from "~/convex/_generated/dataModel";
 
-export const newsletterColumnLabels: Record<string, string> = {
+export const extrasColumnLabels: Record<string, string> = {
   name: "Name",
   state: "Status",
   img: "Image",
@@ -147,7 +147,7 @@ export const extraColumns: ColumnDef<ExtraColumnsProps>[] = [
       return (
         <div className="truncate text-center text-sm capitalize">
           {new Date(startDate).toLocaleString("en-US", {
-            month: "short",
+            month: "numeric",
             day: "numeric",
             year: "2-digit",
             hour: "numeric",
@@ -170,7 +170,7 @@ export const extraColumns: ColumnDef<ExtraColumnsProps>[] = [
       return (
         <div className="truncate text-center text-sm capitalize">
           {new Date(endDate).toLocaleString("en-US", {
-            month: "short",
+            month: "numeric",
             day: "numeric",
             year: "2-digit",
             hour: "numeric",
@@ -193,7 +193,7 @@ export const extraColumns: ColumnDef<ExtraColumnsProps>[] = [
       return (
         <div>
           {new Date(regDeadline).toLocaleString("en-US", {
-            month: "short",
+            month: "numeric",
             day: "numeric",
             year: "2-digit",
             hour: "numeric",
