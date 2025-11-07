@@ -109,7 +109,7 @@ export const OnlineEventDialog = ({
   const user = userData?.user ?? null;
   const isAdmin = user?.role?.includes("admin") ?? false;
 
-  const { imgStorageId } = eventData ?? {};
+  const { imgStorageId, name } = eventData ?? {};
 
   // console.log(eventData, eventId);
 
@@ -370,456 +370,462 @@ export const OnlineEventDialog = ({
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent
         className={cn(
-          "scrollable mini darkbar max-h-[95dvh] max-w-[95dvw] bg-dashboardBgLt sm:max-h-[90dvh] sm:max-w-[max(50dvw,50rem)]",
+          "max-h-[95dvh] max-w-[95dvw] overflow-hidden bg-dashboardBgLt p-0 sm:max-h-[90dvh] sm:max-w-[max(50dvw,50rem)]",
         )}
+        closeBtnClassName="bg-dashboardBgLt rounded-full p-2 opacity-100 text-foreground/50"
       >
         <DialogDescription className="sr-only">
           Online event edit/create dialog
         </DialogDescription>
-        <DialogHeader>
-          <div
-            className={cn(
-              "flex flex-col-reverse items-center justify-between gap-4 pl-2 pr-6 sm:flex-row",
-            )}
-          >
-            <DialogTitle>
-              {/* {img ? (
-                <Image
-                  src={img}
-                  alt={name ?? "Event Image"}
-                  width={200}
-                  height={100}
-                />
-              ) : (
-                <p className="my-3 text-center font-tanker text-4xl lowercase tracking-wide md:text-[3rem]">
-                  {name}
-                </p>
-              )} */}
-              <LogoUploader
-                imageOnly={isMobile}
-                id="logo-upload"
-                onChangeAction={(file) => setLogoFile(file)}
-                // onChangeAction={handleLogoUpload}
-                onRemoveAction={() => {
-                  if (logoFile) {
-                    setLogoFile(null);
-                  } else {
-                    handleImgRemoval();
-                  }
-                }}
-                initialImage={eventData?.img}
-                className="gap-4"
-                size={isMobile ? 250 : 200}
-                height={isMobile ? 125 : 100}
-                showFullImage
-                loading={uploading}
-              />
-            </DialogTitle>
-            <div className={cn("flex items-center gap-4")}>
-              <p>Organizer:</p>
-              <StaffUserSelector
-                type="staff"
-                isAdmin={isAdmin}
-                currentUser={currentUser}
-                setCurrentUser={setCurrentUser}
-                className="rounded-full"
-                minimal
-              />
-            </div>
-          </div>
+        <DialogHeader className="sr-only">
+          <DialogTitle>{`${name ?? "Online Event"} Dialog`}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form
-            onSubmit={handleSubmit(handleUpdate)}
-            className="items-start gap-4 sm:grid sm:grid-cols-[repeat(12,_minmax(0,1fr))] [@media(max-height:620px)]:space-y-2"
-          >
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem className="col-span-6 w-full">
-                  <FormLabel className="font-bold">Name</FormLabel>
-                  <FormControl>
-                    <DebouncedControllerInput
-                      tabIndex={1}
-                      field={field}
-                      placeholder="Name of event"
-                      className="w-full"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="price"
-              render={({ field }) => (
-                <FormItem className="col-span-2 w-full">
-                  <FormLabel className="font-bold">Price</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      min={0}
-                      step={5}
-                      {...field}
-                      value={field.value ?? ""}
-                      onChange={(e) => field.onChange(e.target.valueAsNumber)}
-                      placeholder="ex. 15"
-                      className="w-full text-center"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="capacity.current"
-              render={({ field }) => (
-                <FormItem className="col-span-2 w-full">
-                  <FormLabel className="font-bold">Registered</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      disabled
-                      min={0}
-                      {...field}
-                      value={field.value ?? ""}
-                      onChange={(e) => field.onChange(e.target.valueAsNumber)}
-                      placeholder="ex. 10"
-                      className="w-full text-center"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="capacity.max"
-              render={({ field }) => (
-                <FormItem className="col-span-2 w-full">
-                  <FormLabel className="font-bold">Max Capacity</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      min={0}
-                      {...field}
-                      value={field.value ?? ""}
-                      onChange={(e) => field.onChange(e.target.valueAsNumber)}
-                      placeholder="ex. 10"
-                      className="w-full text-center"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="regDeadline"
-              render={({ field }) => (
-                <FormItem className="col-span-3 w-full">
-                  <FormLabel className="font-bold">
-                    Registration Deadline
-                  </FormLabel>
-                  <FormControl>
-                    <DateTimePickerField
-                      minDate={Date.now()}
-                      value={field.value}
-                      onChange={field.onChange}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="startDate"
-              render={({ field }) => (
-                <FormItem className="col-span-3 w-full">
-                  <FormLabel className="font-bold">Start Date</FormLabel>
-                  <FormControl>
-                    <DateTimePickerField
-                      value={field.value}
-                      onChange={field.onChange}
-                      minDate={regDeadlineVal}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="endDate"
-              render={({ field }) => (
-                <FormItem className="col-span-3 w-full">
-                  <FormLabel className="font-bold">End Date</FormLabel>
-                  <FormControl>
-                    <DateTimePickerField
-                      value={field.value}
-                      onChange={field.onChange}
-                      minDate={startDateVal}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="location"
-              render={({ field }) => (
-                <FormItem className="col-span-3 w-full">
-                  <FormLabel className="font-bold">Location</FormLabel>
-                  <FormControl>
-                    {/* <Input
-                      {...field}
-                      placeholder="Location"
-                      className="w-full"
-                    /> */}
-                    <SelectSimple
-                      options={onlineEventLocationOptions}
-                      value={field.value}
-                      onChangeAction={(value) => field.onChange(value)}
-                      placeholder="Select location"
-                      className="w-full border-gray-300 bg-card sm:h-11"
-                      contentClassName="sm:max-h-80 "
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem className="col-span-full">
-                  <FormLabel className="font-bold">Description</FormLabel>
-                  <FormControl>
-                    <RichTextEditor
-                      value={field.value ?? ""}
-                      onChange={field.onChange}
-                      placeholder="Full details about the event "
-                      charLimit={5000}
-                      requiredChars={10}
-                      formInputPreview
-                      inputPreviewContainerClassName="rounded-lg border-gray-300"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            {/* <FormField
-              control={form.control}
-              name="img"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="font-bold">Image</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      placeholder="Image URL"
-                      className="w-full"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            /> */}
-
-            <FormItem className="col-span-6 mt-2 w-full">
-              <div className="flex items-center justify-between">
-                <FormLabel>Requirements</FormLabel>
-                <span
-                  className={cn(
-                    "text-sm hover:cursor-pointer hover:font-semibold",
-                    formReqs?.length <= 1 && "hidden",
-                  )}
-                  onClick={() => setShowAllReqs((prev) => !prev)}
-                >
-                  View {showAllReqs ? "Less" : "More"}
-                </span>
-              </div>
-              <div className="space-y-2">
-                {(formReqs.length === 0 ? [""] : formReqs)
-                  .slice(0, showAllReqs ? formReqs.length || 1 : 1)
-                  .map((req, i) => {
-                    const isFirst = i === 0;
-                    const isEmpty = !req?.trim();
-
-                    return (
-                      <FormField
-                        key={i}
-                        control={form.control}
-                        name={`requirements.${i}`}
-                        render={({ field }) => (
-                          <FormItem>
-                            <div className="flex w-full gap-y-1">
-                              <FormControl>
-                                <DebouncedFormTextarea
-                                  field={field}
-                                  maxLength={300}
-                                  placeholder="Enter requirement"
-                                  className={cn(
-                                    "max-h-15 min-h-10 w-full resize-none rounded-lg border-gray-300 bg-card",
-                                    isEmpty && "h-10",
-                                  )}
-                                />
-                              </FormControl>
-
-                              {!isFirst && (
-                                <Button
-                                  type="button"
-                                  variant="ghost"
-                                  onClick={() =>
-                                    setValue(
-                                      "requirements",
-                                      formReqs.filter((_, j) => j !== i),
-                                    )
-                                  }
-                                  className="hover:scale-105 hover:text-red-600 active:scale-95"
-                                >
-                                  <Trash className="size-5" />
-                                </Button>
-                              )}
-                            </div>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    );
-                  })}
-
-                {((formReqs?.[formReqs.length - 1]?.trim() && showAllReqs) ||
-                  (formReqs.length === 1 && formReqs[0]?.trim())) && (
-                  <Button
-                    variant="ghost"
-                    type="button"
-                    onClick={() => setValue("requirements", [...formReqs, ""])}
-                  >
-                    + Add Requirement
-                  </Button>
-                )}
-              </div>
-            </FormItem>
-            <FormItem className="col-span-6 mt-2 w-full">
-              <div className="flex items-center justify-between">
-                <FormLabel>Terms</FormLabel>
-                <span
-                  className={cn(
-                    "text-sm hover:cursor-pointer hover:font-semibold",
-                    formTerms?.length <= 1 && "hidden",
-                  )}
-                  onClick={() => setShowAllTerms((prev) => !prev)}
-                >
-                  View {showAllTerms ? "Less" : "More"}
-                </span>{" "}
-              </div>
-              <div className="space-y-2">
-                {(formTerms.length === 0 ? [""] : formTerms)
-                  .slice(0, showAllTerms ? formTerms.length || 1 : 1)
-                  .map((term, i) => {
-                    const isFirst = i === 0;
-                    const isEmpty = !term?.trim();
-
-                    return (
-                      <FormField
-                        key={i}
-                        control={form.control}
-                        name={`terms.${i}`}
-                        render={({ field }) => (
-                          <FormItem>
-                            <div className="flex w-full gap-y-1">
-                              <FormControl>
-                                <DebouncedFormTextarea
-                                  field={field}
-                                  maxLength={300}
-                                  placeholder="Enter term"
-                                  className={cn(
-                                    "max-h-15 min-h-10 w-full resize-none rounded-lg border-gray-300 bg-card",
-                                    isEmpty && "h-10",
-                                  )}
-                                />
-                              </FormControl>
-
-                              {!isFirst && (
-                                <Button
-                                  type="button"
-                                  variant="ghost"
-                                  onClick={() =>
-                                    setValue(
-                                      "terms",
-                                      formTerms.filter((_, j) => j !== i),
-                                    )
-                                  }
-                                  className="hover:scale-105 hover:text-red-600 active:scale-95"
-                                >
-                                  <Trash className="size-5" />
-                                </Button>
-                              )}
-                            </div>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    );
-                  })}
-
-                {((formTerms?.[formTerms.length - 1]?.trim() && showAllTerms) ||
-                  (formTerms.length === 1 && formTerms[0]?.trim())) && (
-                  <Button
-                    variant="ghost"
-                    type="button"
-                    onClick={() => setValue("terms", [...formTerms, ""])}
-                  >
-                    + Add Term
-                  </Button>
-                )}
-              </div>
-            </FormItem>
-            <FormField
-              control={form.control}
-              name="organizerBio"
-              render={({ field }) => (
-                <FormItem className="col-span-full">
-                  <FormLabel className="font-bold">Organizer Bio</FormLabel>
-                  <FormControl>
-                    <RichTextEditor
-                      value={field.value ?? ""}
-                      onChange={field.onChange}
-                      placeholder="A bit about the organizer"
-                      charLimit={2500}
-                      formInputPreview
-                      inputPreviewContainerClassName="rounded-lg border-gray-300"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+          <form onSubmit={handleSubmit(handleUpdate)} className="relative">
             <div
               className={cn(
-                "col-span-full mt-4 flex w-full flex-col-reverse items-center justify-between gap-2 px-3 sm:mt-2 sm:flex-row",
+                "scrollable h-[95dvh] items-start gap-4 p-6 pb-40 sm:grid sm:h-[90dvh] sm:grid-cols-[repeat(12,_minmax(0,1fr))] [@media(max-height:620px)]:space-y-2",
               )}
             >
-              <p
-                className={cn("text-sm", !eventData?.updatedAt && "invisible")}
+              <div
+                className={cn(
+                  "col-span-full flex flex-col-reverse items-center justify-between gap-4 pl-2 pr-6 sm:flex-row",
+                )}
               >
-                Last Edited:{" "}
-                {eventData?.updatedAt
-                  ? new Date(eventData.updatedAt).toLocaleString()
-                  : ""}
-              </p>
+                <LogoUploader
+                  imageOnly={isMobile}
+                  id="logo-upload"
+                  onChangeAction={(file) => setLogoFile(file)}
+                  // onChangeAction={handleLogoUpload}
+                  onRemoveAction={() => {
+                    if (logoFile) {
+                      setLogoFile(null);
+                    } else {
+                      handleImgRemoval();
+                    }
+                  }}
+                  initialImage={eventData?.img}
+                  className="gap-4"
+                  size={isMobile ? 250 : 200}
+                  height={isMobile ? 125 : 100}
+                  showFullImage
+                  loading={uploading}
+                />
+                <div className={cn("flex items-center gap-4")}>
+                  <p>Organizer:</p>
+                  <StaffUserSelector
+                    type="staff"
+                    isAdmin={isAdmin}
+                    currentUser={currentUser}
+                    setCurrentUser={setCurrentUser}
+                    className="rounded-full"
+                    minimal
+                  />
+                </div>
+              </div>
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem className="col-span-6 w-full">
+                    <FormLabel className="font-bold">Name</FormLabel>
+                    <FormControl>
+                      <DebouncedControllerInput
+                        tabIndex={1}
+                        field={field}
+                        placeholder="Name of event"
+                        className="w-full"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-              <div className="flex flex-col items-end gap-8">
+              <FormField
+                control={form.control}
+                name="price"
+                render={({ field }) => (
+                  <FormItem className="col-span-2 w-full">
+                    <FormLabel className="font-bold">Price</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        min={0}
+                        step={5}
+                        {...field}
+                        value={field.value ?? ""}
+                        onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                        placeholder="ex. 15"
+                        className="w-full text-center"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="capacity.current"
+                render={({ field }) => (
+                  <FormItem className="col-span-2 w-full">
+                    <FormLabel className="font-bold">Registered</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        disabled
+                        min={0}
+                        {...field}
+                        value={field.value ?? ""}
+                        onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                        placeholder="ex. 10"
+                        className="w-full text-center"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="capacity.max"
+                render={({ field }) => (
+                  <FormItem className="col-span-2 w-full">
+                    <FormLabel className="font-bold">Max Capacity</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        min={0}
+                        {...field}
+                        value={field.value ?? ""}
+                        onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                        placeholder="ex. 10"
+                        className="w-full text-center"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="regDeadline"
+                render={({ field }) => (
+                  <FormItem className="col-span-3 w-full">
+                    <FormLabel className="font-bold">
+                      Registration Deadline
+                    </FormLabel>
+                    <FormControl>
+                      <DateTimePickerField
+                        minDate={Date.now()}
+                        value={field.value}
+                        onChange={field.onChange}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="startDate"
+                render={({ field }) => (
+                  <FormItem className="col-span-3 w-full">
+                    <FormLabel className="font-bold">Start Date</FormLabel>
+                    <FormControl>
+                      <DateTimePickerField
+                        value={field.value}
+                        onChange={field.onChange}
+                        minDate={regDeadlineVal}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="endDate"
+                render={({ field }) => (
+                  <FormItem className="col-span-3 w-full">
+                    <FormLabel className="font-bold">End Date</FormLabel>
+                    <FormControl>
+                      <DateTimePickerField
+                        value={field.value}
+                        onChange={field.onChange}
+                        minDate={startDateVal}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="location"
+                render={({ field }) => (
+                  <FormItem className="col-span-3 w-full">
+                    <FormLabel className="font-bold">Location</FormLabel>
+                    <FormControl>
+                      {/* <Input
+                        {...field}
+                        placeholder="Location"
+                        className="w-full"
+                      /> */}
+                      <SelectSimple
+                        options={onlineEventLocationOptions}
+                        value={field.value}
+                        onChangeAction={(value) => field.onChange(value)}
+                        placeholder="Select location"
+                        className="w-full border-gray-300 bg-card sm:h-11"
+                        contentClassName="sm:max-h-80 "
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem className="col-span-full">
+                    <FormLabel className="font-bold">Description</FormLabel>
+                    <FormControl>
+                      <RichTextEditor
+                        value={field.value ?? ""}
+                        onChange={field.onChange}
+                        placeholder="Full details about the event "
+                        charLimit={5000}
+                        requiredChars={10}
+                        formInputPreview
+                        inputPreviewContainerClassName="rounded-lg border-gray-300"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              {/* <FormField
+                control={form.control}
+                name="img"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="font-bold">Image</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder="Image URL"
+                        className="w-full"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              /> */}
+
+              <FormItem className="col-span-6 mt-2 w-full">
+                <div className="flex items-center justify-between">
+                  <FormLabel>Requirements</FormLabel>
+                  <span
+                    className={cn(
+                      "text-sm hover:cursor-pointer hover:font-semibold",
+                      formReqs?.length <= 1 && "hidden",
+                    )}
+                    onClick={() => setShowAllReqs((prev) => !prev)}
+                  >
+                    View {showAllReqs ? "Less" : "More"}
+                  </span>
+                </div>
+                <div className="space-y-2">
+                  {(formReqs.length === 0 ? [""] : formReqs)
+                    .slice(0, showAllReqs ? formReqs.length || 1 : 1)
+                    .map((req, i) => {
+                      const isFirst = i === 0;
+                      const isEmpty = !req?.trim();
+
+                      return (
+                        <FormField
+                          key={i}
+                          control={form.control}
+                          name={`requirements.${i}`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <div className="flex w-full gap-y-1">
+                                <FormControl>
+                                  <DebouncedFormTextarea
+                                    field={field}
+                                    maxLength={300}
+                                    placeholder="Enter requirement"
+                                    className={cn(
+                                      "max-h-15 min-h-10 w-full resize-none rounded-lg border-gray-300 bg-card",
+                                      isEmpty && "h-10",
+                                    )}
+                                  />
+                                </FormControl>
+
+                                {!isFirst && (
+                                  <Button
+                                    type="button"
+                                    variant="ghost"
+                                    onClick={() =>
+                                      setValue(
+                                        "requirements",
+                                        formReqs.filter((_, j) => j !== i),
+                                      )
+                                    }
+                                    className="hover:scale-105 hover:text-red-600 active:scale-95"
+                                  >
+                                    <Trash className="size-5" />
+                                  </Button>
+                                )}
+                              </div>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      );
+                    })}
+
+                  {((formReqs?.[formReqs.length - 1]?.trim() && showAllReqs) ||
+                    (formReqs.length === 1 && formReqs[0]?.trim())) && (
+                    <Button
+                      variant="ghost"
+                      type="button"
+                      onClick={() =>
+                        setValue("requirements", [...formReqs, ""])
+                      }
+                    >
+                      + Add Requirement
+                    </Button>
+                  )}
+                </div>
+              </FormItem>
+              <FormItem className="col-span-6 mt-2 w-full">
+                <div className="flex items-center justify-between">
+                  <FormLabel>Terms</FormLabel>
+                  <span
+                    className={cn(
+                      "text-sm hover:cursor-pointer hover:font-semibold",
+                      formTerms?.length <= 1 && "hidden",
+                    )}
+                    onClick={() => setShowAllTerms((prev) => !prev)}
+                  >
+                    View {showAllTerms ? "Less" : "More"}
+                  </span>{" "}
+                </div>
+                <div className="space-y-2">
+                  {(formTerms.length === 0 ? [""] : formTerms)
+                    .slice(0, showAllTerms ? formTerms.length || 1 : 1)
+                    .map((term, i) => {
+                      const isFirst = i === 0;
+                      const isEmpty = !term?.trim();
+
+                      return (
+                        <FormField
+                          key={i}
+                          control={form.control}
+                          name={`terms.${i}`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <div className="flex w-full gap-y-1">
+                                <FormControl>
+                                  <DebouncedFormTextarea
+                                    field={field}
+                                    maxLength={300}
+                                    placeholder="Enter term"
+                                    className={cn(
+                                      "max-h-15 min-h-10 w-full resize-none rounded-lg border-gray-300 bg-card",
+                                      isEmpty && "h-10",
+                                    )}
+                                  />
+                                </FormControl>
+
+                                {!isFirst && (
+                                  <Button
+                                    type="button"
+                                    variant="ghost"
+                                    onClick={() =>
+                                      setValue(
+                                        "terms",
+                                        formTerms.filter((_, j) => j !== i),
+                                      )
+                                    }
+                                    className="hover:scale-105 hover:text-red-600 active:scale-95"
+                                  >
+                                    <Trash className="size-5" />
+                                  </Button>
+                                )}
+                              </div>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      );
+                    })}
+
+                  {((formTerms?.[formTerms.length - 1]?.trim() &&
+                    showAllTerms) ||
+                    (formTerms.length === 1 && formTerms[0]?.trim())) && (
+                    <Button
+                      variant="ghost"
+                      type="button"
+                      onClick={() => setValue("terms", [...formTerms, ""])}
+                    >
+                      + Add Term
+                    </Button>
+                  )}
+                </div>
+              </FormItem>
+              <FormField
+                control={form.control}
+                name="organizerBio"
+                render={({ field }) => (
+                  <FormItem className="col-span-full">
+                    <FormLabel className="font-bold">Organizer Bio</FormLabel>
+                    <FormControl>
+                      <RichTextEditor
+                        value={field.value ?? ""}
+                        onChange={field.onChange}
+                        placeholder="A bit about the organizer"
+                        charLimit={2500}
+                        formInputPreview
+                        inputPreviewContainerClassName="rounded-lg border-gray-300"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <DialogFooter
+              className={cn(
+                "sticky bottom-0 z-10 col-span-full mt-4 flex w-full max-w-[calc(100%-0.75em)] flex-col-reverse items-center justify-between gap-2 bg-dashboardBgLt px-6 py-4 sm:mt-2 sm:flex-row",
+              )}
+            >
+              <span
+                className={cn(
+                  "block text-sm",
+                  !eventData?.updatedAt && "invisible",
+                )}
+              >
+                <p> Last Edited:</p>
+                <p className="text-nowrap">
+                  {eventData?.updatedAt
+                    ? new Date(eventData.updatedAt).toLocaleString(undefined, {
+                        year: "2-digit",
+                        month: "short",
+                        day: "numeric",
+                        hour: "numeric",
+                        minute: "2-digit",
+                        timeZoneName: "short",
+                      })
+                    : ""}
+                </p>
+              </span>
+
+              <div className="flex w-full flex-col items-end gap-4 sm:flex-col">
                 <div
                   className={cn(
                     "flex w-full items-center justify-end gap-2 sm:w-max",
@@ -857,15 +863,14 @@ export const OnlineEventDialog = ({
                       setRedirectOnSuccess((prev) => !prev)
                     }
                   />
-                  <Label htmlFor="redirect-on-success">
+                  <Label htmlFor="redirect-on-success" className="text-xs">
                     Redirect to event page after saving
                   </Label>
                 </div>
               </div>
-            </div>
+            </DialogFooter>
           </form>
         </Form>
-        <DialogFooter></DialogFooter>
       </DialogContent>
     </Dialog>
   );

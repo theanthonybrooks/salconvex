@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import {
@@ -53,7 +53,7 @@ export default function Home() {
   const subStatus = usePreloadedQuery(preloadedSubStatus);
   const hasActiveSubscription = subStatus?.hasActiveSubscription;
   const userPref = userData?.userPref;
-  const videoRef = useRef<HTMLVideoElement | null>(null);
+  // const videoRef = useRef<HTMLVideoElement | null>(null);
 
   // const user = userData?.user ?? null;
   // const isAdmin = user?.role?.includes("admin");
@@ -65,7 +65,7 @@ export default function Home() {
   const { data: totalEventsData } = useQueryWithStatus(
     api.events.event.getTotalNumberOfEvents,
   );
-  const [paused, setPaused] = useState(false);
+  // const [paused, setPaused] = useState(false);
 
   const [currentSlide, setCurrentSlide] = useState(1);
   const [popoverOpen, setPopoverOpen] = useState(false);
@@ -137,17 +137,17 @@ export default function Home() {
     }, 100);
   }, []);
 
-  const handleVideoToggle = () => {
-    const video = videoRef.current;
-    if (!video) return;
-    if (video.paused) {
-      void video.play();
-      setPaused(false);
-    } else {
-      void video.pause();
-      setPaused(true);
-    }
-  };
+  // const handleVideoToggle = () => {
+  //   const video = videoRef.current;
+  //   if (!video) return;
+  //   if (video.paused) {
+  //     void video.play();
+  //     setPaused(false);
+  //   } else {
+  //     void video.pause();
+  //     setPaused(true);
+  //   }
+  // };
 
   return (
     <>
@@ -356,7 +356,7 @@ export default function Home() {
               "absolute bottom-5 left-5 z-10 hidden origin-bottom-left select-none flex-col items-start gap-1 font-tanker lowercase tracking-wide text-card transition-transform duration-700 ease-in-out [text-shadow:0_0_15px_rgba(0,0,0,1)] sm:left-7 sm:flex",
 
               currentSlide === 1
-                ? "sm:scale-[1.2] lg:scale-[1.45] xl:scale-[1.75] 2xl:scale-[2]"
+                ? "sm:scale-[1.2] lg:scale-[1.45] 2xl:scale-[2]"
                 : "scale-[.6] lg:scale-100",
             )}
             style={{

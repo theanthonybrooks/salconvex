@@ -144,6 +144,12 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
   const remainingCapacity = capacity.max - capacity.current;
   const remainingSpace = remainingCapacity > 0;
   const startDate = new Date(event.startDate);
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    timeZoneName: "short",
+  });
+
+  const parts = formatter.formatToParts(startDate);
+  const timeZone = parts.find((p) => p.type === "timeZoneName")?.value || "";
   const endDate = new Date(event.endDate);
   const isoStartDate = startDate.toISOString();
   const isoEndDate = endDate.toISOString();
@@ -157,6 +163,7 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
     hour: "numeric",
     minute: "2-digit",
   });
+
   const endDatePart = endDate.toLocaleDateString("en-US", {
     weekday: "short",
     month: "short",
@@ -171,6 +178,7 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
     endDatePart === datePart ? endTimePart : `${endDatePart} @ ${endTimePart}`;
   const dateOutput = `${datePart} @ ${timePart} - ${endDateOutput}`;
   const deadline = new Date(regDeadline);
+
   const deadlineDate = deadline.toLocaleDateString("en-US", {
     weekday: "short",
     month: "short",
@@ -184,7 +192,7 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
   const deadlineOutput =
     deadlineDate === datePart
       ? deadlineTime
-      : `${deadlineDate} @ ${deadlineTime}`;
+      : `${deadlineDate} @ ${deadlineTime} (${timeZone})`;
 
   const handleCheckout = async (values: EventRegistrationValues) => {
     const registrationName = user?.name ?? values.name;
@@ -304,7 +312,7 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
         >
           {name}
         </h1>
-        <h2 className="text-lg font-semibold">{`${datePart} @ ${timePart}`}</h2>
+        <h2 className="text-lg font-semibold">{`${datePart} @ ${timePart} (${timeZone})`}</h2>
 
         <div className="flex flex-col items-center gap-6">
           {remainingCapacity <= 3 &&
@@ -352,7 +360,11 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
           )}
         </div>
       </section>
-      <div className={cn("grid gap-5 px-8 pb-10 sm:grid-cols-[60%_50px_auto]")}>
+      <div
+        className={cn(
+          "grid gap-5 px-8 pb-10 sm:grid-cols-[55%_50px_auto] 2xl:grid-cols-[60%_50px_auto]",
+        )}
+      >
         <Accordion type="multiple" defaultValue={["about"]}>
           <AccordionItem value="about">
             <AccordionTrigger title="Details:" fontSize={fontSize} />
@@ -405,7 +417,10 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
               <br />
               <span>
                 <strong>When:</strong>
-                <p> {dateOutput}</p>
+                <p>
+                  {" "}
+                  {dateOutput} ({timeZone})
+                </p>
               </span>
               <br />
               <strong>Registration Deadline:</strong>
@@ -499,7 +514,9 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
             </div>
           ) : (
             <>
-              {canceledRegistration && (voucherCoversPrice || premiumPlan) ? (
+              {canceledRegistration &&
+              (voucherCoversPrice || premiumPlan) &&
+              !deadlineHasPassed ? (
                 <>
                   {/* <FormError
                     message={
