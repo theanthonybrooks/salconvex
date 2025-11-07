@@ -630,6 +630,7 @@ export const openCallCompensationSchema = z.object({
     travelCosts: z.union([z.number(), z.boolean()]).optional(),
     materials: z.union([z.number(), z.boolean()]).optional(),
     equipment: z.union([z.number(), z.boolean()]).optional(),
+    productionCosts: z.union([z.number(), z.boolean()]).optional(),
   }),
 });
 

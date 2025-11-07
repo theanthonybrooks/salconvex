@@ -201,6 +201,7 @@ export const compensationCategoryValidator = v.object({
   travelCosts: v.optional(v.union(v.number(), v.boolean())),
   materials: v.optional(v.union(v.number(), v.boolean())),
   equipment: v.optional(v.union(v.number(), v.boolean())),
+  productionCosts: v.optional(v.union(v.number(), v.boolean())),
 });
 
 export type CompensationCategoryType = Infer<

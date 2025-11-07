@@ -289,6 +289,9 @@ const OpenCallCard = ({
 
                     {noBudgetInfo && <p>No Budget Info</p>}
                   </div>
+                  {allInclusiveBudget && (
+                    <p className="text-sm italic">(All-inclusive budget)</p>
+                  )}
 
                   <OpenCallProvidedPreview
                     id={id}

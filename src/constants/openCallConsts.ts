@@ -1,4 +1,5 @@
 import { CallType } from "@/types/openCallTypes";
+
 import { CallFormatType } from "~/convex/schema";
 
 export const CALL_TYPE_LABELS: Record<Exclude<CallType, null>, string> = {
@@ -72,6 +73,7 @@ export const openCallCategoryFields = [
   { label: "Travel Costs", value: "travelCosts" },
   { label: "Materials", value: "materials" },
   { label: "Equipment", value: "equipment" },
+  { label: "Production Costs", value: "productionCosts" },
 ] as const;
 
 export const openCallLinkFormatOptions = [

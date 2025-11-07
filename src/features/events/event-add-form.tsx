@@ -1326,25 +1326,17 @@ export const EventOCForm = ({
                 },
                 categories: {
                   artistStipend:
-                    openCallData.compensation?.categories?.artistStipend ??
-                    undefined,
-                  designFee:
-                    openCallData.compensation?.categories?.designFee ??
-                    undefined,
+                    openCallData.compensation?.categories?.artistStipend,
+                  designFee: openCallData.compensation?.categories?.designFee,
                   accommodation:
-                    openCallData.compensation?.categories?.accommodation ??
-                    undefined,
-                  food:
-                    openCallData.compensation?.categories?.food ?? undefined,
+                    openCallData.compensation?.categories?.accommodation,
+                  food: openCallData.compensation?.categories?.food,
                   travelCosts:
-                    openCallData.compensation?.categories?.travelCosts ??
-                    undefined,
-                  materials:
-                    openCallData.compensation?.categories?.materials ??
-                    undefined,
-                  equipment:
-                    openCallData.compensation?.categories?.equipment ??
-                    undefined,
+                    openCallData.compensation?.categories?.travelCosts,
+                  materials: openCallData.compensation?.categories?.materials,
+                  equipment: openCallData.compensation?.categories?.equipment,
+                  productionCosts:
+                    openCallData.compensation?.categories?.productionCosts,
                 },
               },
               requirements: {
@@ -1444,6 +1436,8 @@ export const EventOCForm = ({
                   travelCosts: openCallData.compensation.categories.travelCosts,
                   materials: openCallData.compensation.categories.materials,
                   equipment: openCallData.compensation.categories.equipment,
+                  productionCosts:
+                    openCallData.compensation.categories.productionCosts,
                 },
               },
               requirements: {
@@ -1595,6 +1589,8 @@ export const EventOCForm = ({
                       openCallData.compensation.categories.travelCosts,
                     materials: openCallData.compensation.categories.materials,
                     equipment: openCallData.compensation.categories.equipment,
+                    productionCosts:
+                      openCallData.compensation.categories.productionCosts,
                   },
                 },
                 requirements: {

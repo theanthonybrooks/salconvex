@@ -2,9 +2,9 @@
 
 "use client";
 
-import { useState } from "react";
 import { EligibilityType } from "@/types/openCallTypes";
-import { Id } from "~/convex/_generated/dataModel";
+
+import { useState } from "react";
 import { capitalize } from "lodash";
 import { useFormContext } from "react-hook-form";
 
@@ -36,6 +36,8 @@ import {
 import { RichTextDisplay } from "@/helpers/richTextFns";
 import { cn } from "@/helpers/utilsFns";
 import { getCallFormatLabel } from "@/lib/openCallFns";
+
+import { Id } from "~/convex/_generated/dataModel";
 
 interface SubmissionFormRecapDesktopProps {
   formType: number;
@@ -128,12 +130,12 @@ export const SubmissionFormRecapDesktop = ({
                     {orgData?.contact?.organizer && (
                       <span className="flex items-center gap-1">
                         <span className="font-medium">Contact:</span>{" "}
-                        {orgData?.contact?.organizer}
-                        {orgData?.contact?.organizerTitle && (
-                          <span className="text-sm">
-                            - {orgData?.contact?.organizerTitle}
-                          </span>
-                        )}
+                        <div>
+                          <p>{orgData?.contact?.organizer}</p>
+                          {orgData?.contact?.organizerTitle && (
+                            <p>- {orgData?.contact?.organizerTitle}</p>
+                          )}
+                        </div>
                       </span>
                     )}
                   </td>

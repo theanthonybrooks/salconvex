@@ -616,6 +616,7 @@ const SubmissionFormOC2 = ({
                     )}
                     badgeClassName="py-2 lg:py-2 lg:text-sm bg-card"
                     textClassName="text-base"
+                    listClassName="max-h-auto"
                     options={[...openCallCategoryFields]}
                     onValueChange={(selected: string[] = []) => {
                       const currentValues = field.value ?? {};

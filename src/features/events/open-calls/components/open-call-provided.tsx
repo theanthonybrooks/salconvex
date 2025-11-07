@@ -1,5 +1,8 @@
+import { openCallCategoryFields } from "@/constants/openCallConsts";
+import { siteUrl } from "@/constants/siteInfo";
+
 import { OpenCall } from "@/types/openCallTypes";
-import { X } from "lucide-react";
+
 import { FaPaintRoller, FaUserCheck } from "react-icons/fa6";
 import { IoAirplane } from "react-icons/io5";
 import {
@@ -8,12 +11,11 @@ import {
   PiPencilLineFill,
 } from "react-icons/pi";
 import { TbStairs } from "react-icons/tb";
+import { DollarSign, X } from "lucide-react";
 
 import { TooltipSimple } from "@/components/ui/tooltip";
 import { formatCurrency } from "@/helpers/currencyFns";
 import { cn } from "@/helpers/utilsFns";
-import { openCallCategoryFields } from "@/constants/openCallConsts";
-import { siteUrl } from "@/constants/siteInfo";
 
 interface OpenCallProvidedProps {
   categories?: OpenCall["compensation"]["categories"];
@@ -115,6 +117,7 @@ export const OpenCallProvidedPreview = ({
   noBudgetInfo,
   className,
   format = "desktop",
+  
 }: OpenCallProvidedPreviewProps) => {
   const isMobile = format === "mobile";
   const budgetItems = [
@@ -125,6 +128,7 @@ export const OpenCallProvidedPreview = ({
     { key: "materials", Icon: FaPaintRoller, source: "category" },
     { key: "travelCosts", Icon: IoAirplane, source: "category" },
     { key: "equipment", Icon: TbStairs, source: "category" },
+    { key: "productionCosts", Icon: DollarSign, source: "category" },
     // { key: "budgetMoreInfo", Icon: FaRegCommentDots, source: "moreInfo" },
   ];
 
@@ -151,7 +155,7 @@ export const OpenCallProvidedPreview = ({
               "rounded-full border-1.5 p-1",
               active
                 ? "border-emerald-500 text-emerald-500"
-                : "border-foreground/20 text-foreground/20",
+                : "hidden border-foreground/20 text-foreground/20",
             )}
           >
             <TooltipSimple

@@ -24,9 +24,9 @@ export const ArtistFeatureSelect = ({
   return (
     <SelectSimple
       options={[
-        { value: "none", label: "-" },
         { value: "true", label: <Check className="size-4" /> },
         { value: "false", label: <X className="size-4" /> },
+        { value: "none", label: "-" },
       ]}
       value={feature === true ? "true" : feature === false ? "false" : "none"}
       onChangeAction={(value) => {

@@ -827,6 +827,9 @@ const EventCardPreview = ({
                   </>
                 )}
               </div>
+              {budget.allInclusive && noCategories && (
+                <p className="text-sm italic">(All-inclusive budget)</p>
+              )}
               {!publicView && (
                 <OpenCallProvidedPreview
                   id={event._id}
@@ -885,7 +888,7 @@ const EventCardPreview = ({
             openCall={event.openCallStatus}
             publicView={publicPreview || isUserOrg ? false : publicView}
             appFee={basicInfo ? basicInfo.appFee : 0}
-            className="max-w-40 xl:hidden"
+            className="max-w-40 [@media(min-width:1367px)]:hidden"
           />
 
           <ApplyButton
@@ -914,12 +917,12 @@ const EventCardPreview = ({
             eventCategory={eventCategory}
             isPreview={true}
             appFee={basicInfo ? basicInfo.appFee : 0}
-            className="hidden xl:flex"
+            className="hidden [@media(min-width:1367px)]:flex"
             fontSize={fontSize}
           />
           {isCurrentlyOpen && basicInfo.callFormat && (
-            <div className="flex max-w-40 items-center justify-center gap-x-1 text-center text-sm xl:max-w-none">
-              <span className="flex items-center gap-x-1 rounded-sm text-xl font-bold xl:text-sm">
+            <div className="flex max-w-40 items-center justify-center gap-x-1 text-center text-sm 2xl:max-w-none">
+              <span className="flex items-center gap-x-1 rounded-sm text-xl font-bold 2xl:text-sm">
                 {basicInfo.callFormat}:
               </span>
 
