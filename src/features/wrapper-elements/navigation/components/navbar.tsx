@@ -14,6 +14,7 @@ import { User } from "@/types/user";
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import { useMediaQuery } from "@/hooks/use-media-query";
 import { useViewportHeight } from "@/hooks/use-viewPort-Height";
 import { motion, useMotionValueEvent, useScroll } from "framer-motion";
 import { useTheme } from "next-themes";
@@ -88,7 +89,9 @@ export default function NavBar(
     // subStatus,
   }: NavBarProps,
 ) {
-  const { isMobile } = useDevice();
+  const { isMobile: isMobileDevice } = useDevice();
+  const isMobileSize = useMediaQuery("(max-width: 1024px)");
+  const isMobile = isMobileDevice || isMobileSize;
   const { theme } = useTheme();
   const viewportHeight = useViewportHeight();
   const { preloadedUserData, preloadedSubStatus } = useConvexPreload();
@@ -187,7 +190,7 @@ export default function NavBar(
     scrolled: boolean | undefined,
     homePage: boolean,
   ): Variants => {
-    const homePageHiddenNav = homePage && !scrolled;
+    const homePageHiddenNav = homePage && !scrolled && !isMobile;
 
     return {
       visible: {
@@ -221,34 +224,7 @@ export default function NavBar(
   return (
     <>
       {/* ------ Desktop & Mobile: Main Navbar ----- */}
-      {/* <motion.nav
-        id="navbar"
-        initial={{
-          boxShadow: "none",
-          backgroundColor: homePage
-            ? "rgba(0,0,0,0)"
-            : "hsl(var(--background))",
-        }}
-        animate={{
-          boxShadow: isScrolled ? "var(--nav-shadow)" : "none",
-          height: isScrolled || homePage ? "80px" : "100px",
-          backgroundColor:
-            !navBgScroll && homePage
-              ? "rgba(0,0,0,0)"
-              : homePage && navBgScroll
-                ? bgColor
-                : "hsl(var(--background))",
-        }}
-        // transition={{ duration: 0.3, ease: "easeInOut" }}
-        transition={{
-          backgroundColor: { duration: 2.0, ease: "easeIn" },
-          boxShadow: { duration: 0.3, ease: "easeInOut" },
-          height: { duration: 0.3, ease: "easeInOut" },
-        }}
-        className={cn(
-          "fixed left-0 right-0 top-0 z-20 h-25 w-screen [@media(max-width:720px)]:!bg-background",
-        )}
-      > */}
+
       <motion.nav
         id="navbar"
         key="navbar"
@@ -256,7 +232,7 @@ export default function NavBar(
         initial="hidden"
         animate={isScrolled ? "visible" : "hidden"}
         className={cn(
-          "fixed left-0 right-0 top-0 z-20 h-25 w-screen [@media(max-width:720px)]:!bg-background",
+          "fixed left-0 right-0 top-0 z-20 h-25 w-screen [@media(max-w-1080px)]:!bg-background",
           // (isMobile || !homePage) && "bg-background",
         )}
       >

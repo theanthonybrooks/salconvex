@@ -16,7 +16,6 @@ import { FaEnvelope, FaGlobe, FaInstagram } from "react-icons/fa6";
 import { Plus } from "lucide-react";
 
 import { AnimatedCounter } from "@/components/ui/animate-counter";
-import { Button } from "@/components/ui/button";
 import {
   Carousel,
   CarouselContent,
@@ -168,7 +167,7 @@ export default function Home() {
               onSelectIndexChange={setCurrentSlide}
             >
               <CarouselContent rounded="sm">
-                <CarouselItem className="relative w-full bg-transparent">
+                {/* <CarouselItem className="relative w-full bg-transparent">
                   <video
                     ref={videoRef}
                     src="/artist-highlight/nov25/oldhues-video-edit2.mp4"
@@ -181,7 +180,7 @@ export default function Home() {
                     controlsList="nodownload nofullscreen noremoteplayback noplaybackrate"
                     className="absolute inset-0 h-full w-full object-cover object-[50%_32%]"
                   />
-                </CarouselItem>
+                </CarouselItem> */}
                 <CarouselItem className="relative w-full bg-transparent">
                   <Image
                     src="/artist-highlight/nov25/oldhues-25.jpg"
@@ -232,7 +231,7 @@ export default function Home() {
 
               <CarouselDots className="md:hidden" />
             </Carousel>
-            <Button
+            {/* <Button
               variant="icon"
               onClick={handleVideoToggle}
               className={cn(
@@ -241,7 +240,7 @@ export default function Home() {
               )}
             >
               {paused ? "Play" : "Pause"} Video
-            </Button>
+            </Button> */}
 
             <Popover onOpenChange={setPopoverOpen} open={popoverOpen}>
               <PopoverTrigger asChild>
@@ -254,11 +253,11 @@ export default function Home() {
                   <div className="group flex cursor-pointer flex-col items-center gap-2 sm:flex-row">
                     <span className={cn("flex items-center gap-2")}>
                       <i className={cn("text-base")}>
-                        {currentSlide === 1
+                        {currentSlide === 0
                           ? "Fireside (2025)"
-                          : currentSlide === 2 || currentSlide === 3
+                          : currentSlide === 1 || currentSlide === 2
                             ? "In Bloom (2023)"
-                            : currentSlide === 4
+                            : currentSlide === 3
                               ? "Mess Mess Mess (2024)"
                               : "Hua Sheng Supermarket (2023)"}
                       </i>
