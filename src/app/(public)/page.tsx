@@ -353,10 +353,10 @@ export default function Home() {
             animate={{ opacity: 1 }}
             transition={{ duration: 1, ease: "easeInOut" }}
             className={cn(
-              "absolute bottom-5 left-5 z-10 hidden origin-bottom-left select-none flex-col items-start gap-1 font-tanker lowercase tracking-wide text-card transition-transform duration-700 ease-in-out [text-shadow:0_0_10px_rgba(0,0,0,0.3)] sm:left-7 sm:flex",
+              "absolute bottom-5 left-5 z-10 hidden origin-bottom-left select-none flex-col items-start gap-1 font-tanker lowercase tracking-wide text-card transition-transform duration-700 ease-in-out [text-shadow:0_0_15px_rgba(0,0,0,1)] sm:left-7 sm:flex",
 
               currentSlide === 1
-                ? "[text-shadow:0_0_15px_rgba(0,0,0,1)] sm:scale-[1.2] lg:scale-[1.45] xl:scale-[1.75] 2xl:scale-[2]"
+                ? "sm:scale-[1.2] lg:scale-[1.45] xl:scale-[1.75] 2xl:scale-[2]"
                 : "scale-[.6] lg:scale-100",
             )}
             style={{

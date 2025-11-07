@@ -39,7 +39,8 @@
     "Extras",
     "Stripe",
     "Resend",
-    "Component"
+    "Component",
+    "Artist Highlight"
   ],
   "typescript.tsdk": "node_modules\\typescript\\lib",
   "python.analysis.autoImportCompletions": true
