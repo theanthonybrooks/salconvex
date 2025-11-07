@@ -11,7 +11,8 @@ import { toast } from "react-toastify";
 
 import { CheckCircle2, CircleX, LoaderCircle } from "lucide-react";
 
-import type { FeatureMap } from "~/convex/schema";
+import type { UserCurrenciesType } from "~/convex/actions/getUserInfo";
+import type { FeatureMap, StripeIntervalPricesType } from "~/convex/schema";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -29,6 +30,7 @@ import {
   ModeType,
 } from "@/features/account/account-profile-form";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
+import { getPrice } from "@/helpers/pricingFns";
 import { getUserFontSizePref } from "@/helpers/stylingFns";
 import { cn } from "@/helpers/utilsFns";
 
@@ -44,14 +46,15 @@ type SwitchProps = {
 
 type PricingCardProps = {
   user?: User;
+  currency: UserCurrenciesType;
   isYearly?: boolean;
   title: string;
   planKey: string;
   accountType: string;
 
   prices: {
-    month?: { usd?: { amount?: number; stripeId: string } };
-    year?: { usd?: { amount?: number; stripeId: string } };
+    month?: StripeIntervalPricesType;
+    year?: StripeIntervalPricesType;
     rate?: number;
   };
 
@@ -62,7 +65,7 @@ type PricingCardProps = {
   popular?: boolean;
   image?: string;
   stripePriceId?: string;
-  userSubPriceId?: string;
+  stripeProductId?: string;
   hadTrial?: boolean;
   subscription?: Doc<"userSubscriptions"> | null;
   activeSub?: boolean;
@@ -324,6 +327,7 @@ export const AccountTypeSwitch = ({
 const PricingCard = ({
   user,
   activeSub,
+  currency,
   isYearly,
   title,
   planKey,
@@ -462,11 +466,11 @@ const PricingCard = ({
             <span className={cn("text-4xl font-bold")}>
               {!isFree ? (
                 isArtist ? (
-                  `$${
+                  `${currency === "usd" ? "$" : ""}${
                     isYearly
                       ? ((prices.year?.usd?.amount ?? 0).toFixed(0) ?? "N/A")
                       : (prices.month?.usd?.amount?.toFixed(0) ?? "N/A")
-                  }`
+                  }${currency === "eur" ? "€" : ""}`
                 ) : (
                   <div className="flex flex-col gap-1">
                     <p className="text-sm text-muted-foreground">Starting at</p>
@@ -497,8 +501,9 @@ const PricingCard = ({
           </div>
           {isArtist && isYearly && (
             <p className={cn("mt-1 text-muted-foreground")}>
-              ( ${((prices.year?.usd?.amount ?? 0) / 12).toFixed(2) ?? "N/A"}{" "}
-              per month )
+              ( {currency === "usd" ? "$" : ""}
+              {((prices.year?.usd?.amount ?? 0) / 12).toFixed(2) ?? "N/A"}
+              {currency === "eur" ? "€" : ""} per month )
             </p>
           )}
           {(!user || isEligibleForFree) && !isFree && isOrganizer && (
@@ -592,9 +597,12 @@ export default function Pricing() {
   // useScrollToTopOnMount();
   const searchParams = useSearchParams();
   const typeParam = searchParams.get("type") as AccountTypeBase;
-  const { preloadedSubStatus, preloadedUserData } = useConvexPreload();
+  const { preloadedSubStatus, preloadedUserData, locationData } =
+    useConvexPreload();
   const subData = usePreloadedQuery(preloadedSubStatus);
   const userData = usePreloadedQuery(preloadedUserData);
+  const { currency, country } = locationData;
+  console.log(currency, country);
   const userPref = userData?.userPref;
   const fontSizePref = getUserFontSizePref(userPref?.fontSize);
   const baseFontSize = fontSizePref?.body;
@@ -604,7 +612,6 @@ export default function Pricing() {
   const subscription = subData?.subscription;
   const subInterval = subscription?.intervalNext ?? subscription?.interval;
 
-  const userSubPriceId = subscription?.stripePriceId;
   // const handleManageSubscription = useManageSubscription({ subscription });
   const user = userData?.user;
   const [urlAccountType, setUrlAccountType] = useState<AccountTypeBase | null>(
@@ -727,15 +734,27 @@ export default function Pricing() {
             className="mt-10 flex flex-col justify-center gap-y-6 lg:flex-row lg:gap-5 3xl:mt-16"
           >
             {[...plans]
+              // .sort((a, b) => {
+              //   const priceA = isYearly
+              //     ? (a.prices.year?.usd?.amount ?? Infinity)
+              //     : (a.prices.month?.usd?.amount ?? Infinity);
+              //   const priceB = isYearly
+              //     ? (b.prices.year?.usd?.amount ?? Infinity)
+              //     : (b.prices.month?.usd?.amount ?? Infinity);
+              //   return priceA - priceB;
+              // })
               .sort((a, b) => {
                 const priceA = isYearly
-                  ? (a.prices.year?.usd?.amount ?? Infinity)
-                  : (a.prices.month?.usd?.amount ?? Infinity);
+                  ? (getPrice(a.prices.year, currency)?.amount ?? Infinity)
+                  : (getPrice(a.prices.month, currency)?.amount ?? Infinity);
+
                 const priceB = isYearly
-                  ? (b.prices.year?.usd?.amount ?? Infinity)
-                  : (b.prices.month?.usd?.amount ?? Infinity);
+                  ? (getPrice(b.prices.year, currency)?.amount ?? Infinity)
+                  : (getPrice(b.prices.month, currency)?.amount ?? Infinity);
+
                 return priceA - priceB;
               })
+
               // .filter((plan) => {
               //   if (!hasSub) return true; // show all if user doesn’t have a subscription
 
@@ -751,13 +770,17 @@ export default function Pricing() {
               //   return isCurrentUserPlan;
               // })
               .map((plan) => {
+                // const stripePriceId = isYearly
+                //   ? plan.prices?.year?.usd?.stripeId
+                //   : plan.prices?.month?.usd?.stripeId;
                 const stripePriceId = isYearly
-                  ? plan.prices?.year?.usd?.stripeId
-                  : plan.prices?.month?.usd?.stripeId;
+                  ? getPrice(plan.prices.year, currency)?.stripeId
+                  : getPrice(plan.prices.month, currency)?.stripeId;
 
                 const { key, ...rest } = plan;
                 return (
                   <PricingCard
+                    currency={currency}
                     image={plan.img}
                     key={plan.title}
                     user={user}
@@ -766,8 +789,8 @@ export default function Pricing() {
                     isYearly={isYearly}
                     accountType={selectedAccountType}
                     stripePriceId={stripePriceId}
+                    stripeProductId={plan.stripeProductId}
                     hadTrial={hadTrial}
-                    userSubPriceId={userSubPriceId}
                     subscription={subscription}
                     activeSub={hasSub}
                   />
@@ -799,6 +822,7 @@ export default function Pricing() {
                   };
                   return (
                     <PricingCard
+                      currency={currency}
                       key={plan.title}
                       user={user}
                       planKey={key}

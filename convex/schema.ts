@@ -9,10 +9,17 @@ const stripePriceValidator = v.object({
   stripeId: v.string(),
 });
 
+export type StripePriceType = Infer<typeof stripePriceValidator>;
+
 // Define a prices object structure for a specific interval
 const stripeIntervalPricesValidator = v.object({
   usd: stripePriceValidator,
+  eur: v.optional(stripePriceValidator),
 });
+
+export type StripeIntervalPricesType = Infer<
+  typeof stripeIntervalPricesValidator
+>;
 // #endregion
 
 // #region -------------Account Validators --------------

@@ -9,6 +9,7 @@
  */
 
 import type * as actions_getTimezone from "../actions/getTimezone.js";
+import type * as actions_getUserInfo from "../actions/getUserInfo.js";
 import type * as actions_resend from "../actions/resend.js";
 import type * as actions_sendOtpEmail from "../actions/sendOtpEmail.js";
 import type * as admin from "../admin.js";
@@ -68,6 +69,7 @@ import type {
  */
 declare const fullApi: ApiFromModules<{
   "actions/getTimezone": typeof actions_getTimezone;
+  "actions/getUserInfo": typeof actions_getUserInfo;
   "actions/resend": typeof actions_resend;
   "actions/sendOtpEmail": typeof actions_sendOtpEmail;
   admin: typeof admin;

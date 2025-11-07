@@ -25,7 +25,7 @@ import {
   convexAuthNextjsToken,
 } from "@convex-dev/auth/nextjs/server";
 import { ConvexQueryCacheProvider } from "convex-helpers/react/cache/provider";
-import { preloadQuery } from "convex/nextjs";
+import { fetchAction, preloadQuery } from "convex/nextjs";
 
 import "leaflet/dist/leaflet.css";
 
@@ -112,6 +112,7 @@ export default async function RootLayout({
     {},
     { token },
   );
+  const locationData = await fetchAction(api.actions.getUserInfo.getLocation);
 
   return (
     <ConvexAuthNextjsServerProvider>
@@ -153,6 +154,7 @@ export default async function RootLayout({
               preloadedUserData={preloadedUserData}
               preloadedSubStatus={preloadedSubStatus}
               preloadedOrganizerData={preloadedOrganizerData}
+              locationData={locationData}
             >
               <ConvexQueryCacheProvider>
                 <ThemedProvider>

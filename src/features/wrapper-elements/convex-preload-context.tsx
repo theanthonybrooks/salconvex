@@ -1,6 +1,9 @@
 "use client";
 
 import { createContext, ReactNode, useContext } from "react";
+
+import type { UserLocationType } from "~/convex/actions/getUserInfo";
+
 import { api } from "~/convex/_generated/api";
 import { Preloaded } from "convex/react";
 
@@ -12,6 +15,7 @@ type ConvexPreloadContextType = {
   preloadedOrganizerData: Preloaded<
     typeof api.organizer.organizations.getUserOrgEvents
   >;
+  locationData: UserLocationType;
 };
 
 const ConvexPreloadContext = createContext<ConvexPreloadContextType | null>(
@@ -27,10 +31,16 @@ export function ConvexPreloadContextProvider({
   preloadedUserData,
   preloadedSubStatus,
   preloadedOrganizerData,
+  locationData,
 }: ConvexPreloadContextProviderProps) {
   return (
     <ConvexPreloadContext.Provider
-      value={{ preloadedUserData, preloadedSubStatus, preloadedOrganizerData }}
+      value={{
+        preloadedUserData,
+        preloadedSubStatus,
+        preloadedOrganizerData,
+        locationData,
+      }}
     >
       {children}
     </ConvexPreloadContext.Provider>

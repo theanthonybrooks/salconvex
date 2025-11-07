@@ -1,3 +1,13 @@
+import type { UserCurrenciesType } from "~/convex/actions/getUserInfo";
+import type { StripeIntervalPricesType } from "~/convex/schema";
+
+export function getPrice(
+  priceObj: StripeIntervalPricesType | undefined,
+  currency: UserCurrenciesType,
+) {
+  return priceObj?.[currency];
+}
+
 export const OC_PRICING_TIERS = [
   {
     name: "base",

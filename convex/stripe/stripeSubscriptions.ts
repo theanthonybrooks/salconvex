@@ -205,6 +205,7 @@ export const createStripeCheckoutSession = action({
       // Create a Stripe Checkout Session.
       const session: Stripe.Checkout.Session =
         await stripe.checkout.sessions.create({
+          // payment_method_types: ["card", "sepa_debit"],
           payment_method_types: ["card"],
           customer: stripeCustomerId,
           line_items: [
