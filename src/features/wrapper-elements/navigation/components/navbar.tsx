@@ -232,7 +232,7 @@ export default function NavBar(
         initial="hidden"
         animate={isScrolled ? "visible" : "hidden"}
         className={cn(
-          "fixed left-0 right-0 top-0 z-20 h-25 w-screen [@media(max-w-1080px)]:!bg-background",
+          "fixed left-0 right-0 top-0 z-20 h-25 w-screen [@media(max-w-1024px)]:!bg-background",
           // (isMobile || !homePage) && "bg-background",
         )}
       >
