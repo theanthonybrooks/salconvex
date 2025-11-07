@@ -28,6 +28,7 @@ export default {
       screens: {
         lg: "1025px",
         tablet: "1080px",
+        ipad: "1367px",
 
         "2xl": "1536px",
         "3xl": "1920px",
@@ -169,7 +170,7 @@ export default {
         "20": "5rem",
         "25": "100px",
       },
-     
+
       margin: {
         "10": "2.5rem",
         "12": "3rem",
@@ -206,6 +207,7 @@ export default {
         "80": "320px",
         "90": "360px",
         "100": "400px",
+
         "3xl": "1536px",
         "90dvw": "90dvw",
         "80dvw": "80dvw",

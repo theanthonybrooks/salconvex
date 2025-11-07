@@ -13,14 +13,15 @@ import {
   getExternalErrorHtml,
   getExternalRedirectHtml,
 } from "@/utils/loading-page-html";
+import { toast } from "react-toastify";
+
+import { FaBookmark, FaRegBookmark } from "react-icons/fa6";
 import {
   CheckCircleIcon,
   CircleDollarSignIcon,
   LoaderCircle,
   X,
 } from "lucide-react";
-import { FaBookmark, FaRegBookmark } from "react-icons/fa6";
-import { toast } from "react-toastify";
 
 import {
   AlertDialog,
@@ -123,7 +124,7 @@ export const ApplyButtonShort = ({
         variant="salWithShadowHidden"
         size="lg"
         className={cn(
-          "w-full min-w-[100px] cursor-pointer bg-white/60",
+          "w-full min-w-[100px] cursor-pointer bg-white",
           className,
           appStatus !== null &&
             !publicView &&

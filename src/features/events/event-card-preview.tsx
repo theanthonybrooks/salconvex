@@ -888,7 +888,7 @@ const EventCardPreview = ({
             openCall={event.openCallStatus}
             publicView={publicPreview || isUserOrg ? false : publicView}
             appFee={basicInfo ? basicInfo.appFee : 0}
-            className="max-w-40 [@media(min-width:1367px)]:hidden"
+            className="ipad:hidden max-w-40"
           />
 
           <ApplyButton
@@ -917,7 +917,7 @@ const EventCardPreview = ({
             eventCategory={eventCategory}
             isPreview={true}
             appFee={basicInfo ? basicInfo.appFee : 0}
-            className="hidden [@media(min-width:1367px)]:flex"
+            className="ipad:flex hidden"
             fontSize={fontSize}
           />
           {isCurrentlyOpen && basicInfo.callFormat && (
