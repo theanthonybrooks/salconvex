@@ -12,11 +12,10 @@ import { capitalize } from "lodash";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 
-import { CalendarClockIcon } from "lucide-react";
-
 import { FormSuccess } from "@/components/form-success";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Link } from "@/components/ui/custom-link";
 import { DebouncedControllerInput } from "@/components/ui/debounced-form-input";
 import { DebouncedFormTextarea } from "@/components/ui/debounced-form-textarea";
 import {
@@ -589,17 +588,18 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
                     message={
                       <p className={cn("inline")}>
                         You&apos;re registered!{" "}
-                        <a
+                        <Link
                           href={calendarLink}
                           download={`${name.replace(/\s+/g, "_")}.ics`}
-                          className="inline-flex items-center gap-1"
+                          className="inline-flex items-center gap-1 underline hover:underline-offset-4"
                         >
-                          Add it to your calendar!{" "}
-                          <CalendarClockIcon className="size-7 md:size-4" />
-                        </a>
+                          Add it to your calendar{" "}
+                          {/* <CalendarClockIcon className="size-7 md:size-4" /> */}
+                        </Link>
+                        !
                       </p>
                     }
-                    className={cn("mb-4 w-full")}
+                    className={cn("mb-4 w-full max-w-max")}
                   />
 
                   <p className={cn("text-center", fontSize)}>
