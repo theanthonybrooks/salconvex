@@ -188,7 +188,7 @@ export function AdminDashboardTableWrapper({
                 img: false,
               }}
               defaultFilters={[{ id: `state`, value: ["published", "draft"] }]}
-              onRowSelect={(row) => console.log(row?._id)}
+              onRowSelect={(row) => setSelectedRow(row?._id ?? null)}
               defaultSort={{ id: `startDate`, desc: true }}
               adminActions={adminActions}
               tableType="extras"
@@ -211,6 +211,7 @@ export function AdminDashboardTableWrapper({
                 tableType="userAddOns"
                 pageType="dashboard"
                 pageSize={10}
+                className="mx-auto w-full max-w-[80dvw] overflow-x-auto sm:max-w-[90vw]"
               />
             )}
           </div>

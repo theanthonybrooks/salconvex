@@ -402,7 +402,13 @@ export const updateRegistration = mutation({
   args: {
     eventId: v.id("onlineEvents"),
     email: v.string(),
-    action: v.union(v.literal("cancel"), v.literal("renew")),
+    action: v.union(
+      v.literal("cancel"),
+      v.literal("renew"),
+      v.literal("update"),
+    ),
+    notes: v.optional(v.string()),
+    link: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
@@ -513,14 +519,22 @@ export const updateRegistration = mutation({
           current: event.capacity.current + 1,
         },
       });
+    } else if (args.action === "update") {
+      await ctx.db.patch(registration._id, {
+        notes: args.notes,
+        link: args.link,
+      });
     }
-    await sendEventRegistrationEmailHelper(
-      ctx,
-      args.eventId,
-      userId,
-      formattedEmail,
-      args.action,
-    );
+
+    if (args.action !== "update") {
+      await sendEventRegistrationEmailHelper(
+        ctx,
+        args.eventId,
+        userId,
+        formattedEmail,
+        args.action,
+      );
+    }
     return { event, status: "success" };
   },
 });

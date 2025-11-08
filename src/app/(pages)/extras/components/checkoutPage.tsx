@@ -3,6 +3,7 @@
 import type { EventRegistrationValues } from "@/schemas/public";
 import type { Preloaded } from "convex/react";
 
+import { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { EventRegistrationSchema } from "@/schemas/public";
@@ -52,6 +53,7 @@ type CheckoutPageProps = {
 };
 
 export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
+  const [editing, setEditing] = useState(false);
   const router = useRouter();
   const queryResult = usePreloadedQuery(preloaded);
   const event = queryResult?.data;
@@ -157,8 +159,8 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
     weekday: "short",
     month: "short",
     day: "numeric",
-    year: "numeric",
   });
+
   const timePart = startDate.toLocaleTimeString("en-US", {
     hour: "numeric",
     minute: "2-digit",
@@ -245,13 +247,20 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
     }
   };
 
-  const handleUpdateRegistration = async (action: "cancel" | "renew") => {
+  const handleUpdateRegistration = async (
+    action: "cancel" | "renew" | "update",
+    values?: EventRegistrationValues,
+  ) => {
     try {
       if (!user) return;
       const result = await updateRegistration({
         email: user.email,
         eventId: event._id,
         action,
+        ...(action === "update" && {
+          notes: values?.notes,
+          link: values?.link,
+        }),
       });
 
       if (result?.error) {
@@ -259,12 +268,14 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
         toast.error(result.error);
         return;
       }
+      toast.dismiss();
       if (action === "cancel") {
-        toast.dismiss();
         toast.success("Successfully cancelled!");
-      } else {
-        toast.dismiss();
+      } else if (action === "renew") {
         toast.success("Successfully renewed your registration!");
+      } else if (action === "update") {
+        toast.success("Successfully updated your registration!");
+        setEditing(false);
       }
     } catch (error) {
       toast.dismiss();
@@ -564,7 +575,7 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
                     </p>
                   )}
                 </>
-              ) : activeRegistration ? (
+              ) : activeRegistration && !editing ? (
                 <>
                   <Image
                     // src="/gifs/see-you-there.gif"
@@ -590,23 +601,44 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
                     }
                     className={cn("mb-4 w-full")}
                   />
-                  <p className={cn("mb-2 text-balance text-center", fontSize)}>
-                    Can&apos;t attend? You can cancel your registration below.
+
+                  <p className={cn("text-center", fontSize)}>
+                    Want to update or can&apos;t attend?
                   </p>
-                  <Button
-                    variant="salWithShadowHiddenPink"
-                    size="lg"
-                    className="mt-2 w-max text-base sm:text-base"
-                    onClick={() => handleUpdateRegistration("cancel")}
-                    fontSize={fontSize}
-                  >
-                    Cancel Registration
-                  </Button>
+                  <p className={cn("mb-2 text-center", fontSize)}>
+                    You can manage your registration below.
+                  </p>
+                  <div className="flex w-full flex-col-reverse items-center justify-center gap-2 sm:flex-row">
+                    <Button
+                      variant="salWithShadowHiddenPink"
+                      size="lg"
+                      className="mt-2 w-full text-base sm:w-max sm:text-base"
+                      onClick={() => handleUpdateRegistration("cancel")}
+                      fontSize={fontSize}
+                    >
+                      Cancel Registration
+                    </Button>
+                    <Button
+                      variant="salWithShadowHidden"
+                      size="lg"
+                      className="mt-2 w-full text-base sm:w-max sm:text-base"
+                      onClick={() => setEditing(true)}
+                      fontSize={fontSize}
+                    >
+                      Update Registration
+                    </Button>
+                  </div>
                 </>
               ) : (
                 <Form {...form}>
                   <form
-                    onSubmit={handleSubmit(handleCheckout)}
+                    onSubmit={handleSubmit(async (values) => {
+                      if (editing) {
+                        await handleUpdateRegistration("update", values);
+                      } else {
+                        await handleCheckout(values);
+                      }
+                    })}
                     className="mb-2 flex w-full max-w-xl flex-col gap-4"
                   >
                     {!user && (
@@ -709,7 +741,7 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
                         </FormItem>
                       )}
                     />
-                    {!unpaidRegistration && (
+                    {!unpaidRegistration && !editing && (
                       <FormField
                         control={form.control}
                         name="termsAgreement"
@@ -750,7 +782,7 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
                       variant="salWithShadowHidden"
                       size="lg"
                       className="w-full"
-                      disabled={!isValid || !termsAgreement}
+                      disabled={!isValid || (!termsAgreement && !editing)}
                       fontSize={fontSize}
                       tabIndex={4}
                     >
@@ -758,7 +790,9 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
                         ? "Registration Closed"
                         : unpaidRegistration
                           ? "Finish Registration"
-                          : "Register"}
+                          : editing
+                            ? "Update"
+                            : "Register"}
                     </Button>
                   </form>
                   <p className="text-sm">
