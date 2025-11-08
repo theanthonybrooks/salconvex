@@ -1,10 +1,11 @@
 //List the page titles, descriptions, seo, meta tags, and other social media metadata here. Favicons as well. TBD
 
-import { formatDatePlain } from "@/helpers/dateFns";
 import {
   lastUpdatedPrivacyRaw,
   lastUpdatedTermsRaw,
 } from "@/constants/siteInfo";
+
+import { formatDatePlain } from "@/helpers/dateFns";
 
 export function getPageMeta(pathname: string | null) {
   if (!pathname) return pageTitles[0];
@@ -25,7 +26,7 @@ export const DEFAULT_ICON = {
 };
 
 export const DEFAULT_DESCRIPTION =
-  "List of street art, graffiti, & mural projects. Open calls, event calendar, and global map. Created, maintained, and shared by @anthonybrooksart";
+  "  The Street Art List is a global list of street art, graffiti, & mural projects. Open calls, event calendar, and global map, with organizer and artist dashboards. Created, regularly updated, and run by visual artist, Anthony Brooks (@anthonybrooksart), a Serbian-American artist based in Berlin, Germany.";
 
 interface PageTitles {
   path: string;

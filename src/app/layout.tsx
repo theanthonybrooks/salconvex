@@ -130,6 +130,23 @@ export default async function RootLayout({
             name="google-site-verification"
             content="jXicA4CesSrJjuZE7VQjf8nlL0VIKXbLRSxWNuEiI3M"
           />
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "WebSite",
+                name: "The Street Art List",
+                url: "https://thestreetartlist.com",
+                description:
+                  "Directory of street art, mural, and public art open calls, RFQs, RFPs, and EOIs worldwide. Plus a global map, ongoing event calendar, and organizer and artist dashboards.",
+                sameAs: [
+                  "https://instagram.com/anthonybrooksart",
+                  "https://www.facebook.com/thestreetartlist",
+                ],
+              }),
+            }}
+          />
         </head>
         <body
           className={cn(

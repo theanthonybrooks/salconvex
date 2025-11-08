@@ -172,6 +172,14 @@ export default function Home() {
       {/* <div className="sticky inset-0 h-dvh">
      
       </div> */}
+      <p className="sr-only" data-nosnippet={false}>
+        The Street Art List is a global list of street art, graffiti, & mural
+        projects. Open calls, event calendar, and global map, with organizer and
+        artist dashboards. Created, regularly updated, and run by visual artist,
+        Anthony Brooks (@anthonybrooksart), a Serbian-American artist based in
+        Berlin, Germany.
+      </p>
+
       <section className="home-page relative w-full">
         <div className="sticky top-0 z-0 h-[60dvh] sm:h-dvh">
           <motion.div
@@ -399,6 +407,10 @@ export default function Home() {
         </div>
 
         <div className="relative z-10 bg-background pt-4 sm:pt-10">
+          <h1 className="hidden px-4 pb-8 text-center font-tanker text-4xl tracking-tight lg:block">
+            Global database of everything street art, graffiti, and
+            mural-related
+          </h1>
           <div className="flex w-screen items-center justify-center gap-3 bg-foreground/90 p-6 font-tanker lowercase text-background">
             <div className="flex w-[clamp(300px,70vw,1000px)] flex-col items-center justify-around gap-3 sm:flex-row">
               <span className="flex flex-col items-center gap-2">
@@ -447,7 +459,10 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="mx-auto mt-10 flex w-full max-w-[clamp(300px,80vw,1000px)] flex-col items-start justify-center gap-2 py-4">
+          <div
+            className="mx-auto mt-10 flex w-full max-w-[clamp(300px,80vw,1000px)] flex-col items-start justify-center gap-2 py-4"
+            data-nosnippet
+          >
             <span className="inline items-center">
               <strong>The Street Art List&nbsp; </strong> is an initiative
               created and run by&nbsp;

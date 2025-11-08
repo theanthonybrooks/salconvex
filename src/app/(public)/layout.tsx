@@ -23,9 +23,19 @@ export async function generateMetadata(): Promise<Metadata> {
   const pathname = headersList.get("x-pathname");
   const meta = getPageMeta(pathname);
 
+  let title = meta.title || "The Street Art List";
+  let description = meta.description || DEFAULT_DESCRIPTION;
+
+  // Override for home page only
+  if (pathname === "/" || pathname === "/home") {
+    title = "Street Art & Mural Open Calls | The Street Art List";
+    description =
+      "Discover global mural and street art open calls, public art RFQs, RFPs, and EOIs. The Street Art List connects artists and organizers worldwide.";
+  }
+
   return {
-    title: meta.title || "The Street Art List",
-    description: meta.description || DEFAULT_DESCRIPTION,
+    title,
+    description,
     openGraph: {
       title: meta.externalTitle || meta.title || "The Street Art List",
       description: meta.description || DEFAULT_DESCRIPTION,

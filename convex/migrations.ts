@@ -39,6 +39,30 @@ export const run = migrations.runner();
 
 // export const runPFM = migrations.runner(internal.migrations.populateFeatureMap);
 
+export const removeCurrencyFromUserPrefsWithoutSubs = migrations.define({
+  table: "userPreferences",
+  migrateOne: async (ctx, userPref) => {
+    const user = await ctx.db.get(userPref.userId);
+    if (!user) {
+      await ctx.db.delete(userPref._id);
+      return;
+    }
+    const subscription = await ctx.db
+      .query("userSubscriptions")
+      .withIndex("userId", (q) => q.eq("userId", user._id))
+      .first();
+    const activeSub =
+      subscription?.status === "active" || subscription?.status === "trialing";
+    if (activeSub) return;
+    await ctx.db.patch(userPref._id, {
+      currency: undefined,
+    });
+  },
+});
+
+export const runRCU = migrations.runner(
+  internal.migrations.removeCurrencyFromUserPrefsWithoutSubs,
+);
 
 export const backfillKanbanCardAssignments = migrations.define({
   table: "todoKanban",

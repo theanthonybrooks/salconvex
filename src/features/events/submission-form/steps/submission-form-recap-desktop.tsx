@@ -131,7 +131,7 @@ export const SubmissionFormRecapDesktop = ({
                       {capitalize(orgData?.contact?.primaryContact)}
                     </p>{" "}
                     {orgData?.contact?.organizer && (
-                      <span className="flex items-center gap-1">
+                      <span className="flex gap-1">
                         <span className="font-medium">Contact:</span>{" "}
                         <div>
                           <p>{orgData?.contact?.organizer}</p>
