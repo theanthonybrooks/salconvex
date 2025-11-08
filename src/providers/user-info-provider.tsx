@@ -112,7 +112,7 @@ export const UserInfoProvider = ({ children }: Props) => {
     const loadCurrency = async () => {
       if (user) {
         if (userPref?.currency) {
-          setCurrency(userPref.currency as CurrencyOptions);
+          setCurrency(userPref.currency.toLowerCase() as CurrencyOptions);
         } else {
           const detected = await getClientCurrency();
           await updateUserPrefs({ currency: detected });
