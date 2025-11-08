@@ -13,8 +13,10 @@ import { useMutation, usePreloadedQuery } from "convex/react";
 // Context
 // ---------------------------------------------
 type CurrencyOptions = "usd" | "eur";
+type SymbolOptions = "$" | "€";
 type UserInfoContextValue = {
   currency: CurrencyOptions;
+  symbol: SymbolOptions;
 };
 
 const UserInfoContext = createContext<UserInfoContextValue | undefined>(
@@ -136,9 +138,10 @@ export const UserInfoProvider = ({ children }: Props) => {
 
     loadCurrency();
   }, [user, userPref, updateUserPrefs]);
+  const symbol = currency === "usd" ? "$" : "€";
 
   return (
-    <UserInfoContext.Provider value={{ currency }}>
+    <UserInfoContext.Provider value={{ currency, symbol }}>
       {children}
     </UserInfoContext.Provider>
   );

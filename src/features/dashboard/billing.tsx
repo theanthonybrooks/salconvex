@@ -23,12 +23,14 @@ import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-con
 import { getUserFontSizePref } from "@/helpers/stylingFns";
 import { getSubscriptionStatusVals } from "@/helpers/subscriptionFns";
 import { cn } from "@/helpers/utilsFns";
+import { useUserInfo } from "@/providers/user-info-provider";
 
 import { api } from "~/convex/_generated/api";
 import { useAction, usePreloadedQuery } from "convex/react";
 import { ConvexError } from "convex/values";
 
 export default function BillingPage() {
+  const { currency } = useUserInfo();
   const [showConfetti, setShowConfetti] = useState(false);
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const { preloadedSubStatus, preloadedUserData } = useConvexPreload();
@@ -292,7 +294,9 @@ export default function BillingPage() {
                       </span>
                       <span className="flex flex-col items-end justify-start font-medium">
                         <span className="flex items-center gap-2">
-                          ${baseDetails?.actualAmount}
+                          {currency === "usd" ? "$" : ""}
+                          {baseDetails?.actualAmount}
+                          {currency === "eur" ? "€" : ""}
                           {/* {subscription?.amount
                             ? (subscription.amount / 100).toFixed(0)
                             : 0} */}
@@ -314,7 +318,9 @@ export default function BillingPage() {
                               <span className="text-sm font-light italic text-gray-400">
                                 {" "}
                                 {/* (${(nextAmount! / 100).toFixed(0)} starting ) */}
-                                (${baseDetails.nextAmount}/
+                                ({currency === "usd" ? "$" : ""}
+                                {baseDetails.nextAmount}
+                                {currency === "eur" ? "€" : ""}/
                                 {interval?.nextInterval ??
                                   interval?.currentInterval}{" "}
                                 starting{" "}

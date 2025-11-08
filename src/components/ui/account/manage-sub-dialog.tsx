@@ -242,7 +242,7 @@ export const SubDialog = ({
                   <DialogClose asChild>
                     <Button
                       className="w-fit px-6"
-                      variant="salWithShadowHidden"
+                      variant="salWithShadowHiddenBg"
                       onClick={() => {
                         reset();
                         setOpen(false);
@@ -263,7 +263,7 @@ export const SubDialog = ({
                         : "salWithShadowHidden"
                     }
                     tabIndex={7}
-                    className="min-w-30 flex-1 bg-salYellow focus:scale-95 focus:bg-salYellow/20 sm:flex-auto"
+                    className="min-w-30 flex-1 focus:scale-95 focus:bg-salYellow/20 sm:flex-auto"
                   >
                     {pending ? (
                       <LoaderCircle className="size-5 animate-spin" />
