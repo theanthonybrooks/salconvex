@@ -139,10 +139,12 @@ export default async function RootLayout({
                 name: "The Street Art List",
                 url: "https://thestreetartlist.com",
                 description:
-                  "Directory of street art, mural, and public art open calls, RFQs, RFPs, and EOIs worldwide. Plus a global map, ongoing event calendar, and organizer and artist dashboards.",
+                  "Directory of mural, graffiti, public art, and street art calls. All types of open calls - RFQs, RFPs, and EOIs worldwide. Plus a global map, ongoing event calendar, and organizer and artist dashboards.",
                 sameAs: [
-                  "https://instagram.com/anthonybrooksart",
+                  "https://instagram.com/thestreetartlist",
                   "https://www.facebook.com/thestreetartlist",
+                  "https://www.threads.com/@thestreetartlist",
+                  "https://streetartlist.com",
                 ],
               }),
             }}
