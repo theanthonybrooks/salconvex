@@ -11,7 +11,6 @@ import { toast } from "react-toastify";
 
 import { CheckCircle2, CircleX, LoaderCircle } from "lucide-react";
 
-import type { UserCurrenciesType } from "~/convex/actions/getUserInfo";
 import type { FeatureMap, StripeIntervalPricesType } from "~/convex/schema";
 import { Button } from "@/components/ui/button";
 import {
@@ -39,6 +38,8 @@ import { Doc } from "~/convex/_generated/dataModel";
 import { AccountTypeBase } from "~/convex/schema";
 import { useQuery } from "convex-helpers/react/cache";
 import { useAction, usePreloadedQuery } from "convex/react";
+
+export type UserCurrenciesType = "usd" | "eur";
 
 type SwitchProps = {
   onSwitchAction: (value: string) => void;
@@ -393,6 +394,7 @@ const PricingCard = ({
         interval,
         planKey,
         hadTrial,
+        currency,
       });
 
       if (url) {
@@ -558,6 +560,8 @@ const PricingCard = ({
           user={user}
           mode={accountType as ModeType}
           onClick={() => {
+            // console.log("stripeId and currency", stripePriceId, currency);
+
             handleCheckout(isYearly ? "year" : "month", hadTrial ?? false);
           }}
           planKey={planKey}
@@ -597,23 +601,20 @@ export default function Pricing() {
   // useScrollToTopOnMount();
   const searchParams = useSearchParams();
   const typeParam = searchParams.get("type") as AccountTypeBase;
-  const { preloadedSubStatus, preloadedUserData, locationData } =
-    useConvexPreload();
+  const { preloadedSubStatus, preloadedUserData } = useConvexPreload();
   const subData = usePreloadedQuery(preloadedSubStatus);
   const userData = usePreloadedQuery(preloadedUserData);
-  const { currency, country } = locationData;
-  console.log(currency, country);
-  const userPref = userData?.userPref;
-  const fontSizePref = getUserFontSizePref(userPref?.fontSize);
+  const { user, userPref } = userData ?? {};
+  const { fontSize, currency: userCurrency } = userPref ?? {};
+  const fontSizePref = getUserFontSizePref(fontSize);
   const baseFontSize = fontSizePref?.body;
-
+  const currency = (userCurrency?.toLowerCase() ?? "usd") as UserCurrenciesType;
   const hasSub = subData?.hasActiveSubscription;
   const hadTrial = subData?.hadTrial;
   const subscription = subData?.subscription;
+  const bannedSub = subscription?.banned;
   const subInterval = subscription?.intervalNext ?? subscription?.interval;
 
-  // const handleManageSubscription = useManageSubscription({ subscription });
-  const user = userData?.user;
   const [urlAccountType, setUrlAccountType] = useState<AccountTypeBase | null>(
     null,
   );
@@ -666,8 +667,26 @@ export default function Pricing() {
   const toggleOpenCall = (value: string) =>
     setHasOpenCall(parseInt(value) === 0);
 
-  const plans = useQuery(api.plans.getUserPlans);
-  const orgPlans = useQuery(api.plans.getOrgPlans);
+  const plans = useQuery(api.plans.getUserPlans, !bannedSub ? {} : "skip");
+  const orgPlans = useQuery(api.plans.getOrgPlans, !bannedSub ? {} : "skip");
+
+  if (bannedSub)
+    return (
+      <div className="my-20 flex flex-col items-center">
+        <p className="font-tanker text-[2.5em] lowercase tracking-wide text-foreground lg:text-[4em]">
+          Your Membership Has Been Canceled
+        </p>
+        <p className="text-center text-lg font-semibold">
+          For more information and/or to reinstate your membership,{" "}
+          <Link
+            href="/support?reason=account"
+            className="!text-lg font-semibold underline underline-offset-2"
+          >
+            contact support
+          </Link>
+        </p>
+      </div>
+    );
 
   if (!plans || !orgPlans)
     return <div className="h-screen w-screen bg-background" />;

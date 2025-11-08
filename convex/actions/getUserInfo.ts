@@ -25,6 +25,7 @@ export const getLocation = action({
 
     try {
       const res = await fetch("https://ipapi.co/json/");
+      console.log("res", res);
       if (res.ok) {
         const data = await res.json();
         if (data?.country_code) {
@@ -33,8 +34,8 @@ export const getLocation = action({
         }
         console.log("data", data);
       }
-    } catch {
-      console.error("Error fetching IP address, using default location");
+    } catch (err) {
+      console.error("Error fetching IP address, using default location", err);
     }
 
     return { country, currency } as UserLocationType;

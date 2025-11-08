@@ -50,13 +50,31 @@ export default function Home() {
   const { preloadedUserData, preloadedSubStatus } = useConvexPreload();
   const { theme, setTheme } = useTheme();
   const userData = usePreloadedQuery(preloadedUserData);
+  const { userPref } = userData ?? {};
   const subStatus = usePreloadedQuery(preloadedSubStatus);
+
   const hasActiveSubscription = subStatus?.hasActiveSubscription;
-  const userPref = userData?.userPref;
+
   // const videoRef = useRef<HTMLVideoElement | null>(null);
 
   // const user = userData?.user ?? null;
   // const isAdmin = user?.role?.includes("admin");
+  // useEffect(() => {
+  //   if (userCurrency || !user) return;
+
+  //   const updateCurrency = async () => {
+  //     try {
+  //       const result = await getUserInfo();
+  //       console.log("result", result);
+  //       if (!result) return;
+  //       await updateUserPrefs({ currency: result.currency });
+  //     } catch (error) {
+  //       console.error("Failed to update user currency:", error);
+  //     }
+  //   };
+
+  //   updateCurrency();
+  // }, [getUserInfo, userCurrency, updateUserPrefs, user]);
 
   const { data: totalOpenCallsData } = useQueryWithStatus(
     api.openCalls.openCall.getTotalNumberOfOpenCalls,

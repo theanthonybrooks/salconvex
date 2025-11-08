@@ -9,6 +9,8 @@ interface CurrencyData {
   [region: string]: Currency[];
 }
 
+
+
 export const currencies: CurrencyData[] = [
   {
     "North America": [

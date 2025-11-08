@@ -188,7 +188,7 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
         fontSize: "normal",
         timezone: "",
         language: "EN",
-        currency: "USD",
+        // currency: "",
         theme: "default",
         notifications: {
           general: true,

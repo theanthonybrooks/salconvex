@@ -121,6 +121,7 @@ export const createStripeCheckoutSession = action({
     planKey: schema.tables.userPlans.validator.fields.key,
     interval: v.optional(v.string()),
     hadTrial: v.optional(v.boolean()),
+    currency: v.optional(v.string()),
   },
   handler: async (ctx, args): Promise<{ url: string }> => {
     try {
@@ -155,10 +156,11 @@ export const createStripeCheckoutSession = action({
       if (!plan || !plan.prices || !plan.prices.month) {
         throw new Error("Plan not found or missing pricing info");
       }
+      const currency = args.currency ?? "usd";
 
       const priceId =
-        (args.interval && plan.prices[args.interval]?.usd?.stripeId) ||
-        plan.prices.month.usd.stripeId;
+        (args.interval && plan.prices[args.interval]?.[currency]?.stripeId) ||
+        plan.prices.month.currency.stripeId;
 
       // console.log("priceId which: ", priceId);
 
@@ -206,7 +208,7 @@ export const createStripeCheckoutSession = action({
       const session: Stripe.Checkout.Session =
         await stripe.checkout.sessions.create({
           // payment_method_types: ["card", "sepa_debit"],
-          payment_method_types: ["card"],
+          // payment_method_types: ["card"],
           customer: stripeCustomerId,
           line_items: [
             {
@@ -446,7 +448,6 @@ export const subscriptionStoreWebhook = mutation({
         break;
 
       // ...
-      //!! SECTION: --------------------------------------------------------------------
 
       case "checkout.session.expired": //NOTE:
         const customer = await ctx.db
@@ -466,17 +467,14 @@ export const subscriptionStoreWebhook = mutation({
         }
 
         break;
-      //!! SECTION: --------------------------------------------------------------------
 
       case "subscription_schedule.updated":
         break;
       // ...
-      //!! SECTION: --------------------------------------------------------------------
 
       case "invoice.created":
         console.log("invoice.created:", args.body);
         break;
-      //!! SECTION: --------------------------------------------------------------------
 
       case "customer.subscription.created":
         //! This doesn't contain the metadata in the baseObject
@@ -571,7 +569,6 @@ export const subscriptionStoreWebhook = mutation({
         //? :  Removed section that creates a new sub since it's handled prior to checkout and this should only update that existing "subscription" row in the db.
 
         break;
-      //!! SECTION: --------------------------------------------------------------------
 
       case "customer.subscription.updated":
         const discountPercent = baseObject?.discount?.coupon?.percent_off;
@@ -684,8 +681,6 @@ export const subscriptionStoreWebhook = mutation({
         }
         break;
 
-      //!! SECTION: --------------------------------------------------------------------
-
       case "customer.subscription.deleted":
         if (newsletterSub) {
           await updateUserNewsletter(ctx, {
@@ -732,7 +727,6 @@ export const subscriptionStoreWebhook = mutation({
         }
         break;
 
-      //!! SECTION: --------------------------------------------------------------------
       case "customer.discount.created":
         const discountedSub = await ctx.db
           .query("userSubscriptions")
@@ -754,7 +748,6 @@ export const subscriptionStoreWebhook = mutation({
         }
         break;
 
-      //!! SECTION: --------------------------------------------------------------------
       case "customer.discount.deleted":
         const affectedSub = await ctx.db
           .query("userSubscriptions")
@@ -777,7 +770,6 @@ export const subscriptionStoreWebhook = mutation({
 
         break;
 
-      //!! SECTION: --------------------------------------------------------------------
       case "invoice.payment_succeeded":
         // console.log({
         //   // lines: dataObject.lines,
@@ -817,6 +809,7 @@ export const subscriptionStoreWebhook = mutation({
 
           await ctx.db.patch(invoicePaid._id, {
             paidStatus: args.body.data.object.paid,
+            chargeId: dataObject.charge,
             ...(typeof productPlan === "number" && { plan: productPlan }),
 
             customerCancellationComment: undefined,
@@ -827,7 +820,37 @@ export const subscriptionStoreWebhook = mutation({
 
         break;
 
-      //!! SECTION: --------------------------------------------------------------------
+      case "charge.dispute.created":
+        const chargeId = baseObject.charge;
+        if (chargeId) {
+          const subscription = await ctx.db
+            .query("userSubscriptions")
+            .withIndex("by_chargeId", (q) => q.eq("chargeId", chargeId))
+            .first();
+
+          const stripeId = subscription?.stripeId;
+
+          if (stripeId) {
+            // await ctx.db.patch(subscription._id, {
+            //   status: "canceled",
+            // });
+            await ctx.db.patch(subscription._id, {
+              banned: true,
+            });
+            await ctx.scheduler.runAfter(
+              0,
+              internal.stripe.stripeBase.cancelSubscription,
+              {
+                chargeId,
+              },
+            );
+          }
+
+          // await stripe.subscriptions.update(charge.subscription, {
+          //   default_payment_method: null,
+          // });
+        }
+        break;
 
       case "subscription.active":
         // Find and update subscription
@@ -843,8 +866,6 @@ export const subscriptionStoreWebhook = mutation({
           });
         }
         break;
-
-      //!! SECTION: --------------------------------------------------------------------
 
       case "subscription.canceled":
         // Find and update subscription
@@ -870,8 +891,6 @@ export const subscriptionStoreWebhook = mutation({
         }
         break;
 
-      //!! SECTION: --------------------------------------------------------------------
-
       case "subscription.uncanceled":
         // Find and update subscription
         const uncanceledSub = await ctx.db
@@ -892,8 +911,6 @@ export const subscriptionStoreWebhook = mutation({
         }
         break;
 
-      //!! SECTION: --------------------------------------------------------------------
-
       case "subscription.revoked":
         // Find and update subscription
         const revokedSub = await ctx.db
@@ -910,8 +927,6 @@ export const subscriptionStoreWebhook = mutation({
           });
         }
         break;
-
-      //!! SECTION: --------------------------------------------------------------------
 
       case "order.created":
         console.log("order.created:", args.body);

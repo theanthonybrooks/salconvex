@@ -870,41 +870,38 @@ export default function SettingsPage() {
                     </div>
                     <Separator />
                     {/* //TODO: Add this back in when I implement the currency conversion logic */}
-                    {/*     <div className="flex flex-col items-start justify-start gap-y-2 md:flex-row md:items-center md:justify-between md:gap-y-0">
-                    <div className="space-y-0.5">
-                      <Label className={fontSize}>Currency</Label>
-                      <p className="text-sm text-muted-foreground">
-                        Set your preferred currency
-                      </p>
-                    </div>
-                    /~ <Select defaultValue='est'>
-                      <SelectTrigger className='w-[180px]'>
-                        <SelectValue placeholder='Select timezone' />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {options.map((option) => (
-                          <SelectItem value={option.value}>
-                            {option.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select> ~/
+                    {/* <div className="flex flex-col items-start justify-start gap-y-2 md:flex-row md:items-center md:justify-between md:gap-y-0">
+                      <div className="space-y-0.5">
+                        <Label className={fontSize}>Currency</Label>
+                        <p className="text-sm text-muted-foreground">
+                          Set your preferred currency
+                        </p>
+                      </div>
 
-                    <SearchMappedSelect<Currency>
-                      className="sm:w-[120px]"
-                      value={selectedCurrency ?? "USD"}
-                      onChange={setCurrency}
-                      data={currencies[0]}
-                      getItemLabel={(currency) =>
-                        `${currency.symbol} (${currency.code}) - ${currency.name}`
-                      }
-                      searchFields={["name", "symbol", "code"]}
-                      getItemDisplay={(currency) =>
-                        `${currency.symbol} (${currency.code})`
-                      }
-                      getItemValue={(currency) => currency.code}
-                    />
-                  </div>*/}
+                      <SearchMappedSelect<Currency>
+                        disabled
+                        className="sm:w-[120px]"
+                        value={
+                          userPref?.currency
+                            ? userPref.currency.toUpperCase()
+                            : "USD"
+                        }
+                        onChange={(value) => {
+                          handleUpdateUserPrefs({
+                            currency: value === "EUR" ? "eur" : "usd",
+                          });
+                        }}
+                        data={currencies[0]}
+                        getItemLabel={(currency) =>
+                          `${currency.symbol} (${currency.code}) - ${currency.name}`
+                        }
+                        searchFields={["name", "symbol", "code"]}
+                        getItemDisplay={(currency) =>
+                          `${currency.symbol} (${currency.code})`
+                        }
+                        getItemValue={(currency) => currency.code}
+                      />
+                    </div> */}
                     {isArtist && activeSub && (
                       <div className="flex flex-col items-start justify-start gap-2 md:flex-row md:items-center md:justify-between">
                         <div className="space-y-0.5">

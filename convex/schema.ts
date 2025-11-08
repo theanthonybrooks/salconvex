@@ -4,6 +4,7 @@ import { Infer, v } from "convex/values";
 
 // #region ------------- Subscription Validators --------------
 // Define a price object structure that matches your data
+
 const stripePriceValidator = v.object({
   amount: v.number(),
   stripeId: v.string(),
@@ -51,7 +52,7 @@ export const fontSizeValidator = v.union(
 );
 export type FontSizeType = Infer<typeof fontSizeValidator> | undefined;
 
-export const userPrefsValidator = v.object({
+const userPrefsBaseValues = {
   autoApply: v.optional(v.boolean()),
   currency: v.optional(v.string()),
   timezone: v.optional(v.string()),
@@ -67,7 +68,16 @@ export const userPrefsValidator = v.object({
     }),
   ),
   cookiePrefs: v.optional(v.union(v.literal("all"), v.literal("required"))),
-});
+};
+
+const userPrefsFullValidator = {
+  userId: v.id("users"),
+  lastUpdated: v.optional(v.number()),
+  ...userPrefsBaseValues,
+};
+
+export const userPrefsValidator = v.object(userPrefsBaseValues);
+const userPrefsFull = v.object(userPrefsFullValidator);
 
 export type UserPrefsType = Infer<typeof userPrefsValidator>;
 // #endregion
@@ -819,6 +829,7 @@ const userSubscriptionSchema = {
   userId: v.optional(v.string()),
   stripeId: v.optional(v.string()),
   stripePriceId: v.optional(v.string()),
+  chargeId: v.optional(v.string()),
   promoCode: v.optional(v.string()),
   adminPromoCode: v.optional(v.string()),
   promoAppliedAt: v.optional(v.number()),
@@ -850,6 +861,7 @@ const userSubscriptionSchema = {
   customerId: v.optional(v.string()),
   lastEditedAt: v.optional(v.number()),
   paidStatus: v.optional(v.boolean()),
+  banned: v.optional(v.boolean()),
 };
 
 const userSubscriptionSchemaValidator = v.object(userSubscriptionSchema);
@@ -1427,6 +1439,7 @@ export default defineSchema({
     .index("by_status", ["status"])
     .index("userId", ["userId"])
     .index("stripeId", ["stripeId"])
+    .index("by_chargeId", ["chargeId"])
     .index("customerId", ["customerId"]),
 
   userAddOns: defineTable(userAddOnsSchema)
@@ -1472,25 +1485,7 @@ export default defineSchema({
     reason: v.string(),
   }),
 
-  userPreferences: defineTable({
-    userId: v.id("users"),
-    autoApply: v.optional(v.boolean()),
-    currency: v.optional(v.string()),
-    timezone: v.optional(v.string()),
-
-    language: v.optional(v.string()),
-    theme: v.optional(v.string()),
-    fontSize: v.optional(fontSizeValidator),
-    notifications: v.optional(
-      v.object({
-        newsletter: v.optional(v.boolean()),
-        general: v.optional(v.boolean()),
-        applications: v.optional(v.boolean()),
-      }),
-    ),
-    cookiePrefs: v.optional(v.union(v.literal("all"), v.literal("required"))),
-    lastUpdated: v.optional(v.number()),
-  })
+  userPreferences: defineTable(userPrefsFull)
     .index("by_notifications_general", ["notifications.general"])
     .index("by_notifications_newsletter", ["notifications.newsletter"])
     .index("by_notifications_applications", ["notifications.applications"])

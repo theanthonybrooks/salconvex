@@ -174,3 +174,43 @@ export const getUserSubscriptions = query({
     return { artistSubscription, orgSubscription };
   },
 });
+
+export const getCharge = query({
+  args: {
+    chargeId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const charge = await ctx.db
+      .query("userSubscriptions")
+      .withIndex("by_chargeId", (q) => q.eq("chargeId", args.chargeId))
+      .first();
+
+    if (!charge) throw new Error("Charge not found");
+
+    return charge;
+  },
+});
+
+export const cancelSubscription = internalAction({
+  args: {
+    chargeId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const subData = await ctx.runQuery(api.stripe.stripeBase.getCharge, {
+      chargeId: args.chargeId,
+    });
+
+    if (!subData) throw new Error("Charge not found");
+
+    const stripeId = subData?.stripeId;
+    if (!stripeId) throw new Error("No stripeId found");
+
+    await stripe.subscriptions.cancel(stripeId, {
+      cancellation_details: {
+        comment: `User disputed charge: ${args.chargeId}`,
+      },
+    });
+
+    return { success: true };
+  },
+});

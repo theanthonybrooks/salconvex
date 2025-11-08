@@ -1,4 +1,5 @@
-import type { UserCurrenciesType } from "~/convex/actions/getUserInfo";
+import type { UserCurrenciesType } from "@/features/homepage/pricing";
+
 import type { StripeIntervalPricesType } from "~/convex/schema";
 
 export function getPrice(
