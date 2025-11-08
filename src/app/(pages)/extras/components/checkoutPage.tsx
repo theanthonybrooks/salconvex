@@ -12,6 +12,8 @@ import { capitalize } from "lodash";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 
+import { Pencil } from "lucide-react";
+
 import { FormSuccess } from "@/components/form-success";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -35,6 +37,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/state-accordion-test";
+import { OnlineEventDialog } from "@/features/extras/components/online-event-dialog";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { generateGeneralICSFile } from "@/helpers/addToCalendar";
 import { autoHttps } from "@/helpers/linkFns";
@@ -56,12 +59,14 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
   const router = useRouter();
   const queryResult = usePreloadedQuery(preloaded);
   const event = queryResult?.data;
+  const eventOrganizer = event?.organizer;
   const userIsRegistered = queryResult?.userRegistration;
   const eventIsDraft = event?.state === "draft";
 
   const { preloadedUserData, preloadedSubStatus } = useConvexPreload();
   const userData = usePreloadedQuery(preloadedUserData);
   const { user, userPref } = userData ?? {};
+  const isOrganizer = user?._id === eventOrganizer;
   const isAdmin = user?.role?.includes("admin");
   const fontSizePref = getUserFontSizePref(userPref?.fontSize ?? "large");
   const fontSize = fontSizePref?.body;
@@ -370,12 +375,36 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
           )}
         </div>
       </section>
+
       <div
         className={cn(
           "grid gap-5 px-8 pb-10 sm:grid-cols-[55%_50px_auto] 2xl:grid-cols-[60%_50px_auto]",
         )}
       >
         <Accordion type="multiple" defaultValue={["about"]}>
+          {(isOrganizer || isAdmin) && (
+            <div className="flex items-center gap-3 rounded border-1.5 border-dashed border-foreground/20 bg-white/30 p-3">
+              <OnlineEventDialog eventId={event._id}>
+                <Button
+                  variant="outline"
+                  className="flex items-center gap-2 border-foreground/30 p-0 px-2 hover:cursor-pointer hover:bg-white/70 active:scale-90"
+                  fontSize={fontSize}
+                >
+                  <span className="">Edit</span>
+                  <Pencil className="size-4" />
+                </Button>
+              </OnlineEventDialog>
+              <Link href="/dashboard/admin/extras" target="_blank">
+                <Button
+                  variant="outline"
+                  className="flex items-center gap-2 border-foreground/30 p-0 px-2 hover:cursor-pointer hover:bg-white/70 active:scale-90"
+                  fontSize={fontSize}
+                >
+                  View in Dashboard
+                </Button>
+              </Link>
+            </div>
+          )}
           <AccordionItem value="about">
             <AccordionTrigger title="Details:" fontSize={fontSize} />
             <AccordionContent className="pb-3" fontSize={fontSize}>

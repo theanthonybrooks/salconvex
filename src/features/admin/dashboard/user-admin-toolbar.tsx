@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { TableTypes } from "@/types/tanstack-table";
-import { api } from "~/convex/_generated/api";
-import { useQuery } from "convex-helpers/react/cache";
+
+import { useEffect, useState } from "react";
 
 import { ToolbarData } from "@/components/data-table/data-table";
 import {
@@ -18,6 +17,9 @@ import {
 } from "@/components/ui/select";
 import { convertCurrency, formatAmount } from "@/helpers/currencyFns";
 import { cn } from "@/helpers/utilsFns";
+
+import { api } from "~/convex/_generated/api";
+import { useQuery } from "convex-helpers/react/cache";
 
 interface UserAdminToolbarProps {
   toolbarData: ToolbarData | undefined;
@@ -83,7 +85,7 @@ export const AdminToolbar = ({ toolbarData, mode }: UserAdminToolbarProps) => {
   return (
     <div
       className={cn(
-        "mx-auto flex w-full max-w-[80vw] flex-col items-center gap-2 sm:flex-row",
+        "mx-auto flex w-full max-w-[80vw] flex-col items-center gap-2 sm:max-w-full sm:flex-row",
         usersMode && "justify-between",
       )}
     >
