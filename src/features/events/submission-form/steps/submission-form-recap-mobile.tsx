@@ -2,10 +2,10 @@
 
 "use client";
 
+import { EligibilityType } from "@/types/openCallTypes";
+
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { EligibilityType } from "@/types/openCallTypes";
-import { Id } from "~/convex/_generated/dataModel";
 import { motion } from "framer-motion";
 import { useFormContext } from "react-hook-form";
 
@@ -40,6 +40,9 @@ import {
 import { RichTextDisplay } from "@/helpers/richTextFns";
 import { cn } from "@/helpers/utilsFns";
 import { getCallFormatLabel } from "@/lib/openCallFns";
+import { useUserInfo } from "@/providers/user-info-provider";
+
+import { Id } from "~/convex/_generated/dataModel";
 
 interface SubmissionFormRecapMobileProps {
   formType: number;
@@ -62,6 +65,8 @@ export const SubmissionFormRecapMobile = ({
   isEligibleForFree,
   alreadyPaid,
 }: SubmissionFormRecapMobileProps) => {
+  const { currency } = useUserInfo();
+  const outputCurrency = currency === "usd" ? "USD" : "EUR";
   const [hasMounted, setHasMounted] = useState(false);
 
   const eventOnly = formType === 1;
@@ -598,12 +603,14 @@ export const SubmissionFormRecapMobile = ({
             <span className="items-baseline gap-2 text-right text-base font-medium text-foreground">
               Submission cost for this open call is:
               <span className={cn("flex items-start justify-end gap-2")}>
-                (USD){" "}
+                ({outputCurrency}){" "}
                 <span
                   className={cn("mr-5 flex items-center text-4xl font-bold")}
                 >
                   <p className={cn(isEligibleForFree && "text-emerald-600")}>
-                    ${isEligibleForFree ? 0 : submissionCost}
+                    {outputCurrency === "USD" ? "$" : ""}
+                    {isEligibleForFree ? 0 : submissionCost}
+                    {outputCurrency === "EUR" ? "€" : ""}
                   </p>
                 </span>
               </span>

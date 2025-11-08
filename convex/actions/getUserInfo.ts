@@ -3,7 +3,6 @@
 import type { Infer } from "convex/values";
 
 import { v } from "convex/values";
-import { action } from "../_generated/server";
 
 const userCurrenciesValidator = v.union(v.literal("usd"), v.literal("eur"));
 
@@ -15,29 +14,3 @@ const locationValidator = v.object({
 });
 
 export type UserLocationType = Infer<typeof locationValidator>;
-
-export const getLocation = action({
-  args: {},
-  returns: locationValidator,
-  handler: async () => {
-    let country = "US";
-    let currency = "usd";
-
-    try {
-      const res = await fetch("https://ipapi.co/json/");
-      console.log("res", res);
-      if (res.ok) {
-        const data = await res.json();
-        if (data?.country_code) {
-          country = data.country_code;
-          currency = data.currency === "EUR" ? "eur" : "usd";
-        }
-        console.log("data", data);
-      }
-    } catch (err) {
-      console.error("Error fetching IP address, using default location", err);
-    }
-
-    return { country, currency } as UserLocationType;
-  },
-});

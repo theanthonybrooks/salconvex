@@ -36,6 +36,7 @@ import {
 import { RichTextDisplay } from "@/helpers/richTextFns";
 import { cn } from "@/helpers/utilsFns";
 import { getCallFormatLabel } from "@/lib/openCallFns";
+import { useUserInfo } from "@/providers/user-info-provider";
 
 import { Id } from "~/convex/_generated/dataModel";
 
@@ -58,6 +59,8 @@ export const SubmissionFormRecapDesktop = ({
   isEligibleForFree,
   alreadyPaid,
 }: SubmissionFormRecapDesktopProps) => {
+  const { currency } = useUserInfo();
+  const outputCurrency = currency === "usd" ? "USD" : "EUR";
   const eventOnly = formType === 1;
   const paidCall = formType === 3;
   const {
@@ -583,12 +586,14 @@ export const SubmissionFormRecapDesktop = ({
             <span className="items-baseline gap-2 text-lg font-semibold text-foreground">
               Submission cost for this event/open call is:
               <span className={cn("flex items-start justify-end gap-2")}>
-                (USD){" "}
+                ({outputCurrency}){" "}
                 <span
                   className={cn("mr-5 flex items-center text-4xl font-bold")}
                 >
                   <p className={cn(isEligibleForFree && "text-emerald-600")}>
-                    ${isEligibleForFree ? 0 : submissionCost}
+                    {outputCurrency === "USD" ? "$" : ""}
+                    {isEligibleForFree ? 0 : submissionCost}
+                    {outputCurrency === "EUR" ? "€" : ""}
                   </p>
                 </span>
               </span>

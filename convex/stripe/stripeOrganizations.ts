@@ -31,10 +31,11 @@ export const createStripeOrgCheckoutSession = action({
     openCallId: v.optional(v.union(v.id("openCalls"), v.null())),
     slidingPrice: v.number(),
     isEligibleForFree: v.boolean(),
+    currency: v.union(v.literal("usd"), v.literal("eur")),
   },
   handler: async (ctx, args): Promise<{ url: string }> => {
     try {
-      console.log(args);
+      const { currency } = args;
 
       const identity = await getAuthUserId(ctx);
       if (!identity) throw new Error("Not authenticated");
@@ -107,12 +108,12 @@ export const createStripeOrgCheckoutSession = action({
       // Create a Stripe Checkout Session.
       const session: Stripe.Checkout.Session =
         await stripe.checkout.sessions.create({
-          payment_method_types: ["card"],
+          // payment_method_types: ["card"],
           customer: stripeCustomerId,
           line_items: [
             {
               price_data: {
-                currency: "usd",
+                currency,
                 unit_amount: args.slidingPrice ? args.slidingPrice * 100 : 5000,
                 product_data: {
                   name: "Open Call Listing - One-Time",

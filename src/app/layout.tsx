@@ -38,8 +38,8 @@ import "react-datepicker/dist/react-datepicker.css";
 
 import { ToastContainer } from "react-toastify";
 
-import { UserInfoUpdator } from "@/features/auth/components/user-currency-updator";
 import { DashboardClassSync } from "@/providers/dashboard-provider";
+import { UserInfoProvider } from "@/providers/user-info-provider";
 
 import { api } from "~/convex/_generated/api";
 
@@ -173,7 +173,7 @@ export default async function RootLayout({
                       <CookieBanner
                         localCookiePrefs={localCookiePrefs as CookiePref}
                       />
-                      <UserInfoUpdator>{children}</UserInfoUpdator>
+                      <UserInfoProvider>{children}</UserInfoProvider>
                     </DeviceProvider>
                   </PostHogProvider>
                   <ToastContainer

@@ -49,6 +49,7 @@ import { getEventCategoryLabel } from "@/helpers/eventFns";
 import { getOcPricing } from "@/helpers/pricingFns";
 import { handleFileUrl, handleOrgFileUrl } from "@/lib/fileUploadFns";
 import { useDevice } from "@/providers/device-provider";
+import { useUserInfo } from "@/providers/user-info-provider";
 
 import { api } from "~/convex/_generated/api";
 import { Doc, Id } from "~/convex/_generated/dataModel";
@@ -70,6 +71,7 @@ export type EventOCFormValues = z.infer<typeof eventWithOCSchema>;
 
 export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   const { isMobile } = useDevice();
+  const { currency } = useUserInfo();
   const { isSidebarCollapsed } = useDashboard();
 
   const isAdmin = user?.role?.includes("admin") || false;
@@ -513,6 +515,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
               : 50,
           isEligibleForFree,
           openCallId,
+          currency,
         });
         url = result.url;
       }

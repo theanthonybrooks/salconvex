@@ -32,6 +32,7 @@ import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-con
 import { getPrice } from "@/helpers/pricingFns";
 import { getUserFontSizePref } from "@/helpers/stylingFns";
 import { cn } from "@/helpers/utilsFns";
+import { useUserInfo } from "@/providers/user-info-provider";
 
 import { api } from "~/convex/_generated/api";
 import { Doc } from "~/convex/_generated/dataModel";
@@ -483,11 +484,15 @@ const PricingCard = ({
                           isEligibleForFree && "line-through",
                         )}
                       >
-                        $50
+                        {currency === "usd" ? "$" : ""}50
+                        {currency === "eur" ? "€" : ""}
                       </span>
 
                       {isEligibleForFree && (
-                        <span className="font-semibold text-green-600">$0</span>
+                        <span className="font-semibold text-green-600">
+                          {currency === "usd" ? "$" : ""}0
+                          {currency === "eur" ? "€" : ""}
+                        </span>
                       )}
                     </span>
                   </div>
@@ -599,13 +604,14 @@ const PricingCard = ({
 
 export default function Pricing() {
   // useScrollToTopOnMount();
+  const { currency: userCurrency } = useUserInfo();
   const searchParams = useSearchParams();
   const typeParam = searchParams.get("type") as AccountTypeBase;
   const { preloadedSubStatus, preloadedUserData } = useConvexPreload();
   const subData = usePreloadedQuery(preloadedSubStatus);
   const userData = usePreloadedQuery(preloadedUserData);
   const { user, userPref } = userData ?? {};
-  const { fontSize, currency: userCurrency } = userPref ?? {};
+  const { fontSize } = userPref ?? {};
   const fontSizePref = getUserFontSizePref(fontSize);
   const baseFontSize = fontSizePref?.body;
   const currency = (userCurrency?.toLowerCase() ?? "usd") as UserCurrenciesType;

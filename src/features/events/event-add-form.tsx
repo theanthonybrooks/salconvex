@@ -63,6 +63,7 @@ import { getOcPricing } from "@/helpers/pricingFns";
 import { cn } from "@/helpers/utilsFns";
 import { handleFileUrl, handleOrgFileUrl } from "@/lib/fileUploadFns";
 import { useDevice } from "@/providers/device-provider";
+import { useUserInfo } from "@/providers/user-info-provider";
 
 import { api } from "~/convex/_generated/api";
 import { Doc, Id } from "~/convex/_generated/dataModel";
@@ -155,6 +156,7 @@ export const EventOCForm = ({
   // const convex = useConvex();
   const router = useRouter();
   const { isMobile } = useDevice();
+  const { currency } = useUserInfo();
   const isAdmin = user?.role?.includes("admin") || false;
   const steps = getSteps(isAdmin);
   const finalStep = activeStep === steps.length - 1;
@@ -575,6 +577,7 @@ export const EventOCForm = ({
               : 50,
           isEligibleForFree,
           openCallId,
+          currency,
         });
         url = result.url;
       }
