@@ -407,7 +407,7 @@ export default function Home() {
         </div>
 
         <div className="relative z-10 bg-background pt-4 sm:pt-10">
-          <h1 className="hidden px-4 pb-8 text-center font-tanker text-4xl tracking-tight lg:block">
+          <h1 className="hidden px-4 pb-8 text-center font-tanker text-4xl lg:block">
             Global database of everything street art, graffiti, and
             mural-related
           </h1>
