@@ -21,8 +21,11 @@ export function getOpenCallStatus(
 
   if (ocType === "Rolling") return "active";
 
-  if (ocType === "Email" && end) {
-    return now > end ? "ended" : "active";
+  if (ocType === "Email") {
+    if (end) {
+      return now > end ? "ended" : "active";
+    }
+    return "active";
   }
 
   return null;

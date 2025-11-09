@@ -14,7 +14,7 @@ import { newsletterColumns } from "@/features/admin/dashboard/newsletter-columns
 import { userColumns } from "@/features/admin/dashboard/user-columns";
 import { userAddOnColumns } from "@/features/admin/dashboard/userAddon-columns";
 import { applicationColumns } from "@/features/artists/applications/components/events-data-table/application-columns";
-import { getColumns } from "@/features/events/components/events-data-table/columns";
+import { getEventColumns } from "@/features/events/components/events-data-table/event-columns";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { cn } from "@/helpers/utilsFns";
 
@@ -94,7 +94,7 @@ export function AdminDashboardTableWrapper({
           <div className="hidden max-h-full w-full px-10 pb-10 pt-7 lg:block">
             <h3 className="mb-3 text-xl">Submitted Events & Open Calls</h3>
             <DataTable
-              columns={getColumns(isAdmin)}
+              columns={getEventColumns(isAdmin)}
               data={eventsData}
               // columnVisibility={{
               //   category: true,
@@ -114,7 +114,7 @@ export function AdminDashboardTableWrapper({
           </div>
           <div className="flex flex-col items-center justify-center gap-4 py-7 lg:hidden">
             <DataTable
-              columns={getColumns(isAdmin)}
+              columns={getEventColumns(isAdmin)}
               data={eventsData}
               defaultVisibility={{
                 type: false,

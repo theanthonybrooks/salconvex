@@ -1,14 +1,16 @@
 "use client";
 
 import { EventCategory, EventType } from "@/types/eventTypes";
+
 import { ColumnDef } from "@tanstack/react-table";
-import { Id } from "~/convex/_generated/dataModel";
 
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 import { Link } from "@/components/ui/custom-link";
 import { ListActionSelector } from "@/features/artists/dashboard/data-tables/bookmark-hidden-selector";
 import { getEventCategoryLabel, getEventTypeLabel } from "@/helpers/eventFns";
 import { cn } from "@/helpers/utilsFns";
+
+import { Id } from "~/convex/_generated/dataModel";
 
 export const hiddenColumnLabels: Record<string, string> = {
   name: "Event Name",
@@ -33,7 +35,9 @@ export const hiddenColumns: ColumnDef<hiddenColumnsProps>[] = [
     accessorKey: "rowNumber",
     id: "rowNumber",
     header: ({ column }) => <DataTableColumnHeader column={column} title="#" />,
-    size: 40,
+    minSize: 30,
+    size: 30,
+    maxSize: 40,
     cell: ({ row, table }) => {
       const totalRows = table.getCoreRowModel().rows.length;
       const descending = table.getState().sorting?.[0]?.desc ?? false;
@@ -144,8 +148,8 @@ export const hiddenColumns: ColumnDef<hiddenColumnsProps>[] = [
   {
     accessorKey: "hiddenStatus",
     id: "hiddenStatus",
-    minSize: 120,
-    maxSize: 180,
+    minSize: 90,
+    maxSize: 90,
 
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Status" />

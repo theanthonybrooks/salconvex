@@ -172,47 +172,6 @@ interface MultiSelectProps<T extends string>
 }
 
 export const MultiSelect = React.forwardRef(
-  //   HTMLButtonElement,
-  //   MultiSelectProps
-  // >(
-  //   (
-  //     {
-  //       fallbackValue,
-  //       limit,
-  //       id,
-  //       value,
-  //       options,
-  //       onValueChange,
-  //       variant,
-  //       shiftOffset,
-  //       height = 10,
-  //       hasSearch = true,
-  //       selectAll = true,
-  //       defaultValue = [],
-  //       lockedValue = [],
-
-  //       placeholder = "Select options",
-  //       animation = 0,
-  //       maxCount = 3,
-  //       showArrow,
-  //       compact = false,
-  //       // modalPopover = false,
-  //       shortResults = false,
-  //       condensed = false,
-  //       tabIndex = 0,
-  //       // asChild = false,
-  //       className,
-  //       badgeClassName,
-  //       textClassName,
-  //       listClassName,
-  //       groupClassName,
-  //       disabled,
-  //       abbreviated = false,
-  //       showIcon = true,
-  //       ...props
-  //     },
-  //     ref,
-  //   ) => {
   <T extends string>(
     {
       options,

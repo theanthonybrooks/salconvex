@@ -1,7 +1,8 @@
+import { noEventCategories } from "@/constants/eventConsts";
+
 import { User } from "@/types/user";
-import { Doc } from "~/convex/_generated/dataModel";
+
 import { Controller, useFormContext } from "react-hook-form";
-import { HiArrowTurnLeftDown } from "react-icons/hi2";
 
 import { FormLinksInput } from "@/components/ui/form-links-inputs";
 import { Label } from "@/components/ui/label";
@@ -12,7 +13,6 @@ import {
   SelectGroup,
   SelectItem,
   SelectLabel,
-  SelectSeparator,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
@@ -20,7 +20,8 @@ import { Separator } from "@/components/ui/separator";
 import { EventOCFormValues } from "@/features/events/event-add-form";
 import { getEventCategoryLabel } from "@/helpers/eventFns";
 import { cn } from "@/helpers/utilsFns";
-import { noEventCategories, prodOnlyCategories } from "@/constants/eventConsts";
+
+import { Doc } from "~/convex/_generated/dataModel";
 
 interface SubmissionFormEventStep2Props {
   user: User | undefined;
@@ -65,7 +66,6 @@ const SubmissionFormEventStep2 = ({
   const isOngoing = watch("event.dates.eventFormat") === "ongoing";
 
   const noEvent = noEventCategories.includes(category);
-  const prodOnly = prodOnlyCategories.includes(category);
 
   // #region ------------- Queries, Actions, and Mutations --------------
 
@@ -94,7 +94,7 @@ const SubmissionFormEventStep2 = ({
             Step{" "}
             {categoryEvent && !eventOnly && !isOngoing
               ? 10
-              : (!categoryEvent && isOngoing) || noEvent || prodOnly
+              : (!categoryEvent && isOngoing) || noEvent
                 ? 8
                 : 9}
             :{" "}
@@ -136,50 +136,6 @@ const SubmissionFormEventStep2 = ({
         >
           {canNameEvent && (
             <>
-              {/* <div className="input-section h-full">
-                <p className="min-w-max font-bold lg:text-xl">
-                  Step{" "}
-                  {categoryEvent && !eventOnly && !isOngoing
-                    ? 11
-                    : (!categoryEvent && isOngoing) || noEvent || prodOnly
-                      ? 9
-                      : 10}
-                  :{" "}
-                </p>
-                <p className="flex items-center gap-1 lg:text-xs">
-                  Other {getEventCategoryLabel(category, true)} Info
-                </p>
-              </div>
-
-              <div className="mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
-                <Label htmlFor="event.name" className="sr-only">
-                  {getEventCategoryLabel(category, true)} Other Info
-                </Label>
-
-                <Controller
-                  name="event.otherInfo"
-                  control={control}
-                  render={({ field }) => (
-                    <RichTextEditor
-                      value={field.value ?? ""}
-                      onChange={field.onChange}
-                      placeholder="Add any other info about your project/event. Don't add open call details here."
-                      charLimit={5000}
-                      formInputPreview
-                      inputPreviewContainerClassName="rounded-lg"
-                    />
-                  )}
-                />
-                <span className="w-full text-center text-xs italic text-muted-foreground">
-                  (Formatting is for preview and won&apos;t exactly match the
-                  public version)
-                </span>
-              </div> */}
-              {/* <Separator
-                thickness={2}
-                className="col-span-full mx-auto my-2 block"
-                orientation="horizontal"
-              /> */}
               <p className="col-span-full mx-auto mb-2 font-medium">
                 {eventOnly
                   ? "Open Call: Is this an invite-only event?"
@@ -190,7 +146,7 @@ const SubmissionFormEventStep2 = ({
                   Step{" "}
                   {categoryEvent && !eventOnly && !isOngoing
                     ? 11
-                    : (!categoryEvent && isOngoing) || noEvent || prodOnly
+                    : (!categoryEvent && isOngoing) || noEvent
                       ? 9
                       : 10}
                   :
@@ -226,7 +182,7 @@ const SubmissionFormEventStep2 = ({
                       <SelectContent className="min-w-auto">
                         {!eventOnly && (
                           <>
-                            {!freeCall && isAdmin && (
+                            {/*   {!freeCall && isAdmin && (
                               <>
                                 <SelectItem fit value="False">
                                   No, there&apos;s not an open call
@@ -234,16 +190,16 @@ const SubmissionFormEventStep2 = ({
                                 <SelectItem fit value="Invite">
                                   No, it&apos;s an invite only event
                                 </SelectItem>
-                                {/* <p className="border-y-2 border-dotted border-foreground/50 bg-salYellowLt/20 px-2 py-2 text-sm">
+                                /~ <p className="border-y-2 border-dotted border-foreground/50 bg-salYellowLt/20 px-2 py-2 text-sm">
                                 Or select the type of call:
-                              </p> */}
+                              </p> ~/
                                 <SelectSeparator />{" "}
                                 <span className="flex items-center gap-1 px-3 py-1 text-xs italic text-muted-foreground">
                                   <HiArrowTurnLeftDown className="size-4 shrink-0 translate-y-1.5" />
                                   Or select the type of call
                                 </span>
                               </>
-                            )}
+                            )}*/}
                             <SelectItem fit value="Fixed">
                               Fixed Deadline
                             </SelectItem>

@@ -1,11 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { api } from "~/convex/_generated/api";
-import { useMutation } from "convex/react";
-import { ConvexError } from "convex/values";
-import { LoaderCircle } from "lucide-react";
 import { toast } from "react-toastify";
+
+import { LoaderCircle } from "lucide-react";
 
 import {
   Select,
@@ -14,7 +12,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Event } from "@/features/events/components/events-data-table/columns";
+import { Event } from "@/features/events/components/events-data-table/event-columns";
+
+import { api } from "~/convex/_generated/api";
+import { useMutation } from "convex/react";
+import { ConvexError } from "convex/values";
 
 interface DataTableEventEditionProps {
   event: Event;

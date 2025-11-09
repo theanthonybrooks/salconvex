@@ -19,8 +19,8 @@ import { useStepper } from "@/components/ui/stepper";
 import { TooltipSimple } from "@/components/ui/tooltip";
 import {
   Event as EventType,
-  getColumns,
-} from "@/features/events/components/events-data-table/columns";
+  getEventColumns,
+} from "@/features/events/components/events-data-table/event-columns";
 import { EventOCFormValues } from "@/features/events/event-add-form";
 import { OrgSearch } from "@/features/organizers/components/org-search";
 import { cn } from "@/helpers/utilsFns";
@@ -390,7 +390,7 @@ const SubmissionFormOrgStep = ({
               </div>
             )}
             <DataTable
-              columns={getColumns(false)}
+              columns={getEventColumns(false)}
               data={eventsData}
               defaultVisibility={{
                 _id: false,
@@ -421,7 +421,7 @@ const SubmissionFormOrgStep = ({
               adminActions={{ isAdmin }}
             />
             <DataTable
-              columns={getColumns(false)}
+              columns={getEventColumns(false)}
               data={eventsData}
               minimalView={
                 dashboardView && firstColVisible && !sidebarCollapsed
@@ -448,7 +448,7 @@ const SubmissionFormOrgStep = ({
               }}
             />
             <DataTable
-              columns={getColumns(false)}
+              columns={getEventColumns(false)}
               data={eventsData}
               minimalView={
                 dashboardView && firstColVisible && !sidebarCollapsed

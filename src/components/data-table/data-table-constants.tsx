@@ -4,6 +4,7 @@ import { eventTypeOptions } from "@/constants/eventConsts";
 import { onlineEventCategories } from "@/constants/extrasConsts";
 
 import type { DataTableFacetedFilterOption } from "@/components/data-table/data-table-faceted-filter";
+import type { PageTypes, TableTypes } from "@/types/tanstack-table";
 
 import { FaMoneyBill } from "react-icons/fa6";
 import {
@@ -330,12 +331,13 @@ export const accountTypeOptions = [
 
 interface FilterConfig {
   columnId: string;
+  pageType?: PageTypes;
   title: string;
   options: DataTableFacetedFilterOption[];
   showWhenMinimal?: boolean; // optional flag
 }
 
-type TableFilterConfig = Record<string, FilterConfig[]>;
+type TableFilterConfig = Record<TableTypes, FilterConfig[]>;
 
 export const TABLE_FILTERS: TableFilterConfig = {
   extras: [
@@ -363,8 +365,18 @@ export const TABLE_FILTERS: TableFilterConfig = {
   ],
   events: [
     { columnId: "state", title: "State", options: eventStates },
-    { columnId: "openCallState", title: "Open Call", options: eventStates },
-    { columnId: "category", title: "Category", options: eventCategories },
+    {
+      columnId: "openCallState",
+      title: "Open Call",
+      options: eventStates,
+      pageType: "dashboard",
+    },
+    {
+      columnId: "category",
+      title: "Category",
+      options: eventCategories,
+      pageType: "dashboard",
+    },
   ],
   openCalls: [
     { columnId: "state", title: "State", options: eventStates },
@@ -435,4 +447,6 @@ export const TABLE_FILTERS: TableFilterConfig = {
       options: bookmarkIntents,
     },
   ],
+  organizations: [],
+  hidden: [],
 };

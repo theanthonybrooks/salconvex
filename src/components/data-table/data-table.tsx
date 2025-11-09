@@ -309,6 +309,21 @@ export function DataTable<TData, TValue>({
     table.setPageSize(pageSize);
   }, [table, pageSize]);
 
+  // useEffect(() => {
+  //   if (!data.length) return;
+
+  //   // Get the first row index (or whichever should be "newest")
+  //   const firstRowIndex = 0;
+
+  //   // If no row is selected yet, or if the new data length increased, select first
+  //   const hasSelection = Object.keys(rowSelection).length > 0;
+
+  //   if (!hasSelection) {
+  //     setRowSelection({ [firstRowIndex]: true });
+  //     onRowSelect?.(data[firstRowIndex], { [firstRowIndex]: true });
+  //   }
+  // }, [data, rowSelection, onRowSelect]);
+
   return (
     <div className={cn("w-full space-y-4 pb-3", outerContainerClassName)}>
       <AdminToolbar toolbarData={toolbarData} mode={tableType} />

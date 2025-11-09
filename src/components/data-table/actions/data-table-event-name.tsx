@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/dialog";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { Event } from "@/features/events/components/events-data-table/columns";
+import { Event } from "@/features/events/components/events-data-table/event-columns";
 import { getEventCategoryLabel } from "@/helpers/eventFns";
 import { cn } from "@/helpers/utilsFns";
 

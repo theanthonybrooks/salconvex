@@ -20,7 +20,7 @@ import { userAddOnColumnLabels } from "@/features/admin/dashboard/userAddon-colu
 import { applicationColumnLabels } from "@/features/artists/applications/components/events-data-table/application-columns";
 import { bookmarkColumnLabels } from "@/features/artists/dashboard/data-tables/bookmark-columns";
 import { hiddenColumnLabels } from "@/features/artists/dashboard/data-tables/hidden-columns";
-import { columnLabels } from "@/features/events/components/events-data-table/columns";
+import { columnLabels } from "@/features/events/components/events-data-table/event-columns";
 import { orgEventColumnLabels } from "@/features/organizers/dashboard/data-tables/organizer-columns";
 
 interface DataTableViewOptionsProps<TData> {

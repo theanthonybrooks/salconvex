@@ -729,7 +729,7 @@ export const getFilteredEventsPublic = query({
               else openCallStatus = "active";
             } else if (ocType === "Rolling" || ocType === "Email") {
               openCallStatus = ocEnd && now > ocEnd ? "ended" : "active";
-            }
+            } else if (ocType === "Unknown") openCallStatus = "active";
 
             hasActiveOpenCall = openCallStatus === "active";
           } else if (openCall && openCall.state === "archived") {

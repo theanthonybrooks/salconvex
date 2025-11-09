@@ -77,7 +77,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   const isAdmin = user?.role?.includes("admin") || false;
   const router = useRouter();
   const [activeStep, setActiveStep] = useState(0);
-  const [formType, setFormType] = useState<number>(isAdmin ? 1 : 0);
+  const [formType, setFormType] = useState<number>(0);
   const [editedSections, setEditedSections] = useState<
     ("event" | "openCall")[]
   >([]);
@@ -140,7 +140,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   // #region ------------- Actions, Mutations, Queries --------------
 
   const searchParams = useSearchParams();
-  const eventId = searchParams.get("_id");
+  const loadedEventId = searchParams.get("_id");
   const currentValues = getValues();
   const getCheckoutUrl = useAction(
     api.stripe.stripeOrganizations.createStripeOrgCheckoutSession,
@@ -253,7 +253,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   // #endregion
   // #region ------------- Variables --------------
   const eventFormType = eventData?.formType;
-  const hasEventId = !!eventData?._id;
+  const eventId = eventData?._id;
   const userAcceptedTerms = acceptedTerms;
   // const firstTimeOnStep = furthestStep <= activeStep;
   const orgName = orgData?.name ?? "";
@@ -279,9 +279,9 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
     (newOrgEvent &&
       activeStep === 0 &&
       eventData &&
-      hasEventId &&
+      eventId &&
       canClearEventData.current) ||
-    (isSelectedRowEmpty && hasEventId && activeStep === 0);
+    (isSelectedRowEmpty && eventId && activeStep === 0);
 
   const orgNameValid = !errors.organization?.name && Boolean(orgName?.trim());
   const orgLocationValid =
@@ -290,7 +290,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   const orgDataValid = orgNameValid && orgLocationValid && orgLogoValid;
   const { data: preloadData } = useQueryWithStatus(
     api.events.event.preloadEventAndOrgById,
-    typeof eventId === "string" ? { eventId: eventId as Id<"events"> } : "skip",
+    loadedEventId ? { eventId: loadedEventId as Id<"events"> } : "skip",
   );
 
   const {
@@ -407,9 +407,9 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   const [submissionCost, setSubmissionCost] = useState<
     { name: string; price: number; converted: number } | undefined
   >({ name: "base", price: 50, converted: 0 });
-  const projectBudgetLg =
-    submissionCost?.converted && submissionCost.converted > 1000;
-
+  const projectBudgetLg = Boolean(
+    submissionCost?.converted && submissionCost.converted > 1000,
+  );
   const alreadyPaid = !!openCallData?.paid;
   const alreadyApprovedOC = !!openCallData?.approvedBy;
   const alreadyApprovedEvent = !!eventData?.approvedBy;
@@ -1667,10 +1667,10 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   }, [editedSections, handleDraftUpdate]);
 
   useEffect(() => {
-    if (!initialFormType.current && hasEventId) {
+    if (!initialFormType.current && eventId) {
       initialFormType.current = formType;
     }
-  }, [formType, hasEventId]);
+  }, [formType, eventId]);
 
   useEffect(() => {
     if (formType === 1 || !initialFormType.current) return;
@@ -1680,13 +1680,15 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
     } else if (
       !projectBudgetLg &&
       initialFormType.current < 3 &&
-      formType === 3
+      formType === 3 &&
+      !isAdmin
     ) {
       setFormType(2);
       setValue("event.formType", 2);
     }
-  }, [formType, projectBudgetLg, setValue]);
+  }, [formType, projectBudgetLg, setValue, isAdmin]);
 
+  //note-to-self: this is just to load the form type from the searchparam event data to sync it with the current form type.
   useEffect(() => {
     if (eventFormType === undefined || eventFormType === 0 || formType !== 0)
       return;

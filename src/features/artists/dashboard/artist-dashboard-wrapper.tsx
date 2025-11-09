@@ -157,10 +157,8 @@ export function ArtistDashboardTableWrapper({
             <DataTable
               columns={hiddenColumns}
               data={hiddenData ?? []}
-              defaultVisibility={{
-                edition: false,
-                eventEnd: false,
-              }}
+              // defaultVisibility={{
+              // }}
               // onRowSelect={(row) => {
               //   console.log(row);
               // }}
@@ -177,7 +175,6 @@ export function ArtistDashboardTableWrapper({
               data={hiddenData ?? []}
               defaultVisibility={{
                 edition: false,
-                eventEnd: false,
               }}
               // onRowSelect={(row) => {
               //   console.log(row);

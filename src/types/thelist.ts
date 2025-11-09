@@ -1,4 +1,10 @@
 import { SearchType } from "@/constants/filterConsts";
+
+import type {
+  CallFormat,
+  CallType,
+  EligibilityType,
+} from "@/types/openCallTypes";
 import {
   EventCategory,
   EventType,
@@ -21,15 +27,17 @@ export type Continents =
   | "Africa"
   | "South America";
 
+type ExtendedCallFormat = CallFormat | "";
+
 export interface Filters {
   showHidden?: boolean;
   bookmarkedOnly?: boolean;
   eventTypes?: EventType[];
   eventCategories?: EventCategory[];
   continent?: Continents[];
-  eligibility?: string[];
-  callType?: string[];
-  callFormat?: string;
+  eligibility?: EligibilityType[];
+  callType?: CallType[];
+  callFormat?: ExtendedCallFormat;
   limit: number;
   postStatus?: PostStatusOptions;
 }

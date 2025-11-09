@@ -204,7 +204,7 @@ export const SubmissionFormRecapDesktop = ({
                   </tr>
                 )}
 
-                {eventData.category !== "project" && (
+                {eventData.category === "event" && (
                   <tr>
                     <th className="pr-4 align-top font-medium">Event Dates:</th>
                     <td>

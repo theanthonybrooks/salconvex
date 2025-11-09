@@ -4,7 +4,7 @@ import { siteUrl } from "@/constants/siteInfo";
 import { OpenCallCategoryKey } from "@/types/openCallTypes";
 import { User } from "@/types/user";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { currencies, Currency } from "@/app/data/currencies";
 import FilePondPluginFileValidateSize from "filepond-plugin-file-validate-size";
 import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type";
@@ -47,6 +47,8 @@ interface SubmissionFormOC2Props {
   pastEvent: boolean;
 }
 
+type HasBudgetOptions = "true" | "false" | "";
+
 const SubmissionFormOC2 = ({
   // user,
   isAdmin,
@@ -71,6 +73,7 @@ const SubmissionFormOC2 = ({
     // getValues,
     // formState: { errors },
   } = useFormContext<EventOCFormValues>();
+
   const currentFormType = watch("event.formType") ?? 0;
   const openCall = watch("openCall");
   const organizer = watch("organization");
@@ -81,7 +84,7 @@ const SubmissionFormOC2 = ({
 
   const orgCurrency = organizer?.location?.currency;
   const existingHasBudget = openCall?.compensation?.budget?.hasBudget;
-  const [hasBudget, setHasBudget] = useState<"true" | "false" | "">(
+  const [hasBudget, setHasBudget] = useState<HasBudgetOptions>(
     typeof existingHasBudget === "boolean"
       ? (String(existingHasBudget) as "true" | "false")
       : paidCall
@@ -111,6 +114,12 @@ const SubmissionFormOC2 = ({
 
   const setValueRef = useRef(setValue);
 
+  const handleResetBudget = useCallback(() => {
+    setValue("openCall.compensation.budget.min", 0);
+    setValue("openCall.compensation.budget.max", 0);
+    setValue("openCall.compensation.budget.rate", 0);
+  }, [setValue]);
+
   useEffect(() => {
     if (!paidCall) return;
     if (paidCall) {
@@ -127,11 +136,16 @@ const SubmissionFormOC2 = ({
     } else if (!formValue && noBudgetMin) {
       setHasBudget("false");
     } else if (formValue === "false" && validBudgetMin) {
-      setValue("openCall.compensation.budget.min", 0);
-      setValue("openCall.compensation.budget.max", 0);
-      setValue("openCall.compensation.budget.rate", 0);
+      handleResetBudget();
     }
-  }, [validBudgetMin, noBudgetMin, setValue, hasBudget, budgetMin]);
+  }, [
+    validBudgetMin,
+    noBudgetMin,
+    setValue,
+    hasBudget,
+    budgetMin,
+    handleResetBudget,
+  ]);
 
   useEffect(() => {
     const isValidNumber = Number.isFinite(budgetMax);
@@ -417,6 +431,7 @@ const SubmissionFormOC2 = ({
                       checked={field.value || false}
                       onCheckedChange={(checked) => {
                         field.onChange(checked);
+                        if (checked) handleResetBudget();
                       }}
                     />
                   );

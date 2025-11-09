@@ -11,7 +11,7 @@ export type PlatformType =
 
 export const platformDomains: Record<PlatformType, string[]> = {
   instagram: ["instagram.com"],
-  threads: ["threads.com"],
+  threads: ["threads.com", "threads.net"],
   facebook: ["facebook.com"],
   vk: ["vk.com"],
   linkedin: ["linkedin.com"],

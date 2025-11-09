@@ -1,16 +1,18 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { SearchType, TheListFilterCommandItem } from "@/constants/filterConsts";
+
 import { MergedEventPreviewData } from "@/types/eventTypes";
 import { Filters, SearchParams, SortOptions } from "@/types/thelist";
 import { User } from "@/types/user";
+
+import { useEffect, useMemo, useState } from "react";
 import { debounce } from "lodash";
 
 import { ViewOptions } from "@/features/events/event-list-client";
 import { TheListFilterDrawer } from "@/features/thelist/components/filter-drawer";
 import { FilterBase } from "@/features/thelist/components/filters/filter-base";
 import { cn } from "@/helpers/utilsFns";
-import { SearchType, TheListFilterCommandItem } from "@/constants/filterConsts";
 
 interface ListFilterProps<T extends TheListFilterCommandItem> {
   title: string;
@@ -104,22 +106,6 @@ export const TheListFilters = <T extends TheListFilterCommandItem>({
     }
     return;
   }, [view]);
-  // useEffect(() => {
-  //   const params = new URLSearchParams();
-  //   setParamIfNotDefault(params, "term", value, "");
-  //   setParamIfNotDefault(params, "st", searchType, "all");
-  //   const queryString = params.toString();
-  //   const baseUrl = window.location.origin + window.location.pathname;
-  //   sessionStorage.setItem(
-  //     "previousSalPage",
-  //     baseUrl + (queryString ? `?${queryString}` : ""),
-  //   );
-  //   window.history.replaceState(
-  //     null,
-  //     "",
-  //     baseUrl + (queryString ? `?${queryString}` : ""),
-  //   );
-  // }, [searchType, value]);
 
   return (
     <div className={cn("flex items-center justify-center gap-2", className)}>

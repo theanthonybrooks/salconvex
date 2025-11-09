@@ -134,6 +134,8 @@ export const FilterBase = ({
     filters.eventCategories?.length !== 0 &&
     !filters.eventCategories?.includes("event");
   const alphaSort = sortOptions.sortBy === "name";
+  const unknownOption = isAdmin ? [{ value: "Unknown", label: "Unknown" }] : [];
+  const callTypeOptions = [...callType_option_values, ...unknownOption];
 
   // useEffect(() => {
 
@@ -510,7 +512,7 @@ export const FilterBase = ({
                   Call Type:
                 </Label>
                 <MultiSelect
-                  options={callType_option_values}
+                  options={callTypeOptions}
                   value={filters.callType ?? []}
                   onValueChange={(value) =>
                     onChange({ callType: value as CallType[] })
@@ -1014,7 +1016,7 @@ export const FilterBase = ({
                     Call Type:
                   </Label>
                   <MultiSelect
-                    options={callType_option_values}
+                    options={callTypeOptions}
                     value={filters.callType ?? []}
                     onValueChange={(value) =>
                       onChange({ callType: value as CallType[] })

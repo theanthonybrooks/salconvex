@@ -1,14 +1,16 @@
 "use client";
 
+import { dashboardNavItems } from "@/constants/links";
+
 import { MergedEventPreviewData } from "@/types/eventTypes";
 import { Filters, SearchParams, SortOptions } from "@/types/thelist";
 import { User } from "@/types/user";
-import { UserPrefsType } from "~/convex/schema";
 
 import { Separator } from "@/components/ui/separator";
 import { ViewOptions } from "@/features/events/event-list-client";
 import { TheListFilters } from "@/features/thelist/components/filters/the-list-filters";
-import { dashboardNavItems } from "@/constants/links";
+
+import { UserPrefsType } from "~/convex/schema";
 
 interface Props {
   user: User | null;
@@ -48,7 +50,7 @@ export const EventFilters = ({
     (filters.continent && filters.continent.length > 0) ||
     (filters.eligibility && filters.eligibility.length > 0) ||
     (filters.callType && filters.callType.length > 0) ||
-    !!(filters.callFormat && filters.callFormat !== "") ||
+    Boolean(filters.callFormat) ||
     (filters.postStatus && filters.postStatus !== "all") ||
     search.searchTerm !== "";
 

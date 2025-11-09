@@ -1,7 +1,9 @@
 import {
   eventCategoryOptions,
   eventTypeOptions,
+  hasProductionCategories,
   noEventCategories,
+  noProdCategories,
   prodOnlyCategories,
 } from "@/constants/eventConsts";
 
@@ -78,9 +80,6 @@ const SubmissionFormEventStep1 = ({
   const eventState = eventData?.state;
   const archivedEvent = eventState === "archived";
   // console.log(eventData);
-  const category = eventData?.category as EventCategory;
-  const noEvent = noEventCategories.includes(category);
-  const prodOnly = prodOnlyCategories.includes(category);
 
   // console.log(previousEventNameValid);
   // #region ------------- Queries, Actions, and Mutations --------------
@@ -127,8 +126,17 @@ const SubmissionFormEventStep1 = ({
     nameValidTrigger;
   const isOngoing = eventData?.dates?.eventFormat === "ongoing";
   const eventDatesFormat = eventData?.dates?.eventFormat;
-  const hasEventFormat = !!eventData?.dates?.eventFormat;
+  const hasEventFormat = Boolean(eventData?.dates?.eventFormat);
   const prodDatesFormat = eventData?.dates?.prodFormat;
+  const prodDates = eventData?.dates?.prodDates;
+  const category = eventData?.category as EventCategory;
+  const hasEvent = category === "event";
+  const noEvent = noEventCategories.includes(category);
+  const noProd = noProdCategories.includes(category);
+  const hasProd = hasProductionCategories.includes(category) && !isOngoing;
+  const prodOnly = prodOnlyCategories.includes(category);
+  const singleProdDate = prodDates?.length === 1;
+  console.log(singleProdDate);
 
   const eventDateFormatRequired = !!(
     hasEventFormat &&
@@ -137,25 +145,39 @@ const SubmissionFormEventStep1 = ({
       eventDatesFormat,
     )
   );
-  const eventDateFormatNotRequired = !!(
-    hasEventFormat &&
-    eventDatesFormat &&
-    ["noEvent"].includes(eventDatesFormat)
+  const eventDateFormatNotRequired = Boolean(
+    hasEventFormat && eventDatesFormat && eventDatesFormat.includes("noEvent"),
   );
 
   const prodSameAsEvent = eventData?.dates?.prodFormat === "sameAsEvent";
+  console.log(prodSameAsEvent, prodDatesFormat);
   const blankEventDates =
     eventDates?.[0]?.start === "" || eventDates?.[0]?.end === "";
   const orgData = watch("organization");
   const isAdmin = user?.role?.includes("admin") || false;
   const eventOnly = formType === 1;
 
+  // useEffect(() => {
+  //   if (noEvent && prodDatesFormat !== "noProd") {
+  //     setValue("event.dates.prodFormat", "noProd");
+  //     setValue("event.dates.prodDates", [{ start: "", end: "" }]);
+  //   }
+  // }, [noEvent, setValue, prodDatesFormat]);
+
   useEffect(() => {
-    if (noEvent && prodDatesFormat !== "noProd") {
-      setValue("event.dates.prodFormat", "noProd");
+    if (noProd) {
+      setValue("event.dates.eventFormat", "noEvent");
+      setValue("event.dates.eventDates", [{ start: "", end: "" }]);
+      setValue("event.dates.prodFormat", "yearRange");
+      setValue("event.dates.prodDates", [
+        { start: String(eventEdition), end: String(eventEdition) },
+      ]);
+    } else {
+      setValue("event.dates.prodFormat", "setDates");
+      //   setValue("event.dates.eventFormat", "");
       setValue("event.dates.prodDates", [{ start: "", end: "" }]);
     }
-  }, [noEvent, setValue, prodDatesFormat]);
+  }, [noProd, setValue, eventEdition]);
 
   useEffect(() => {
     if (prodOnly) {
@@ -496,7 +518,7 @@ const SubmissionFormEventStep1 = ({
               // "xl:self-center",
             )}
           >
-            {!prodOnly && (
+            {hasEvent && (
               <>
                 <div className="input-section">
                   <p className="min-w-max font-bold lg:text-xl">
@@ -517,14 +539,13 @@ const SubmissionFormEventStep1 = ({
               </>
             )}
 
-            {!isOngoing &&
-              !noEvent &&
+            {hasProd &&
               hasEventFormat &&
               (!blankEventDates || eventDateFormatNotRequired) && (
                 <>
                   <div className="input-section">
                     <p className="min-w-max font-bold lg:text-xl">
-                      Step {categoryEvent && !eventOnly ? 8 : prodOnly ? 6 : 7}
+                      Step {categoryEvent && !eventOnly ? 8 : noEvent ? 6 : 7}
                       :{" "}
                     </p>
                     <p className="lg:text-xs">Production Dates</p>
@@ -537,7 +558,7 @@ const SubmissionFormEventStep1 = ({
                     type="production"
                     watchPath="event"
                   />
-                  {!prodSameAsEvent && prodDatesFormat && (
+                  {!prodSameAsEvent && prodDatesFormat && singleProdDate && (
                     <label
                       className={cn(
                         "col-start-2 mx-auto flex w-full cursor-pointer items-center gap-2 py-2 lg:max-w-md",
@@ -550,7 +571,6 @@ const SubmissionFormEventStep1 = ({
                           return (
                             <Checkbox
                               disabled={
-                                isOngoing ||
                                 !hasEventFormat ||
                                 (blankEventDates && eventDateFormatRequired)
                               }
@@ -596,9 +616,11 @@ const SubmissionFormEventStep1 = ({
                     Step{" "}
                     {categoryEvent && !eventOnly && !isOngoing
                       ? 9
-                      : (!categoryEvent && isOngoing) || noEvent || prodOnly
-                        ? 7
-                        : 8}
+                      : noProd
+                        ? 6
+                        : (!categoryEvent && isOngoing) || noEvent
+                          ? 7
+                          : 8}
                     :{" "}
                   </p>
                   <p className="lg:text-xs">

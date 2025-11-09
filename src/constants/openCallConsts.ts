@@ -29,7 +29,7 @@ export const callTypeValues = [
   "False",
 ] as const;
 
-export const validOCVals = ["Fixed", "Rolling", "Email"];
+export const validOCVals = ["Fixed", "Rolling", "Email", "Unknown"];
 export const openCallStates = [
   "draft",
   "editing",

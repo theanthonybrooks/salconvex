@@ -52,10 +52,16 @@ export function DataTableToolbar<TData>({
   const onlySearch = oneFilter && searchActive;
   const isAdmin = table.options.meta?.isAdmin;
   const tableType = table.options.meta?.tableType;
-  const filters = tableType ? (TABLE_FILTERS[tableType] ?? []) : [];
+  const pageType = table.options.meta?.pageType;
+  const filters =
+    tableType && TABLE_FILTERS[tableType]
+      ? TABLE_FILTERS[tableType].filter(
+          (filter) => !filter.pageType || filter.pageType === pageType,
+        )
+      : [];
 
   // const tableType = table.options.meta?.tableType;
-  const pageType = table.options.meta?.pageType;
+
   const minimalView = table.options.meta?.minimalView;
   const forDashboard = pageType === "dashboard";
   const eventAndOC = tableType === "events" || tableType === "openCalls";

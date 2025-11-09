@@ -165,7 +165,7 @@ const selectColumn: ColumnDef<Event> = {
   enableResizing: false,
 };
 
-export const getColumns = (isAdmin: boolean): ColumnDef<Event>[] => {
+export const getEventColumns = (isAdmin: boolean): ColumnDef<Event>[] => {
   const baseColumns: ColumnDef<Event>[] = [
     {
       accessorKey: "name",

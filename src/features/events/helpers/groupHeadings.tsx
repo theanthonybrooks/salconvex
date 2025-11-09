@@ -1,6 +1,8 @@
-import { JSX } from "react";
 import { PublicEventPreviewData } from "@/types/eventTypes";
+
+import { JSX } from "react";
 import { DateTime } from "luxon";
+
 import { FaQuoteLeft, FaQuoteRight } from "react-icons/fa6";
 
 import { ViewOptions } from "@/features/events/event-list-client";
@@ -109,6 +111,7 @@ export function getGroupKeyFromEvent(
     if (eventOCStatus === "Invite") return { raw: "Invite Only" };
     if (ocStatus === "coming-soon") return { raw: "Coming Soon!" };
     if (ocStatus === "ended") return { raw: "Past Open Call" };
+    if (callType === "Unknown") return { raw: "Unknown Deadline" };
 
     // if (!!callType && isPublished) return { raw: String(callType) };
     return { raw: "No Public Open Call" };

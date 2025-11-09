@@ -415,6 +415,12 @@ export const EventOCForm = ({
   const eventDates = eventData?.dates?.eventDates;
   const eventDatesFormat = eventData?.dates?.eventFormat;
   const hasNoEventDates = eventDates?.length === 0 || !eventDates;
+  console.log(
+    eventDates,
+    Boolean(eventDates),
+    hasNoEventDates,
+    eventDates?.length,
+  );
   const prodDatesStart = eventData?.dates?.prodDates?.[0]?.start;
   const noProdStart =
     eventData?.dates?.noProdStart ||
@@ -2083,9 +2089,6 @@ export const EventOCForm = ({
       "seasonRange",
     ];
 
-    if (!eventDatesFormat) return;
-    // if (!hasNoEventDatesEdition) return;
-
     if (
       eventDatesFormat === "noEvent" ||
       eventDatesFormat === "setDates" ||
@@ -2117,7 +2120,7 @@ export const EventOCForm = ({
       setValue("event.dates.eventDates", [
         {
           start: toYearMonth(new Date()),
-          end: "",
+          end: toYearMonth(new Date()),
         },
       ]);
     }

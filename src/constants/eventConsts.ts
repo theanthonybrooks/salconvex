@@ -1,7 +1,9 @@
 export const freeEvents = ["gjm", "pup"];
 export const paidEvents = ["mur", "saf", "mus", "oth"];
-export const noEventCategories = ["residency", "gfund", "roster"];
-export const prodOnlyCategories = ["project"];
+export const prodOnlyCategories = ["project", "residency"];
+export const hasProductionCategories = ["event", ...prodOnlyCategories];
+export const noProdCategories = ["gfund", "roster"];
+export const noEventCategories = [...noProdCategories, ...prodOnlyCategories];
 export const eventTypeOptions = [
   {
     value: "gjm",
