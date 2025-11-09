@@ -1,14 +1,13 @@
+import { SortOptions } from "@/types/thelist";
+
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useFilteredEventsQuery } from "@/hooks/use-filtered-events-query";
-import { SortOptions } from "@/types/thelist";
-import { api } from "~/convex/_generated/api";
-import { makeUseQueryWithStatus } from "convex-helpers/react";
-import { useQueries } from "convex-helpers/react/cache";
 import { formatInTimeZone } from "date-fns-tz";
 import { saveAs } from "file-saver";
 import { toJpeg } from "html-to-image";
 import JSZip from "jszip";
+
 import {
   ArrowLeft,
   ArrowRight,
@@ -30,6 +29,10 @@ import RecapPost from "@/features/events/ui/thisweek-recap/recap-post";
 import { formatCondensedDateRange } from "@/helpers/dateFns";
 import { cn } from "@/helpers/utilsFns";
 import { waitForImagesToLoad } from "@/lib/imageFns";
+
+import { api } from "~/convex/_generated/api";
+import { makeUseQueryWithStatus } from "convex-helpers/react";
+import { useQueries } from "convex-helpers/react/cache";
 
 interface ThisweekRecapPostProps {
   source: "thisweek" | "nextweek";
@@ -165,7 +168,7 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
   };
 
   useEffect(() => {
-    if (!filteredResults?.length) return;
+    // if (!filteredResults?.length) return;
 
     const grouped: Record<string, { events: string[]; timeZone: string }> = {};
 
@@ -220,7 +223,7 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
   }, [filteredResults]);
 
   useEffect(() => {
-    if (!filteredResults?.length) return;
+    // if (!filteredResults?.length) return;
 
     const altText = `Weekly post for ${displayRange}. The links are on The Street Art List website (thestreetartlist.com)`;
 
