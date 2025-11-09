@@ -1,4 +1,4 @@
-import type { RecapData } from "@/app/render/recap/page";
+import type { RecapData } from "@/app/render/recap/recap-render-client";
 
 import { NextRequest, NextResponse } from "next/server";
 import chromium from "@sparticuz/chromium";
@@ -28,9 +28,21 @@ export async function POST(req: NextRequest) {
     let browser;
     try {
       browser = await (isDev
-        ? puppeteer.launch({ headless: true })
+        ? puppeteer.launch({
+            headless: true,
+            defaultViewport: {
+              width: 1000,
+              height: 1400,
+              deviceScaleFactor: 2,
+            },
+          })
         : puppeteer.launch({
             args: chromium.args,
+            defaultViewport: {
+              width: 1000,
+              height: 1400,
+              deviceScaleFactor: 2,
+            },
             executablePath: (await chromium.executablePath()) || undefined,
             headless: true,
           }));

@@ -21,6 +21,9 @@ export default {
         libreFranklin: ["var(--font-libre-franklin)", ...fontFamily.sans],
         bebasNeue: ["var(--font-bebas-neue)", ...fontFamily.sans],
         acumin: ['"acumin-variable"', "sans-serif"],
+        ramaE: ["rama-gothic-e", ...fontFamily.sans],
+        ramaM: ["rama-gothic-m", ...fontFamily.sans],
+        ramaC: ["rama-gothic-c", ...fontFamily.sans],
       },
       screens: {
         lg: "1025px",
