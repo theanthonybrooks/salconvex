@@ -16,10 +16,11 @@ import { cn } from "@/helpers/utilsFns";
 interface RecapPostProps {
   event: PublicEventPreviewData;
   index: number | null;
+  id: string;
 }
 
 const RecapPost = forwardRef<HTMLDivElement, RecapPostProps>((props, ref) => {
-  const { event, index } = props;
+  const { event, index, id } = props;
   const { openCall } = event.tabs;
   const eligibility = event.hasActiveOpenCall
     ? openCall?.eligibility
@@ -32,6 +33,7 @@ const RecapPost = forwardRef<HTMLDivElement, RecapPostProps>((props, ref) => {
 
   return (
     <div
+      id={id}
       ref={ref}
       className="relative h-[625px] w-[500px] bg-[#feee1f] bg-cover bg-center"
     >

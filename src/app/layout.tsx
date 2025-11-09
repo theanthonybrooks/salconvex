@@ -122,6 +122,10 @@ export default async function RootLayout({
         className={cn(isDashboard && "overflow-hidden")}
       >
         <head>
+          <link
+            rel="stylesheet"
+            href="https://use.typekit.net/dck7qmb.css"
+          ></link>
           <meta
             name="google-site-verification"
             content="jXicA4CesSrJjuZE7VQjf8nlL0VIKXbLRSxWNuEiI3M"

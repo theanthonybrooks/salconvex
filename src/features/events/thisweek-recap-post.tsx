@@ -6,7 +6,7 @@ import { useFilteredEventsQuery } from "@/hooks/use-filtered-events-query";
 import { formatInTimeZone } from "date-fns-tz";
 import { saveAs } from "file-saver";
 import { toJpeg } from "html-to-image";
-import JSZip from "jszip";
+import { toast } from "react-toastify";
 
 import {
   ArrowLeft,
@@ -118,27 +118,63 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
           queryResult.weekEndISO,
         )
       : "";
+  // const handleDownloadAll = async () => {
+  //   const zip = new JSZip();
+  //   const folder = zip.folder(displayRange ?? "Recap Images");
+
+  //   if (!folder) return;
+
+  //   const nodes = refs.current.filter(Boolean) as HTMLElement[];
+
+  //   await waitForImagesToLoad(nodes);
+  //   for (let i = 0; i < nodes.length; i++) {
+  //     try {
+  //       const dataUrl = await toJpeg(nodes[i]!, { quality: 0.95 });
+  //       const base64 = dataUrl.split(",")[1];
+  //       folder.file(`${i + 1}.jpg`, base64, { base64: true });
+  //     } catch (err) {
+  //       console.error(`Error rendering node ${i}`, err);
+  //     }
+  //   }
+
+  //   const content = await zip.generateAsync({ type: "blob" });
+  //   saveAs(content, `${displayRange}-recap.zip`);
+  // };
+
   const handleDownloadAll = async () => {
-    const zip = new JSZip();
-    const folder = zip.folder(displayRange ?? "Recap Images");
+    try {
+      await toast.promise(
+        (async () => {
+          const res = await fetch("/api/recap-screenshot", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              events: filteredResults, // use the already
+              fontSize: dateFontSize,
+              displayRange,
+              source,
+              excludedIds,
+            }),
+          });
 
-    if (!folder) return;
+          if (!res.ok) throw new Error("Failed to generate screenshots");
 
-    const nodes = refs.current.filter(Boolean) as HTMLElement[];
-
-    await waitForImagesToLoad(nodes);
-    for (let i = 0; i < nodes.length; i++) {
-      try {
-        const dataUrl = await toJpeg(nodes[i]!, { quality: 0.95 });
-        const base64 = dataUrl.split(",")[1];
-        folder.file(`${i + 1}.jpg`, base64, { base64: true });
-      } catch (err) {
-        console.error(`Error rendering node ${i}`, err);
-      }
+          const blob = await res.blob();
+          saveAs(blob, `${displayRange}-recap.zip`);
+        })(),
+        {
+          pending: "Creating recap post...",
+          success: "Recap created successfully!",
+          error: "Failed to create post.",
+        },
+        {
+          autoClose: 2000,
+          pauseOnHover: false,
+        },
+      );
+    } catch (err) {
+      console.error(err);
     }
-
-    const content = await zip.generateAsync({ type: "blob" });
-    saveAs(content, `${displayRange}-recap.zip`);
   };
 
   const handleDownloadSingle = async (index: number) => {
@@ -255,6 +291,7 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
         <div className="mx-auto flex w-fit flex-col gap-y-6">
           <div className="group relative">
             <RecapCover
+              id="recap-cover"
               dateRange={displayRange}
               fontSize={dateFontSize}
               ref={(el) => {
@@ -313,6 +350,7 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
                 key={event._id}
               >
                 <RecapPost
+                  id={`recap-post-${index + 1}`}
                   ref={(el) => {
                     refs.current[index + 1] = el;
                   }}
@@ -355,6 +393,7 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
           {filteredResults && (
             <div className="group relative">
               <RecapLastPage
+                id="recap-last-page"
                 openCallCount={otherOpenCallCount}
                 ref={(el) => {
                   refs.current[filteredResults.length + 1] = el;
@@ -373,6 +412,7 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
           {filteredResults && (
             <div className="group relative">
               <RecapEndCover
+                id="recap-end-cover"
                 ref={(el) => {
                   refs.current[filteredResults.length + 2] = el;
                 }}

@@ -176,10 +176,6 @@ const OpenCallSocials = ({ data }: OpenCallSocialsProps) => {
             />
           </div>
         </section>
-        {/* <section className={cn("flex flex-col gap-3")}>
-          <p>Social Media Story</p>
-          <div className="h-[889px] w-[500px] rounded-sm border-3"></div>
-        </section> */}
       </div>
     </div>
   );

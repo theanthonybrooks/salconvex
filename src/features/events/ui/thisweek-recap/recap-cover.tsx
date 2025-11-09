@@ -4,20 +4,24 @@ import { forwardRef } from "react";
 
 import { cn } from "@/helpers/utilsFns";
 
-interface RecapCoverProps {
+interface RecapPgBaseProps {
+  id: string;
+}
+interface RecapCoverProps extends RecapPgBaseProps {
   dateRange: string;
   fontSize: number | null;
 }
 
-interface RecapLastPageProps {
+interface RecapLastPageProps extends RecapPgBaseProps {
   openCallCount: number;
 }
 
 export const RecapCover = forwardRef<HTMLDivElement, RecapCoverProps>(
-  ({ dateRange, fontSize }, ref) => {
+  ({ id, dateRange, fontSize }, ref) => {
     const rangeLength = dateRange.trim().length;
     return (
       <div
+        id={id}
         ref={ref}
         className="relative flex h-[625px] w-[500px] bg-[#feee1f] bg-cover bg-center"
       >
@@ -57,31 +61,35 @@ export const RecapCover = forwardRef<HTMLDivElement, RecapCoverProps>(
   },
 );
 
-export const RecapEndCover = forwardRef<HTMLDivElement>((_, ref) => {
-  return (
-    <div
-      ref={ref}
-      className="relative flex h-[625px] w-[500px] bg-[#feee1f] bg-cover bg-center"
-    >
-      <img
-        className="m-auto max-h-full max-w-full"
-        src="/branding/weekly-back-cover2.png"
-        alt="Open Calls Ending this Week Background"
-        height={400}
-        width={400}
-        crossOrigin="anonymous"
-      />
-
-      <section className="absolute bottom-0 flex w-full -translate-y-8 flex-col text-center font-bold">
-        TheStreetArtList.com
-      </section>
-    </div>
-  );
-});
-export const RecapLastPage = forwardRef<HTMLDivElement, RecapLastPageProps>(
-  ({ openCallCount }, ref) => {
+export const RecapEndCover = forwardRef<HTMLDivElement, RecapPgBaseProps>(
+  ({ id }, ref) => {
     return (
       <div
+        id={id}
+        ref={ref}
+        className="relative flex h-[625px] w-[500px] bg-[#feee1f] bg-cover bg-center"
+      >
+        <img
+          className="m-auto max-h-full max-w-full"
+          src="/branding/weekly-back-cover2.png"
+          alt="Open Calls Ending this Week Background"
+          height={400}
+          width={400}
+          crossOrigin="anonymous"
+        />
+
+        <section className="absolute bottom-0 flex w-full -translate-y-8 flex-col text-center font-bold">
+          TheStreetArtList.com
+        </section>
+      </div>
+    );
+  },
+);
+export const RecapLastPage = forwardRef<HTMLDivElement, RecapLastPageProps>(
+  ({ openCallCount, id }, ref) => {
+    return (
+      <div
+        id={id}
         ref={ref}
         className="relative flex aspect-square h-[625px] w-[500px] flex-col items-center justify-center bg-[#feee1f] bg-cover bg-center"
       >

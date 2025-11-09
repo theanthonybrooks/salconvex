@@ -65,7 +65,7 @@ const SubmissionFormEventStep2 = ({
   const freeCall = formType === 2;
   const isOngoing = watch("event.dates.eventFormat") === "ongoing";
 
-  const noEvent = noEventCategories.includes(category);
+  const noEvent = noEventCategories.includes(category ?? "");
 
   // #region ------------- Queries, Actions, and Mutations --------------
 

@@ -131,12 +131,11 @@ const SubmissionFormEventStep1 = ({
   const prodDates = eventData?.dates?.prodDates;
   const category = eventData?.category as EventCategory;
   const hasEvent = category === "event";
-  const noEvent = noEventCategories.includes(category);
-  const noProd = noProdCategories.includes(category);
+  const noEvent = noEventCategories.includes(category ?? "");
+  const noProd = noProdCategories.includes(category ?? "");
   const hasProd = hasProductionCategories.includes(category) && !isOngoing;
-  const prodOnly = prodOnlyCategories.includes(category);
+  const prodOnly = prodOnlyCategories.includes(category ?? "");
   const singleProdDate = prodDates?.length === 1;
-  console.log(singleProdDate);
 
   const eventDateFormatRequired = !!(
     hasEventFormat &&

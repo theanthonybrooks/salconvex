@@ -1,8 +1,9 @@
-import { FAR_FUTURE, isValidIsoDate, parseEventDate } from "@/helpers/dateFns";
-import { SortOptions } from "@/types/thelist";
-
 import { EventData } from "@/types/eventTypes";
 import { OpenCall, OpenCallStatus } from "@/types/openCallTypes";
+import { SortOptions } from "@/types/thelist";
+
+import { FAR_FUTURE, isValidIsoDate, parseEventDate } from "@/helpers/dateFns";
+
 import { EventLookupOrgBase } from "~/convex/schema";
 
 export type EnrichedEventsCardData = EventData & {
@@ -159,6 +160,7 @@ export const compareEnrichedEvents = (
 
       if (hasOpenCall && (!isPast || isRolling)) {
         if (callType === "Fixed") priority = 0;
+        else if (callType === "Unknown") priority = 0;
         else if (callType === "Rolling") priority = 1;
         else if (callType === "Email") priority = 2;
         else priority = 3;
