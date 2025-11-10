@@ -1,25 +1,15 @@
 "use client";
 
 //TODO: Add view sync to the params. Otherwise when you refresh or go back, it resets to the default view.
-import { SearchType } from "@/constants/filterConsts";
+import { MergedEventPreviewData } from "@/types/eventTypes";
+import { Filters, SearchParams, SortOptions } from "@/types/thelist";
 
-import {
-  EventCategory,
-  EventType,
-  MergedEventPreviewData,
-} from "@/types/eventTypes";
-import {
-  Continents,
-  Filters,
-  SearchParams,
-  SortOptions,
-} from "@/types/thelist";
-
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useFilteredEventsQuery } from "@/hooks/use-filtered-events-query";
 import { motion } from "framer-motion";
+import { debounce } from "lodash";
 
 import { Button } from "@/components/ui/button";
 import SalHeader from "@/components/ui/headers/sal-header";
@@ -30,10 +20,11 @@ import EventCardPreview from "@/features/events/event-card-preview";
 import { EventFilters } from "@/features/events/event-list-filters";
 import { getGroupKeyFromEvent } from "@/features/events/helpers/groupHeadings";
 import Pricing from "@/features/homepage/pricing";
+import { useEventListContext } from "@/features/the-list/client-provider";
 import { useArtistPreload } from "@/features/wrapper-elements/artist-preload-context";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { generateSkeletonGroups } from "@/helpers/skeletonFns";
-import { cn, setParamIfNotDefault } from "@/helpers/utilsFns";
+import { cn } from "@/helpers/utilsFns";
 import { useDevice } from "@/providers/device-provider";
 
 import { usePreloadedQuery } from "convex/react";
@@ -49,18 +40,22 @@ export const viewOptionValues = [
 export type ViewOptions = (typeof viewOptionValues)[number]["value"];
 
 const ClientEventList = () => {
-  const searchParams = useSearchParams();
+  // const searchParams = useSearchParams();
   const initialTitleRef = useRef<string | null>(null);
-
-  const [view, setView] = useState<ViewOptions>(() => {
-    if (typeof window !== "undefined") {
-      const saved = sessionStorage.getItem("salView") as ViewOptions | null;
-      if (saved && viewOptionValues.some((opt) => opt.value === saved)) {
-        return saved;
-      }
-    }
-    return "openCall";
-  });
+  const {
+    filters,
+    sortOptions,
+    setSortOptions,
+    search,
+    setSearch,
+    view,
+    setView,
+    page,
+    setPage,
+    getDefaultSortForView,
+    getDefaultSearchForView,
+    handleResetFilters,
+  } = useEventListContext();
 
   const browserTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
@@ -91,103 +86,33 @@ const ClientEventList = () => {
   const userTimeZone = userPref?.timezone || browserTimeZone;
   const hasTZPref = !!userPref?.timezone;
 
-  const defaultFilters: Filters = useMemo(
-    () => ({
-      showHidden: false,
-      bookmarkedOnly: false,
-      limit: 10,
+  const prevPage = Math.max(page - 1, 1);
 
-      eventTypes: [],
-      eventCategories: [],
-      eligibility: [],
-      callType: [],
-      callFormat: "",
-    }),
+  const [debouncedFilters, setDebouncedFilters] = useState(filters);
+  const [debouncedSort, setDebouncedSort] = useState(sortOptions);
+  const [debouncedSearch, setDebouncedSearch] = useState(search);
+
+  const updateDebouncedValues = useMemo(
+    () =>
+      debounce(
+        (filters: Filters, sort: SortOptions, search: SearchParams) => {
+          setDebouncedFilters(filters);
+          setDebouncedSort(sort);
+          setDebouncedSearch(search);
+        },
+        400, // milliseconds
+      ),
     [],
   );
 
-  const getDefaultSortForView = (view: ViewOptions): SortOptions => {
-    if (view === "event" || view === "archive") {
-      return { sortBy: "eventStart", sortDirection: "asc" };
-    }
-    if (view === "organizer" || view === "orgView") {
-      return { sortBy: "organizer", sortDirection: "asc" };
-    }
-    return { sortBy: "openCall", sortDirection: "asc" };
-  };
-
-  const defaultSort = useMemo(() => getDefaultSortForView(view), [view]);
-  const defaultSearch = useMemo<SearchParams>(
-    () => ({
-      searchTerm: "",
-      searchType:
-        view === "event" || view === "archive"
-          ? "events"
-          : view === "organizer"
-            ? "orgs"
-            : "all",
-    }),
-    [view],
-  );
-
-  const currentFilters: Filters = {
-    showHidden: searchParams.get("h") === "true",
-    bookmarkedOnly: searchParams.get("b") === "true",
-    limit: Number(searchParams.get("l")) || defaultFilters.limit,
-    // page: Number(searchParams.get("page")) || 1,
-    eventTypes:
-      (searchParams.get("type")?.split(",") as EventType[]) ??
-      defaultFilters.eventTypes,
-    eventCategories:
-      (searchParams.get("cat")?.split(",") as EventCategory[]) ??
-      defaultFilters.eventCategories,
-    continent:
-      (searchParams.get("cont")?.split(",") as Continents[]) ??
-      defaultFilters.continent,
-  };
-
-  const currentSort: SortOptions = {
-    sortBy:
-      (searchParams.get("sb") as SortOptions["sortBy"]) ?? defaultSort.sortBy,
-    sortDirection:
-      (searchParams.get("sd") as SortOptions["sortDirection"]) ??
-      defaultSort.sortDirection,
-  };
-
-  const currentSearch: SearchParams = {
-    searchTerm: searchParams.get("term") ?? "",
-    searchType: (searchParams.get("st") as SearchType) ?? "all",
-  };
-
-  const [filters, setFilters] = useState<Filters>(currentFilters);
-  const [sortOptions, setSortOptions] = useState<SortOptions>(currentSort);
-  const [search, setSearch] = useState<SearchParams>(currentSearch);
-  const [page, setPage] = useState(Number(searchParams.get("page")) || 1);
-  const prevPage = Math.max(page - 1, 1);
-
-  const getDefaultSearchForView = (view: ViewOptions): SearchParams => {
-    if (view === "event" || view === "archive") {
-      return {
-        searchTerm: search?.searchTerm ?? "",
-        searchType: "events",
-      };
-    }
-    if (view === "organizer") {
-      return {
-        searchTerm: search?.searchTerm ?? "",
-        searchType: "orgs",
-      };
-    }
-    return {
-      searchTerm: search?.searchTerm ?? "",
-      searchType: "all",
-    };
-  };
+  useEffect(() => {
+    updateDebouncedValues(filters, sortOptions, search);
+  }, [filters, sortOptions, search, updateDebouncedValues]);
 
   // const queryResult = useFilteredEventsQuery(filters, sortOptions, { page });
   const queryResult = useFilteredEventsQuery(
-    filters,
-    sortOptions,
+    debouncedFilters,
+    debouncedSort,
     { page },
     "thelist",
     view,
@@ -201,11 +126,11 @@ const ClientEventList = () => {
     },
     false,
     // { searchTerm: "fresh", searchType: "all" },
-    search,
+    debouncedSearch,
   );
   void useFilteredEventsQuery(
-    filters,
-    sortOptions,
+    debouncedFilters,
+    debouncedSort,
     {
       page: page + 1,
     },
@@ -220,11 +145,11 @@ const ClientEventList = () => {
       userOrgs: orgData?.orgIds ?? [],
     },
     !hasActiveSubscription || view === "organizer" || view === "archive",
-    hasActiveSubscription ? search : undefined,
+    hasActiveSubscription ? debouncedSearch : undefined,
   );
   void useFilteredEventsQuery(
-    filters,
-    sortOptions,
+    debouncedFilters,
+    debouncedSort,
     {
       page: prevPage,
     },
@@ -242,8 +167,12 @@ const ClientEventList = () => {
       view === "organizer" ||
       view === "archive" ||
       page === 1,
-    hasActiveSubscription ? search : undefined,
+    hasActiveSubscription ? debouncedSearch : undefined,
   );
+
+  useEffect(() => {
+    return () => updateDebouncedValues.cancel();
+  }, [updateDebouncedValues]);
 
   const total = queryResult?.total ?? 0;
   const totalOpen = queryResult?.totalOpenCalls;
@@ -251,67 +180,19 @@ const ClientEventList = () => {
   const totalArchived = queryResult?.totalArchived;
   // const isLoading = !queryResult;
   const isLoading = !queryResult?.finishedLoading;
-
-  const handleResetFilters = useCallback(() => {
-    setFilters(defaultFilters);
-    setSortOptions(defaultSort);
-    setSearch(defaultSearch);
+  const handleViewChange = (newView: ViewOptions) => {
+    setView(newView);
+    setSortOptions(getDefaultSortForView(newView));
+    setSearch(getDefaultSearchForView(newView));
+    if (newView === "archive") {
+      handleResetFilters();
+    }
     setPage(1);
-  }, [defaultFilters, defaultSort, defaultSearch]);
+  };
 
   useEffect(() => {
     sessionStorage.setItem("salView", view);
   }, [view]);
-
-  useEffect(() => {
-    const params = new URLSearchParams();
-
-    setParamIfNotDefault(params, "h", filters.showHidden, false);
-    setParamIfNotDefault(params, "b", filters.bookmarkedOnly, false);
-    setParamIfNotDefault(params, "l", filters.limit, 10);
-
-    if (filters.eventTypes?.length)
-      params.set("type", filters.eventTypes.join(","));
-    else params.delete("type");
-
-    if (filters.eventCategories?.length)
-      params.set("cat", filters.eventCategories.join(","));
-    else params.delete("cat");
-
-    if (filters.continent?.length)
-      params.set("cont", filters.continent.join(","));
-    else params.delete("cont");
-
-    if (page && page !== 1) {
-      params.set("page", page.toString());
-    } else {
-      params.delete("page");
-    }
-
-    setParamIfNotDefault(params, "sb", sortOptions.sortBy, defaultSort.sortBy);
-    setParamIfNotDefault(params, "sd", sortOptions.sortDirection, "asc");
-
-    setParamIfNotDefault(params, "term", search.searchTerm, "");
-    if (search?.searchTerm && search.searchTerm.length > 0) {
-      setParamIfNotDefault(params, "st", search.searchType, "all");
-    } else {
-      params.delete("st");
-    }
-
-    const queryString = params.toString();
-    const baseUrl = window.location.origin + window.location.pathname;
-    sessionStorage.setItem(
-      "previousSalPage",
-      baseUrl + (queryString ? `?${queryString}` : ""),
-    );
-    // document.cookie =
-    //   "login_url=/thelist; path=/; max-age=300; SameSite=Lax; Secure";
-    window.history.replaceState(
-      null,
-      "",
-      baseUrl + (queryString ? `?${queryString}` : ""),
-    );
-  }, [filters, sortOptions, page, defaultSort, search]);
 
   useEffect(() => {
     window.scroll({ top: 240 });
@@ -343,6 +224,7 @@ const ClientEventList = () => {
   const paginatedEvents = enrichedEvents;
 
   const groupedEvents = useMemo(() => {
+    console.time("groupedEvents");
     const list =
       publicView && view !== "event"
         ? paginatedEvents.slice(0, 6)
@@ -385,7 +267,7 @@ const ClientEventList = () => {
         groups[mainKey].events.push(event);
       }
     }
-
+    console.timeEnd("groupedEvents");
     return Object.values(groups);
   }, [paginatedEvents, sortOptions, publicView, userTimeZone, hasTZPref, view]);
 
@@ -393,30 +275,6 @@ const ClientEventList = () => {
     (sum, group) => sum + group.events.length,
     0,
   );
-  const handleFilterChange = (partial: Partial<Filters>) => {
-    setFilters((prev) => ({ ...prev, ...partial }));
-    setPage(1);
-  };
-
-  const handleSortChange = (partial: Partial<SortOptions>) => {
-    setSortOptions((prev) => ({ ...prev, ...partial }));
-    setPage(1);
-  };
-
-  const handleSearchChange = (partial: Partial<SearchParams>) => {
-    setSearch((prev) => ({ ...prev, ...partial }));
-    setPage(1);
-  };
-
-  const handleViewChange = (newView: ViewOptions) => {
-    setView(newView);
-    setSortOptions(getDefaultSortForView(newView));
-    setSearch(getDefaultSearchForView(newView));
-    if (newView === "archive") {
-      handleResetFilters();
-    }
-    setPage(1);
-  };
 
   const skeletonGroups = useMemo(() => generateSkeletonGroups(page), [page]);
   const hasResults = totalResults > 0;
@@ -463,17 +321,9 @@ const ClientEventList = () => {
           {/* TODO: make this public with some features that are only available to logged in users */}
 
           <EventFilters
-            filters={filters}
-            search={search}
-            sortOptions={sortOptions}
-            onSearchChange={handleSearchChange}
-            onChange={handleFilterChange}
-            onSortChange={handleSortChange}
-            onResetFilters={handleResetFilters}
             userPref={userPref}
             user={user}
             isMobile={isMobile}
-            view={view}
             results={paginatedEvents}
             isLoading={isLoading}
           />

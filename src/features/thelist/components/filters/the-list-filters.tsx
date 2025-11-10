@@ -6,10 +6,10 @@ import { MergedEventPreviewData } from "@/types/eventTypes";
 import { Filters, SearchParams, SortOptions } from "@/types/thelist";
 import { User } from "@/types/user";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { debounce } from "lodash";
 
-import { ViewOptions } from "@/features/events/event-list-client";
+import { useEventListContext } from "@/features/the-list/client-provider";
 import { TheListFilterDrawer } from "@/features/thelist/components/filter-drawer";
 import { FilterBase } from "@/features/thelist/components/filters/filter-base";
 import { cn } from "@/helpers/utilsFns";
@@ -24,16 +24,6 @@ interface ListFilterProps<T extends TheListFilterCommandItem> {
   iconOnly?: boolean;
   isMobile?: boolean;
   user: User | null;
-
-  filters: Filters;
-  sortOptions: SortOptions;
-  search: SearchParams;
-  onSearchChange: (newSearch: Partial<SearchParams>) => void;
-  onChange: (newFilters: Partial<Filters>) => void;
-  onSortChange: (newSort: Partial<SortOptions>) => void;
-  onResetFilters: () => void;
-  hasActiveFilters: boolean | undefined;
-  view: ViewOptions;
   results: MergedEventPreviewData[];
   isLoading: boolean;
   // userPref: UserPrefsType | null;
@@ -49,18 +39,52 @@ export const TheListFilters = <T extends TheListFilterCommandItem>({
   isMobile = false,
   className,
   placeholder = "Search",
-  hasActiveFilters,
-  search,
-  filters,
-  sortOptions,
-  onSearchChange,
-  onChange,
-  onSortChange,
-  onResetFilters,
-  view,
+
   results,
   isLoading,
 }: ListFilterProps<T>) => {
+  const {
+    search,
+    view,
+    filters,
+    sortOptions,
+    setFilters,
+    setSortOptions,
+    setSearch,
+    setPage,
+    handleResetFilters,
+  } = useEventListContext();
+
+  const hasActiveFilters =
+    filters.bookmarkedOnly ||
+    filters.showHidden ||
+    (filters.eventTypes && filters.eventTypes.length > 0) ||
+    (filters.eventCategories && filters.eventCategories.length > 0) ||
+    (filters.continent && filters.continent.length > 0) ||
+    (filters.eligibility && filters.eligibility.length > 0) ||
+    (filters.callType && filters.callType.length > 0) ||
+    Boolean(filters.callFormat) ||
+    (filters.postStatus && filters.postStatus !== "all") ||
+    search.searchTerm !== "";
+
+  const handleFilterChange = (partial: Partial<Filters>) => {
+    setFilters((prev) => ({ ...prev, ...partial }));
+    setPage(1);
+  };
+
+  const handleSortChange = (partial: Partial<SortOptions>) => {
+    setSortOptions((prev) => ({ ...prev, ...partial }));
+    setPage(1);
+  };
+
+  const handleSearchChange = useCallback(
+    (partial: Partial<SearchParams>) => {
+      setSearch((prev) => ({ ...prev, ...partial }));
+      setPage(1);
+    },
+    [setSearch, setPage],
+  );
+
   // const { preloadedSubStatus } = useConvexPreload();
   // const subData = usePreloadedQuery(preloadedSubStatus);
   // const { hasActiveSubscription } = subData ?? {};
@@ -79,9 +103,9 @@ export const TheListFilters = <T extends TheListFilterCommandItem>({
       debounce((value: string, searchType: SearchType) => {
         const cleaned = value.replace(/[^a-zA-Z0-9\s]/g, "");
         if (cleaned.length >= 2 || value.length === 0)
-          onSearchChange({ searchTerm: value, searchType });
+          handleSearchChange({ searchTerm: value, searchType });
       }, 600),
-    [onSearchChange],
+    [handleSearchChange],
   );
 
   useEffect(() => {
@@ -120,10 +144,10 @@ export const TheListFilters = <T extends TheListFilterCommandItem>({
           shortcut={shortcut}
           hasShortcut={true}
           placeholder={placeholder}
-          onSearchChange={onSearchChange}
-          onChange={onChange}
-          onSortChange={onSortChange}
-          onResetFilters={onResetFilters}
+          onSearchChange={handleSearchChange}
+          onChange={handleFilterChange}
+          onSortChange={handleSortChange}
+          onResetFilters={handleResetFilters}
           isLoading={isLoading}
           className={cn("flex h-12")}
           view={view}
@@ -148,10 +172,10 @@ export const TheListFilters = <T extends TheListFilterCommandItem>({
         search={search}
         filters={filters}
         sortOptions={sortOptions}
-        onSearchChange={onSearchChange}
-        onChange={onChange}
-        onSortChange={onSortChange}
-        onResetFilters={onResetFilters}
+        onSearchChange={handleSearchChange}
+        onChange={handleFilterChange}
+        onSortChange={handleSortChange}
+        onResetFilters={handleResetFilters}
         isLoading={isLoading}
         hasActiveFilters={hasActiveFilters}
         view={view}

@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 
 import ClientEventList from "@/features/events/event-list-client";
+import { EventListProvider } from "@/features/the-list/client-provider";
 
 export const metadata: Metadata = {
   title: "The List",
@@ -31,9 +32,9 @@ export const metadata: Metadata = {
 
 const TheList = async () => {
   return (
-    <>
+    <EventListProvider>
       <ClientEventList />
-    </>
+    </EventListProvider>
   );
 };
 

@@ -1,4 +1,3 @@
-// app/render/recap/page.tsx
 import { notFound } from "next/navigation";
 import RecapRenderClient from "@/app/render/recap/recap-render-client";
 

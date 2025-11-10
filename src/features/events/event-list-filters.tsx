@@ -3,57 +3,22 @@
 import { dashboardNavItems } from "@/constants/links";
 
 import { MergedEventPreviewData } from "@/types/eventTypes";
-import { Filters, SearchParams, SortOptions } from "@/types/thelist";
 import { User } from "@/types/user";
 
 import { Separator } from "@/components/ui/separator";
-import { ViewOptions } from "@/features/events/event-list-client";
 import { TheListFilters } from "@/features/thelist/components/filters/the-list-filters";
 
 import { UserPrefsType } from "~/convex/schema";
 
 interface Props {
   user: User | null;
-  search: SearchParams;
-  filters: Filters;
-  sortOptions: SortOptions;
-  onSearchChange: (newSearch: Partial<SearchParams>) => void;
-  onChange: (newFilters: Partial<Filters>) => void;
-  onSortChange: (newSort: Partial<SortOptions>) => void;
-  onResetFilters: () => void;
   userPref: UserPrefsType | null;
   isMobile: boolean;
-  view: ViewOptions;
   results: MergedEventPreviewData[];
   isLoading: boolean;
 }
 
-export const EventFilters = ({
-  user,
-  search,
-  filters,
-  sortOptions,
-  onSearchChange,
-  onChange,
-  onSortChange,
-  onResetFilters,
-  isMobile,
-  view,
-  results,
-  isLoading,
-}: Props) => {
-  const hasActiveFilters =
-    filters.bookmarkedOnly ||
-    filters.showHidden ||
-    (filters.eventTypes && filters.eventTypes.length > 0) ||
-    (filters.eventCategories && filters.eventCategories.length > 0) ||
-    (filters.continent && filters.continent.length > 0) ||
-    (filters.eligibility && filters.eligibility.length > 0) ||
-    (filters.callType && filters.callType.length > 0) ||
-    Boolean(filters.callFormat) ||
-    (filters.postStatus && filters.postStatus !== "all") ||
-    search.searchTerm !== "";
-
+export const EventFilters = ({ user, isMobile, results, isLoading }: Props) => {
   //TODO: Add filters for: applied, open calls, budget range?, eligibility, ... ?
   return (
     <div className="mx-auto mb-6 flex w-full max-w-[min(95vw,1280px)] flex-col items-center gap-4 px-6 sm:gap-6 sm:px-8">
@@ -68,16 +33,8 @@ export const EventFilters = ({
         placeholder="Search"
         user={user}
         // userPref={userPref}
-        search={search}
-        filters={filters}
-        sortOptions={sortOptions}
-        onSearchChange={onSearchChange}
-        onChange={onChange}
-        onSortChange={onSortChange}
-        onResetFilters={onResetFilters}
-        hasActiveFilters={hasActiveFilters}
+
         isMobile={isMobile}
-        view={view}
         results={results}
         isLoading={isLoading}
       />
