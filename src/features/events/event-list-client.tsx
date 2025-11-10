@@ -2,7 +2,7 @@
 
 //TODO: Add view sync to the params. Otherwise when you refresh or go back, it resets to the default view.
 import { MergedEventPreviewData } from "@/types/eventTypes";
-import { Filters, SearchParams, SortOptions } from "@/types/thelist";
+import { Filters, SortOptions } from "@/types/thelist";
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
@@ -90,15 +90,13 @@ const ClientEventList = () => {
 
   const [debouncedFilters, setDebouncedFilters] = useState(filters);
   const [debouncedSort, setDebouncedSort] = useState(sortOptions);
-  const [debouncedSearch, setDebouncedSearch] = useState(search);
 
   const updateDebouncedValues = useMemo(
     () =>
       debounce(
-        (filters: Filters, sort: SortOptions, search: SearchParams) => {
+        (filters: Filters, sort: SortOptions) => {
           setDebouncedFilters(filters);
           setDebouncedSort(sort);
-          setDebouncedSearch(search);
         },
         400, // milliseconds
       ),
@@ -106,8 +104,8 @@ const ClientEventList = () => {
   );
 
   useEffect(() => {
-    updateDebouncedValues(filters, sortOptions, search);
-  }, [filters, sortOptions, search, updateDebouncedValues]);
+    updateDebouncedValues(filters, sortOptions);
+  }, [filters, sortOptions, updateDebouncedValues]);
 
   // const queryResult = useFilteredEventsQuery(filters, sortOptions, { page });
   const queryResult = useFilteredEventsQuery(
@@ -126,7 +124,7 @@ const ClientEventList = () => {
     },
     false,
     // { searchTerm: "fresh", searchType: "all" },
-    debouncedSearch,
+    search,
   );
   void useFilteredEventsQuery(
     debouncedFilters,
@@ -145,7 +143,7 @@ const ClientEventList = () => {
       userOrgs: orgData?.orgIds ?? [],
     },
     !hasActiveSubscription || view === "organizer" || view === "archive",
-    hasActiveSubscription ? debouncedSearch : undefined,
+    hasActiveSubscription ? search : undefined,
   );
   void useFilteredEventsQuery(
     debouncedFilters,
@@ -167,7 +165,7 @@ const ClientEventList = () => {
       view === "organizer" ||
       view === "archive" ||
       page === 1,
-    hasActiveSubscription ? debouncedSearch : undefined,
+    hasActiveSubscription ? search : undefined,
   );
 
   useEffect(() => {
@@ -224,7 +222,6 @@ const ClientEventList = () => {
   const paginatedEvents = enrichedEvents;
 
   const groupedEvents = useMemo(() => {
-    console.time("groupedEvents");
     const list =
       publicView && view !== "event"
         ? paginatedEvents.slice(0, 6)
@@ -267,7 +264,6 @@ const ClientEventList = () => {
         groups[mainKey].events.push(event);
       }
     }
-    console.timeEnd("groupedEvents");
     return Object.values(groups);
   }, [paginatedEvents, sortOptions, publicView, userTimeZone, hasTZPref, view]);
 

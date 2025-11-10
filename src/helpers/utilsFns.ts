@@ -72,7 +72,7 @@ export const setParamIfNotDefault = <T>(
       value.every((item) => defaultValue.includes(item))
     : value === defaultValue;
 
-  console.log({ key, value, defaultValue, isDefault });
+  // console.log({ key, value, defaultValue, isDefault });
 
   if (isDefault || (Array.isArray(value) && value.length === 0) || !value) {
     params.delete(key);
