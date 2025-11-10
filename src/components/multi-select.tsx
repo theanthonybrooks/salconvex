@@ -1,7 +1,12 @@
 import type { VariantProps } from "class-variance-authority";
+import type {
+  ButtonHTMLAttributes,
+  ComponentType,
+  KeyboardEvent,
+  Ref,
+} from "react";
 
-import * as React from "react";
-import { useCallback, useEffect } from "react";
+import { forwardRef, useCallback, useEffect, useRef, useState } from "react";
 import { cva } from "class-variance-authority";
 
 import { FaCheck } from "react-icons/fa";
@@ -41,7 +46,7 @@ interface BaseOption<T extends string = string> {
   label: string;
   value: T;
   group?: string;
-  icon?: React.ComponentType<{ className?: string }>;
+  icon?: ComponentType<{ className?: string }>;
   abbr?: string;
   disabled?: boolean;
   premium?: boolean;
@@ -74,7 +79,7 @@ const multiSelectVariants = cva("mx-[2px]", {
  * Props for MultiSelect component
  */
 interface MultiSelectProps<T extends string>
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+  extends ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof multiSelectVariants> {
   /**
    * An array of option objects to be displayed in the multi-select component.
@@ -89,7 +94,7 @@ interface MultiSelectProps<T extends string>
   //   /** The group label associated with the option. */
   //   group?: string;
   //   /** Optional icon component to display alongside the option. */
-  //   icon?: React.ComponentType<{ className?: string }>;
+  //   icon?: ComponentType<{ className?: string }>;
   //   abbr?: string;
   //   disabled?: boolean;
   //   premium?: boolean;
@@ -101,6 +106,9 @@ interface MultiSelectProps<T extends string>
    * Receives an array of the new selected values.
    */
   onValueChange: (value: string[]) => void;
+
+  /**Callback is called when the user clicks on the update button */
+  manualUpdate?: boolean;
 
   /** The default selected values when the component mounts. */
   defaultValue?: string[];
@@ -171,11 +179,12 @@ interface MultiSelectProps<T extends string>
   fallbackValue?: string[];
 }
 
-export const MultiSelect = React.forwardRef(
+export const MultiSelect = forwardRef(
   <T extends string>(
     {
       options,
       onValueChange,
+      manualUpdate = false,
       value,
       defaultValue = [],
       lockedValue = [],
@@ -193,7 +202,7 @@ export const MultiSelect = React.forwardRef(
       showIcon = true,
       ...props
     }: Omit<MultiSelectProps<T>, "ref">,
-    ref: React.Ref<HTMLButtonElement>,
+    ref: Ref<HTMLButtonElement>,
   ) => {
     const {
       variant,
@@ -210,20 +219,23 @@ export const MultiSelect = React.forwardRef(
       id,
     } = props;
     const [selectedValues, setSelectedValues] =
-      React.useState<string[]>(defaultValue);
+      useState<string[]>(defaultValue);
+    const [pendingValues, setPendingValues] = useState<string[]>(defaultValue);
+    const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+    const [isAnimating, setIsAnimating] = useState(false);
+    const commandInputRef = useRef<HTMLInputElement>(null);
+    const firstItemRef = useRef<HTMLDivElement>(null);
+    const displayValues = manualUpdate ? pendingValues : selectedValues;
+    const hasPendingChanges =
+      manualUpdate &&
+      (pendingValues.length !== selectedValues.length ||
+        pendingValues.some((v) => !selectedValues.includes(v)));
 
-    const [isPopoverOpen, setIsPopoverOpen] = React.useState(false);
-    const [isAnimating, setIsAnimating] = React.useState(false);
-    const commandInputRef = React.useRef<HTMLInputElement>(null);
-    const firstItemRef = React.useRef<HTMLDivElement>(null);
-
-    const handleInputKeyDown = (
-      event: React.KeyboardEvent<HTMLInputElement>,
-    ) => {
+    const handleInputKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
       if (event.key === "Enter") {
         setIsPopoverOpen(true);
       } else if (event.key === "Backspace" && !event.currentTarget.value) {
-        const newSelectedValues = [...selectedValues];
+        const newSelectedValues = [...displayValues];
         newSelectedValues.pop();
         setSelectedValues(newSelectedValues);
         onValueChange(newSelectedValues);
@@ -232,51 +244,87 @@ export const MultiSelect = React.forwardRef(
 
     const toggleOption = (option: string) => {
       if (lockedValue?.includes(option)) return;
-      const isSelected = selectedValues.includes(option);
-      if (!isSelected && limit && selectedValues.length >= limit) return;
-      let newSelectedValues = selectedValues.includes(option)
-        ? selectedValues.filter((value) => value !== option)
-        : [...selectedValues, option];
+
+      const isSelected = displayValues.includes(option);
+      if (!isSelected && limit && displayValues.length >= limit) return;
+
+      let newSelectedValues = displayValues.includes(option)
+        ? displayValues.filter((value) => value !== option)
+        : [...displayValues, option];
 
       if (newSelectedValues.length === 0 && fallbackValue?.length) {
         newSelectedValues = [...fallbackValue];
       }
-      setSelectedValues(newSelectedValues);
-      onValueChange(newSelectedValues);
+      if (manualUpdate) {
+        setPendingValues(newSelectedValues);
+      } else {
+        setSelectedValues(newSelectedValues);
+        onValueChange(newSelectedValues);
+      }
     };
 
     const handleClear = useCallback(() => {
-      let newSelectedValues = [...lockedValue];
-      if (newSelectedValues.length === 0 && fallbackValue?.length) {
-        newSelectedValues = [...fallbackValue];
+      let newValues = [...lockedValue];
+      if (newValues.length === 0 && fallbackValue?.length) {
+        newValues = [...fallbackValue];
       }
-      setSelectedValues(newSelectedValues);
+
+      if (manualUpdate) {
+        setPendingValues(newValues);
+      } else {
+        setSelectedValues(newValues);
+        onValueChange([]);
+      }
+    }, [manualUpdate, lockedValue, fallbackValue, onValueChange]);
+
+    const forceClear = useCallback(() => {
+      let newValues = [...lockedValue];
+      if (newValues.length === 0 && fallbackValue?.length) {
+        newValues = [...fallbackValue];
+      }
+
+      setSelectedValues(newValues);
+      setPendingValues(newValues);
       onValueChange([]);
-    }, [lockedValue, onValueChange, fallbackValue]);
+    }, [lockedValue, fallbackValue, onValueChange]);
 
     const handleTogglePopover = () => {
       setIsPopoverOpen((prev) => !prev);
     };
 
     const clearExtraOptions = () => {
-      const newSelectedValues = selectedValues.slice(0, maxCount);
-      setSelectedValues(newSelectedValues);
-      onValueChange(newSelectedValues);
+      const newValues = displayValues.slice(0, maxCount);
+      if (manualUpdate) {
+        setPendingValues(newValues);
+      } else {
+        setSelectedValues(newValues);
+        onValueChange(newValues);
+      }
     };
 
     const toggleAll = () => {
-      if (selectedValues.length === options.length) {
-        handleClear();
+      const allValues = options.map((option) => option.value);
+
+      if (displayValues.length === options.length) {
+        if (manualUpdate) {
+          setPendingValues([]);
+        } else {
+          handleClear();
+        }
       } else {
-        const allValues = options.map((option) => option.value);
-        setSelectedValues(allValues);
-        onValueChange(allValues);
+        if (manualUpdate) {
+          setPendingValues(allValues);
+        } else {
+          setSelectedValues(allValues);
+          onValueChange(allValues);
+        }
       }
     };
 
     useEffect(() => {
       if (value !== undefined) {
         setSelectedValues([...value]);
+        setPendingValues([...value]);
       }
     }, [value]);
 
@@ -293,28 +341,22 @@ export const MultiSelect = React.forwardRef(
       }
     }, [isPopoverOpen, hasSearch]);
 
-    // useEffect(() => {
-    //   if (!isPopoverOpen) return;
-
-    //   const scrollbarWidth =
-    //     window.innerWidth - document.documentElement.clientWidth;
-    //   const originalOverflow = document.body.style.overflow;
-    //   const originalPaddingRight = document.body.style.paddingRight;
-
-    //   document.body.style.overflow = "hidden";
-    //   document.body.style.paddingRight = `${scrollbarWidth}px`;
-
-    //   return () => {
-    //     document.body.style.overflow = originalOverflow;
-    //     document.body.style.paddingRight = originalPaddingRight;
-    //   };
-    // }, [isPopoverOpen]);
     const disabledClass = disabled
       ? "pointer-events-none opacity-50 border-foreground/50"
       : "";
 
     return (
-      <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen} modal>
+      <Popover
+        open={isPopoverOpen}
+        onOpenChange={(open) => {
+          if (!open && manualUpdate && hasPendingChanges) {
+            setSelectedValues(pendingValues);
+            onValueChange(pendingValues);
+          }
+          setIsPopoverOpen(open);
+        }}
+        modal
+      >
         <PopoverTrigger asChild>
           <Button
             ref={ref}
@@ -330,11 +372,11 @@ export const MultiSelect = React.forwardRef(
               className,
             )}
           >
-            {selectedValues.length > 0 ? (
+            {displayValues.length > 0 ? (
               <div className="flex w-full items-center justify-between border-stone-300">
                 <div className="jack flex flex-wrap items-center">
                   {!shortResults &&
-                    selectedValues.slice(0, maxCount).map((value) => {
+                    displayValues.slice(0, maxCount).map((value) => {
                       const option = options.find((o) => o.value === value);
                       const IconComponent = option?.icon;
                       return (
@@ -372,7 +414,7 @@ export const MultiSelect = React.forwardRef(
                         </Badge>
                       );
                     })}
-                  {!shortResults && selectedValues.length > maxCount && (
+                  {!shortResults && displayValues.length > maxCount && (
                     <Badge
                       className={cn(
                         "border-foreground/1 bg-transparent text-foreground hover:bg-salPink/40",
@@ -383,10 +425,10 @@ export const MultiSelect = React.forwardRef(
                       style={{ animationDuration: `${animation}s` }}
                     >
                       {condensed || compact ? (
-                        <> {selectedValues.length - maxCount}</>
+                        <> {displayValues.length - maxCount}</>
                       ) : (
                         <>
-                          {`+ ${selectedValues.length - maxCount} more`}
+                          {`+ ${displayValues.length - maxCount} more`}
 
                           <XCircle
                             className={cn(
@@ -413,7 +455,7 @@ export const MultiSelect = React.forwardRef(
                       )}
                       style={{ animationDuration: `${animation}s` }}
                     >
-                      {`${selectedValues.length} selected`}
+                      {`${displayValues.length} selected`}
                     </Badge>
                   )}
                 </div>
@@ -423,7 +465,7 @@ export const MultiSelect = React.forwardRef(
                       className="mx-2 h-4 cursor-pointer text-foreground/50 hover:scale-110 hover:text-red-600"
                       onClick={(event) => {
                         event.stopPropagation();
-                        handleClear();
+                        forceClear();
                       }}
                     />
                   )}
@@ -507,7 +549,7 @@ export const MultiSelect = React.forwardRef(
                     <div
                       className={cn(
                         "mr-2 flex size-4 items-start justify-center rounded-sm border border-primary",
-                        selectedValues.length === options.length
+                        displayValues.length === options.length
                           ? "bg-primary text-primary-foreground"
                           : "opacity-50 [&_svg]:invisible",
                       )}
@@ -539,15 +581,13 @@ export const MultiSelect = React.forwardRef(
                       )}
                     >
                       {groupOptions.map((option, idx) => {
-                        const isSelected = selectedValues.includes(
-                          option.value,
-                        );
+                        const isSelected = displayValues.includes(option.value);
                         const isDisabled =
                           option.disabled ||
                           !!(
                             !isSelected &&
                             limit &&
-                            selectedValues.length >= limit
+                            displayValues.length >= limit
                           );
                         return (
                           <CommandItem
@@ -588,13 +628,13 @@ export const MultiSelect = React.forwardRef(
                   //note-to-self: For non-grouped results
                   <CommandGroup className="scrollable mini justy max-h-64">
                     {options.map((option, idx) => {
-                      const isSelected = selectedValues.includes(option.value);
+                      const isSelected = displayValues.includes(option.value);
                       const isDisabled =
                         option.disabled ||
                         !!(
                           !isSelected &&
                           limit &&
-                          selectedValues.length >= limit
+                          displayValues.length >= limit
                         );
                       return (
                         <CommandItem
@@ -635,7 +675,7 @@ export const MultiSelect = React.forwardRef(
               <CommandSeparator />
               <CommandGroup className="border-t border-muted-foreground/30">
                 <div className="flex items-center justify-between">
-                  {selectedValues.length > 0 && (
+                  {displayValues.length > 0 && (
                     <>
                       <CommandItem
                         onSelect={handleClear}
@@ -649,18 +689,31 @@ export const MultiSelect = React.forwardRef(
                       />
                     </>
                   )}
-                  <CommandItem
-                    onSelect={() => setIsPopoverOpen(false)}
-                    className="max-w-full flex-1 cursor-pointer justify-center"
-                  >
-                    Close
-                  </CommandItem>
+                  {manualUpdate && hasPendingChanges ? (
+                    <CommandItem
+                      onSelect={() => {
+                        setSelectedValues(pendingValues);
+                        onValueChange(pendingValues);
+                        setIsPopoverOpen(false);
+                      }}
+                      className="flex-1 cursor-pointer justify-center"
+                    >
+                      Update
+                    </CommandItem>
+                  ) : (
+                    <CommandItem
+                      onSelect={() => setIsPopoverOpen(false)}
+                      className="max-w-full flex-1 cursor-pointer justify-center"
+                    >
+                      Close
+                    </CommandItem>
+                  )}
                 </div>
               </CommandGroup>
             </CommandList>
           </Command>
         </PopoverContent>
-        {animation > 0 && selectedValues.length > 0 && (
+        {animation > 0 && displayValues.length > 0 && (
           <WandSparkles
             className={cn(
               "my-2 h-3 w-3 cursor-pointer bg-background text-foreground",

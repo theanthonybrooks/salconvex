@@ -424,6 +424,7 @@ export const FilterBase = ({
                 Category:
               </Label>
               <MultiSelect
+                manualUpdate
                 options={[...eventCategoryOptions]}
                 value={filters.eventCategories ?? []}
                 onValueChange={(value) =>
@@ -446,6 +447,7 @@ export const FilterBase = ({
                 Event Type:
               </Label>
               <MultiSelect
+                manualUpdate
                 options={[...eventTypeOptions]}
                 value={filters.eventTypes ?? []}
                 onValueChange={(value) =>
@@ -470,6 +472,7 @@ export const FilterBase = ({
                 Continent:
               </Label>
               <MultiSelect
+                manualUpdate
                 options={select_continents}
                 value={filters.continent ?? []}
                 onValueChange={(value) =>
@@ -512,6 +515,7 @@ export const FilterBase = ({
                   Call Type:
                 </Label>
                 <MultiSelect
+                  manualUpdate
                   options={callTypeOptions}
                   value={filters.callType ?? []}
                   onValueChange={(value) =>
@@ -537,6 +541,7 @@ export const FilterBase = ({
                     Eligibility:
                   </Label>
                   <MultiSelect
+                    manualUpdate
                     options={[
                       ...eligibilityOptionValues.filter(
                         (option) => isAdmin || option.value !== "Unknown",
@@ -599,6 +604,7 @@ export const FilterBase = ({
                   Continent:
                 </Label>
                 <MultiSelect
+                  manualUpdate
                   options={select_continents}
                   value={filters.continent ?? []}
                   onValueChange={(value) =>
@@ -817,6 +823,7 @@ export const FilterBase = ({
                   Category:
                 </Label>
                 <MultiSelect
+                  manualUpdate
                   options={[...eventCategoryOptions]}
                   value={filters.eventCategories ?? []}
                   onValueChange={(value) =>
@@ -840,6 +847,7 @@ export const FilterBase = ({
                 Event Type:
               </Label>
               <MultiSelect
+                manualUpdate
                 options={[...eventTypeOptions]}
                 value={filters.eventTypes ?? []}
                 onValueChange={(value) =>
@@ -863,6 +871,7 @@ export const FilterBase = ({
                   Continent:
                 </Label>
                 <MultiSelect
+                  manualUpdate
                   options={select_continents}
                   value={filters.continent ?? []}
                   onValueChange={(value) =>
@@ -966,6 +975,7 @@ export const FilterBase = ({
                       Continent:
                     </Label>
                     <MultiSelect
+                      manualUpdate
                       options={select_continents}
                       value={filters.continent ?? []}
                       onValueChange={(value) =>
@@ -991,6 +1001,7 @@ export const FilterBase = ({
                     Eligibility:
                   </Label>
                   <MultiSelect
+                    manualUpdate
                     options={[
                       ...eligibilityOptionValues.filter(
                         (option) => isAdmin || option.value !== "Unknown",
@@ -1016,6 +1027,7 @@ export const FilterBase = ({
                     Call Type:
                   </Label>
                   <MultiSelect
+                    manualUpdate
                     options={callTypeOptions}
                     value={filters.callType ?? []}
                     onValueChange={(value) =>

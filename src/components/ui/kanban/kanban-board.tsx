@@ -286,6 +286,7 @@ const Board = ({ purpose: initialPurpose }: KanbanBoardProps) => {
               </div>
 
               <MultiSelect
+                manualUpdate
                 options={[...supportCategoryOptions]}
                 onValueChange={(value) => {
                   setCategory(value as SupportCategory[]);

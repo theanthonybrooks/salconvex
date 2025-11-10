@@ -70,7 +70,8 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
   const subData = usePreloadedQuery(preloadedSubStatus);
   const { hasActiveSubscription } = subData ?? {};
   const userData = usePreloadedQuery(preloadedUserData);
-  const userPref = userData?.userPref ?? null;
+  const { userPref } = userData ?? {};
+  // const isAdmin = user?.role?.includes("admin");
   const baseFontSize = userPref?.fontSize === "large" ? "text-base" : "text-sm";
   // const smFontSize = userPref?.fontSize === "large" ? "text-sm" : "text-xs";
   const subFontColor = "text-stone-500";
@@ -90,6 +91,7 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
           ["events", "orgs", "loc"].includes(opt.value),
         );
       case "archive":
+        // if (isAdmin) return searchTypeOptions;
         return searchTypeOptions.filter((opt) => !["all"].includes(opt.value));
       case "event":
         return searchTypeOptions.filter((opt) => !["all"].includes(opt.value));
@@ -575,10 +577,10 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
                           baseFontSize,
                         )}
                       >
-                        {groupItems.map((item) => {
+                        {groupItems.map((item, i) => {
                           return (
                             <Command.Item
-                              key={`${groupKey}-${item.path}`}
+                              key={`${groupKey}-${item.path}-${i}`}
                               value={`${groupKey}-${item.path}`}
                               className={cn(
                                 "group flex cursor-pointer items-center rounded p-2 pl-5 text-foreground transition-colors hover:bg-stone-100 hover:text-stone-900 data-[selected='true']:bg-salYellow/40",

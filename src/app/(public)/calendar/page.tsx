@@ -73,9 +73,19 @@ const CalendarPage = () => {
 
   return (
     <div className="mt-8 flex h-full w-full flex-1 flex-col items-center justify-center gap-4 px-4">
-      <h1 className="font-tanker text-3xl lowercase tracking-wide xl:text-[5rem]">
+      <h1 className="sr-only font-tanker text-3xl lowercase tracking-wide xl:text-[5rem]">
         Event & Open Call Calendar
       </h1>
+      <div className={cn("")}>
+        <Image
+          src="/branding/event-calendar.png"
+          alt="About The Street Art List"
+          width={400}
+          height={200}
+          priority={true}
+          className="[@media(max-width:724px)]:w-64"
+        />
+      </div>
 
       <div
         className={cn(
