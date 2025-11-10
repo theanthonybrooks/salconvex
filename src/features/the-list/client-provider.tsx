@@ -3,6 +3,11 @@
 import type { SearchType } from "@/constants/filterConsts";
 import type { EventCategory, EventType } from "@/types/eventTypes";
 import type {
+  CallFormat,
+  CallType,
+  EligibilityType,
+} from "@/types/openCallTypes";
+import type {
   Continents,
   Filters,
   SearchParams,
@@ -135,6 +140,14 @@ export const EventListProvider = ({
     continent:
       (searchParams.get("cont")?.split(",") as Continents[]) ??
       defaultFilters.continent,
+    eligibility:
+      (searchParams.get("e")?.split(",") as EligibilityType[]) ??
+      defaultFilters.eligibility,
+    callType:
+      (searchParams.get("ct")?.split(",") as CallType[]) ??
+      defaultFilters.callType,
+    callFormat:
+      (searchParams.get("f") as CallFormat) ?? defaultFilters.callFormat,
   };
 
   const currentSort: SortOptions = {
@@ -214,6 +227,7 @@ export const EventListProvider = ({
           setParamIfNotDefault(params, "e", filters.eligibility, []);
           setParamIfNotDefault(params, "ct", filters.callType, []);
           setParamIfNotDefault(params, "f", filters.callFormat, "");
+          setParamIfNotDefault(params, "cont", filters.continent, []);
 
           if (page !== 1) params.set("page", String(page));
           else params.delete("page");
