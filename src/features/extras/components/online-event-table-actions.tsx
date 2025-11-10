@@ -122,11 +122,13 @@ export const UpdateOrder = ({
   order,
   takenOrders,
   capacity,
+  disabled,
 }: {
   registrationId: Id<"userAddOns">;
   order?: number;
   takenOrders: number[];
   capacity: number;
+  disabled?: boolean;
 }) => {
   const updateRegistration = useMutation(
     api.userAddOns.onlineEvents.updateRegistrationAdmin,
@@ -165,6 +167,7 @@ export const UpdateOrder = ({
 
   return (
     <SelectSimple
+      disabled={disabled}
       options={[nullOption, ...availableOptions]}
       value={String(order) ?? ""}
       onChangeAction={(value) => {

@@ -202,10 +202,12 @@ export const userAddOnColumns: ColumnDef<UserAddOnColumnsProps>[] = [
         _id: registrationId,
         capacity,
         takenOrders,
+        status,
       } = row.original;
-
+      const disabled = status !== "chosen";
       return (
         <UpdateOrder
+          disabled={disabled}
           registrationId={registrationId}
           order={order}
           takenOrders={takenOrders}

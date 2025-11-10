@@ -81,6 +81,10 @@ export const numberedTableTypes = [
   "extras",
 ];
 
+export type AdminActions = {
+  isAdmin: boolean;
+};
+
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
@@ -92,9 +96,7 @@ interface DataTableProps<TData, TValue> {
   tableClassName?: string;
   outerContainerClassName?: string;
   selectedRow?: Record<string, boolean>;
-  adminActions?: {
-    isAdmin: boolean;
-  };
+  adminActions?: AdminActions;
   tableType?: TableTypes;
   pageType?: PageTypes;
   initialSearchTerm?: string;

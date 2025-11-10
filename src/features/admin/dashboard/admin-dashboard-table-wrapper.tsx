@@ -7,6 +7,7 @@ import { useDashboard } from "@/app/(pages)/dashboard/_components/dashboard-cont
 
 import type { Id } from "~/convex/_generated/dataModel";
 import { DataTable } from "@/components/data-table/data-table";
+import { ResponsiveDataTable } from "@/components/data-table/data-table-wrapper";
 import { useAdminPreload } from "@/features/admin/admin-preload-context";
 import { artistColumns } from "@/features/admin/dashboard/artist-columns";
 import { extraColumns } from "@/features/admin/dashboard/extras-column";
@@ -135,86 +136,54 @@ export function AdminDashboardTableWrapper({
       )}
       {extrasPage && (
         <>
-          <div className="hidden max-h-full w-full px-10 pb-10 pt-7 lg:block">
-            <h3 className="mb-3 text-xl">Online Events</h3>
-            <DataTable
-              columns={extraColumns}
-              data={extrasData?.events ?? []}
+          <ResponsiveDataTable
+            title="Online Events"
+            description="View all of your online events and their status."
+            data={extrasData?.events ?? []}
+            columns={extraColumns}
+            defaultVisibility={{
+              description: false,
+              terms: false,
+              requirements: false,
+              location: false,
+              updatedAt: false,
+              createdAt: false,
+              img: false,
+            }}
+            onRowSelect={(row) => setSelectedRow(row?._id ?? null)}
+            defaultFilters={[{ id: `state`, value: ["published", "draft"] }]}
+            defaultSort={{ id: `startDate`, desc: true }}
+            tableType="extras"
+            pageType="dashboard"
+            pageSize={10}
+            adminActions={adminActions}
+          />
+          {eventRegistrations && (
+            <ResponsiveDataTable
+              title="User Add-Ons"
+              description="View user registrations for your events."
+              data={eventRegistrations ?? []}
+              columns={userAddOnColumns}
               defaultVisibility={{
-                description: false,
-                terms: false,
-                requirements: false,
-                location: false,
-                updatedAt: false,
-                createdAt: false,
-                img: false,
-              }}
-              onRowSelect={(row) => setSelectedRow(row?._id ?? null)}
-              defaultFilters={[{ id: `state`, value: ["published", "draft"] }]}
-              adminActions={adminActions}
-              tableType="extras"
-              pageType="dashboard"
-              defaultSort={{ id: `startDate`, desc: true }}
-              pageSize={10}
-            />
-            {eventRegistrations && (
-              <DataTable
-                columns={userAddOnColumns}
-                data={eventRegistrations ?? []}
-                defaultVisibility={{
+                desktop: {
                   paid: false,
                   canceled: false,
-                }}
-                defaultFilters={[{ id: `canceled`, value: ["false"] }]}
-                defaultSort={{ id: `createdAt`, desc: true }}
-                adminActions={adminActions}
-                tableType="userAddOns"
-                pageType="dashboard"
-                pageSize={10}
-              />
-            )}
-          </div>
-          <div className="flex flex-col items-center justify-center gap-4 py-7 lg:hidden">
-            <DataTable
-              columns={extraColumns}
-              data={extrasData?.events ?? []}
-              defaultVisibility={{
-                description: false,
-                terms: false,
-                requirements: false,
-                location: false,
-                updatedAt: false,
-                createdAt: false,
-                img: false,
-              }}
-              defaultFilters={[{ id: `state`, value: ["published", "draft"] }]}
-              onRowSelect={(row) => setSelectedRow(row?._id ?? null)}
-              defaultSort={{ id: `startDate`, desc: true }}
-              adminActions={adminActions}
-              tableType="extras"
-              pageType="dashboard"
-              className="mx-auto w-full max-w-[80dvw] overflow-x-auto sm:max-w-[90vw]"
-              outerContainerClassName={cn("lg:hidden")}
-            />
-            {eventRegistrations && (
-              <DataTable
-                columns={userAddOnColumns}
-                data={eventRegistrations ?? []}
-                defaultVisibility={{
+                },
+                mobile: {
                   paid: false,
                   canceled: false,
                   createdAt: false,
-                }}
-                defaultFilters={[{ id: `canceled`, value: ["false"] }]}
-                defaultSort={{ id: `createdAt`, desc: true }}
-                adminActions={adminActions}
-                tableType="userAddOns"
-                pageType="dashboard"
-                pageSize={10}
-                className="mx-auto w-full max-w-[80dvw] overflow-x-auto sm:max-w-[90vw]"
-              />
-            )}
-          </div>
+                },
+              }}
+              defaultFilters={[{ id: `canceled`, value: ["false"] }]}
+              defaultSort={{ id: `createdAt`, desc: true }}
+              tableType="userAddOns"
+              pageType="dashboard"
+              pageSize={10}
+              adminActions={adminActions}
+              className="pb-0 pt-0"
+            />
+          )}
         </>
       )}
       {newsletterPage && (
