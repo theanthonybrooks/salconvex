@@ -1,5 +1,6 @@
 import { Check, X } from "lucide-react";
 
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { SelectSimple } from "@/components/ui/select";
 import { cn } from "@/helpers/utilsFns";
 
@@ -38,6 +39,35 @@ export const ArtistFeatureSelect = ({
       placeholder="Select..."
       key={artistId}
       className={cn(feature === false && "bg-red-100")}
+    />
+  );
+};
+
+export const ArtistAdminNotesInput = ({
+  notes,
+  artist,
+}: {
+  artist: Id<"artists">;
+  notes: string;
+}) => {
+  const updateArtistNote = useMutation(
+    api.artists.artistActions.updateArtistNotes,
+  );
+  const handleChange = async (value: string) => {
+    await updateArtistNote({
+      artistId: artist,
+      notes: value,
+    });
+  };
+
+  return (
+    <RichTextEditor
+      value={notes}
+      onChange={handleChange}
+      inputPreview
+      placeholder="More details..."
+      formInputPreviewClassName="line-clamp-1 min-h-5 max-h-5 "
+      inputPreviewContainerClassName="bg-inherit"
     />
   );
 };

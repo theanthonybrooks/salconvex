@@ -12,9 +12,9 @@ import { useAdminPreload } from "@/features/admin/admin-preload-context";
 import { artistColumns } from "@/features/admin/dashboard/artist-columns";
 import { extraColumns } from "@/features/admin/dashboard/extras-column";
 import { newsletterColumns } from "@/features/admin/dashboard/newsletter-columns";
+import { AdminToolbar } from "@/features/admin/dashboard/user-admin-toolbar";
 import { userColumns } from "@/features/admin/dashboard/user-columns";
 import { userAddOnColumns } from "@/features/admin/dashboard/userAddon-columns";
-import { applicationColumns } from "@/features/artists/applications/components/events-data-table/application-columns";
 import { getEventColumns } from "@/features/events/components/events-data-table/event-columns";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { cn } from "@/helpers/utilsFns";
@@ -52,7 +52,7 @@ export function AdminDashboardTableWrapper({
     isAdmin,
   };
   const submissionsPage = page === "events";
-  const appsPage = page === "applications";
+  // const appsPage = page === "applications";
   const usersPage = page === "users";
   const artistsPage = page === "artists";
   const newsletterPage = page === "newsletter";
@@ -66,10 +66,10 @@ export function AdminDashboardTableWrapper({
     api.newsletter.subscriber.getNewsletterSubscribers,
     newsletterPage ? {} : "skip",
   );
-  const applicationData = useQuery(
-    api.artists.applications.getArtistApplications2,
-    appsPage ? {} : "skip",
-  );
+  // const applicationData = useQuery(
+  //   api.artists.applications.getArtistApplications2,
+  //   appsPage ? {} : "skip",
+  // );
 
   const artistsData = useQuery(
     api.artists.artistQueries.getActiveArtists,
@@ -138,7 +138,7 @@ export function AdminDashboardTableWrapper({
         <>
           <ResponsiveDataTable
             title="Online Events"
-            description="View all of your online events and their status."
+            description="View all of your online events"
             data={extrasData?.events ?? []}
             columns={extraColumns}
             defaultVisibility={{
@@ -160,7 +160,7 @@ export function AdminDashboardTableWrapper({
           />
           {eventRegistrations && (
             <ResponsiveDataTable
-              title="User Add-Ons"
+              title="User Registrations"
               description="View user registrations for your events."
               data={eventRegistrations ?? []}
               columns={userAddOnColumns}
@@ -187,67 +187,23 @@ export function AdminDashboardTableWrapper({
         </>
       )}
       {newsletterPage && (
-        <>
-          <div className="hidden max-h-full w-full px-10 pb-10 pt-7 lg:block">
-            <h3 className="mb-3 text-xl">Newsletter Subscriptions</h3>
-            <DataTable
-              columns={newsletterColumns}
-              data={newsletterData?.subscribers ?? []}
-              defaultVisibility={
-                {
-                  // category: viewAll ? true : false,
-                  // dates_edition: viewAll ? true : false,
-                  // type: false,
-                  // role: false,
-                }
-              }
-              defaultFilters={[{ id: `active`, value: ["true"] }]}
-              adminActions={adminActions}
-              tableType="newsletter"
-              pageType="dashboard"
-              defaultSort={{ id: `createdAt`, desc: true }}
-              pageSize={50}
-            />
-          </div>
-          <div className="flex flex-col items-center justify-center gap-4 py-7 lg:hidden">
-            <DataTable
-              columns={newsletterColumns}
-              data={newsletterData?.subscribers ?? []}
-              defaultVisibility={
-                {
-                  // type: false,
-                  // category: false,
-                  // role: false,
-                  // lastEditedAt: false,
-                  // dates_edition: false,
-                }
-              }
-              defaultFilters={[{ id: `active`, value: ["true"] }]}
-              defaultSort={{ id: `createdAt`, desc: true }}
-              adminActions={adminActions}
-              tableType="newsletter"
-              pageType="dashboard"
-              className="mx-auto w-full max-w-[80dvw] overflow-x-auto sm:max-w-[90vw]"
-              outerContainerClassName={cn("lg:hidden")}
-            />
-          </div>
-        </>
+        <ResponsiveDataTable
+          title="Newsletter Subscriptions"
+          description="View newsletter subscribers & their preferences"
+          data={newsletterData?.subscribers ?? []}
+          defaultFilters={[{ id: `active`, value: ["true"] }]}
+          defaultSort={{ id: `createdAt`, desc: true }}
+          columns={newsletterColumns}
+          tableType="newsletter"
+          pageType="dashboard"
+          pageSize={{ desktop: 50, mobile: 10 }}
+          adminActions={adminActions}
+        />
       )}
       {usersPage && (
-        <>
-          <div className="hidden max-h-full w-full px-10 pb-10 pt-7 lg:block">
-            <h3 className="mb-3 text-xl">Site Users</h3>
-            <DataTable
-              columns={userColumns}
-              data={usersData?.users ?? []}
-              defaultVisibility={{
-                role: isSidebarCollapsed,
-                accountType: isSidebarCollapsed,
-                instagram: false,
-                website: false,
-                organizationNames: false,
-                canFeature: false,
-              }}
+        <ResponsiveDataTable
+          extraToolbar={
+            <AdminToolbar
               toolbarData={{
                 totalMonthly: usersData?.totalMonthly ?? 0,
                 totalYearly: usersData?.totalYearly ?? 0,
@@ -255,106 +211,63 @@ export function AdminDashboardTableWrapper({
                 totalThisYear: usersData?.totalThisYear ?? 0,
                 userCount: usersData?.users?.length ?? 0,
               }}
-              adminActions={adminActions}
-              tableType="users"
-              pageType="dashboard"
-              minimalView={!isSidebarCollapsed}
-              collapsedSidebar={isSidebarCollapsed}
-              defaultSort={{ id: `createdAt`, desc: true }}
-              pageSize={50}
             />
-          </div>
-          <div className="flex flex-col items-center justify-center gap-4 py-7 lg:hidden">
-            <DataTable
-              columns={userColumns}
-              data={usersData?.users ?? []}
-              defaultVisibility={{
-                type: false,
-                category: false,
-                role: false,
-                lastEditedAt: false,
-                dates_edition: false,
-              }}
-              toolbarData={{
-                totalMonthly: usersData?.totalMonthly ?? 0,
-                totalYearly: usersData?.totalYearly ?? 0,
-                totalThisMonth: usersData?.totalThisMonth ?? 0,
-                totalThisYear: usersData?.totalThisYear ?? 0,
-                userCount: usersData?.users?.length ?? 0,
-              }}
-              defaultSort={{ id: `createdAt`, desc: true }}
-              onRowSelect={(row) => {
-                console.log(row);
-                // setExistingEvent(row.getValue("event"));
-                // setExistingOpenCall(row.getValue("openCall"));
-              }}
-              minimalView
-              collapsedSidebar={isSidebarCollapsed}
-              adminActions={adminActions}
-              tableType="users"
-              pageType="dashboard"
-              className="mx-auto w-full max-w-[80dvw] overflow-x-auto sm:max-w-[90vw]"
-              outerContainerClassName={cn("lg:hidden")}
-            />
-          </div>
-        </>
+          }
+          title="Site Users"
+          columns={userColumns}
+          data={usersData?.users ?? []}
+          defaultVisibility={{
+            desktop: {
+              role: isSidebarCollapsed,
+              accountType: isSidebarCollapsed,
+              instagram: false,
+              website: false,
+              organizationNames: false,
+              canFeature: false,
+            },
+            mobile: {
+              type: false,
+              category: false,
+              role: false,
+              lastEditedAt: false,
+              dates_edition: false,
+            },
+          }}
+          defaultSort={{ id: `createdAt`, desc: true }}
+          tableType="users"
+          pageType="dashboard"
+          pageSize={{ desktop: 50, mobile: 10 }}
+          adminActions={adminActions}
+          minimalView={{ desktop: !isSidebarCollapsed, mobile: true }}
+          collapsedSidebar={isSidebarCollapsed}
+        />
       )}
       {artistsPage && (
-        <>
-          <div className="hidden max-h-full w-full px-10 pb-10 pt-7 lg:block">
-            <h3 className="mb-3 text-xl">Artists</h3>
-            <DataTable
-              columns={artistColumns}
-              data={artistsData ?? []}
-              defaultFilters={[
-                {
-                  id: `canFeature`,
-                  value: ["true"],
-                },
-                {
-                  id: `instagram`,
-                  value: ["true"],
-                },
-                { id: `feature`, value: ["true", "none"] },
-              ]}
-              toolbarData={{
-                userCount: artistsData?.length ?? 0,
-              }}
-              adminActions={adminActions}
-              tableType="artists"
-              pageType="dashboard"
-              collapsedSidebar={isSidebarCollapsed}
-              defaultSort={{ id: `createdAt`, desc: true }}
-              pageSize={50}
-            />
-          </div>
-          <div className="flex flex-col items-center justify-center gap-4 py-7 lg:hidden">
-            <DataTable
-              columns={artistColumns}
-              data={artistsData ?? []}
-              defaultFilters={[
-                {
-                  id: `canFeature`,
-                  value: ["true"],
-                },
-                {
-                  id: `instagram`,
-                  value: ["true"],
-                },
-                { id: `feature`, value: ["true", "none"] },
-              ]}
-              defaultSort={{ id: `createdAt`, desc: true }}
-              adminActions={adminActions}
-              tableType="artists"
-              pageType="dashboard"
-              collapsedSidebar={isSidebarCollapsed}
-              className="mx-auto w-full max-w-[80dvw] overflow-x-auto sm:max-w-[90vw]"
-              outerContainerClassName={cn("lg:hidden")}
-            />
-          </div>
-        </>
+        <ResponsiveDataTable
+          title="Artists"
+          description="Actively subscribed artists & their links"
+          columns={artistColumns}
+          data={artistsData ?? []}
+          adminActions={adminActions}
+          tableType="artists"
+          pageType="dashboard"
+          collapsedSidebar={isSidebarCollapsed}
+          defaultSort={{ id: `createdAt`, desc: true }}
+          pageSize={50}
+          defaultFilters={[
+            {
+              id: `canFeature`,
+              value: ["true"],
+            },
+            {
+              id: `instagram`,
+              value: ["true"],
+            },
+            { id: `feature`, value: ["true", "none"] },
+          ]}
+        />
       )}
-      {appsPage && (
+      {/* {appsPage && (
         <>
           <div className="hidden max-h-full w-full px-10 pb-10 pt-7 lg:block">
             <h3 className="mb-3 text-xl">Applications</h3>
@@ -396,7 +309,7 @@ export function AdminDashboardTableWrapper({
             />
           </div>
         </>
-      )}
+      )} */}
     </>
   );
 }

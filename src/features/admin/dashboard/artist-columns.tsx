@@ -5,7 +5,10 @@ import { ColumnDef } from "@tanstack/react-table";
 
 import { LucideClipboardCopy, MoreHorizontal } from "lucide-react";
 
-import { ArtistFeatureSelect } from "@/components/data-table/actions/data-table-admin-artist-actions";
+import {
+  ArtistAdminNotesInput,
+  ArtistFeatureSelect,
+} from "@/components/data-table/actions/data-table-admin-artist-actions";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 import { Button } from "@/components/ui/button";
 import { ConfirmingDropdown } from "@/components/ui/confirmation-dialog-context";
@@ -237,8 +240,8 @@ export const artistColumns: ColumnDef<ArtistColumnProps>[] = [
       <DataTableColumnHeader column={column} title="Notes" />
     ),
     cell: ({ row }) => {
-      const { notes } = row.original;
-      return <span className="text-sm">{notes ?? "-"}</span>;
+      const { notes, artistId } = row.original;
+      return <ArtistAdminNotesInput artist={artistId} notes={notes ?? ""} />;
     },
   },
   {

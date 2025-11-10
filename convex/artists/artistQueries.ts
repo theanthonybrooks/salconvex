@@ -44,7 +44,7 @@ export const getActiveArtists = query({
             website: artist.contact?.website ?? "",
             canFeature: artist.canFeature ?? false,
             feature: artist.feature ?? "none",
-            notes: artist.notes ?? "",
+            notes: artist.adminNote ?? "",
             createdAt: artist._creationTime,
           };
         }),

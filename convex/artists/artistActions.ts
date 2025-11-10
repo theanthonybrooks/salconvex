@@ -1,11 +1,12 @@
-import { ApplicationStatus } from "@/types/applications";
 import { ArtistFull } from "@/types/artist";
-import { getAuthUserId } from "@convex-dev/auth/server";
-import { ConvexError, v } from "convex/values";
+
 import slugify from "slugify";
-import { Doc, Id } from "~/convex/_generated/dataModel";
+
+import { getAuthUserId } from "@convex-dev/auth/server";
+import { Doc } from "~/convex/_generated/dataModel";
 import { mutation, query } from "~/convex/_generated/server";
 import { ArtistEventMetadata } from "~/convex/artists/getArtistEventMetadata";
+import { ConvexError, v } from "convex/values";
 
 export const updateOrCreateArtist = mutation({
   args: {
@@ -167,6 +168,30 @@ export const updateArtistFeature = mutation({
 
     await ctx.db.patch(artist._id, {
       feature: args.feature ?? undefined,
+      updatedAt: Date.now(),
+      lastUpdatedBy: userId,
+    });
+  },
+});
+
+export const updateArtistNotes = mutation({
+  args: {
+    artistId: v.id("artists"),
+    notes: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new ConvexError("Not authenticated");
+    const user = userId ? await ctx.db.get(userId) : null;
+    const isAdmin = user?.role?.includes("admin");
+    if (!isAdmin)
+      throw new ConvexError("You don't have permission to update this");
+
+    const artist = await ctx.db.get(args.artistId);
+    if (!artist) throw new ConvexError("Artist not found");
+
+    await ctx.db.patch(artist._id, {
+      adminNote: args.notes ?? undefined,
       updatedAt: Date.now(),
       lastUpdatedBy: userId,
     });

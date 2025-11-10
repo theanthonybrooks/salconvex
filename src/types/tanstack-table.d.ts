@@ -11,8 +11,6 @@
 // }
 import { RowData } from "@tanstack/react-table";
 
-import { ToolbarData } from "@/components/data-table/data-table";
-
 export const tableTypes = [
   "events",
   "orgEvents",
@@ -40,7 +38,7 @@ declare module "@tanstack/react-table" {
     tableType?: TableTypes;
     pageType?: PageTypes;
     getRowData?: (row: TData) => void;
-    toolbarData?: ToolbarData;
+
     isMobile?: boolean;
     minimalView?: boolean;
     collapsedSidebar?: boolean;

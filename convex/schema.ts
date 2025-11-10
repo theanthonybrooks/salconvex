@@ -447,6 +447,7 @@ const userLogSchema = {
 };
 
 const artistSchema = {
+  adminNote: v.optional(v.string()),
   artistId: v.id("users"),
   artistName: v.optional(v.string()),
   artistSlug: v.optional(v.string()),
@@ -472,7 +473,6 @@ const artistSchema = {
   ),
   canFeature: v.optional(v.boolean()),
   feature: v.optional(v.boolean()),
-  notes: v.optional(v.string()),
   updatedAt: v.optional(v.number()),
   lastUpdatedBy: v.optional(v.string()),
   completedProfile: v.boolean(),

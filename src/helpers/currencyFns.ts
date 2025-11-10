@@ -1,5 +1,6 @@
 import { currencies } from "@/app/data/currencies";
 import currencyCodes from "currency-codes";
+
 export function formatAmount(amount: number): string {
   return amount % 1 === 0
     ? amount.toLocaleString("en-US", {
@@ -33,6 +34,29 @@ export async function convertCurrency({
   } catch (err) {
     console.error("Currency conversion failed:", err);
     return amount;
+  }
+}
+
+export async function getRate({
+  from,
+  to,
+}: {
+  from: string;
+  to: string;
+}): Promise<number> {
+  if (from === to) return 1;
+  try {
+    const res = await fetch(
+      `https://www.floatrates.com/daily/${from.toLowerCase()}.json`,
+    );
+    const data = await res.json();
+    const rate = data?.[to]?.rate;
+
+    if (!rate) throw new Error("No " + to + " rate found for " + from);
+    return rate;
+  } catch (err) {
+    console.error("Currency conversion failed:", err);
+    return 1;
   }
 }
 

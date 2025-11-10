@@ -1,146 +1,93 @@
 "use client";
 
-import { TableTypes } from "@/types/tanstack-table";
-
 import { useEffect, useState } from "react";
 
-import { ToolbarData } from "@/components/data-table/data-table";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectSeparator,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { convertCurrency, formatAmount } from "@/helpers/currencyFns";
+import { DollarSign, Euro } from "lucide-react";
+
+import { SelectSimple } from "@/components/ui/select";
+import { formatAmount, getRate } from "@/helpers/currencyFns";
 import { cn } from "@/helpers/utilsFns";
 
-import { api } from "~/convex/_generated/api";
-import { useQuery } from "convex-helpers/react/cache";
+export type ToolbarData = {
+  totalThisMonth?: number;
+  totalThisYear?: number;
+  totalMonthly?: number;
+  totalYearly?: number;
+  userCount?: number;
+};
 
 interface UserAdminToolbarProps {
   toolbarData: ToolbarData | undefined;
-  mode?: TableTypes;
 }
 
-export const AdminToolbar = ({ toolbarData, mode }: UserAdminToolbarProps) => {
-  const userData = useQuery(api.users.getCurrentUser, {});
-  const [currency, setCurrency] = useState<"usd" | "eur">("usd");
-  const [convertedTotalThisMonth, setConvertedTotalThisMonth] =
-    useState<number>(toolbarData?.totalThisMonth ?? 0);
-  const [convertedTotalThisYear, setConvertedTotalThisYear] = useState<number>(
-    toolbarData?.totalThisYear ?? 0,
-  );
-  const [convertedTotalPerMonth, setConvertedTotalPerMonth] = useState<number>(
-    toolbarData?.totalMonthly ?? 0,
-  );
-  const [convertedTotalPerYear, setConvertedTotalPerYear] = useState<number>(
-    toolbarData?.totalYearly ?? 0,
-  );
+const currencyOptions = [
+  { value: "usd", label: "USD", icon: DollarSign },
+  { value: "eur", label: " EUR", icon: Euro },
+] as const;
 
-  const isAdmin = userData?.user?.role?.includes("admin");
-  const totalThisMonth = toolbarData?.totalThisMonth ?? 0;
-  const totalThisYear = toolbarData?.totalThisYear ?? 0;
-  const totalMonthly = toolbarData?.totalMonthly ?? 0;
-  const totalYearly = toolbarData?.totalYearly ?? 0;
+type CurrencyOption = (typeof currencyOptions)[number]["value"];
+
+export const AdminToolbar = ({ toolbarData }: UserAdminToolbarProps) => {
+  const [currency, setCurrency] = useState<CurrencyOption>("usd");
+  const [rate, setRate] = useState<number>(1);
+
+  const totalThisMonth = (toolbarData?.totalThisMonth ?? 0) * rate;
+  const totalThisYear = (toolbarData?.totalThisYear ?? 0) * rate;
+  const totalMonthly = (toolbarData?.totalMonthly ?? 0) * rate;
+  const totalYearly = (toolbarData?.totalYearly ?? 0) * rate;
+
   //   const userCount = toolbarData?.userCount;
-  const usersMode = mode === "users";
 
   useEffect(() => {
-    if (currency === "usd") {
-      setConvertedTotalThisMonth(totalThisMonth);
-      setConvertedTotalThisYear(totalThisYear);
-      setConvertedTotalPerMonth(totalMonthly);
-      setConvertedTotalPerYear(totalYearly);
-      return;
-    }
+    const fetchRate = async () => {
+      if (currency === "usd") {
+        setRate(1);
+      } else {
+        const newRate = await getRate({ from: "usd", to: currency });
+        setRate(newRate);
+      }
+    };
 
-    convertCurrency({
-      amount: totalThisMonth,
-      from: "USD",
-      to: currency.toUpperCase(),
-    }).then(setConvertedTotalThisMonth);
-    convertCurrency({
-      amount: totalThisYear,
-      from: "USD",
-      to: currency.toUpperCase(),
-    }).then(setConvertedTotalThisYear);
-    convertCurrency({
-      amount: totalMonthly,
-      from: "USD",
-      to: currency.toUpperCase(),
-    }).then(setConvertedTotalPerMonth);
-    convertCurrency({
-      amount: totalYearly,
-      from: "USD",
-      to: currency.toUpperCase(),
-    }).then(setConvertedTotalPerYear);
-  }, [currency, totalThisMonth, totalThisYear, totalMonthly, totalYearly]);
-
-  if (!isAdmin) return null;
+    fetchRate();
+  }, [currency]);
 
   return (
     <div
       className={cn(
-        "mx-auto flex w-full max-w-[80vw] flex-col items-center gap-2 sm:max-w-full sm:flex-row",
-        usersMode && "justify-between",
+        "mx-auto mb-6 flex w-full max-w-[80vw] flex-col items-center justify-between gap-2 sm:max-w-full sm:flex-row",
       )}
     >
-      {usersMode && (
-        <>
-          <div className="flex flex-col gap-2 sm:flex-row">
-            {/* <span className="flex items-center gap-2">
-              <p className="text-sm text-muted-foreground">Total Users:</p>
-              <p className="text-sm font-bold">{userCount ?? 0}</p>
-            </span> */}
-            <span className="flex items-center gap-2">
-              <p className="text-sm text-muted-foreground">This Month:</p>
-              <p className="text-sm font-bold">
-                {currency === "usd" ? "$" : "€"}
-                {formatAmount(convertedTotalThisMonth) ?? 0}
-              </p>
-              <p className="text-sm text-muted-foreground">
-                ({currency === "usd" ? "$" : "€"}
-                {formatAmount(convertedTotalPerMonth) ?? 0} per month)
-              </p>
-            </span>
-            <span className="flex items-center gap-2">
-              <p className="text-sm text-muted-foreground">This Year:</p>
-              <p className="text-sm font-bold">
-                {currency === "usd" ? "$" : "€"}
-                {formatAmount(convertedTotalThisYear) ?? 0}
-              </p>
-              <p className="text-sm text-muted-foreground">
-                ({currency === "usd" ? "$" : "€"}
-                {formatAmount(convertedTotalPerYear) ?? 0} per year)
-              </p>
-            </span>
-          </div>
-          <div className="flex w-full items-center gap-2 sm:w-auto">
-            <Select
-              value={currency}
-              onValueChange={(value) => setCurrency(value as "usd" | "eur")}
-            >
-              <SelectTrigger className="h-12 w-full sm:w-fit">
-                <SelectValue placeholder="Currency" />
-              </SelectTrigger>
-              <SelectContent className="min-w-auto">
-                <SelectGroup>
-                  <SelectLabel className="text-sm text-muted-foreground">
-                    Currency
-                  </SelectLabel>
-                  <SelectSeparator />
-                  <SelectItem value="usd">USD</SelectItem>
-                  <SelectItem value="eur">EUR</SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </div>
-        </>
-      )}
+      <div className="flex flex-col gap-2 sm:flex-row">
+        <span className="flex items-center gap-2">
+          <p className="text-sm text-muted-foreground">This Month:</p>
+          <p className="text-sm font-bold">
+            {currency === "usd" ? "$" : "€"}
+            {formatAmount(totalThisMonth) ?? 0}
+          </p>
+          <p className="text-sm text-muted-foreground">
+            ({currency === "usd" ? "$" : "€"}
+            {formatAmount(totalMonthly) ?? 0} per month)
+          </p>
+        </span>
+        <span className="flex items-center gap-2">
+          <p className="text-sm text-muted-foreground">This Year:</p>
+          <p className="text-sm font-bold">
+            {currency === "usd" ? "$" : "€"}
+            {formatAmount(totalThisYear) ?? 0}
+          </p>
+          <p className="text-sm text-muted-foreground">
+            ({currency === "usd" ? "$" : "€"}
+            {formatAmount(totalYearly) ?? 0} per year)
+          </p>
+        </span>
+      </div>
+      <SelectSimple
+        options={[...currencyOptions]}
+        value={currency}
+        onChangeAction={(value) => setCurrency(value as CurrencyOption)}
+        placeholder="Currency"
+        className="w-16"
+      />
     </div>
   );
 };

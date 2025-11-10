@@ -36,7 +36,7 @@ export const ListActionSelector = ({
       onChangeAction={(val) => {
         handleChange(val === "yes", bookmarked ? "bookmarked" : "hidden");
       }}
-      placeholder="Select..."
+      placeholder="-"
       options={[
         { value: "yes", label: yesValue },
         { value: "no", label: noValue },

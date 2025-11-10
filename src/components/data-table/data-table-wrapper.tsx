@@ -1,44 +1,10 @@
 import type { AdminActions } from "@/components/data-table/data-table";
 import type { PageTypes, TableTypes } from "@/types/tanstack-table";
 import type { ColumnDef } from "@tanstack/react-table";
+import type { ReactNode } from "react";
 
 import { DataTable } from "@/components/data-table/data-table";
 import { cn } from "@/helpers/utilsFns";
-
-// import { ReactNode } from "react";
-
-// type DataTableWrapperProps = {
-//   title: string;
-//   description?: string;
-//   children: ReactNode;
-//   mobileChildren: ReactNode;
-// };
-
-// export const DataTableWrapper = ({
-//   children,
-//   mobileChildren,
-//   title,
-//   description,
-// }: DataTableWrapperProps) => {
-//   return (
-//     <>
-//       <div className="hidden max-h-full w-full px-10 pb-10 pt-7 lg:block">
-//         <h3 className="mb-3 text-xl">{title}</h3>
-//         {description && (
-//           <p className="text-sm text-muted-foreground">{description}</p>
-//         )}
-//         {children}
-//       </div>
-//       <div className="flex flex-col items-center justify-center gap-4 py-7 lg:hidden">
-//         <h3 className="mb-3 text-xl">{title}</h3>
-//         {description && (
-//           <p className="text-sm text-muted-foreground">{description}</p>
-//         )}
-//         {mobileChildren}
-//       </div>
-//     </>
-//   );
-// };
 
 type MaybeResponsive<T> =
   | T
@@ -70,6 +36,9 @@ type ResponsiveDataTableProps<TData, TValue> = {
   /** Optional wrapper classes */
   className?: string;
   mobileClassName?: string;
+  extraToolbar?: ReactNode;
+  minimalView?: MaybeResponsive<boolean>;
+  collapsedSidebar?: MaybeResponsive<boolean>;
 };
 
 export function ResponsiveDataTable<TData, TValue>({
@@ -87,6 +56,9 @@ export function ResponsiveDataTable<TData, TValue>({
   adminActions,
   className,
   mobileClassName,
+  extraToolbar,
+  minimalView,
+  collapsedSidebar,
 }: ResponsiveDataTableProps<TData, TValue>) {
   const resolve = <T,>(
     value: MaybeResponsive<T> | undefined,
@@ -107,8 +79,16 @@ export function ResponsiveDataTable<TData, TValue>({
       >
         {title && <h3 className="mb-3 text-xl">{title}</h3>}
         {description && (
-          <p className="text-sm text-muted-foreground">{description}</p>
+          <p
+            className={cn(
+              "mb-8 text-sm text-muted-foreground",
+              extraToolbar && "mb-3",
+            )}
+          >
+            {description}
+          </p>
         )}
+        {extraToolbar}
         <DataTable
           columns={columns}
           data={data}
@@ -120,19 +100,29 @@ export function ResponsiveDataTable<TData, TValue>({
           tableType={tableType}
           pageType={pageType}
           pageSize={resolve(pageSize, "desktop")}
+          minimalView={resolve(minimalView, "desktop")}
+          collapsedSidebar={resolve(collapsedSidebar, "desktop")}
         />
       </div>
 
       <div
         className={cn(
-          "flex flex-col items-center justify-center gap-4 py-7 lg:hidden",
+          "mx-auto flex max-w-[80dvw] flex-col justify-center gap-4 py-7 sm:max-w-[90vw] lg:hidden",
           mobileClassName,
         )}
       >
         {title && <h3 className="text-xl">{title}</h3>}
         {description && (
-          <p className="text-sm text-muted-foreground">{description}</p>
+          <p
+            className={cn(
+              "mb-6 text-sm text-muted-foreground",
+              extraToolbar && "mb-3",
+            )}
+          >
+            {description}
+          </p>
         )}
+        {extraToolbar}
         <DataTable
           columns={columns}
           data={data}
@@ -144,7 +134,9 @@ export function ResponsiveDataTable<TData, TValue>({
           tableType={tableType}
           pageType={pageType}
           pageSize={resolve(pageSize, "mobile")}
-          className="mx-auto w-full max-w-[80dvw] overflow-x-auto sm:max-w-[90vw]"
+          minimalView={resolve(minimalView, "mobile")}
+          collapsedSidebar={resolve(collapsedSidebar, "mobile")}
+          className="w-full overflow-x-auto"
         />
       </div>
     </>

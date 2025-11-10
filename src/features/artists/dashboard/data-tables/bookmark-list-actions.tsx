@@ -55,7 +55,7 @@ export const BookmarkListActionSelector = ({
   return (
     <SelectSimple
       hasReset
-      placeholder="Select..."
+      placeholder="-"
       disabled={disabledValue}
       value={value ?? ""}
       onChangeAction={handleChange}

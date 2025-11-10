@@ -43,19 +43,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { AdminToolbar } from "@/features/admin/dashboard/user-admin-toolbar";
 import { cn } from "@/helpers/utilsFns";
 
 import { DataTablePagination } from "./data-table-pagination";
 import { DataTableToolbar } from "./data-table-toolbar";
-
-export type ToolbarData = {
-  totalThisMonth?: number;
-  totalThisYear?: number;
-  totalMonthly?: number;
-  totalYearly?: number;
-  userCount?: number;
-};
 
 // "events" | "orgEvents" | "organizations" | "openCalls" | "users" | "artists" | "newsletter" | "applications" | "bookmarks" | "hidden"
 
@@ -88,7 +79,6 @@ export type AdminActions = {
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  toolbarData?: ToolbarData;
 
   defaultVisibility?: VisibilityState;
   onRowSelect?: (row: TData | null, selection: Record<string, boolean>) => void;
@@ -111,7 +101,7 @@ interface DataTableProps<TData, TValue> {
 export function DataTable<TData, TValue>({
   columns,
   data,
-  toolbarData,
+
   onRowSelect,
   defaultVisibility,
   className,
@@ -139,8 +129,6 @@ export function DataTable<TData, TValue>({
     const filters: ColumnFiltersState = [];
 
     const validColumnIds = columns.map((c) => c.id).filter(Boolean);
-
-    console.log(validColumnIds);
 
     searchParams.forEach((value, key) => {
       if (!value) return;
@@ -199,7 +187,6 @@ export function DataTable<TData, TValue>({
       pageType,
       collapsedSidebar,
       minimalView,
-      toolbarData,
     },
     initialState: {
       pagination: {
@@ -330,7 +317,6 @@ export function DataTable<TData, TValue>({
 
   return (
     <div className={cn("w-full space-y-4 pb-3", outerContainerClassName)}>
-      <AdminToolbar toolbarData={toolbarData} mode={tableType} />
       <DataTableToolbar
         table={table}
         setRowSelection={setRowSelection}
