@@ -2,9 +2,14 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 
+import type { UserAddOnStatus } from "~/convex/schema";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 import { Link } from "@/components/ui/custom-link";
-import { TooltipSimple } from "@/components/ui/tooltip";
+import {
+  UpdateOrder,
+  UpdateRegistrationStatus,
+  ViewNotes,
+} from "@/features/extras/components/online-event-table-actions";
 
 import { Id } from "~/convex/_generated/dataModel";
 
@@ -16,6 +21,8 @@ export const userAddOnColumnLabels: Record<string, string> = {
   paid: "Paid",
   canceled: "Canceled",
   createdAt: "Created",
+  status: "Status",
+  order: "Order",
 };
 
 interface UserAddOnColumnsProps {
@@ -27,7 +34,11 @@ interface UserAddOnColumnsProps {
   paid: boolean;
   plan?: number;
   canceled: boolean;
+  status: UserAddOnStatus;
+  order?: number;
+  capacity: number;
   _creationTime: number;
+  takenOrders: number[];
 }
 
 export const userAddOnColumns: ColumnDef<UserAddOnColumnsProps>[] = [
@@ -40,7 +51,7 @@ export const userAddOnColumns: ColumnDef<UserAddOnColumnsProps>[] = [
     cell: ({ row }) => {
       return (
         <div
-          className="text-center text-sm text-muted-foreground"
+          className="text-center"
           onClick={() => {
             row.toggleSelected();
           }}
@@ -81,7 +92,7 @@ export const userAddOnColumns: ColumnDef<UserAddOnColumnsProps>[] = [
         <Link
           href={`mailto:${email ?? ""}`}
           target="_blank"
-          className="truncate text-sm text-muted-foreground"
+          className="truncate"
         >
           {email}
         </Link>
@@ -97,11 +108,7 @@ export const userAddOnColumns: ColumnDef<UserAddOnColumnsProps>[] = [
     cell: ({ row }) => {
       const { link } = row.original;
       return (
-        <Link
-          href={link ?? "#"}
-          target="_blank"
-          className="truncate text-sm text-muted-foreground"
-        >
+        <Link href={link ?? "#"} target="_blank" className="truncate">
           {link}
         </Link>
       );
@@ -117,15 +124,7 @@ export const userAddOnColumns: ColumnDef<UserAddOnColumnsProps>[] = [
     ),
     cell: ({ row }) => {
       const { notes } = row.original;
-      return (
-        <>
-          <TooltipSimple content={notes}>
-            <div className="truncate text-sm text-muted-foreground">
-              {notes ?? ""}
-            </div>
-          </TooltipSimple>
-        </>
-      );
+      return <ViewNotes notes={notes} />;
     },
   },
 
@@ -138,11 +137,7 @@ export const userAddOnColumns: ColumnDef<UserAddOnColumnsProps>[] = [
     ),
     cell: ({ row }) => {
       const { paid } = row.original;
-      return (
-        <div className="truncate text-center text-sm text-muted-foreground">
-          {paid ? "Yes" : "No"}
-        </div>
-      );
+      return <div className="truncate text-center">{paid ? "Yes" : "No"}</div>;
     },
     filterFn: (row, columnId, filterValue) => {
       if (!Array.isArray(filterValue)) return true;
@@ -161,9 +156,7 @@ export const userAddOnColumns: ColumnDef<UserAddOnColumnsProps>[] = [
     cell: ({ row }) => {
       const { canceled } = row.original;
       return (
-        <div className="truncate text-center text-sm text-muted-foreground">
-          {canceled ? "Yes" : "No"}
-        </div>
+        <div className="truncate text-center">{canceled ? "Yes" : "No"}</div>
       );
     },
     filterFn: (row, columnId, filterValue) => {
@@ -171,6 +164,61 @@ export const userAddOnColumns: ColumnDef<UserAddOnColumnsProps>[] = [
       const value = row.getValue(columnId);
       return filterValue.includes(String(value));
     },
+  },
+  {
+    accessorKey: "status",
+    id: "status",
+    minSize: 120,
+    maxSize: 120,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Status" />
+    ),
+    cell: ({ row }) => {
+      const { status, _id: registrationId } = row.original;
+      return (
+        <UpdateRegistrationStatus
+          status={status}
+          registrationId={registrationId}
+        />
+      );
+    },
+    filterFn: (row, columnId, filterValue) => {
+      if (!Array.isArray(filterValue)) return true;
+      const value = row.getValue(columnId);
+      return filterValue.includes(String(value));
+    },
+  },
+  {
+    accessorKey: "order",
+    id: "order",
+    minSize: 50,
+    maxSize: 50,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Order" />
+    ),
+    cell: ({ row }) => {
+      const {
+        order,
+        _id: registrationId,
+        capacity,
+        takenOrders,
+      } = row.original;
+
+      return (
+        <UpdateOrder
+          registrationId={registrationId}
+          order={order}
+          takenOrders={takenOrders}
+          capacity={capacity}
+        />
+      );
+    },
+    filterFn: (row, columnId, filterValue) => {
+      if (!Array.isArray(filterValue)) return true;
+      const value = row.getValue(columnId);
+      return filterValue.includes(String(value));
+    },
+    sortUndefined: "last",
   },
   {
     accessorKey: "plan",
@@ -181,11 +229,7 @@ export const userAddOnColumns: ColumnDef<UserAddOnColumnsProps>[] = [
     ),
     cell: ({ row }) => {
       const { plan } = row.original;
-      return (
-        <div className="truncate text-center text-sm text-muted-foreground">
-          {plan ?? "-"}
-        </div>
-      );
+      return <div className="truncate text-center">{plan ?? "-"}</div>;
     },
   },
 

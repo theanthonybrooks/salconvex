@@ -246,6 +246,7 @@ export const SelectSimple = ({
     <Select
       value={value}
       onValueChange={(val) => {
+        console.log(val);
         if (val === "-") {
           onChangeAction("");
           return;
@@ -281,9 +282,9 @@ export const SelectSimple = ({
               </div>
             )}
 
-            {opts.map((option) => (
+            {opts.map((option, i) => (
               <SelectItem
-                key={option.value}
+                key={option.value + i}
                 value={option.value}
                 disabled={option.disabled}
                 className={cn(

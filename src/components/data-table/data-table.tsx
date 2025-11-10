@@ -3,6 +3,8 @@
 import {
   onlineEventStatusBgColorMap,
   onlineEventStatusColorMap,
+  registrationStatusBgColorMap,
+  registrationStatusColorMap,
 } from "@/constants/extrasConsts";
 
 import {
@@ -32,7 +34,7 @@ import {
   VisibilityState,
 } from "@tanstack/react-table";
 
-import type { OnlineEventStateType } from "~/convex/schema";
+import type { OnlineEventStateType, UserAddOnStatus } from "~/convex/schema";
 import {
   Table,
   TableBody,
@@ -424,6 +426,13 @@ export function DataTable<TData, TValue>({
                   };
                   const statusColor = onlineEventStatusBgColorMap[state];
                   const textColor = onlineEventStatusColorMap[state];
+                  bgStatusClass = `${statusColor} ${textColor}`;
+                } else if (tableType === "userAddOns") {
+                  const { status } = row.original as {
+                    status: UserAddOnStatus;
+                  };
+                  const statusColor = registrationStatusBgColorMap[status];
+                  const textColor = registrationStatusColorMap[status];
                   bgStatusClass = `${statusColor} ${textColor}`;
                 }
 

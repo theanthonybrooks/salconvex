@@ -10,7 +10,11 @@ import type {
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { internal } from "~/convex/_generated/api";
 import { internalMutation, mutation, query } from "~/convex/_generated/server";
-import { onlineEventsSchema, onlineEventStateValues } from "~/convex/schema";
+import {
+  onlineEventsSchema,
+  onlineEventStateValues,
+  userAddOnStatusValidator,
+} from "~/convex/schema";
 import { ConvexError, v } from "convex/values";
 
 export async function getRegistration(
@@ -677,12 +681,58 @@ export const getAllRegistrationsForEvent = query({
     eventId: v.id("onlineEvents"),
   },
   handler: async (ctx, args) => {
+    const event = await ctx.db.get(args.eventId);
     const registrations = await ctx.db
       .query("userAddOns")
       .withIndex("by_eventId", (q) => q.eq("eventId", args.eventId))
       .collect();
 
-    return registrations;
+    const assignedOrders = registrations.map((r) => r.order);
+    const takenOrders = assignedOrders.filter(
+      (n): n is number => n !== undefined,
+    );
+
+    const enrichedRegistrations = await Promise.all(
+      registrations.map(async (registration) => {
+        return {
+          ...registration,
+          status: registration.status ?? "",
+          capacity: event?.capacity?.max ?? 20,
+          order: registration.order,
+          takenOrders,
+        };
+      }),
+    );
+
+    return enrichedRegistrations;
+  },
+});
+
+export const updateRegistrationAdmin = mutation({
+  args: {
+    registrationId: v.id("userAddOns"),
+    order: v.optional(v.number()),
+    status: v.optional(userAddOnStatusValidator),
+    type: v.union(v.literal("order"), v.literal("status")),
+  },
+  handler: async (ctx, args) => {
+    const { registrationId, order, status, type } = args;
+    const registration = await ctx.db.get(registrationId);
+    if (!registration) {
+      throw new Error("Registration not found");
+    }
+    if (type === "order") {
+      await ctx.db.patch(registrationId, {
+        order,
+      });
+    } else if (type === "status") {
+      await ctx.db.patch(registrationId, {
+        status,
+        ...(status !== "chosen" && { order: undefined }),
+      });
+    }
+
+    return registration;
   },
 });
 

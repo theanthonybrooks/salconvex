@@ -944,6 +944,15 @@ const userPlansSchema = {
   popular: v.boolean(),
 };
 
+export const userAddOnStatusValidator = v.union(
+  v.literal("chosen"),
+  v.literal("backup"),
+  v.literal(""),
+  v.literal("ineligible"),
+);
+
+export type UserAddOnStatus = Infer<typeof userAddOnStatusValidator>;
+
 const userAddOnsSchema = {
   userId: v.union(v.id("users"), v.null()),
   name: v.string(),
@@ -955,6 +964,8 @@ const userAddOnsSchema = {
   notes: v.optional(v.string()),
   link: v.optional(v.string()),
   plan: v.optional(v.number()),
+  status: v.optional(userAddOnStatusValidator),
+  order: v.optional(v.number()),
 };
 
 export const onlineEventStateValues = v.union(
