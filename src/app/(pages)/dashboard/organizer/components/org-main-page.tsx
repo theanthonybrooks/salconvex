@@ -5,22 +5,27 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { OrgInfo } from "@/app/(pages)/dashboard/organizer/components/org-info";
+import { motion } from "framer-motion";
 
 import type { Doc, Id } from "~/convex/_generated/dataModel";
 import { ResponsiveDataTable } from "@/components/data-table/data-table-wrapper";
+import { Card } from "@/components/ui/card";
 import { SearchMappedSelect } from "@/components/ui/mapped-select";
 import NavTabs from "@/components/ui/nav-tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getEventColumns } from "@/features/events/components/events-data-table/event-columns";
 import { OrganizerLogoName } from "@/features/organizers/components/organizer-logo-name-card";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { getUserFontSizePref } from "@/helpers/stylingFns";
 import { cn } from "@/helpers/utilsFns";
+import { useDevice } from "@/providers/device-provider";
 
 import { api } from "~/convex/_generated/api";
 import { useQuery } from "convex-helpers/react/cache/hooks";
 import { usePreloadedQuery } from "convex/react";
 
 export const OrgMainPage = () => {
+  const { isMobile } = useDevice();
   const { preloadedUserData } = useConvexPreload();
   const userData = usePreloadedQuery(preloadedUserData);
   const [activeTab, setActiveTab] = useState("orgInfo");
@@ -51,7 +56,9 @@ export const OrgMainPage = () => {
     { id: "events", label: "My Events" },
     // { id: "organizer", label: "Organizer" },
     // { id: "analytics", label: "Analytics" },
-  ];
+  ] as const;
+
+  const tabListMobile = tabList.map((tab) => tab.id);
 
   const orgData = {
     "": [...userOrgs],
@@ -67,10 +74,10 @@ export const OrgMainPage = () => {
   const isOrgOwner = currentOrg?.ownerId === user?._id;
 
   return (
-    <div className={cn("flex flex-col gap-3 p-10")}>
+    <div className={cn("flex flex-col gap-3 p-4 sm:p-10")}>
       <div
         className={cn(
-          "flex flex-col items-center sm:flex-row sm:justify-between",
+          "flex flex-col items-center gap-3 sm:flex-row sm:justify-between",
         )}
       >
         <div className={cn("flex items-center gap-3")}>
@@ -97,7 +104,7 @@ export const OrgMainPage = () => {
                 <span className="truncate">{org.name}</span>
               </div>
             )}
-            placeholder="Select an Organization"
+            placeholder="Select an organization"
           />
           {/*     <Button
             variant="outline"
@@ -112,46 +119,129 @@ export const OrgMainPage = () => {
       </div>
 
       {selectedOrg && (
-        <NavTabs
-          tabs={tabList}
-          activeTab={activeTab}
-          setActiveTab={(value) => setActiveTab(value)}
-          fontSize={fontSize}
-          variant="card"
-        >
-          <div id="orgInfo">
-            <OrgInfo orgData={currentOrg} user={user} />
-          </div>
-          <div id="events">
-            {
-              <ResponsiveDataTable
-                title="Events"
-                description="View all of your events"
-                data={currentOrgEvents ?? []}
-                columns={
-                  getEventColumns(false) as ColumnDef<Record<string, unknown>>[]
-                }
-                defaultVisibility={{
-                  desktop: {
-                    type: false,
-                    _id: false,
-                  },
-                  mobile: {
-                    type: false,
-                    category: false,
-                    _id: false,
-                    lastEditedAt: false,
-                  },
-                }}
-                defaultSort={{ id: `lastEditedAt`, desc: true }}
-                tableType="events"
-                pageType="dashboard"
-                pageSize={{ desktop: 50, mobile: 10 }}
-              />
-            }
-          </div>
-          <p> Just some text for a child component placeholder</p>
-        </NavTabs>
+        <>
+          {!isMobile ? (
+            <NavTabs
+              tabs={[...tabList]}
+              activeTab={activeTab}
+              setActiveTab={(value) => setActiveTab(value)}
+              fontSize={fontSize}
+              variant="card"
+            >
+              <div id="orgInfo">
+                <OrgInfo orgData={currentOrg} user={user} />
+              </div>
+              <div id="events">
+                <ResponsiveDataTable
+                  title="Events"
+                  description="View all of your events"
+                  data={currentOrgEvents ?? []}
+                  columns={
+                    getEventColumns(false) as ColumnDef<
+                      Record<string, unknown>
+                    >[]
+                  }
+                  defaultVisibility={{
+                    desktop: {
+                      type: false,
+                      _id: false,
+                    },
+                    mobile: {
+                      type: false,
+                      category: false,
+                      _id: false,
+                      lastEditedAt: false,
+                    },
+                  }}
+                  defaultSort={{ id: `lastEditedAt`, desc: true }}
+                  tableType="events"
+                  pageType="dashboard"
+                  pageSize={{ desktop: 50, mobile: 10 }}
+                />
+              </div>
+              <p> Just some text for a child component placeholder</p>
+            </NavTabs>
+          ) : (
+            <Card
+              className={cn(
+                "mb-10 w-full gap-x-3 rounded-3xl border-foreground/20 bg-white/50 p-3 first:mt-6 lg:hidden",
+              )}
+            >
+              <Tabs
+                onValueChange={(value) => setActiveTab(value)}
+                value={activeTab}
+                defaultValue={activeTab}
+                className="flex w-full flex-col justify-center"
+              >
+                <TabsList className="scrollable justx invis relative flex h-12 w-full justify-around rounded-xl bg-white/60">
+                  {tabListMobile.map((tab) => (
+                    <TabsTrigger
+                      key={tab}
+                      value={tab}
+                      className={cn(
+                        "relative z-10 flex h-10 w-full items-center justify-center px-4 text-sm font-medium",
+                        activeTab === tab
+                          ? "text-black"
+                          : "text-muted-foreground",
+                      )}
+                    >
+                      {activeTab === tab && (
+                        <motion.div
+                          layoutId="tab-bg"
+                          className="absolute inset-0 z-0 rounded-md border-1.5 border-foreground bg-background shadow-sm"
+                          initial={false}
+                          exit={{ opacity: 0 }}
+                          transition={{
+                            type: "spring",
+                            stiffness: 400,
+                            damping: 30,
+                          }}
+                        />
+                      )}
+                      <span className="relative z-10">
+                        {tab === "orgInfo" && "Organizer"}
+                        {tab === "events" && "Submissions"}
+                      </span>
+                    </TabsTrigger>
+                  ))}
+                </TabsList>
+
+                <TabsContent value="orgInfo">
+                  <OrgInfo orgData={currentOrg} user={user} />
+                </TabsContent>
+                <TabsContent value="events">
+                  {" "}
+                  <ResponsiveDataTable
+                    title="Events"
+                    description="View all of your events"
+                    data={currentOrgEvents ?? []}
+                    columns={
+                      getEventColumns(false) as ColumnDef<
+                        Record<string, unknown>
+                      >[]
+                    }
+                    defaultVisibility={{
+                      desktop: {
+                        type: false,
+                        _id: false,
+                      },
+                      mobile: {
+                        type: false,
+                        category: false,
+                        _id: false,
+                        lastEditedAt: false,
+                      },
+                    }}
+                    defaultSort={{ id: `lastEditedAt`, desc: true }}
+                    tableType="events"
+                    pageType="dashboard"
+                    pageSize={{ desktop: 50, mobile: 10 }}
+                  />
+                </TabsContent>
+              </Tabs>
+            </Card>
+          )}
+        </>
       )}
       {noOrgs && (
         <div className="flex flex-col items-center justify-center gap-4 p-10">

@@ -142,7 +142,7 @@ export const OrgInfo = ({ orgData, user }: OrgInfoProps) => {
     <div>
       <Form {...form}>
         <form
-          className="grid gap-4 px-10 py-4 sm:grid-cols-[1fr_8%_1fr]"
+          className="grid gap-4 px-3 py-4 sm:grid-cols-[1fr_8%_1fr] sm:px-10"
           onSubmit={handleSubmit(onSubmit)}
         >
           <div className={cn("col-span-full flex items-start justify-between")}>
@@ -328,7 +328,7 @@ export const OrgInfo = ({ orgData, user }: OrgInfoProps) => {
                 }
                 type="submit"
                 size="lg"
-                className="w-full max-w-50 self-end bg-white py-6 text-base focus-visible:bg-salPinkLt sm:py-0 md:bg-salYellow"
+                className="w-full self-end bg-white py-6 text-base focus-visible:bg-salPinkLt sm:max-w-50 sm:py-0 md:bg-salYellow"
                 disabled={!isValid || !isDirty || pending}
               >
                 {!isValid ? (
