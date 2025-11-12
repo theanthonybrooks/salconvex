@@ -24,7 +24,7 @@ import {
   toMutableEnum,
 } from "@/lib/zodFns";
 
-const locationBase = z.object({
+export const locationBase = z.object({
   full: z.string().min(3, "Location is required"),
   locale: z.optional(z.string()),
   city: z.optional(z.string()),
@@ -53,7 +53,7 @@ const locationBase = z.object({
   demonym: z.optional(z.string()),
 });
 
-const locationSchema = locationBase.superRefine((data, ctx) => {
+export const locationSchema = locationBase.superRefine((data, ctx) => {
   if ((data.city || data.state) && !data.country) {
     ctx.addIssue({
       code: "custom",
@@ -135,9 +135,7 @@ const linksSchemaLoose = z.object({
     .optional(),
 });
 
-const linksSchemaStrict = z.object({
-  sameAsOrganizer: z.boolean().optional(),
-
+export const linksSchemaStrictBase = z.object({
   website: z
     .url({
       protocol: /^https?$/,
@@ -209,13 +207,17 @@ const linksSchemaStrict = z.object({
     .optional(),
 });
 
-const contactSchema = z.object({
+const linksSchemaStrict = linksSchemaStrictBase.extend({
+  sameAsOrganizer: z.boolean().optional(),
+});
+
+export const contactSchema = z.object({
   organizer: z.optional(z.string()),
   organizerTitle: z.optional(z.string()),
   primaryContact: z.string().optional(),
 });
 
-const baseOrganizationSchema = z.object({
+export const baseOrganizationSchema = z.object({
   _id: z.optional(z.string()),
   name: z
     .string()
@@ -239,10 +241,11 @@ const baseOrganizationSchema = z.object({
   hadFreeCall: z.optional(z.boolean()),
   isComplete: z.optional(z.boolean()),
 });
-const organizationSchema = baseOrganizationSchema.extend({
+export const organizationSchema = baseOrganizationSchema.extend({
+  blurb: z.optional(z.string()),
   about: z.optional(z.string()),
   contact: contactSchema.optional(),
-  links: linksSchemaStrict.optional(),
+  links: linksSchemaStrictBase.optional(),
 });
 
 export const eventBase = z.object({
@@ -758,12 +761,15 @@ export const eventSubmitSchema = z.object({
   }),
 });
 
-type LinkField = keyof z.infer<typeof linksSchemaStrict>;
-type OrgLinkPath = `organization.links.${LinkField}`;
-type EventLinkPath = `event.links.${Exclude<LinkField, "sameAsOrganizer">}`;
+export type LinkField = keyof z.infer<typeof linksSchemaStrict>;
+export type OrgLinkField = keyof z.infer<typeof linksSchemaStrictBase>;
+type OrgLinkPath =
+  `organization.links.${Exclude<LinkField, "sameAsOrganizer">}`;
+type EventLinkPath = `event.links.${LinkField}`;
 // Only org has primaryContact radio behavior, and "sameAsOrganizer" doesn't apply to individual inputs
 
-export type ValidLinkPath = OrgLinkPath | EventLinkPath;
+export type ValidLinkPath = EventLinkPath;
+export type ValidOrgLinkPath = OrgLinkPath;
 
 export const getEventSchema = (isAdmin: boolean = false) => {
   if (isAdmin) {

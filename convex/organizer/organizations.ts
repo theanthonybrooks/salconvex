@@ -442,6 +442,7 @@ export const updateOrganization = mutation({
         timezoneOffset: v.optional(v.number()),
       }),
     ),
+    blurb: v.optional(v.string()),
     about: v.optional(v.string()),
     contact: v.optional(
       v.object({
@@ -493,6 +494,7 @@ export const updateOrganization = mutation({
         countryAbbr: args.location?.countryAbbr ?? "",
         continent: args.location?.continent ?? "",
       },
+      blurb: args.blurb,
       about: args.about,
       contact: {
         organizer: args.contact?.organizer,
@@ -607,7 +609,11 @@ export const getUserOrganizations = query({
       // return all.filter(filterFn);
       const all =
         trimmedQuery === ""
-          ? await ctx.db.query("organizations").order("asc").collect()
+          ? await ctx.db
+              .query("organizations")
+              // .withIndex("by_slug", (q) => q.eq("slug", "weiner"))
+              .order("asc")
+              .collect()
           : await ctx.db
               .query("organizations")
               .withSearchIndex("search_by_slug", (q) => q.search("slug", slug))
@@ -643,6 +649,7 @@ export const getUserOrganizations = query({
       const sortedOrgs = filteredResults.sort((a, b) =>
         a.name.localeCompare(b.name),
       );
+
       return sortedOrgs;
     }
   },
@@ -760,10 +767,10 @@ export const getEventsByOrgId = query({
     if (!org) return null;
 
     const events = await ctx.db
-      .query("eventOrganizers")
-      .withIndex("by_organizerId", (q) => q.eq("organizerId", org._id))
+      .query("events")
+      .withIndex("by_mainOrgId", (q) => q.eq("mainOrgId", org._id))
       .collect();
-
+    console.log(events.length);
     return events;
   },
 });

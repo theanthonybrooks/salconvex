@@ -1,4 +1,10 @@
+import type { ValidOrgLinkPath } from "@/features/organizers/schemas/event-add-schema";
+import type { ReactNode } from "react";
+import type { FieldValues, Path } from "react-hook-form";
+
 import { Control, Controller, useFormContext, useWatch } from "react-hook-form";
+import PhoneInput, { Country } from "react-phone-number-input";
+
 import {
   FaEnvelope,
   FaFacebook,
@@ -13,7 +19,6 @@ import {
   FaYoutube,
 } from "react-icons/fa6";
 import { HiArrowTurnRightDown } from "react-icons/hi2";
-import PhoneInput, { Country } from "react-phone-number-input";
 
 import { Checkbox } from "@/components/ui/checkbox";
 import { DebouncedControllerInput } from "@/components/ui/debounced-form-input";
@@ -39,7 +44,7 @@ type FormLinksInputProps = {
   dashBoardView?: boolean;
 };
 
-const handleFields: {
+export const handleFields: {
   key: string;
   icon: React.ReactNode;
   platform: PlatformType;
@@ -107,6 +112,7 @@ export const FormLinksInput = ({
   const primaryField = watch("organization.contact.primaryContact");
   const eventSameAsOrg = eventData?.links?.sameAsOrganizer;
   const eventCountry = eventData?.location?.countryAbbr;
+  const orgCountry = organization?.location?.countryAbbr;
   const hideLinks = isEvent && eventSameAsOrg;
   const eventPhone = eventData?.links?.phone;
   const orgPhone = organization?.links?.phone;
@@ -327,7 +333,7 @@ export const FormLinksInput = ({
                           <PhoneInput
                             {...field}
                             international
-                            defaultCountry={(eventCountry as Country) || "US"}
+                            defaultCountry={(orgCountry as Country) || "US"}
                             value={field.value ?? ""}
                             placeholder="+1 (555) 555-5555"
                             className={cn(
@@ -489,27 +495,35 @@ export const FormLinksInput = ({
                 render={({ field: primaryFieldControl }) => (
                   <>
                     {/* Debounced handle fields */}
-                    {handleFields.map(
-                      ({ key, icon, platform, placeholder, primaryOption }) => {
-                        const name =
-                          `organization.links.${key}` as ValidLinkPath;
+                    {handleFields
+                      .filter(({ key }) => key !== "sameAsOrganizer")
+                      .map(
+                        ({
+                          key,
+                          icon,
+                          platform,
+                          placeholder,
+                          primaryOption,
+                        }) => {
+                          const name =
+                            `organization.links.${key}` as ValidOrgLinkPath;
 
-                        return (
-                          <HandleInput
-                            key={name}
-                            control={control}
-                            name={name}
-                            platform={platform}
-                            icon={icon}
-                            placeholder={placeholder.org}
-                            primaryOption={primaryOption}
-                            isOrg={true}
-                            primaryField={primaryField}
-                            onPrimaryChange={primaryFieldControl.onChange}
-                          />
-                        );
-                      },
-                    )}
+                          return (
+                            <HandleInput
+                              key={name}
+                              control={control}
+                              name={name}
+                              platform={platform}
+                              icon={icon}
+                              placeholder={placeholder.org}
+                              primaryOption={primaryOption}
+                              isOrg={true}
+                              primaryField={primaryField}
+                              onPrimaryChange={primaryFieldControl.onChange}
+                            />
+                          );
+                        },
+                      )}
                   </>
                 )}
               />
@@ -616,21 +630,98 @@ export const FormLinksInput = ({
   );
 };
 
-type HandleInputProps = {
-  control: Control<EventOCFormValues>;
-  name: ValidLinkPath;
+// type HandleInputProps = {
+//   control: Control<EventOCFormValues>;
+//   name: ValidLinkPath;
+//   platform: PlatformType;
+//   icon: React.ReactNode;
+//   placeholder: string;
+//   primaryOption?: boolean;
+//   disabled?: boolean;
+//   isOrg?: boolean;
+//   primaryField?: string;
+//   onPrimaryChange?: (value: string) => void;
+//   handleCheckSchema?: () => void;
+// };
+
+// function HandleInput({
+//   control,
+//   name,
+//   platform,
+//   icon,
+//   placeholder,
+//   primaryOption,
+//   disabled,
+//   isOrg,
+//   primaryField,
+//   onPrimaryChange,
+//   handleCheckSchema,
+// }: HandleInputProps) {
+//   const fieldKey = name.split(".").pop();
+//   const watched = useWatch({ control, name });
+//   const { getFieldState } = useFormContext<EventOCFormValues>();
+//   const { error } = getFieldState(name);
+
+//   return (
+//     <div className="flex items-center gap-x-4">
+//       {icon}
+//       <Controller
+//         name={name}
+//         control={control}
+//         render={({ field }) => {
+//           return (
+//             <DebouncedControllerInput
+//               field={field}
+//               disabled={disabled}
+//               placeholder={placeholder}
+//               className={cn("flex-1", error && "invalid-field")}
+//               // transform={(val) => formatHandleInput(val, platform)}
+//               transform={(val) => {
+//                 if (platform === "facebook") {
+//                   return formatFacebookInput(val);
+//                 } else if (platform === "youTube") {
+//                   return autoHttps(val);
+//                 }
+//                 return formatHandleInput(val, platform);
+//               }}
+//               onBlur={() => {
+//                 field.onBlur?.();
+//                 handleCheckSchema?.();
+//               }}
+//             />
+//           );
+//         }}
+//       />
+//       {isOrg && fieldKey && primaryOption && (
+//         <Input
+//           type="radio"
+//           disabled={typeof watched !== "string" || !watched.trim()}
+//           name="primaryContact"
+//           value={fieldKey}
+//           checked={primaryField === fieldKey}
+//           onChange={() => onPrimaryChange?.(fieldKey)}
+//         />
+//       )}
+//     </div>
+//   );
+// }
+
+interface HandleInputProps<T extends FieldValues> {
+  control: Control<T>;
+  name: Path<T>;
   platform: PlatformType;
-  icon: React.ReactNode;
+  icon: ReactNode;
   placeholder: string;
   primaryOption?: boolean;
   disabled?: boolean;
   isOrg?: boolean;
   primaryField?: string;
-  onPrimaryChange?: (value: string) => void;
+  onPrimaryChange?: (fieldKey: string) => void;
   handleCheckSchema?: () => void;
-};
+  className?: string;
+}
 
-function HandleInput({
+export function HandleInput<T extends FieldValues>({
   control,
   name,
   platform,
@@ -642,41 +733,36 @@ function HandleInput({
   primaryField,
   onPrimaryChange,
   handleCheckSchema,
-}: HandleInputProps) {
+  className,
+}: HandleInputProps<T>) {
   const fieldKey = name.split(".").pop();
   const watched = useWatch({ control, name });
-  const { getFieldState } = useFormContext<EventOCFormValues>();
+  const { getFieldState } = useFormContext<T>();
   const { error } = getFieldState(name);
 
   return (
-    <div className="flex items-center gap-x-4">
+    <div className={cn("flex items-center gap-x-4", className)}>
       {icon}
       <Controller
         name={name}
         control={control}
-        render={({ field }) => {
-          return (
-            <DebouncedControllerInput
-              field={field}
-              disabled={disabled}
-              placeholder={placeholder}
-              className={cn("flex-1", error && "invalid-field")}
-              // transform={(val) => formatHandleInput(val, platform)}
-              transform={(val) => {
-                if (platform === "facebook") {
-                  return formatFacebookInput(val);
-                } else if (platform === "youTube") {
-                  return autoHttps(val);
-                }
-                return formatHandleInput(val, platform);
-              }}
-              onBlur={() => {
-                field.onBlur?.();
-                handleCheckSchema?.();
-              }}
-            />
-          );
-        }}
+        render={({ field }) => (
+          <DebouncedControllerInput
+            field={field}
+            disabled={disabled}
+            placeholder={placeholder}
+            className={cn("flex-1", error && "invalid-field")}
+            transform={(val) => {
+              if (platform === "facebook") return formatFacebookInput(val);
+              if (platform === "youTube") return autoHttps(val);
+              return formatHandleInput(val, platform);
+            }}
+            onBlur={() => {
+              field.onBlur?.();
+              handleCheckSchema?.();
+            }}
+          />
+        )}
       />
       {isOrg && fieldKey && primaryOption && (
         <Input

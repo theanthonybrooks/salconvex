@@ -500,6 +500,7 @@ const organizationSchema = {
   logoStorageId: v.optional(v.id("_storage")),
 
   location: v.optional(orgLocationValidator),
+  blurb: v.optional(v.string()),
   about: v.optional(v.string()),
   contact: v.optional(contactValidator),
   links: v.optional(linksValidator),

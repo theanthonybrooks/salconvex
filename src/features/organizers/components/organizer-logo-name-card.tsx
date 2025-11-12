@@ -10,7 +10,12 @@ import { getOrganizerLocationString } from "@/helpers/locationFns";
 import { cn } from "@/helpers/utilsFns";
 
 type MinimalOrgCardProps = Pick<Organizer, "logo" | "name" | "location">;
+type OrgLogoNameProps = Pick<Organizer, "logo" | "name">;
 
+interface OrganizerLogoNameProps {
+  organizer: OrgLogoNameProps;
+  fontSize?: string;
+}
 interface OrganizerCardProps {
   organizer: MinimalOrgCardProps;
 }
@@ -60,6 +65,25 @@ export const OrganizerLogoNameCard = ({
         </p>
       </div>
     </Card>
+  );
+};
+
+export const OrganizerLogoName = ({
+  organizer,
+  fontSize = "text-sm",
+}: OrganizerLogoNameProps) => {
+  return (
+    <div className="flex items-center gap-2">
+      <EventOrgLogo
+        imgSrc={organizer?.logo || "/1.jpg"}
+        className={cn(
+          "size-10 rounded-full border-1.5 border-foreground",
+          fontSize === "text-sm" && "border-2",
+        )}
+      />
+
+      <p className={cn("line-clamp-1", fontSize)}>{organizer.name}</p>
+    </div>
   );
 };
 

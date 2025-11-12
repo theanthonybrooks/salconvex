@@ -274,13 +274,16 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   const eventCategory = eventData?.category;
 
   // const eventLogo = eventData?.logo;
+  console.log(
+    newOrgEvent,
+    activeStep,
+    eventData,
+    eventId,
+    canClearEventData.current,
+  );
 
   const clearEventDataTrigger =
-    (newOrgEvent &&
-      activeStep === 0 &&
-      eventData &&
-      eventId &&
-      canClearEventData.current) ||
+    (newOrgEvent && activeStep === 0 && eventId && canClearEventData.current) ||
     (isSelectedRowEmpty && eventId && activeStep === 0);
 
   const orgNameValid = !errors.organization?.name && Boolean(orgName?.trim());
@@ -948,6 +951,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
                 organizerTitle: orgData.contact?.organizerTitle,
                 primaryContact: orgData.contact?.primaryContact || "",
               },
+              blurb: orgData.blurb,
               about: orgData.about,
               links: orgData.links,
               isComplete: true,
@@ -1930,6 +1934,11 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   }, [activeStep, furthestStep]);
 
   useEffect(() => {
+    if (!newOrgEvent) return;
+    prevEventRef.current = null;
+  }, [newOrgEvent, isSelectedRowEmpty]);
+
+  useEffect(() => {
     if (selectedRow && Object.keys(selectedRow).length > 0) {
       canClearEventData.current = true;
     } else if (isSelectedRowEmpty) {
@@ -1938,6 +1947,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   }, [selectedRow, isSelectedRowEmpty]);
 
   //todo: if necessary, perhaps unregister open call in this?
+
   useEffect(() => {
     if (clearEventDataTrigger && !preloadFlag.current) {
       // console.log("hmm");

@@ -1031,6 +1031,7 @@ export const EventOCForm = ({
                 organizerTitle: orgData.contact?.organizerTitle,
                 primaryContact: orgData.contact?.primaryContact || "",
               },
+              blurb: orgData.blurb,
               about: orgData.about,
               links: orgData.links,
               isComplete: true,

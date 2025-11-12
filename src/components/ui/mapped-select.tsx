@@ -1,4 +1,7 @@
+import type { ReactNode } from "react";
+
 import { useState } from "react";
+
 import { Check, ChevronDown, ChevronUp, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -66,8 +69,8 @@ export function MappedSelect<T>({
 interface SearchMappedSelectProps<T> {
   value: string;
   data: Record<string, T[]>;
-  getItemLabel: (item: T) => string;
-  getItemDisplay: (item: T) => string;
+  getItemLabel: (item: T) => ReactNode;
+  getItemDisplay: (item: T) => ReactNode;
   getItemValue: (item: T) => string;
   // getItemKey?: (item: T) => string
   onChange: (value: string) => void;
@@ -148,6 +151,11 @@ SearchMappedSelectProps<T>) {
     },
     {},
   );
+  const filteredCount = Object.values(filteredData).reduce(
+    (acc, items) => acc + items.length,
+    0,
+  );
+  const singleOption = filteredCount === 1;
 
   const onClear = (e: React.MouseEvent<SVGSVGElement>) => {
     e.stopPropagation();
@@ -162,6 +170,7 @@ SearchMappedSelectProps<T>) {
           variant="outline"
           className={cn(
             "relative flex h-10 w-full items-center justify-center truncate border-foreground/20 bg-card pr-8 font-normal hover:bg-background/20 sm:w-[280px]",
+            singleOption && "pointer-events-none",
             className,
           )}
           disabled={disabled}
@@ -169,10 +178,14 @@ SearchMappedSelectProps<T>) {
           <span className="truncate">
             {selectedLabel ? getItemDisplay(selectedLabel) : placeholder}
           </span>
-          {isOpen ? (
-            <ChevronUp className="absolute right-3 size-4 origin-center text-foreground/50" />
-          ) : (
-            <ChevronDown className="absolute right-3 size-4 origin-center text-foreground/50" />
+          {!singleOption && (
+            <>
+              {isOpen ? (
+                <ChevronUp className="absolute right-3 size-4 origin-center text-foreground/50" />
+              ) : (
+                <ChevronDown className="absolute right-3 size-4 origin-center text-foreground/50" />
+              )}
+            </>
           )}
         </Button>
       </PopoverTrigger>
@@ -214,7 +227,7 @@ SearchMappedSelectProps<T>) {
                         setIsOpen(false);
                       }}
                       className={cn(
-                        "flex justify-between hover:bg-background/40",
+                        "flex justify-between hover:cursor-pointer hover:bg-background/40",
                         isSelected && "bg-salYellow",
                       )}
                     >

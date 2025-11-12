@@ -1,12 +1,21 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
-import { ConvexError, v } from "convex/values";
 import { Id } from "~/convex/_generated/dataModel";
-import { mutation } from "~/convex/_generated/server";
+import { mutation, query } from "~/convex/_generated/server";
+import { ConvexError, v } from "convex/values";
 
 export const generateUploadUrl = mutation({
   args: {},
   handler: async (ctx) => {
     return await ctx.storage.generateUploadUrl();
+  },
+});
+
+export const getFileUrl = query({
+  args: {
+    storageId: v.id("_storage"),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.storage.getUrl(args.storageId);
   },
 });
 
@@ -137,7 +146,7 @@ export const deleteFile = mutation({
       .withIndex("by_eventId", (q) => q.eq("eventId", args.eventId))
       .first();
 
-    const hasBeenPublished = !!openCall?.approvedBy ;
+    const hasBeenPublished = !!openCall?.approvedBy;
 
     if (hasBeenPublished || archive) {
       if (isAdmin && !archive) {

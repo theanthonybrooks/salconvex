@@ -1,5 +1,5 @@
-import { redirect } from "next/navigation";
+import { OrgMainPage } from "@/app/(pages)/dashboard/organizer/components/org-main-page";
 
 export default async function OrganizerPageDB() {
-  redirect("/dashboard/organizer/events");
+  return <OrgMainPage />;
 }

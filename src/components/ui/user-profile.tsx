@@ -196,7 +196,7 @@ export function UserProfile({
                     )}
                     {isOrganizer && (
                       <Link
-                        href="/dashboard/organizer/events"
+                        href="/dashboard/organizer"
                         className="underline-offset-2 hover:cursor-pointer hover:underline"
                       >
                         <DropdownMenuItem className="focus:bg-salYellow/50">

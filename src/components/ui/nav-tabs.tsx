@@ -23,7 +23,31 @@ export interface NavTabsProps {
   activeTab?: string;
   setActiveTab?: (tabId: string) => void;
   fontSize?: string;
+  variant?: BgVariant;
 }
+
+type BgVariant = "card" | "neutral";
+
+// const bgMap: Record<BgVariant, { active: string; inactive: string }> = {
+//   card: { active: "bg-card", inactive: "bg-background" },
+//   neutral: { active: "bg-card-secondary", inactive: "bg-background" },
+// };
+
+const bgMap: Record<
+  BgVariant,
+  { active: string; activeTab: string; inactive: string }
+> = {
+  card: {
+    active: "bg-card",
+    activeTab: "before:bg-card after:bg-card",
+    inactive: "bg-background before:bg-background after:bg-background",
+  },
+  neutral: {
+    active: "bg-card-secondary",
+    activeTab: "before:bg-card-secondary after:bg-card-secondary",
+    inactive: "bg-background before:bg-background after:bg-background",
+  },
+};
 
 export default function NavTabs({
   tabs,
@@ -33,7 +57,14 @@ export default function NavTabs({
   activeTab: controlledTab,
   setActiveTab: setControlledTab,
   fontSize = "text-sm",
+  variant = "neutral",
 }: NavTabsProps) {
+  const {
+    active: activeClass,
+    inactive: inactiveClass,
+    activeTab: activeTabClass,
+  } = bgMap[variant];
+
   const internalTab = useState(defaultTab ?? tabs[0]?.id);
   const activeTab = controlledTab ?? internalTab[0];
   const setActiveTab = setControlledTab ?? internalTab[1];
@@ -61,12 +92,12 @@ export default function NavTabs({
                   "tab transition-transform",
                   fontSize,
                   isActive
-                    ? "active bg-card-secondary px-2 py-2 font-bold before:bg-card-secondary after:bg-card-secondary"
-                    : "translate-y-1 bg-background px-2 py-1 leading-[0.5] text-foreground before:bg-background after:bg-background",
+                    ? `active px-2 py-2 font-bold ${activeTabClass} ${activeClass} `
+                    : `translate-y-1 ${inactiveClass} px-2 py-1 leading-[0.5] text-foreground`,
                 )}
                 onClick={() => setActiveTab(tab.id)}
               >
-                <div className="bg-card-secondary">
+                <div className={cn(activeClass)}>
                   <span className="py-2">{tab.label}</span>
                 </div>
               </button>
@@ -74,7 +105,9 @@ export default function NavTabs({
           })}
         </div>
 
-        <div className="content z-[5] rounded-2xl bg-card-secondary p-4 shadow-sm">
+        <div
+          className={cn("content z-[5] rounded-2xl p-4 shadow-sm", activeClass)}
+        >
           {tabContent && <>{tabContent}</>}
         </div>
       </div>

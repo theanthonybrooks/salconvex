@@ -97,76 +97,79 @@ export type Event = {
   openCallApproved?: boolean;
 };
 
-const approvedByColumn: ColumnDef<Event> = {
-  accessorKey: "approvedBy",
-  id: "approvedBy",
-  minSize: 160,
-  maxSize: 160,
-  header: ({ column }) => (
-    <DataTableColumnHeader column={column} title="Approved By" />
-  ),
-  cell: ({ row }) => {
-    const { eApprovedByUserName: eApprover, ocApprovedByUserName: oApprover } =
-      row.original;
+export const getEventColumns = <T extends Event>(
+  isAdmin: boolean,
+): ColumnDef<T>[] => {
+  const approvedByColumn: ColumnDef<T> = {
+    accessorKey: "approvedBy",
+    id: "approvedBy",
+    minSize: 160,
+    maxSize: 160,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Approved By" />
+    ),
+    cell: ({ row }) => {
+      const {
+        eApprovedByUserName: eApprover,
+        ocApprovedByUserName: oApprover,
+      } = row.original;
 
-    return (
-      <div className="flex justify-center">
-        <span className="truncate font-medium">
-          {eApprover}
-          {oApprover && oApprover !== eApprover && `, ${oApprover}`}
-        </span>
-      </div>
-    );
-  },
-};
+      return (
+        <div className="flex justify-center">
+          <span className="truncate font-medium">
+            {eApprover}
+            {oApprover && oApprover !== eApprover && `, ${oApprover}`}
+          </span>
+        </div>
+      );
+    },
+  };
 
-const numberColumn: ColumnDef<Event> = {
-  accessorKey: "rowNumber",
-  id: "rowNumber",
-  header: ({ column }) => <DataTableColumnHeader column={column} title="#" />,
-  size: 40,
-  cell: ({ row }) => {
-    return (
-      <div className="text-center text-sm text-muted-foreground">
-        {row.index + 1}
-      </div>
-    );
-  },
-  enableSorting: false,
-  enableHiding: false,
-  enableResizing: false,
-  enableMultiSort: true,
-};
+  const numberColumn: ColumnDef<T> = {
+    accessorKey: "rowNumber",
+    id: "rowNumber",
+    header: ({ column }) => <DataTableColumnHeader column={column} title="#" />,
+    size: 40,
+    cell: ({ row }) => {
+      return (
+        <div className="text-center text-sm text-muted-foreground">
+          {row.index + 1}
+        </div>
+      );
+    },
+    enableSorting: false,
+    enableHiding: false,
+    enableResizing: false,
+    enableMultiSort: true,
+  };
 
-const selectColumn: ColumnDef<Event> = {
-  id: "select",
-  size: 30,
-  minSize: 30,
-  maxSize: 30,
-  header: ({ table }) => (
-    <Checkbox
-      checked={
-        table.getIsAllPageRowsSelected() ||
-        (table.getIsSomePageRowsSelected() && "indeterminate")
-      }
-      onCheckedChange={() => table.toggleAllRowsSelected(false)}
-      aria-label="Deselect all"
-    />
-  ),
-  cell: ({ row }) => (
-    <Checkbox
-      checked={row.getIsSelected()}
-      onCheckedChange={(value) => row.toggleSelected(!!value)}
-      aria-label="Select row"
-    />
-  ),
-  enableSorting: false,
-  enableHiding: false,
-  enableResizing: false,
-};
-
-export const getEventColumns = (isAdmin: boolean): ColumnDef<Event>[] => {
-  const baseColumns: ColumnDef<Event>[] = [
+  const selectColumn: ColumnDef<T> = {
+    id: "select",
+    size: 30,
+    minSize: 30,
+    maxSize: 30,
+    header: ({ table }) => (
+      <Checkbox
+        checked={
+          table.getIsAllPageRowsSelected() ||
+          (table.getIsSomePageRowsSelected() && "indeterminate")
+        }
+        onCheckedChange={() => table.toggleAllRowsSelected(false)}
+        aria-label="Deselect all"
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        aria-label="Select row"
+      />
+    ),
+    enableSorting: false,
+    enableHiding: false,
+    enableResizing: false,
+  };
+  const baseColumns: ColumnDef<T>[] = [
     {
       accessorKey: "name",
       id: "name",
@@ -205,7 +208,8 @@ export const getEventColumns = (isAdmin: boolean): ColumnDef<Event>[] => {
       ),
       cell: ({ row, table }) => {
         // const isAdmin = table.options.meta?.isAdmin;
-        const event = row.original as Event;
+        const event = row.original as T;
+
         const pageType = table.options.meta?.pageType;
         const isDashboard = pageType === "dashboard";
 
@@ -280,14 +284,14 @@ export const getEventColumns = (isAdmin: boolean): ColumnDef<Event>[] => {
       ),
 
       cell: ({ row, table }) => {
-        const event = row.original as Event;
+        const { _id: eventId } = row.original;
         const ocState =
           (row.getValue("openCallState") as OpenCallState) || null;
         const isAdmin = table.options.meta?.isAdmin;
         return (
           <div className="flex justify-center">
             <DataTableAdminOrgStateActions
-              eventId={event._id}
+              eventId={eventId}
               state={ocState}
               userRole={isAdmin ? "admin" : "user"}
             />
@@ -302,28 +306,6 @@ export const getEventColumns = (isAdmin: boolean): ColumnDef<Event>[] => {
       sortUndefined: "last",
     },
 
-    {
-      accessorKey: "lastEditedAt",
-      id: "lastEditedAt",
-      minSize: 180,
-      maxSize: 180,
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Last Edited" />
-      ),
-      cell: ({ getValue }) => {
-        const value = getValue() as string;
-        return (
-          <div className="flex justify-center space-x-2">
-            <span className="max-w-[175px] truncate font-medium capitalize">
-              {!isNaN(new Date(value).getTime())
-                ? new Date(value).toLocaleString()
-                : "-"}
-            </span>
-          </div>
-        );
-      },
-      enableMultiSort: true,
-    },
     {
       accessorKey: "category",
       id: "category",
@@ -356,7 +338,7 @@ export const getEventColumns = (isAdmin: boolean): ColumnDef<Event>[] => {
         <DataTableColumnHeader column={column} title="Event Type" />
       ),
       cell: ({ row }) => {
-        const types = row.getValue("type") as EventType[];
+        const { type: types } = row.original;
 
         return (
           <div className="flex justify-center space-x-2">
@@ -371,6 +353,26 @@ export const getEventColumns = (isAdmin: boolean): ColumnDef<Event>[] => {
       enableMultiSort: true,
     },
     {
+      accessorKey: "lastEditedAt",
+      id: "lastEditedAt",
+      minSize: 180,
+      maxSize: 180,
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Last Edited" />
+      ),
+      cell: ({ row }) => {
+        const { lastEditedAt: value } = row.original;
+        return (
+          <div className="flex justify-center space-x-2">
+            <span className="max-w-[175px] truncate font-medium capitalize">
+              {value ? new Date(value).toLocaleString() : "-"}
+            </span>
+          </div>
+        );
+      },
+      enableMultiSort: true,
+    },
+    {
       accessorKey: "_id",
       minSize: 120,
       maxSize: 400,
@@ -378,7 +380,7 @@ export const getEventColumns = (isAdmin: boolean): ColumnDef<Event>[] => {
         <DataTableColumnHeader column={column} title="Event ID" />
       ),
       cell: ({ row }) => {
-        const value = row.original as Event;
+        const value = row.original;
         return (
           <div className="flex justify-center">
             <CopyEventId eventId={value._id} />
@@ -394,21 +396,20 @@ export const getEventColumns = (isAdmin: boolean): ColumnDef<Event>[] => {
       minSize: 40,
       enableResizing: false,
       cell: ({ row, table }) => {
-        const event = row.original as Event;
+        const {
+          slug,
+          state,
+          openCallState: ocState,
+          openCallId,
+          dates: { edition },
+          openCallApproved: ocApproved,
+          posted: postStatus,
+        } = row.original;
+        const event = row.original;
         const eventCategory = event.category as EventCategory;
-        const state = event.state as SubmissionFormState;
         const isAdmin = table.options.meta?.isAdmin;
         const isDashboard = table.options.meta?.pageType === "dashboard";
-        const ocState = event.openCallState;
-        const ocApproved = event.openCallApproved;
-        const openCallId = event.openCallId;
         const hasOC = !!openCallId;
-        const edition = event.dates.edition;
-        const slug = event.slug;
-        // const eventApproved = typeof event.approvedAt === "number";
-        const postStatus = event.posted;
-
-        // const openCallState = event.openCallState;
 
         return (
           <div className={cn("flex justify-center", isAdmin && "flex")}>

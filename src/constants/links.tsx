@@ -8,6 +8,7 @@ import { FaFacebookF, FaInstagram, FaThreads } from "react-icons/fa6";
 import { LuMegaphone } from "react-icons/lu";
 import { PiGraph } from "react-icons/pi";
 import {
+  BadgeCheck,
   Banana,
   Bookmark,
   Calendar,
@@ -515,14 +516,24 @@ export const dashboardNavItems: DashNavItem[] = [
   //   userType: ["public"],
   // },
   {
-    label: "My Submissions",
-    href: "/dashboard/organizer/events",
-    icon: LucideCalendar,
+    label: "My Organizations",
+    href: "/dashboard/organizer",
+    icon: BadgeCheck,
     section: true,
     sectionIcon: BsPersonVcard,
     sectionCat: "organizer",
     sectionHead: true,
     heading: "Organizer",
+    desc: "Manage your organizations",
+    sub: ["all"],
+    userType: ["organizer"],
+  },
+  {
+    label: "My Submissions",
+    href: "/dashboard/organizer/events",
+    icon: LucideCalendar,
+    subsection: true,
+    sectionCat: "organizer",
     desc: "Manage your events/projects/open calls",
     sub: ["all"],
     userType: ["organizer"],

@@ -1,6 +1,7 @@
 import { Controller, useFormContext } from "react-hook-form";
 
 import { DebouncedControllerInput } from "@/components/ui/debounced-form-input";
+import { DebouncedFormTextarea } from "@/components/ui/debounced-form-textarea";
 import { FormLinksInput } from "@/components/ui/form-links-inputs";
 import { Label } from "@/components/ui/label";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
@@ -145,6 +146,28 @@ const SubmissionFormOrgStep2 = ({
             </div>
             <div className="input-section h-full">
               <p className="min-w-max font-bold lg:text-xl">Step 6:</p>
+              <p className="lg:text-xs">Organizer - Blurb</p>
+            </div>
+
+            <div className="mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+              <Label htmlFor="event.name" className="sr-only">
+                Organizer - Blurb
+              </Label>
+              <Controller
+                name="organization.blurb"
+                control={control}
+                render={({ field }) => (
+                  <DebouncedFormTextarea
+                    field={field}
+                    maxLength={250}
+                    className="max-h-30 min-h-12"
+                    placeholder="Short blurb about your organization... Limit 250 characters"
+                  />
+                )}
+              />
+            </div>
+            <div className="input-section h-full">
+              <p className="min-w-max font-bold lg:text-xl">Step 7:</p>
               <p className="lg:text-xs">Organizer - About</p>
             </div>
 

@@ -1,0 +1,175 @@
+"use client";
+
+import type { ColumnDef } from "@tanstack/react-table";
+
+import { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
+import { OrgInfo } from "@/app/(pages)/dashboard/organizer/components/org-info";
+
+import type { Doc, Id } from "~/convex/_generated/dataModel";
+import { ResponsiveDataTable } from "@/components/data-table/data-table-wrapper";
+import { SearchMappedSelect } from "@/components/ui/mapped-select";
+import NavTabs from "@/components/ui/nav-tabs";
+import { getEventColumns } from "@/features/events/components/events-data-table/event-columns";
+import { OrganizerLogoName } from "@/features/organizers/components/organizer-logo-name-card";
+import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
+import { getUserFontSizePref } from "@/helpers/stylingFns";
+import { cn } from "@/helpers/utilsFns";
+
+import { api } from "~/convex/_generated/api";
+import { useQuery } from "convex-helpers/react/cache/hooks";
+import { usePreloadedQuery } from "convex/react";
+
+export const OrgMainPage = () => {
+  const { preloadedUserData } = useConvexPreload();
+  const userData = usePreloadedQuery(preloadedUserData);
+  const [activeTab, setActiveTab] = useState("orgInfo");
+  const { user, userPref } = userData ?? {};
+  const [selectedOrg, setSelectedOrg] = useState<Id<"organizations"> | null>(
+    null,
+  );
+
+  const fontSizePref = getUserFontSizePref(userPref?.fontSize);
+  const fontSize = fontSizePref?.body;
+  //   const isAdmin = user?.role?.includes("admin");
+  const userOrgData = useQuery(
+    api.organizer.organizations.getUserOrganizations,
+    { query: "" },
+  );
+
+  const orgEventsData = useQuery(
+    api.events.event.getEventByOrgId,
+    selectedOrg ? { orgId: selectedOrg } : "skip",
+  );
+
+  const userOrgs = useMemo(() => userOrgData ?? [], [userOrgData]);
+  const currentOrgEvents = useMemo(() => orgEventsData ?? [], [orgEventsData]);
+  const noOrgs = userOrgs.length === 0;
+
+  const tabList = [
+    { id: "orgInfo", label: "Organization Info" },
+    { id: "events", label: "My Events" },
+    // { id: "organizer", label: "Organizer" },
+    // { id: "analytics", label: "Analytics" },
+  ];
+
+  const orgData = {
+    "": [...userOrgs],
+  };
+
+  useEffect(() => {
+    if (userOrgs.length === 1) {
+      setSelectedOrg(userOrgs[0]._id);
+    }
+  }, [userOrgs]);
+
+  const currentOrg = userOrgs.find((org) => org._id === selectedOrg);
+  const isOrgOwner = currentOrg?.ownerId === user?._id;
+
+  return (
+    <div className={cn("flex flex-col gap-3 p-10")}>
+      <div
+        className={cn(
+          "flex flex-col items-center sm:flex-row sm:justify-between",
+        )}
+      >
+        <div className={cn("flex items-center gap-3")}>
+          <SearchMappedSelect<Doc<"organizations">>
+            value={selectedOrg ?? ""}
+            disabled={noOrgs}
+            data={orgData}
+            getItemLabel={(org) => (
+              <OrganizerLogoName organizer={org} fontSize={fontSize} />
+            )}
+            getItemValue={(org) => org._id}
+            onChange={(val) => setSelectedOrg(val as Id<"organizations">)}
+            searchFields={["name", "slug"]}
+            className={cn("max-w-72 justify-start bg-card py-2 sm:h-12")}
+            getItemDisplay={(org) => (
+              <div className="flex items-center gap-2">
+                <Image
+                  src={org.logo}
+                  alt={org.name}
+                  width={30}
+                  height={30}
+                  className="rounded-full"
+                />
+                <span className="truncate">{org.name}</span>
+              </div>
+            )}
+            placeholder="Select an Organization"
+          />
+          {/*     <Button
+            variant="outline"
+            className="flex items-center gap-2 border-foreground/20 bg-salYellow/30 sm:h-12"
+          >
+            <Plus className="size-4 shrink-0" />
+            /~ <span>Add Organization</span> ~/
+          </Button>*/}
+        </div>
+        {selectedOrg && <p>Title: {isOrgOwner ? "Org Owner" : "User"}</p>}
+        {/*//todo: replace this with the actual title/role within the org*/}
+      </div>
+
+      {selectedOrg && (
+        <NavTabs
+          tabs={tabList}
+          activeTab={activeTab}
+          setActiveTab={(value) => setActiveTab(value)}
+          fontSize={fontSize}
+          variant="card"
+        >
+          <div id="orgInfo">
+            <OrgInfo orgData={currentOrg} user={user} />
+          </div>
+          <div id="events">
+            {
+              <ResponsiveDataTable
+                title="Events"
+                description="View all of your events"
+                data={currentOrgEvents ?? []}
+                columns={
+                  getEventColumns(false) as ColumnDef<Record<string, unknown>>[]
+                }
+                defaultVisibility={{
+                  desktop: {
+                    type: false,
+                    _id: false,
+                  },
+                  mobile: {
+                    type: false,
+                    category: false,
+                    _id: false,
+                    lastEditedAt: false,
+                  },
+                }}
+                defaultSort={{ id: `lastEditedAt`, desc: true }}
+                tableType="events"
+                pageType="dashboard"
+                pageSize={{ desktop: 50, mobile: 10 }}
+              />
+            }
+          </div>
+          <p> Just some text for a child component placeholder</p>
+        </NavTabs>
+      )}
+      {noOrgs && (
+        <div className="flex flex-col items-center justify-center gap-4 p-10">
+          <p className="text-center text-xl font-bold">
+            You don&apos;t have any organizations yet.
+          </p>
+          <p className="text-center text-sm">
+            Create one by adding a new event or open call.
+          </p>
+          {/* <Button
+            variant="outline"
+            className="flex items-center gap-2 border-foreground/20 bg-salYellow/30 sm:h-12"
+          >
+            <Plus className="size-4 shrink-0" />
+            /~ <span>Add Organization</span> ~/
+          </Button>*/}
+        </div>
+      )}
+    </div>
+  );
+};

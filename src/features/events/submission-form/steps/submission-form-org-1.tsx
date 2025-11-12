@@ -114,6 +114,7 @@ const SubmissionFormOrgStep = ({
     selection: Record<string, boolean>,
   ) => {
     const shouldBeNew = Object.keys(selection).length === 0;
+    console.log(shouldBeNew, newOrgEvent);
     if (newOrgEvent !== shouldBeNew) {
       setNewOrgEvent(shouldBeNew);
     }
@@ -208,9 +209,11 @@ const SubmissionFormOrgStep = ({
                     }, 0);
                   }}
                   placeholder={
-                    isMobile
-                      ? "Search or enter new"
-                      : "Search or enter new name"
+                    dashboardView
+                      ? "Search..."
+                      : isMobile
+                        ? "Search or enter new"
+                        : "Search or enter new name"
                   }
                   className="mb-3 h-12 lg:mb-0 lg:h-20"
                   inputClassName="rounded-lg py-2 text-base lg:text-xl"
