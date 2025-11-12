@@ -62,11 +62,12 @@ export const OrgSearch = ({
   const rawQuery = inputValue;
   const [debouncedQuery, setDebouncedQuery] = useState(rawQuery);
 
-  const { data: results } = useQueryWithStatus(
+  const { data: userOrgResults } = useQueryWithStatus(
     api.organizer.organizations.getUserOrganizations,
     hasUserInteracted ? { query: debouncedQuery || "" } : "skip",
   );
 
+  const results = userOrgResults?.data ?? null;
   // const sortedResults = useMemo(
   //   () =>
   //     results ? [...results].sort((a, b) => a.name.localeCompare(b.name)) : [],

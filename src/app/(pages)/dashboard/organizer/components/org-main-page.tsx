@@ -10,6 +10,7 @@ import { motion } from "framer-motion";
 import type { Doc, Id } from "~/convex/_generated/dataModel";
 import { ResponsiveDataTable } from "@/components/data-table/data-table-wrapper";
 import { Card } from "@/components/ui/card";
+import { LoadingBalls } from "@/components/ui/loading-balls";
 import { SearchMappedSelect } from "@/components/ui/mapped-select";
 import NavTabs from "@/components/ui/nav-tabs";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -37,7 +38,7 @@ export const OrgMainPage = () => {
   const fontSizePref = getUserFontSizePref(userPref?.fontSize);
   const fontSize = fontSizePref?.body;
   //   const isAdmin = user?.role?.includes("admin");
-  const userOrgData = useQuery(
+  const userOrgResults = useQuery(
     api.organizer.organizations.getUserOrganizations,
     { query: "" },
   );
@@ -46,6 +47,8 @@ export const OrgMainPage = () => {
     api.events.event.getEventByOrgId,
     selectedOrg ? { orgId: selectedOrg } : "skip",
   );
+
+  const { data: userOrgData, success } = userOrgResults ?? {};
 
   const userOrgs = useMemo(() => userOrgData ?? [], [userOrgData]);
   const currentOrgEvents = useMemo(() => orgEventsData ?? [], [orgEventsData]);
@@ -159,7 +162,6 @@ export const OrgMainPage = () => {
                   pageSize={{ desktop: 50, mobile: 10 }}
                 />
               </div>
-              <p> Just some text for a child component placeholder</p>
             </NavTabs>
           ) : (
             <Card
@@ -243,7 +245,9 @@ export const OrgMainPage = () => {
           )}
         </>
       )}
-      {noOrgs && (
+      {!success ? (
+        <LoadingBalls />
+      ) : noOrgs ? (
         <div className="flex flex-col items-center justify-center gap-4 p-10">
           <p className="text-center text-xl font-bold">
             You don&apos;t have any organizations yet.
@@ -259,7 +263,7 @@ export const OrgMainPage = () => {
             /~ <span>Add Organization</span> ~/
           </Button>*/}
         </div>
-      )}
+      ) : null}
     </div>
   );
 };

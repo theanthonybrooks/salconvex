@@ -595,10 +595,11 @@ export const getUserOrganizations = query({
   handler: async (ctx, args) => {
     const trimmedQuery = args.query.trim();
     const userId = await getAuthUserId(ctx);
-    if (!userId) return null;
+    if (!userId)
+      return { data: null, success: false, error: "Not authenticated" };
 
     const user = await ctx.db.get(userId);
-    if (!user) return null;
+    if (!user) return { data: null, success: false, error: "User not found" };
     const slug = slugify(args.query, {
       lower: true,
       strict: true,
@@ -625,7 +626,7 @@ export const getUserOrganizations = query({
               org.name.toLowerCase().includes(args.query?.toLowerCase()),
             )
           : all;
-      return filteredResults;
+      return { data: filteredResults, success: true, error: null };
     } else {
       const orgs =
         trimmedQuery === ""
@@ -650,7 +651,7 @@ export const getUserOrganizations = query({
         a.name.localeCompare(b.name),
       );
 
-      return sortedOrgs;
+      return { data: sortedOrgs, success: true, error: null };
     }
   },
 });
