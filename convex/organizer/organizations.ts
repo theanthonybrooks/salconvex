@@ -30,6 +30,17 @@ const genericEmailDomains = [
   "live.com",
 ];
 
+export const updateOrgOwnerMutation = mutation({
+  args: {
+    orgId: v.id("organizations"),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return null;
+    await updateOrgOwner(ctx, args.orgId, userId);
+  },
+});
+
 export async function updateOrgOwner(
   ctx: MutationCtx,
   orgId: Id<"organizations">,
@@ -41,6 +52,27 @@ export async function updateOrgOwner(
     updatedAt: Date.now(),
     lastUpdatedBy: updatedBy ?? userId,
   });
+  const orgStaffOwner = await ctx.db
+    .query("orgStaff")
+    .withIndex("by_orgId_role", (q) =>
+      q.eq("organizationId", orgId).eq("role", "owner"),
+    )
+    .first();
+  if (orgStaffOwner) {
+    await ctx.db.patch(orgStaffOwner._id, {
+      userId: userId,
+      lastUpdatedAt: Date.now(),
+      lastUpdatedBy: updatedBy ?? userId,
+    });
+  } else {
+    await ctx.db.insert("orgStaff", {
+      organizationId: orgId,
+      userId: userId,
+      role: "owner",
+      lastUpdatedAt: Date.now(),
+      lastUpdatedBy: updatedBy ?? userId,
+    });
+  }
 }
 
 export async function updateOrgOwnerBeforeDelete(

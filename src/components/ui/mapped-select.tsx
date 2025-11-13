@@ -151,11 +151,13 @@ SearchMappedSelectProps<T>) {
     },
     {},
   );
-  const filteredCount = Object.values(filteredData).reduce(
+
+  const totalCount = Object.values(data).reduce(
     (acc, items) => acc + items.length,
     0,
   );
-  const singleOption = filteredCount === 1;
+
+  const singleOption = totalCount === 1;
 
   const onClear = (e: React.MouseEvent<SVGSVGElement>) => {
     e.stopPropagation();

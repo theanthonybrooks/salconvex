@@ -38,6 +38,7 @@ import type * as newsletter_subscriber from "../newsletter/subscriber.js";
 import type * as openCalls_openCall from "../openCalls/openCall.js";
 import type * as organizer_applications from "../organizer/applications.js";
 import type * as organizer_organizations from "../organizer/organizations.js";
+import type * as organizer_staff from "../organizer/staff.js";
 import type * as otp_resendOtp from "../otp/resendOtp.js";
 import type * as otp_resetOtp from "../otp/resetOtp.js";
 import type * as otp_verificationCodeEmail from "../otp/verificationCodeEmail.js";
@@ -98,6 +99,7 @@ declare const fullApi: ApiFromModules<{
   "openCalls/openCall": typeof openCalls_openCall;
   "organizer/applications": typeof organizer_applications;
   "organizer/organizations": typeof organizer_organizations;
+  "organizer/staff": typeof organizer_staff;
   "otp/resendOtp": typeof otp_resendOtp;
   "otp/resetOtp": typeof otp_resetOtp;
   "otp/verificationCodeEmail": typeof otp_verificationCodeEmail;

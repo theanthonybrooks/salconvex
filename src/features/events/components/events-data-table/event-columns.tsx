@@ -407,7 +407,7 @@ export const getEventColumns = <T extends Event>(
         } = row.original;
         const event = row.original;
         const eventCategory = event.category as EventCategory;
-        const isAdmin = table.options.meta?.isAdmin;
+        const { isAdmin, isEditor } = table.options.meta ?? {};
         const isDashboard = table.options.meta?.pageType === "dashboard";
         const hasOC = !!openCallId;
 
@@ -428,7 +428,7 @@ export const getEventColumns = <T extends Event>(
                   align="end"
                   className="scrollable mini darkbar max-h-56"
                 >
-                  {isAdmin && (
+                  {(isAdmin || isEditor) && (
                     <>
                       <DropdownMenuGroup>
                         <DropdownMenuLabel>Admin</DropdownMenuLabel>
@@ -462,7 +462,7 @@ export const getEventColumns = <T extends Event>(
                             hasOpenCall={false}
                             category={eventCategory}
                           />
-                          {isAdmin && isDashboard && (
+                          {isEditor && isDashboard && (
                             <RenameEventDialog event={event} />
                           )}
                           {isAdmin && hasOC && (
@@ -495,7 +495,7 @@ export const getEventColumns = <T extends Event>(
                             <ArchiveEvent eventId={event._id} />
                           )}
                           {(state === "archived" ||
-                            (state === "published" && isAdmin)) && (
+                            (state === "published" && isEditor)) && (
                             <ReactivateEvent
                               eventId={event._id}
                               state={state}
@@ -536,7 +536,7 @@ export const getEventColumns = <T extends Event>(
 
                               {(ocState === "archived" ||
                                 ocState === "published") &&
-                                isAdmin && (
+                                isEditor && (
                                   <ReactivateOC
                                     openCallId={openCallId}
                                     state={ocState}

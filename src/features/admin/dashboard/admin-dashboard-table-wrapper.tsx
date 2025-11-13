@@ -66,10 +66,6 @@ export function AdminDashboardTableWrapper({
     api.newsletter.subscriber.getNewsletterSubscribers,
     newsletterPage ? {} : "skip",
   );
-  // const applicationData = useQuery(
-  //   api.artists.applications.getArtistApplications2,
-  //   appsPage ? {} : "skip",
-  // );
 
   const artistsData = useQuery(
     api.artists.artistQueries.getActiveArtists,
@@ -267,49 +263,6 @@ export function AdminDashboardTableWrapper({
           ]}
         />
       )}
-      {/* {appsPage && (
-        <>
-          <div className="hidden max-h-full w-full px-10 pb-10 pt-7 lg:block">
-            <h3 className="mb-3 text-xl">Applications</h3>
-            <DataTable
-              columns={applicationColumns}
-              data={applicationData ?? []}
-              defaultVisibility={{
-                dates_edition: false,
-                manualApplied: false,
-                productionEnd: false,
-                eventEnd: false,
-              }}
-              // onRowSelect={(row) => {
-              //   console.log(row);
-              // }}
-              adminActions={adminActions}
-              tableType="applications"
-              pageType="dashboard"
-            />
-          </div>
-          <div className="flex flex-col items-center justify-center gap-4 py-7 lg:hidden">
-            <DataTable
-              columns={applicationColumns}
-              data={applicationData ?? []}
-              defaultVisibility={{
-                dates_edition: false,
-                manualApplied: false,
-                productionEnd: false,
-                eventEnd: false,
-              }}
-              // onRowSelect={(row) => {
-              //   console.log(row);
-              // }}
-              adminActions={adminActions}
-              tableType="applications"
-              pageType="dashboard"
-              className="mx-auto w-full max-w-[80dvw] overflow-x-auto sm:max-w-[90vw]"
-              outerContainerClassName={cn("lg:hidden")}
-            />
-          </div>
-        </>
-      )} */}
     </>
   );
 }

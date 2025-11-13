@@ -514,6 +514,32 @@ const organizationSchema = {
 const organizerSchemaValidator = v.object(organizationSchema);
 export type OrganizerSchemaType = Infer<typeof organizerSchemaValidator>;
 
+const organizationStaffRoles = v.union(
+  v.literal("owner"),
+  v.literal("orgAdmin"),
+  v.literal("editor"),
+  v.literal("judge"),
+);
+
+const organizationMemberSchema = {
+  userId: v.id("users"),
+  organizationId: v.id("organizations"),
+  role: organizationStaffRoles,
+  lastUpdatedAt: v.optional(v.number()),
+  lastUpdatedBy: v.optional(v.id("users")),
+};
+
+const orgInviteSchema = {
+  organizationId: v.id("organizations"),
+  email: v.string(),
+  used: v.boolean(),
+  usedAt: v.optional(v.number()),
+  invitedBy: v.id("users"),
+  invitedAt: v.number(),
+  inviteCode: v.string(),
+  role: organizationStaffRoles,
+};
+
 //TODO: Make another table that joins the events and open calls. Will act as a quick lookup for totals.
 
 export const eventSchema = {
@@ -1146,6 +1172,12 @@ export default defineSchema({
     .index("by_complete", ["isComplete"])
     .index("by_complete_with_ownerId", ["isComplete", "ownerId"])
     .index("by_ownerId", ["ownerId"]),
+
+  orgStaff: defineTable(organizationMemberSchema)
+    .index("by_orgId", ["organizationId"])
+    .index("by_userId", ["userId"])
+    .index("by_role", ["role"])
+    .index("by_orgId_role", ["organizationId", "role"]),
 
   events: defineTable(eventSchema)
     .searchIndex("search_by_location", {

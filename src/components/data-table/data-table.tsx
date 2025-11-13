@@ -74,6 +74,7 @@ export const numberedTableTypes = [
 
 export type AdminActions = {
   isAdmin: boolean;
+  isEditor?: boolean;
 };
 
 interface DataTableProps<TData, TValue> {
@@ -148,7 +149,7 @@ export function DataTable<TData, TValue>({
     return filters;
   }, [searchParams, columns]);
 
-  const { isAdmin } = adminActions ?? {};
+  const { isAdmin, isEditor } = adminActions ?? {};
 
   const [rowSelection, setRowSelection] = useState(selectedRow ?? {});
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
@@ -181,6 +182,7 @@ export function DataTable<TData, TValue>({
 
     meta: {
       isAdmin,
+      isEditor,
       isMobile,
 
       tableType,

@@ -15,6 +15,7 @@ export const tableTypes = [
   "events",
   "orgEvents",
   "organizations",
+  "organizationStaff",
   "applications",
   "openCalls",
   "users",
@@ -31,9 +32,15 @@ export type PageTypes = (typeof pageTypes)[number];
 
 export type TableTypes = (typeof tableTypes)[number];
 
+export type AdminActionType = {
+  isAdmin: boolean | undefined;
+  isEditor: boolean | undefined;
+};
+
 declare module "@tanstack/react-table" {
   interface TableMeta<TData extends RowData> {
     isAdmin: boolean | undefined;
+    isEditor: boolean | undefined;
 
     tableType?: TableTypes;
     pageType?: PageTypes;

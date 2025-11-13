@@ -438,6 +438,7 @@ export const getEventByOrgId = query({
         ...event,
         openCallState: openCall?.state ?? null,
         openCallId: openCall?._id ?? null,
+        openCallApproved: openCall?.approvedAt ? true : false,
       };
     });
 

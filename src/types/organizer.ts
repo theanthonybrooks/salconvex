@@ -99,3 +99,5 @@ export interface OrganizerCardProps {
   artist?: ArtistFull | null; //todo:make this required
   className?: string;
 }
+
+export type OrgStaffData = Doc<"orgStaff"> & Pick<Doc<"users">, "name">;

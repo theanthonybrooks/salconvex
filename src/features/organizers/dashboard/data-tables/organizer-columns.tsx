@@ -375,7 +375,7 @@ export const orgColumns: ColumnDef<OrgEventData>[] = [
 
       // const openCallState = event.openCallState;
       const state = event.state as SubmissionFormState;
-      const isAdmin = table.options.meta?.isAdmin;
+      const { isAdmin } = table.options.meta ?? {};
       const edition = event.dates.edition;
       const slug = event.slug;
       const openCallId = event.openCallId;

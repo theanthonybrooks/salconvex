@@ -5,6 +5,7 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { OrgInfo } from "@/app/(pages)/dashboard/organizer/components/org-info";
+import { StaffPage } from "@/app/(pages)/dashboard/organizer/components/staff-page";
 import { motion } from "framer-motion";
 
 import type { Doc, Id } from "~/convex/_generated/dataModel";
@@ -34,6 +35,8 @@ export const OrgMainPage = () => {
   const [selectedOrg, setSelectedOrg] = useState<Id<"organizations"> | null>(
     null,
   );
+  const isAdmin = user?.role?.includes("admin");
+  // const isAdmin = false;
 
   const fontSizePref = getUserFontSizePref(userPref?.fontSize);
   const fontSize = fontSizePref?.body;
@@ -57,8 +60,9 @@ export const OrgMainPage = () => {
   const tabList = [
     { id: "orgInfo", label: "Organization Info" },
     { id: "events", label: "My Events" },
-    // { id: "organizer", label: "Organizer" },
+    { id: "staff", label: "Staff" },
     // { id: "analytics", label: "Analytics" },
+    // ...(isAdmin ? [{ id: "admin", label: "Admin" }] : []),
   ] as const;
 
   const tabListMobile = tabList.map((tab) => tab.id);
@@ -75,6 +79,13 @@ export const OrgMainPage = () => {
 
   const currentOrg = userOrgs.find((org) => org._id === selectedOrg);
   const isOrgOwner = currentOrg?.ownerId === user?._id;
+  const allowedEditor =
+    user?._id && currentOrg?.allowedEditors?.includes(user._id);
+
+  const adminActions = {
+    isAdmin: Boolean(isAdmin),
+    isEditor: isOrgOwner || allowedEditor || isAdmin,
+  };
 
   return (
     <div className={cn("flex flex-col gap-3 p-4 sm:p-10")}>
@@ -117,7 +128,24 @@ export const OrgMainPage = () => {
             /~ <span>Add Organization</span> ~/
           </Button>*/}
         </div>
-        {selectedOrg && <p>Title: {isOrgOwner ? "Org Owner" : "User"}</p>}
+        {selectedOrg && (
+          <div className={cn("flex flex-col items-end gap-2")}>
+            <p className="text-xs text-muted-foreground">
+              Last Updated:{" "}
+              {new Date(currentOrg?.updatedAt ?? "").toLocaleString()}
+            </p>
+            <p className="text-sm">
+              <b>Current Role:</b>{" "}
+              {isOrgOwner
+                ? "Org Owner"
+                : allowedEditor
+                  ? "Editor"
+                  : isAdmin
+                    ? "Admin"
+                    : "Guest"}
+            </p>
+          </div>
+        )}
         {/*//todo: replace this with the actual title/role within the org*/}
       </div>
 
@@ -160,6 +188,14 @@ export const OrgMainPage = () => {
                   tableType="events"
                   pageType="dashboard"
                   pageSize={{ desktop: 50, mobile: 10 }}
+                  adminActions={adminActions}
+                />
+              </div>
+              <div id="staff">
+                <StaffPage
+                  orgId={selectedOrg}
+                  adminActions={adminActions}
+                  isOwner={isOrgOwner}
                 />
               </div>
             </NavTabs>
