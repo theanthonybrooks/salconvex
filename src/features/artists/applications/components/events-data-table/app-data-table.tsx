@@ -1,8 +1,9 @@
 "use client";
 
+import { PageTypes, TableTypes } from "@/types/tanstack-table";
+
 import * as React from "react";
 import { useEffect } from "react";
-import { PageTypes, TableTypes } from "@/types/tanstack-table";
 import {
   ColumnDef,
   ColumnFiltersState,

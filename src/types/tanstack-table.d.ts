@@ -40,7 +40,7 @@ export type AdminActionType = {
 declare module "@tanstack/react-table" {
   interface TableMeta<TData extends RowData> {
     isAdmin: boolean | undefined;
-    isEditor: boolean | undefined;
+    isEditor?: boolean;
 
     tableType?: TableTypes;
     pageType?: PageTypes;

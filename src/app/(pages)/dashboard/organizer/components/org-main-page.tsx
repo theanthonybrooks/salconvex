@@ -72,7 +72,7 @@ export const OrgMainPage = () => {
   };
 
   useEffect(() => {
-    if (userOrgs.length === 1) {
+    if (userOrgs.length > 0) {
       setSelectedOrg(userOrgs[0]._id);
     }
   }, [userOrgs]);
