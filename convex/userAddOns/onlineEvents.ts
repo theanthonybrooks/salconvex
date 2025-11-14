@@ -692,10 +692,10 @@ export const removeOnlineEventImage = mutation({
       .collect();
 
     if (eventsUsingImg.length > 1) {
-      throw new ConvexError({
-        message: "Image is in use by another event",
-        data: `Image is in use by another event`,
-      });
+      return {
+        success: true,
+        message: "This image is used by other events. Not deleting.",
+      };
     }
     await ctx.storage.delete(storageId);
     await ctx.db.patch(event._id, {
@@ -703,7 +703,7 @@ export const removeOnlineEventImage = mutation({
       imgStorageId: undefined,
     });
 
-    return { success: true };
+    return { success: true, message: "Image deleted successfully" };
   },
 });
 

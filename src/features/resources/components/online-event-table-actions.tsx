@@ -39,7 +39,9 @@ export const OnlineEventStatusBtn = ({
   );
 
   const mappedOptions = onlineEventCategories.map((opt) =>
-    opt.value === "archived" ? { ...opt, disabled: true } : opt,
+    opt.value === "archived"
+      ? { ...opt, className: "pointer-events-none" }
+      : opt,
   );
 
   return (

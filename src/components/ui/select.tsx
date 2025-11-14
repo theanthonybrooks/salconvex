@@ -196,6 +196,7 @@ interface SelectSimpleProps {
     disabled?: boolean;
     premium?: boolean;
     group?: string;
+    className?: string;
   }[];
   onChangeAction: (value: string) => void;
   value: string;
@@ -293,6 +294,7 @@ export const SelectSimple = ({
                     "pointer-events-none rounded-sm opacity-50",
                   option.value === "-" && "bg-salPinkLt/30 text-destructive",
                   option.group && "pl-8",
+                  option.className,
                 )}
                 center={center}
                 fontSize={fontSize}
