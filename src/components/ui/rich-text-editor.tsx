@@ -14,7 +14,8 @@ import Underline from "@tiptap/extension-underline";
 import { EditorContent, useEditor } from "@tiptap/react";
 import { BubbleMenu } from "@tiptap/react/menus";
 import StarterKit from "@tiptap/starter-kit";
-import { Check, CheckIcon, LoaderCircle, Pencil } from "lucide-react";
+import { toast } from "react-toastify";
+
 import { FaRemoveFormat, FaUnlink } from "react-icons/fa";
 import {
   FaBold,
@@ -26,7 +27,7 @@ import {
   FaStrikethrough,
   FaUnderline,
 } from "react-icons/fa6";
-import { toast } from "react-toastify";
+import { Check, CheckIcon, LoaderCircle, Pencil } from "lucide-react";
 
 import {
   AlertDialog,
@@ -67,6 +68,7 @@ interface Props {
   inputPreviewContainerClassName?: string;
   formInputPreview?: boolean;
   formInputPreviewClassName?: string;
+  dialogClassName?: string;
   tabIndex?: number;
   withTaskList?: boolean;
 }
@@ -108,6 +110,7 @@ export const RichTextEditor = ({
   inputPreviewContainerClassName,
   formInputPreview,
   formInputPreviewClassName,
+  dialogClassName,
   tabIndex,
   withTaskList,
 }: Props) => {
@@ -882,8 +885,9 @@ export const RichTextEditor = ({
           <DialogContent
             className={cn(
               "h-[90dvh] w-[90vw] max-w-full rounded-lg bg-card p-0 sm:w-[95vw]",
+              dialogClassName,
             )}
-            overlayClassName="z-[31]"
+            overlayClassName={cn("z-[31]")}
           >
             <DialogTitle className="sr-only">Text Editor</DialogTitle>
             {EditorUI}

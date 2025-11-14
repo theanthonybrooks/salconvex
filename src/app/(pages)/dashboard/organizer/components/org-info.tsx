@@ -184,7 +184,7 @@ export const OrgInfo = ({ orgData, user }: OrgInfoProps) => {
                       {...field}
                       type="text"
                       placeholder="ex. The Street Art List"
-                      className={cn("w-full border-foreground bg-card")}
+                      className={cn("w-full border-foreground/20 bg-card")}
                     />
                   </FormControl>
                   <FormMessage />
@@ -211,7 +211,7 @@ export const OrgInfo = ({ orgData, user }: OrgInfoProps) => {
                       reset={false}
                       placeholder="Organization Location (city, state, country, etc)..."
                       className="mb-3 w-full lg:mb-0"
-                      inputClassName="rounded-lg border-foreground "
+                      inputClassName="rounded-lg border-foreground/20 "
                     />
                   </FormControl>
                   <FormMessage />
@@ -229,6 +229,7 @@ export const OrgInfo = ({ orgData, user }: OrgInfoProps) => {
                       field={field}
                       maxLength={250}
                       className="max-h-30 min-h-12"
+                      containerClassName="border-foreground/20"
                       placeholder="Short blurb about your organization... Limit 250 characters"
                     />
                   </FormControl>
@@ -252,7 +253,7 @@ export const OrgInfo = ({ orgData, user }: OrgInfoProps) => {
                       purpose="organizerAbout"
                       formInputPreview
                       formInputPreviewClassName="min-h-12 max-h-50 "
-                      inputPreviewContainerClassName="rounded-lg"
+                      inputPreviewContainerClassName="rounded-lg border-foreground/20"
                     />
                   </FormControl>
                   <FormMessage />
@@ -273,7 +274,7 @@ export const OrgInfo = ({ orgData, user }: OrgInfoProps) => {
                       <DebouncedControllerInput
                         field={field}
                         placeholder="Title of primary contact"
-                        className={cn("w-full rounded border-foreground")}
+                        className={cn("w-full rounded border-foreground/20")}
                         tabIndex={0}
                         onBlur={() => {
                           field.onBlur?.();
@@ -297,7 +298,9 @@ export const OrgInfo = ({ orgData, user }: OrgInfoProps) => {
                           <DebouncedControllerInput
                             field={field}
                             placeholder="Title of primary contact"
-                            className={cn("w-full rounded border-foreground")}
+                            className={cn(
+                              "w-full rounded border-foreground/20",
+                            )}
                             tabIndex={0}
                             onBlur={() => {
                               field.onBlur?.();

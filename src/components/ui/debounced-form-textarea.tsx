@@ -16,6 +16,7 @@ interface DebouncedTextareaProps<
   maxLength: number;
   placeholder?: string;
   className?: string;
+  containerClassName?: string;
   delay?: number;
   tabIndex?: number;
 }
@@ -28,6 +29,7 @@ export function DebouncedFormTextarea<
   maxLength,
   placeholder,
   className,
+  containerClassName,
   delay = 300,
   tabIndex = 0,
   disabled,
@@ -70,6 +72,7 @@ export function DebouncedFormTextarea<
       className={cn(
         "relative w-full rounded-lg border border-foreground bg-card focus-within:ring-1 focus-within:ring-ring",
         isFocused && "pb-5",
+        containerClassName,
       )}
     >
       <textarea

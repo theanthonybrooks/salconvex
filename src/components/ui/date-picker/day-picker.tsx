@@ -68,30 +68,6 @@ export function DateTimePickerField({
   const startMonth = minDate ? new Date(minDate) : new Date();
   const thisYear = new Date().getFullYear();
   const inFiveYears = thisYear + 5;
-
-  // const handleDateSelect = (d: Date | undefined) => {
-  //   console.log(date);
-  //   console.log("handleDateSelect", d);
-  //   setDate(d);
-  //   if (d) {
-  //     const match = timeStr.match(/^(\d{1,2}):(\d{2})\s?(AM|PM)$/i);
-  //     if (!match) return;
-  //     const [hourStr, minuteStr, period] = match;
-  //     let h = parseInt(hourStr, 10);
-  //     const m = parseInt(minuteStr, 10);
-  //     if (period.toUpperCase() === "PM" && h < 12) h += 12;
-  //     if (period.toUpperCase() === "AM" && h === 12) h = 0;
-
-  //     const updated = new Date(d);
-  //     console.log("updated", updated);
-  //     updated.setHours(h);
-  //     updated.setMinutes(m);
-  //     onChange(updated.getTime());
-  //   } else {
-  //     onChange(undefined);
-  //   }
-  //   setHasChanges(true);
-  // };
   const handleDateSelect = (d: Date | undefined) => {
     if (!d) {
       setDate(undefined);

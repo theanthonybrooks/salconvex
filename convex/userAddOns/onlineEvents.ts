@@ -258,7 +258,7 @@ export const duplicateOnlineEvent = mutation({
     if (!userId) throw new ConvexError("Not authenticated");
     const event = await ctx.db.get(args.eventId);
     if (!event) throw new ConvexError("Event not found");
-    const { _id, _creationTime, ...eventData } = event;
+    const { _id, _creationTime, updatedAt, updatedBy, ...eventData } = event;
 
     const duplicateEvent = await ctx.db.insert("onlineEvents", {
       ...eventData,

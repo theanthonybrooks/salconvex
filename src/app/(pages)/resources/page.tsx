@@ -15,14 +15,9 @@ const ResourcesPage = () => {
   const { data: onlineEvents, success: onlineEventsSuccess } =
     onlineEventsData ?? {};
 
-  const order = {
-    published: 0,
-    archived: 1,
-    draft: 2,
-  };
   return (
     <div
-      className={cn("mx-auto mb-12 flex w-full max-w-[1300px] flex-col gap-2")}
+      className={cn("mx-auto mb-12 flex w-full max-w-[1400px] flex-col gap-2")}
     >
       {/* <div className={cn("mb-12 sm:mb-16")}>
         <Image
@@ -47,16 +42,23 @@ const ResourcesPage = () => {
         <p className={cn("font-bold")}>Online Events</p>
         <div
           className={cn(
-            "mx-auto flex flex-col gap-8 sm:flex-row sm:justify-around",
+            "mx-auto grid gap-8 sm:grid-cols-2 sm:justify-around lg:grid-cols-3 2xl:grid-cols-4",
           )}
         >
           <>
             {onlineEvents ? (
               onlineEvents
                 .sort((a, b) => {
+                  const order = {
+                    published: 0,
+                    archived: 1,
+                    draft: 2,
+                  };
                   const stateCompare = order[a.state] - order[b.state];
                   if (stateCompare !== 0) return stateCompare;
-                  return b._creationTime - a._creationTime;
+                  if (a.state === "published") return a.startDate - b.startDate;
+                  if (a.state === "archived") return b.endDate - a.endDate;
+                  return a.startDate - b.startDate;
                 })
 
                 .map((resource) => {

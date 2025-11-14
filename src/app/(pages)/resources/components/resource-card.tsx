@@ -107,12 +107,12 @@ export const ResourceCard = ({
             alt={name}
             width={225}
             height={100}
-            // className="h-auto w-auto"
+            className="h-25 w-auto"
           />
         ) : (
           <h1
             className={cn(
-              "text-center font-tanker text-[2.5rem] lowercase leading-none tracking-wide",
+              "h-25 content-center text-center font-tanker text-[2.5rem] lowercase leading-none tracking-wide",
             )}
           >
             {name}

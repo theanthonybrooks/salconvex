@@ -16,20 +16,20 @@ import { LoaderCircle, Trash } from "lucide-react";
 
 import type { Id } from "~/convex/_generated/dataModel";
 import { StaffUserSelector } from "@/components/ui/admin/userSelector";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DateTimePickerField } from "@/components/ui/date-picker/day-picker";
 import { DebouncedControllerInput } from "@/components/ui/debounced-form-input";
 import { DebouncedFormTextarea } from "@/components/ui/debounced-form-textarea";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -360,20 +360,21 @@ export const OnlineEventDialog = ({
   }, [open, defaultValues, form, eventData]);
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent
+    <AlertDialog open={open} onOpenChange={setOpen}>
+      <AlertDialogTrigger asChild>{children}</AlertDialogTrigger>
+      <AlertDialogContent
         className={cn(
-          "max-h-[95dvh] max-w-[95dvw] overflow-hidden bg-dashboardBgLt p-0 sm:max-h-[90dvh] sm:max-w-[max(50dvw,50rem)]",
+          "z-[31] max-h-[95dvh] max-w-[95dvw] overflow-hidden bg-dashboardBgLt p-0 sm:max-h-[90dvh] sm:max-w-[max(50dvw,50rem)]",
         )}
-        closeBtnClassName="bg-dashboardBgLt rounded-full p-2 opacity-100 text-foreground/50"
+        overlayClassName="z-[30]"
+        // closeBtnClassName="bg-dashboardBgLt rounded-full p-2 opacity-100 text-foreground/50"
       >
-        <DialogDescription className="sr-only">
+        <AlertDialogDescription className="sr-only">
           Online event edit/create dialog
-        </DialogDescription>
-        <DialogHeader className="sr-only">
-          <DialogTitle>{`${name ?? "Online Event"} Dialog`}</DialogTitle>
-        </DialogHeader>
+        </AlertDialogDescription>
+        <AlertDialogHeader className="sr-only">
+          <AlertDialogTitle>{`${name ?? "Online Event"} Dialog`}</AlertDialogTitle>
+        </AlertDialogHeader>
         <Form {...form}>
           <form onSubmit={handleSubmit(handleUpdate)} className="relative">
             <div
@@ -663,8 +664,11 @@ export const OnlineEventDialog = ({
                                     maxLength={300}
                                     placeholder="Enter requirement"
                                     className={cn(
-                                      "max-h-15 min-h-10 w-full resize-none rounded-lg border-gray-300 bg-card",
+                                      "max-h-15 min-h-10 w-full resize-none",
                                       isEmpty && "h-10",
+                                    )}
+                                    containerClassName={cn(
+                                      "rounded-lg border-gray-300 bg-card",
                                     )}
                                   />
                                 </FormControl>
@@ -740,8 +744,11 @@ export const OnlineEventDialog = ({
                                     maxLength={300}
                                     placeholder="Enter term"
                                     className={cn(
-                                      "max-h-15 min-h-10 w-full resize-none rounded-lg border-gray-300 bg-card",
+                                      "max-h-15 min-h-10 w-full resize-none",
                                       isEmpty && "h-10",
+                                    )}
+                                    containerClassName={cn(
+                                      "rounded-lg border-gray-300 bg-card",
                                     )}
                                   />
                                 </FormControl>
@@ -803,7 +810,7 @@ export const OnlineEventDialog = ({
                 )}
               />
             </div>
-            <DialogFooter
+            <AlertDialogFooter
               className={cn(
                 "sticky bottom-0 z-10 col-span-full mt-4 flex w-full max-w-[calc(100%-0.75em)] flex-col-reverse items-center justify-between gap-2 bg-dashboardBgLt px-6 py-4 sm:mt-2 sm:flex-row",
               )}
@@ -872,10 +879,10 @@ export const OnlineEventDialog = ({
                   </Label>
                 </div>
               </div>
-            </DialogFooter>
+            </AlertDialogFooter>
           </form>
         </Form>
-      </DialogContent>
-    </Dialog>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 };

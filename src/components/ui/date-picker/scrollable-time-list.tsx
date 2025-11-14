@@ -88,7 +88,7 @@ export function ScrollableTimeList({
                   isSelected
                     ? "selected-time border-1.5 border-foreground bg-salPinkLt font-medium"
                     : "hover:bg-salPinkLtHover",
-                  isDisabled && "pointer-events-none opacity-20",
+                  isDisabled && "pointer-events-none hidden opacity-20",
                 )}
               >
                 {t}

@@ -375,7 +375,10 @@ export const resourceColumns: ColumnDef<ResourceColumnsProps>[] = [
 
       return (
         <>
-          <div className={cn("flex justify-center gap-0.5")}>
+          <div
+            className={cn("flex justify-center gap-0.5")}
+            onClick={(e) => e.stopPropagation()}
+          >
             <OnlineEventDialog eventId={event._id}>
               <Button
                 variant="outline"

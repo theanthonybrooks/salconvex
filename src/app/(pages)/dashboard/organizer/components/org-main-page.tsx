@@ -62,7 +62,7 @@ export const OrgMainPage = () => {
     { id: "events", label: "My Events" },
     { id: "staff", label: "Staff" },
     // { id: "analytics", label: "Analytics" },
-    // ...(isAdmin ? [{ id: "admin", label: "Admin" }] : []),
+    ...(isAdmin ? [{ id: "invoices", label: "Invoices" }] : []),
   ] as const;
 
   const tabListMobile = tabList.map((tab) => tab.id);
@@ -198,6 +198,7 @@ export const OrgMainPage = () => {
                   isOwner={isOrgOwner}
                 />
               </div>
+              {isAdmin && <div id="invoices">Invoices page</div>}
             </NavTabs>
           ) : (
             <Card

@@ -209,7 +209,7 @@ export default function NavBar(
       hidden: {
         height: homePage ? "80px" : "100px",
         backgroundColor: !homePageHiddenNav ? bgColor : "rgba(0, 0, 0, 0)",
-        boxShadow: "",
+        boxShadow: "none",
         transition: {
           backgroundColor: {
             duration: 0,
