@@ -374,19 +374,21 @@ export const resourceColumns: ColumnDef<ResourceColumnsProps>[] = [
       // console.log(table.options)
 
       return (
-        <div className={cn("flex justify-center gap-0.5")}>
-          <OnlineEventDialog eventId={event._id}>
-            <Button
-              variant="outline"
-              className="ml-auto size-8 max-h-8 min-w-8 border-foreground/30 p-0 hover:cursor-pointer hover:bg-white/70 active:scale-90"
-            >
-              <span className="sr-only">Edit</span>
-              <Pencil className="size-4" />
-            </Button>
-          </OnlineEventDialog>
-          <DuplicateEventBtn eventId={event._id} />
-          <DeleteEventBtn eventId={event._id} />
-        </div>
+        <>
+          <div className={cn("flex justify-center gap-0.5")}>
+            <OnlineEventDialog eventId={event._id}>
+              <Button
+                variant="outline"
+                className="ml-auto size-8 max-h-8 min-w-8 border-foreground/30 p-0 hover:cursor-pointer hover:bg-white/70 active:scale-90"
+              >
+                <span className="sr-only">Edit</span>
+                <Pencil className="size-4" />
+              </Button>
+            </OnlineEventDialog>
+            <DuplicateEventBtn eventId={event._id} />
+            <DeleteEventBtn eventId={event._id} />
+          </div>
+        </>
       );
     },
   },

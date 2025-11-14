@@ -35,6 +35,7 @@ export function DebouncedFormTextarea<
   ...textareaProps
 }: DebouncedTextareaProps<TFieldValues, TName>) {
   const [localValue, setLocalValue] = useState(field.value ?? "");
+  const [isFocused, setIsFocused] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const emptyRequired = required && localValue.trim().length === 0;
 
@@ -60,12 +61,17 @@ export function DebouncedFormTextarea<
     const el = textareaRef.current;
     if (!el) return;
 
-    el.style.height = "auto"; // reset to shrink
+    el.style.height = "auto";
     el.style.height = `${el.scrollHeight}px`;
   }, [localValue]);
 
   return (
-    <div className={cn("relative w-full")}>
+    <div
+      className={cn(
+        "relative w-full rounded-lg border border-foreground bg-card focus-within:ring-1 focus-within:ring-ring",
+        isFocused && "pb-5",
+      )}
+    >
       <textarea
         {...field}
         {...textareaProps}
@@ -77,16 +83,18 @@ export function DebouncedFormTextarea<
           setLocalValue(val);
           debouncedOnChange(val);
         }}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
         tabIndex={tabIndex}
         maxLength={maxLength}
         placeholder={placeholder}
         className={cn(
-          "scrollable justy mini w-full resize-none rounded-lg border border-foreground bg-card p-3 pb-6 text-base placeholder:italic focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 sm:text-sm",
+          "scrollable justy mini w-full resize-none bg-transparent p-3 text-base placeholder:italic focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 sm:text-sm",
           emptyRequired && "invalid-field",
           className,
         )}
       />
-      {!disabled && (
+      {!disabled && isFocused && (
         <p className="absolute bottom-3 right-3 bg-card/90 text-xs text-gray-400">
           {localValue.length}/{maxLength}
         </p>

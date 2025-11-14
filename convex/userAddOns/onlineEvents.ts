@@ -686,6 +686,17 @@ export const removeOnlineEventImage = mutation({
     if (!userId) throw new Error("Not authenticated");
     const event = eventId ? await ctx.db.get(eventId) : null;
     if (!event) throw new Error("Event not found");
+    const eventsUsingImg = await ctx.db
+      .query("onlineEvents")
+      .withIndex("by_imgStorageId", (q) => q.eq("imgStorageId", storageId))
+      .collect();
+
+    if (eventsUsingImg.length > 1) {
+      throw new ConvexError({
+        message: "Image is in use by another event",
+        data: `Image is in use by another event`,
+      });
+    }
     await ctx.storage.delete(storageId);
     await ctx.db.patch(event._id, {
       img: undefined,

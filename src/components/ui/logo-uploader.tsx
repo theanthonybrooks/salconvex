@@ -19,6 +19,8 @@ type LogoUploaderProps = {
   initialImage?: string;
   imageOnly?: boolean;
   className?: string;
+  imgClassName?: string;
+  inputClassName?: string;
   reset?: boolean;
   size?: number;
   height?: number;
@@ -35,6 +37,8 @@ export default function LogoUploader({
   onRemoveAction,
   initialImage,
   className,
+  imgClassName,
+  inputClassName,
   tabIndex = 0,
   disabled,
   size = 80,
@@ -153,6 +157,7 @@ export default function LogoUploader({
             showFullImage &&
               !croppedPreviewUrl &&
               "border-dashed border-foreground/30",
+            inputClassName,
           )}
           style={{ height, width: size }}
           onClick={() => fileInputRef.current?.click()}
@@ -190,6 +195,7 @@ export default function LogoUploader({
               className={cn(
                 "rounded-full bg-card object-cover",
                 showFullImage && "rounded-none bg-transparent",
+                imgClassName,
               )}
             />
           ) : (

@@ -4,6 +4,7 @@ import { Copy, Trash } from "lucide-react";
 
 import type { Id } from "~/convex/_generated/dataModel";
 import { Button } from "@/components/ui/button";
+import { TooltipSimple } from "@/components/ui/tooltip";
 
 import { api } from "~/convex/_generated/api";
 import { useMutation } from "convex/react";
@@ -25,14 +26,16 @@ export const DuplicateEventBtn = ({ eventId }: AdminResourceActionsProps) => {
     }
   };
   return (
-    <Button
-      variant="outline"
-      className="ml-auto size-8 max-h-8 min-w-8 border-foreground/30 p-0 hover:cursor-pointer hover:bg-white/70 active:scale-90"
-      onClick={handleDuplicateEvent}
-    >
-      <span className="sr-only">Duplicate</span>
-      <Copy className="size-4" />
-    </Button>
+    <TooltipSimple content="Duplicate Event">
+      <Button
+        variant="outline"
+        className="ml-auto size-8 max-h-8 min-w-8 border-foreground/30 p-0 hover:cursor-pointer hover:bg-white/70 active:scale-90"
+        onClick={handleDuplicateEvent}
+      >
+        <span className="sr-only">Duplicate</span>
+        <Copy className="size-4" />
+      </Button>
+    </TooltipSimple>
   );
 };
 export const DeleteEventBtn = ({ eventId }: AdminResourceActionsProps) => {
@@ -48,13 +51,15 @@ export const DeleteEventBtn = ({ eventId }: AdminResourceActionsProps) => {
     }
   };
   return (
-    <Button
-      variant="outline"
-      className="ml-auto size-8 max-h-8 min-w-8 border-foreground/30 p-0 hover:cursor-pointer hover:bg-white/70 active:scale-90"
-      onClick={handleDeleteEvent}
-    >
-      <span className="sr-only">Delete</span>
-      <Trash className="size-4" />
-    </Button>
+    <TooltipSimple content="Delete Event" align="end">
+      <Button
+        variant="outline"
+        className="ml-auto size-8 max-h-8 min-w-8 border-foreground/30 p-0 hover:cursor-pointer hover:bg-white/70 active:scale-90"
+        onClick={handleDeleteEvent}
+      >
+        <span className="sr-only">Delete</span>
+        <Trash className="size-4" />
+      </Button>
+    </TooltipSimple>
   );
 };

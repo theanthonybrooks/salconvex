@@ -386,24 +386,48 @@ export const OnlineEventDialog = ({
                   "col-span-full flex flex-col-reverse items-center justify-between gap-4 pl-2 pr-6 sm:flex-row",
                 )}
               >
-                <LogoUploader
-                  imageOnly={isMobile}
-                  id="logo-upload"
-                  onChangeAction={(file) => setLogoFile(file)}
-                  // onChangeAction={handleLogoUpload}
-                  onRemoveAction={() => {
-                    if (logoFile) {
-                      setLogoFile(null);
-                    } else {
-                      handleImgRemoval();
-                    }
-                  }}
-                  initialImage={eventData?.img}
-                  className="gap-4"
-                  size={isMobile ? 250 : 200}
-                  height={isMobile ? 125 : 100}
-                  showFullImage
-                  loading={uploading}
+                <FormField
+                  control={form.control}
+                  name="img"
+                  render={({ field }) => (
+                    <FormItem className="col-span-full">
+                      <FormLabel className="font-bold">Event Image</FormLabel>
+                      <FormControl>
+                        <LogoUploader
+                          imageOnly={isMobile}
+                          id="logo-upload"
+                          onChangeAction={(file) => {
+                            setLogoFile(file);
+                            // setValue("img", "local-upload", {
+                            //   shouldDirty: true,
+                            // });
+                          }}
+                          // onChangeAction={handleLogoUpload}
+                          onRemoveAction={() => {
+                            if (logoFile) {
+                              setLogoFile(null);
+                            } else {
+                              setValue("img", "", { shouldDirty: true });
+                              handleImgRemoval();
+                              // note: removed this as it was deleting images regardless of whether or not they're used for other
+                            }
+                          }}
+                          initialImage={field.value || eventData?.img}
+                          className="gap-4"
+                          imgClassName={cn(
+                            "w-auto",
+                            isMobile ? "h-[125px]" : "h-25",
+                          )}
+                          inputClassName=" focus:bg-transparent"
+                          size={isMobile ? 250 : 200}
+                          height={isMobile ? 125 : 100}
+                          showFullImage
+                          loading={uploading}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
                 <div className={cn("flex items-center gap-4")}>
                   <p>Organizer:</p>

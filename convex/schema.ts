@@ -1493,6 +1493,7 @@ export default defineSchema({
     .index("by_eventId", ["eventId"]),
 
   onlineEvents: defineTable(onlineEventsSchema)
+    .index("by_imgStorageId", ["imgStorageId"])
     .index("by_startDate", ["startDate"])
     .index("by_endDate", ["endDate"])
     .index("by_state", ["state"])
