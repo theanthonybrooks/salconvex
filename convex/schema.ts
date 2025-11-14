@@ -1029,8 +1029,6 @@ export const onlineEventsSchema = {
 };
 export const onlineEventsSchemaValidator = v.object(onlineEventsSchema);
 
-export type OnlineEventType = Infer<typeof onlineEventsSchemaValidator>;
-
 export const eventVoucherSchema = v.object({
   userId: v.id("users"),
   email: v.string(),
@@ -1497,6 +1495,7 @@ export default defineSchema({
   onlineEvents: defineTable(onlineEventsSchema)
     .index("by_startDate", ["startDate"])
     .index("by_endDate", ["endDate"])
+    .index("by_state", ["state"])
     .index("by_state_endDate", ["state", "endDate"])
     .index("by_slug", ["slug"])
     .index("by_slug_startDate", ["slug", "startDate"])

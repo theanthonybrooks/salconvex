@@ -10,6 +10,7 @@ import { PiGraph } from "react-icons/pi";
 import {
   BadgeCheck,
   Banana,
+  BookHeart,
   Bookmark,
   Calendar,
   Calendar1,
@@ -18,7 +19,6 @@ import {
   CreditCard,
   EyeOff,
   FileText,
-  Gift,
   Heart,
   HelpCircle,
   Home,
@@ -142,7 +142,7 @@ export const FOOTER_LINKS: FooterSection[] = [
       // { name: "Documentation", href: "/docs" },
       // { name: "Examples", href: "/examples" },
       { name: "Pricing", href: "/pricing" },
-      { name: "Extras", href: "/extras/portfolio-reviews" },
+      { name: "Resources", href: "/resources" },
     ],
   },
 
@@ -364,9 +364,9 @@ export const dashboardNavItems: DashNavItem[] = [
     userType: [],
   },
   {
-    label: "Extras",
-    href: "/dashboard/admin/extras",
-    icon: Gift,
+    label: "Resources",
+    href: "/dashboard/admin/resources",
+    icon: BookHeart,
     subsection: true,
     sectionCat: "admin",
     desc: "Online Events +",
@@ -502,19 +502,7 @@ export const dashboardNavItems: DashNavItem[] = [
   //   sub: ["active", "trialing", "admin"],
   //   userType: ["artist", "admin"],
   // },
-  // {
-  //   label: "Other Stuff",
-  //   href: "/dashboard/misc",
-  //   icon: Ellipsis,
-  //   sectionIcon: Ellipsis,
-  //   section: true,
-  //   sectionHead: true,
-  //   sectionCat: "misc",
-  //   heading: "Miscellaneous",
-  //   desc: "Extras & other tools",
-  //   sub: ["active", "trialing"],
-  //   userType: ["public"],
-  // },
+
   {
     label: "My Organizations",
     href: "/dashboard/organizer",
@@ -606,10 +594,10 @@ export type LinktreeProps = SocialProps & {
 
 export const linktreeLinks: LinktreeProps[] = [
   {
-    label: "Portfolio Reviews - Registration",
+    label: "Current Events",
     icon: LuMegaphone,
-    path: "/extras/portfolio-reviews",
-    group: "Current Events",
+    path: "/resources",
+    group: "Resources",
     type: "onlineEvent",
   },
   {

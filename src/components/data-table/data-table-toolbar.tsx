@@ -16,7 +16,7 @@ import { AlertDialogSimple } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { TooltipSimple } from "@/components/ui/tooltip";
-import { OnlineEventDialog } from "@/features/extras/components/online-event-dialog";
+import { OnlineEventDialog } from "@/features/resources/components/online-event-dialog";
 import { cn } from "@/helpers/utilsFns";
 import { useDevice } from "@/providers/device-provider";
 
@@ -65,7 +65,7 @@ export function DataTableToolbar<TData>({
   const minimalView = table.options.meta?.minimalView;
   const forDashboard = pageType === "dashboard";
   const eventAndOC = tableType === "events" || tableType === "openCalls";
-  const extrasTable = tableType === "extras";
+  const resourcesTable = tableType === "resources";
   // const userAddOnsTable = tableType === "userAddOns";
   // const appsTable = tableType === "applications";
   // const artistsTable = tableType === "artists";
@@ -150,7 +150,7 @@ export function DataTableToolbar<TData>({
           }}
           className="mx-auto h-12 w-full sm:h-10 sm:w-[150px] lg:w-[200px]"
         />
-        {extrasTable && isAdmin && (
+        {resourcesTable && isAdmin && (
           <div className="flex items-center gap-3 [@media(max-width:640px)]:w-full [@media(max-width:640px)]:flex-col">
             <OnlineEventDialog type="create">
               <Button

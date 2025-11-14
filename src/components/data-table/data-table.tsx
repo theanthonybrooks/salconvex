@@ -5,7 +5,7 @@ import {
   onlineEventStatusColorMap,
   registrationStatusBgColorMap,
   registrationStatusColorMap,
-} from "@/constants/extrasConsts";
+} from "@/constants/resourcesConsts";
 
 import {
   ApplicationStatus,
@@ -50,7 +50,7 @@ import { DataTableToolbar } from "./data-table-toolbar";
 
 // "events" | "orgEvents" | "organizations" | "openCalls" | "users" | "artists" | "newsletter" | "applications" | "bookmarks" | "hidden"
 
-export const selectableTableTypes = [
+export const selectableTableTypes: TableTypes[] = [
   "events",
   "orgEvents",
   "organizations",
@@ -59,17 +59,17 @@ export const selectableTableTypes = [
   // "newsletter",
   // "applications",
   "openCalls",
-  "extras",
+  "resources",
 ];
 
-export const numberedTableTypes = [
+export const numberedTableTypes: TableTypes[] = [
   "users",
   "artists",
   "newsletter",
   "applications",
   "bookmarks",
   "hidden",
-  "extras",
+  "resources",
 ];
 
 export type AdminActions = {
@@ -410,7 +410,7 @@ export function DataTable<TData, TValue>({
                       applicationStatus as NonNullApplicationStatus
                     ];
                   bgStatusClass = `${statusColor} ${textColor}`;
-                } else if (tableType === "extras") {
+                } else if (tableType === "resources") {
                   const { state } = row.original as {
                     state: OnlineEventStateType;
                   };
@@ -438,8 +438,6 @@ export function DataTable<TData, TValue>({
                         "hover:cursor-pointer hover:bg-salYellow/10",
 
                       bgStatusClass,
-                      // tableType === "extras" &&
-                      //   "data-[state=selected]:bg-slate-100",
                     )}
                   >
                     {row.getVisibleCells().map((cell) => (

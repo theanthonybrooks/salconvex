@@ -10,8 +10,8 @@ import { DataTable } from "@/components/data-table/data-table";
 import { ResponsiveDataTable } from "@/components/data-table/data-table-wrapper";
 import { useAdminPreload } from "@/features/admin/admin-preload-context";
 import { artistColumns } from "@/features/admin/dashboard/artist-columns";
-import { extraColumns } from "@/features/admin/dashboard/extras-column";
 import { newsletterColumns } from "@/features/admin/dashboard/newsletter-columns";
+import { resourceColumns } from "@/features/admin/dashboard/resources-column";
 import { AdminToolbar } from "@/features/admin/dashboard/user-admin-toolbar";
 import { userColumns } from "@/features/admin/dashboard/user-columns";
 import { userAddOnColumns } from "@/features/admin/dashboard/userAddon-columns";
@@ -56,7 +56,7 @@ export function AdminDashboardTableWrapper({
   const usersPage = page === "users";
   const artistsPage = page === "artists";
   const newsletterPage = page === "newsletter";
-  const extrasPage = page === "extras";
+  const resourcesPage = page === "resources";
 
   const usersData = useQuery(
     api.users.usersWithSubscriptions,
@@ -72,14 +72,14 @@ export function AdminDashboardTableWrapper({
     artistsPage ? {} : "skip",
   );
 
-  const extrasData = useQuery(
+  const resourcesData = useQuery(
     api.userAddOns.onlineEvents.getAllOnlineEvents,
-    extrasPage ? {} : "skip",
+    resourcesPage ? {} : "skip",
   );
 
   const eventRegistrations = useQuery(
     api.userAddOns.onlineEvents.getAllRegistrationsForEvent,
-    extrasPage && selectedRow
+    resourcesPage && selectedRow
       ? { eventId: selectedRow as Id<"onlineEvents"> }
       : "skip",
   );
@@ -130,13 +130,13 @@ export function AdminDashboardTableWrapper({
           </div>
         </>
       )}
-      {extrasPage && (
+      {resourcesPage && (
         <>
           <ResponsiveDataTable
             title="Online Events"
             description="View all of your online events"
-            data={extrasData?.events ?? []}
-            columns={extraColumns}
+            data={resourcesData?.events ?? []}
+            columns={resourceColumns}
             defaultVisibility={{
               description: false,
               terms: false,
@@ -149,7 +149,7 @@ export function AdminDashboardTableWrapper({
             onRowSelect={(row) => setSelectedRow(row?._id ?? null)}
             defaultFilters={[{ id: `state`, value: ["published", "draft"] }]}
             defaultSort={{ id: `startDate`, desc: true }}
-            tableType="extras"
+            tableType="resources"
             pageType="dashboard"
             pageSize={10}
             adminActions={adminActions}

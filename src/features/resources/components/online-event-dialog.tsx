@@ -1,9 +1,11 @@
-import type { ExtrasType } from "@/schemas/admin";
+import { onlineEventLocationOptions } from "@/constants/resourcesConsts";
+
+import type { ResourcesType } from "@/schemas/admin";
 import type { User } from "@/types/user";
 import type { ReactNode } from "react";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { extrasSchema } from "@/schemas/admin";
+import { resourcesSchema } from "@/schemas/admin";
 import { getExternalRedirectHtml } from "@/utils/loading-page-html";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -48,12 +50,6 @@ import { useDevice } from "@/providers/device-provider";
 import { api } from "~/convex/_generated/api";
 import { useQuery } from "convex-helpers/react/cache";
 import { useMutation, usePreloadedQuery } from "convex/react";
-
-const onlineEventLocationOptions = [
-  { value: "google meet", label: "Google Meet" },
-  { value: "zoom", label: "Zoom" },
-  { value: "discord", label: "Discord" },
-];
 
 type OnlineEventDialogProps = {
   children: ReactNode;
@@ -136,8 +132,8 @@ export const OnlineEventDialog = ({
     [user?._id, type, isAdmin],
   );
 
-  const form = useForm<ExtrasType>({
-    resolver: zodResolver(extrasSchema),
+  const form = useForm<ResourcesType>({
+    resolver: zodResolver(resourcesSchema),
     defaultValues,
     mode: "onChange",
     delayError: 1000,
@@ -163,10 +159,8 @@ export const OnlineEventDialog = ({
 
   const startDateVal = formData.startDate;
   const regDeadlineVal = formData.regDeadline;
-  // const result = extrasSchema.safeParse(formData);
-  // console.log(result);
-  // console.log(formData);
-  const handleUpdate = async (data: ExtrasType) => {
+
+  const handleUpdate = async (data: ResourcesType) => {
     try {
       if (!user) throw new Error("User not found");
       setPending(true);
@@ -211,7 +205,7 @@ export const OnlineEventDialog = ({
           return;
         }
         const slug = slugify(data.name, { lower: true, strict: true });
-        const url = `/extras/${slug}`;
+        const url = `/resources/${slug}`;
         newTab.document.write(
           getExternalRedirectHtml(url, 2, `the ${data.name} Event`),
         );
@@ -573,7 +567,7 @@ export const OnlineEventDialog = ({
                         className="w-full"
                       /> */}
                       <SelectSimple
-                        options={onlineEventLocationOptions}
+                        options={[...onlineEventLocationOptions]}
                         value={field.value}
                         onChangeAction={(value) => field.onChange(value)}
                         placeholder="Select location"

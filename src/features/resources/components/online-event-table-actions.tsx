@@ -3,7 +3,7 @@
 import {
   onlineEventCategories,
   registrationStatusOptions,
-} from "@/constants/extrasConsts";
+} from "@/constants/resourcesConsts";
 
 import { toast } from "react-toastify";
 
@@ -68,7 +68,7 @@ export const OnlineEventStatusBtn = ({
 
 export const GoToOnlineEvent = ({ slug, children }: OnlineEventLinkProps) => {
   return (
-    <Link variant="standard" href={`/extras/${slug}`}>
+    <Link variant="standard" href={`/resources/${slug}`}>
       <Button variant="ghost">{children}</Button>
     </Link>
   );

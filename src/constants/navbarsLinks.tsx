@@ -9,16 +9,22 @@ export const landingPageNavbarMenuLinksResources: {
   isIcon?: boolean;
   sub: string[];
 }[] = [
+  // {
+  //   title: "For Artists",
+  //   href: "/resources/artists",
+  //   description: "Resources compiled for artists.",
+  //   sub: ["all"],
+  // },
+  // {
+  //   title: "For Organizers",
+  //   href: "/resources/organizers",
+  //   description: "Resources compiled for organizers.",
+  //   sub: ["all"],
+  // },
   {
-    title: "For Artists",
-    href: "/resources/artists",
+    title: "Current Events",
+    href: "/resources",
     description: "Resources compiled for artists.",
-    sub: ["all"],
-  },
-  {
-    title: "For Organizers",
-    href: "/resources/organizers",
-    description: "Resources compiled for organizers.",
     sub: ["all"],
   },
   // {

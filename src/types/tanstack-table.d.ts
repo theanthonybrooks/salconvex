@@ -23,7 +23,7 @@ export const tableTypes = [
   "hidden",
   "newsletter",
   "artists",
-  "extras",
+  "resources",
   "userAddOns",
 ] as const;
 

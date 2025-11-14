@@ -6,7 +6,7 @@ import { supportCategoryValidator } from "@/constants/supportConsts";
 
 import { z } from "zod";
 
-export const extrasSchema = z.object({
+export const resourcesSchema = z.object({
   name: z.string().min(3, "Name is required"),
   img: z.string().optional(),
   description: z.string().min(10, "Description is required"),
@@ -32,7 +32,7 @@ export const extrasSchema = z.object({
   //   createdAt: z.number(),
 });
 
-export type ExtrasType = z.infer<typeof extrasSchema>;
+export type ResourcesType = z.infer<typeof resourcesSchema>;
 
 export const kanbanCardSchema = z.object({
   title: z.string().min(3, "Title is required"),

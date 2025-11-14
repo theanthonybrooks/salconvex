@@ -275,7 +275,6 @@ export const subscriptionStoreWebhook = mutation({
     body: v.any(),
   },
   handler: async (ctx, args) => {
-    // Extract event type from webhook payload
     let eventType = args.body.type;
     let createdTimestamp: number | undefined =
       args.body.data.created ?? args.body.data.object.created;

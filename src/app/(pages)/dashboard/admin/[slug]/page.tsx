@@ -60,8 +60,8 @@ export default async function AdminPage({
       return <AdminDashboardTableWrapper page="applications" />;
     case "newsletter":
       return <AdminDashboardTableWrapper page="newsletter" />;
-    case "extras":
-      return <AdminDashboardTableWrapper page="extras" />;
+    case "resources":
+      return <AdminDashboardTableWrapper page="resources" />;
     default:
       redirect("/dashboard/admin");
   }

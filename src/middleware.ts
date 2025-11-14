@@ -29,6 +29,12 @@ export default convexAuthNextjsMiddleware(
       return NextResponse.next();
     }
 
+    // redirect /extras/... → /resources/...
+    if (pathname.includes("/extras/")) {
+      const target = pathname.replace("/extras/", "/resources/");
+      return NextResponse.redirect(new URL(target, request.url));
+    }
+
     const userAgent = request.headers.get("user-agent") || "";
     const ua = new UAParser(userAgent).getResult();
 

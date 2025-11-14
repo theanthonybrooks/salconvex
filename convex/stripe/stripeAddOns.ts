@@ -139,7 +139,7 @@ export const createStripeAddOnCheckoutSession = action({
           mode: "payment",
           subscription_data: {},
           //TODO: set this to the event page or some sort of confirmation page
-          success_url: `${process.env.FRONTEND_URL}/extras/${event.slug}`,
+          success_url: `${process.env.FRONTEND_URL}/resources/${event.slug}`,
           cancel_url: `${process.env.FRONTEND_URL}/pricing`,
           metadata: metadata,
           client_reference_id: metadata.userId,

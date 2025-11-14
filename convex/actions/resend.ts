@@ -709,7 +709,7 @@ export const sendEventRegistrationEmail = internalAction({
                         style="padding:40px; text-align:center;"
                       >
                         <img
-                          src="https://thestreetartlist.com/branding/extras/extras-heading-update.png"
+                          src="https://thestreetartlist.com/branding/resources/extras-heading.png"
                           alt="The Street Art List"
                           width="300"
                           style="display:block; margin:0 auto; padding-bottom:20px;"
@@ -754,7 +754,7 @@ export const sendEventRegistrationEmail = internalAction({
 
                         <p>
                           Registration update link: (<a
-                            href="https://thestreetartlist.com/extras/${eventData.slug}"
+                            href="https://thestreetartlist.com/resources/${eventData.slug}"
                             target="_blank"
                             style="color:black; text-decoration:none; font-weight:bold;"
                             >here</a

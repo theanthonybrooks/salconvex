@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { notFound } from "next/navigation";
-import { CheckoutPage } from "@/app/(pages)/extras/components/checkoutPage";
+import { CheckoutPage } from "@/app/(pages)/resources/components/checkoutPage";
 import { capitalize } from "lodash";
 
 import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
@@ -29,7 +29,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       : null;
 
     if (!result?.data || !result) {
-      return { title: "Extras - Online Event Not Found" };
+      return { title: "Resources - Online Event Not Found" };
     }
 
     return {

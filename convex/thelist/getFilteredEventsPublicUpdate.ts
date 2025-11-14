@@ -615,7 +615,6 @@ export const getFilteredEventsPublic = query({
     }
     //TODO: Add back the other filters before the rest of this runs. Can also limit the queries here for the thisweek and public open call page?
 
-    // Now extract the eventIds from the lookup table
     const eventIds = lookupResults
       .map((r) => r.eventId)
       .filter(Boolean) as Id<"events">[];

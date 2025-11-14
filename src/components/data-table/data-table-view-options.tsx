@@ -13,8 +13,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { extrasColumnLabels } from "@/features/admin/dashboard/extras-column";
 import { newsletterColumnLabels } from "@/features/admin/dashboard/newsletter-columns";
+import { resourcesColumnLabels } from "@/features/admin/dashboard/resources-column";
 import { userColumnLabels } from "@/features/admin/dashboard/user-columns";
 import { userAddOnColumnLabels } from "@/features/admin/dashboard/userAddon-columns";
 import { applicationColumnLabels } from "@/features/artists/applications/components/events-data-table/application-columns";
@@ -36,7 +36,7 @@ const labelMaps: Record<string, Record<string, string>> = {
   users: userColumnLabels,
   newsletter: newsletterColumnLabels,
   userAddOns: userAddOnColumnLabels,
-  extras: extrasColumnLabels,
+  resources: resourcesColumnLabels,
 };
 
 export function DataTableViewOptions<TData>({

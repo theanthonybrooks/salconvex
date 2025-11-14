@@ -62,6 +62,16 @@ export async function sendEventRegistrationEmailHelper(
   );
 }
 
+export const getPublishedOnlineEvents = query({
+  handler: async (ctx) => {
+    const events = await ctx.db.query("onlineEvents").collect();
+    if (!events) return { success: true, data: [], message: "No events found" };
+    const filtered = events.filter((e) => e.state !== "draft");
+
+    return { success: true, data: filtered, message: "Success" };
+  },
+});
+
 export const getAllOnlineEvents = query({
   handler: async (ctx) => {
     let totalEvents = 0;
@@ -236,6 +246,34 @@ export const createOnlineEvent = mutation({
       state: args.state ?? "draft",
     });
     return event;
+  },
+});
+
+export const duplicateOnlineEvent = mutation({
+  args: {
+    eventId: v.id("onlineEvents"),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new ConvexError("Not authenticated");
+    const event = await ctx.db.get(args.eventId);
+    if (!event) throw new ConvexError("Event not found");
+    const { _id, _creationTime, ...eventData } = event;
+
+    const duplicateEvent = await ctx.db.insert("onlineEvents", {
+      ...eventData,
+      startDate: Date.now(),
+      endDate: Date.now(),
+      regDeadline: Date.now(),
+      capacity: {
+        ...event.capacity,
+        current: 0,
+      },
+      organizer: userId,
+      state: "draft",
+    });
+
+    return duplicateEvent;
   },
 });
 

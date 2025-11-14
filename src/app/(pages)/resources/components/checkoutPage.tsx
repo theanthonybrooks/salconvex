@@ -37,7 +37,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/state-accordion-test";
-import { OnlineEventDialog } from "@/features/extras/components/online-event-dialog";
+import { OnlineEventDialog } from "@/features/resources/components/online-event-dialog";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { generateGeneralICSFile } from "@/helpers/addToCalendar";
 import { autoHttps } from "@/helpers/linkFns";
@@ -174,7 +174,6 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
     weekday: "short",
     month: "short",
     day: "numeric",
-    year: "numeric",
   });
   const endTimePart = endDate.toLocaleTimeString("en-US", {
     hour: "numeric",
@@ -394,7 +393,7 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
                   <Pencil className="size-4" />
                 </Button>
               </OnlineEventDialog>
-              <Link href="/dashboard/admin/extras" target="_blank">
+              <Link href="/dashboard/admin/resources" target="_blank">
                 <Button
                   variant="outline"
                   className="flex items-center gap-2 border-foreground/30 p-0 px-2 hover:cursor-pointer hover:bg-white/70 active:scale-90"
@@ -524,7 +523,10 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
                   size="lg"
                   className="w-full flex-1"
                   onClick={() => {
-                    localStorage.setItem("login_redirect", `/extras/${slug}`);
+                    localStorage.setItem(
+                      "login_redirect",
+                      `/resources/${slug}`,
+                    );
                     router.push("/auth/sign-in");
                   }}
                   fontSize={fontSize}
@@ -537,7 +539,10 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
                   size="lg"
                   className="w-full flex-1"
                   onClick={() => {
-                    localStorage.setItem("login_redirect", `/extras/${slug}`);
+                    localStorage.setItem(
+                      "login_redirect",
+                      `/resources/${slug}`,
+                    );
                     router.push("/auth/register");
                   }}
                   fontSize={fontSize}

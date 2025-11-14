@@ -1,3 +1,5 @@
+import type { OnlineEventLocation } from "@/types/resourceTypes";
+
 import {
   CheckCircle,
   CheckIcon,
@@ -8,6 +10,17 @@ import {
 } from "lucide-react";
 
 import type { OnlineEventStateType, UserAddOnStatus } from "~/convex/schema";
+
+export const onlineEventLocationOptions = [
+  { value: "google meet", label: "Google Meet" },
+  { value: "zoom", label: "Zoom" },
+  { value: "discord", label: "Discord" },
+] as const;
+
+export const isOnlineEventLocation = (
+  value: string,
+): value is OnlineEventLocation =>
+  onlineEventLocationOptions.some((opt) => opt.value === value);
 
 export const onlineEventCategories = [
   {

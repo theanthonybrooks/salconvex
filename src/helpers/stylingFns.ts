@@ -12,6 +12,8 @@
 //       return "";
 //   }
 
+import { capitalize } from "lodash";
+
 import { FontSizeType } from "~/convex/schema";
 
 // }
@@ -22,6 +24,13 @@ type FontPref = {
   tiny: string;
   pref: NonNullable<FontSizeType>;
 };
+
+export function capitalizeWords(value: string): string {
+  return value
+    .split(" ")
+    .map((word) => capitalize(word))
+    .join(" ");
+}
 
 export function getUserFontSizePref(pref?: FontSizeType): FontPref | null {
   if (!pref)

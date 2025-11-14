@@ -1,7 +1,7 @@
 "use client";
 
 import { eventTypeOptions } from "@/constants/eventConsts";
-import { onlineEventCategories } from "@/constants/extrasConsts";
+import { onlineEventCategories } from "@/constants/resourcesConsts";
 
 import type { DataTableFacetedFilterOption } from "@/components/data-table/data-table-faceted-filter";
 import type { PageTypes, TableTypes } from "@/types/tanstack-table";
@@ -340,7 +340,7 @@ interface FilterConfig {
 type TableFilterConfig = Record<TableTypes, FilterConfig[]>;
 
 export const TABLE_FILTERS: TableFilterConfig = {
-  extras: [
+  resources: [
     { columnId: "state", title: "Status", options: onlineEventCategories },
   ],
   userAddOns: [

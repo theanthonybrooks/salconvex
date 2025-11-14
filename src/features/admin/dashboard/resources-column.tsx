@@ -9,16 +9,20 @@ import { Check, Pencil } from "lucide-react";
 import type { OnlineEventStateType } from "~/convex/schema";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 import { Button } from "@/components/ui/button";
-import { OnlineEventDialog } from "@/features/extras/components/online-event-dialog";
+import {
+  DeleteEventBtn,
+  DuplicateEventBtn,
+} from "@/features/admin/dashboard/components/admin-resource-actions";
+import { OnlineEventDialog } from "@/features/resources/components/online-event-dialog";
 import {
   GoToOnlineEvent,
   OnlineEventStatusBtn,
-} from "@/features/extras/components/online-event-table-actions";
+} from "@/features/resources/components/online-event-table-actions";
 import { cn } from "@/helpers/utilsFns";
 
 import { Id } from "~/convex/_generated/dataModel";
 
-export const extrasColumnLabels: Record<string, string> = {
+export const resourcesColumnLabels: Record<string, string> = {
   name: "Name",
   state: "Status",
   img: "Image",
@@ -34,7 +38,7 @@ export const extrasColumnLabels: Record<string, string> = {
   requirements: "Requirements",
 };
 
-interface ExtraColumnsProps {
+interface ResourceColumnsProps {
   _id: Id<"onlineEvents">;
   name: string;
   img?: string;
@@ -56,7 +60,7 @@ interface ExtraColumnsProps {
   state: OnlineEventStateType;
 }
 
-export const extraColumns: ColumnDef<ExtraColumnsProps>[] = [
+export const resourceColumns: ColumnDef<ResourceColumnsProps>[] = [
   {
     accessorKey: "rowNumber",
     id: "rowNumber",
@@ -68,7 +72,6 @@ export const extraColumns: ColumnDef<ExtraColumnsProps>[] = [
           className="text-center text-sm text-muted-foreground"
           onClick={() => {
             row.toggleSelected();
-            console.log(row.original._id);
           }}
         >
           {row.index + 1}
@@ -360,8 +363,8 @@ export const extraColumns: ColumnDef<ExtraColumnsProps>[] = [
   {
     id: "actions",
 
-    maxSize: 40,
-    minSize: 40,
+    maxSize: 120,
+    minSize: 120,
     enableResizing: false,
     cell: ({ row }) => {
       const event = row.original;
@@ -371,7 +374,7 @@ export const extraColumns: ColumnDef<ExtraColumnsProps>[] = [
       // console.log(table.options)
 
       return (
-        <div className={cn("flex justify-center")}>
+        <div className={cn("flex justify-center gap-0.5")}>
           <OnlineEventDialog eventId={event._id}>
             <Button
               variant="outline"
@@ -381,6 +384,8 @@ export const extraColumns: ColumnDef<ExtraColumnsProps>[] = [
               <Pencil className="size-4" />
             </Button>
           </OnlineEventDialog>
+          <DuplicateEventBtn eventId={event._id} />
+          <DeleteEventBtn eventId={event._id} />
         </div>
       );
     },

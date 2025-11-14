@@ -403,47 +403,45 @@ export default function NavBar(
               >
                 <NavigationMenu delayDuration={Infinity}>
                   <NavigationMenuList className="gap-2">
-                    {isAdmin && (
-                      <NavigationMenuItem>
-                        <NavigationMenuTrigger
-                          isCurrent={isActiveResources}
-                          className={cn(
-                            "hidden border-2 border-transparent bg-transparent hover:border-foreground/70 data-[state=open]:border-foreground xl:flex",
-                            // homePage && "bg-transparent",
-                            isActiveResources && activeMainItemClasses,
-                          )}
-                          onPointerMove={(event) => event.preventDefault()}
-                          onPointerLeave={(event) => event.preventDefault()}
-                        >
-                          Resources
-                        </NavigationMenuTrigger>
-                        <NavigationMenuContent
-                          onPointerEnter={(event) => event.preventDefault()}
-                          onPointerLeave={(event) => event.preventDefault()}
-                        >
-                          <div className="flex w-[400px] flex-col gap-1 p-3 lg:w-max xl:max-w-[700px]">
-                            {filteredNavbarMenuResources.map((component) => {
-                              const activeLink =
-                                component.href.includes(currentPage) &&
-                                pathname === component.href;
-                              return (
-                                <ListItem
-                                  key={component.title}
-                                  title={component.title}
-                                  href={component.href}
-                                  activeItem={activeLink}
-                                  className={cn(
-                                    "cursor-pointer text-balance transition-colors duration-200 ease-in-out",
-                                  )}
-                                >
-                                  {/* {component.description} */}
-                                </ListItem>
-                              );
-                            })}
-                          </div>
-                        </NavigationMenuContent>
-                      </NavigationMenuItem>
-                    )}
+                    <NavigationMenuItem>
+                      <NavigationMenuTrigger
+                        isCurrent={isActiveResources}
+                        className={cn(
+                          "hidden border-2 border-transparent bg-transparent hover:border-foreground/70 data-[state=open]:border-foreground xl:flex",
+                          // homePage && "bg-transparent",
+                          isActiveResources && activeMainItemClasses,
+                        )}
+                        onPointerMove={(event) => event.preventDefault()}
+                        onPointerLeave={(event) => event.preventDefault()}
+                      >
+                        Resources
+                      </NavigationMenuTrigger>
+                      <NavigationMenuContent
+                        onPointerEnter={(event) => event.preventDefault()}
+                        onPointerLeave={(event) => event.preventDefault()}
+                      >
+                        <div className="flex w-[400px] flex-col gap-1 p-3 lg:w-max xl:max-w-[700px]">
+                          {filteredNavbarMenuResources.map((component) => {
+                            const activeLink =
+                              component.href.includes(currentPage) &&
+                              pathname === component.href;
+                            return (
+                              <ListItem
+                                key={component.title}
+                                title={component.title}
+                                href={component.href}
+                                activeItem={activeLink}
+                                className={cn(
+                                  "cursor-pointer text-balance transition-colors duration-200 ease-in-out",
+                                )}
+                              >
+                                {/* {component.description} */}
+                              </ListItem>
+                            );
+                          })}
+                        </div>
+                      </NavigationMenuContent>
+                    </NavigationMenuItem>
                   </NavigationMenuList>
                 </NavigationMenu>
                 <NavigationMenu delayDuration={Infinity}>

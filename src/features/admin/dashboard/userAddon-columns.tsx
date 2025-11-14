@@ -9,7 +9,7 @@ import {
   UpdateOrder,
   UpdateRegistrationStatus,
   ViewNotes,
-} from "@/features/extras/components/online-event-table-actions";
+} from "@/features/resources/components/online-event-table-actions";
 
 import { Id } from "~/convex/_generated/dataModel";
 
