@@ -380,6 +380,10 @@ const PricingCard = ({
   const isEligibleForFree = (isOrganizer && hadFreeCall === false) || !user;
   const hadTrial = subscription?.hadTrial;
   const userSubPriceId = subscription?.stripePriceId;
+  const userInterval = subscription?.interval;
+  const sameInterval =
+    (isYearly && userInterval === "year") ||
+    (!isYearly && userInterval === "month");
   const isCurrentUserPlan =
     typeof stripePriceId === "string" &&
     typeof userSubPriceId === "string" &&
@@ -420,7 +424,8 @@ const PricingCard = ({
         },
         activeSub &&
           !isCurrentUserPlan &&
-          "opacity-75 grayscale hover:opacity-100 hover:grayscale-0",
+          sameInterval &&
+          "scale-90 transition-transform duration-200 ease-in-out hover:scale-100",
         isOrganizer && "self-start",
         isCurrentUserPlan && "border-3",
         // isFree && "self-start",
