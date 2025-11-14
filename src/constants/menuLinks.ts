@@ -59,7 +59,7 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
       // {
       //   title: "Archive",
       //   // path: "/archive",
-      //   path: "https://thestreetartlist.helioho.st/archive",
+      //   path: "https://archive.thestreetartlist.com/archive",
       //   category: "thelist",
       //   public: true,
       //   userType: ["public"],
@@ -67,7 +67,7 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
       // },
       {
         title: "World Map",
-        path: "https://thestreetartlist.helioho.st/map",
+        path: "https://archive.thestreetartlist.com/map",
         category: "thelist",
         public: true,
         userType: ["public"],

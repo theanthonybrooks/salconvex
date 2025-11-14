@@ -66,10 +66,10 @@ export default async function HomeLayout({
   const isAdmin = user?.role?.includes("admin");
 
   if (pathname === "/map" && !isAdmin) {
-    redirect("https://thestreetartlist.helioho.st/map");
+    redirect("https://archive.thestreetartlist.com/map");
   }
   if (pathname === "/archive" && !isAdmin) {
-    redirect("https://thestreetartlist.helioho.st/archive");
+    redirect("https://archive.thestreetartlist.com/archive");
   }
 
   return (

@@ -1,5 +1,7 @@
 import type { AdminActionType } from "@/types/tanstack-table";
 
+import { InfoIcon } from "lucide-react";
+
 import type { Id } from "~/convex/_generated/dataModel";
 import { ResponsiveDataTable } from "@/components/data-table/data-table-wrapper";
 import { Button } from "@/components/ui/button";
@@ -71,13 +73,16 @@ export const StaffPage = ({ orgId, adminActions, isOwner }: StaffPageProps) => {
       {isAdmin && (
         <div
           className={cn(
-            "mx-auto mb-8 max-w-[90%] rounded-lg border-1.5 border-dashed border-foreground/20 bg-salYellowLtHover px-8 py-6 text-sm",
+            "mx-auto mb-8 flex max-w-[90%] items-center gap-x-5 rounded-lg border-1.5 border-dashed border-foreground/20 bg-salYellowLtHover px-8 py-6 text-sm",
           )}
         >
-          <p className="font-bold">Admin note:</p>
-          Should have ability to view current members, a way to generate an
-          invite link to add new members, a way to remove members, and a way to
-          reassign an organization to a new owner (should be admin only).
+          <InfoIcon className="size-10 shrink-0" />
+          <span>
+            <p className="font-bold">Admin note:</p>
+            Should have ability to view current members, a way to generate an
+            invite link to add new members, a way to remove members, and a way
+            to reassign an organization to a new owner (should be admin only).
+          </span>
         </div>
       )}
     </div>

@@ -164,7 +164,7 @@ export const theListNavbarMenuLinks: {
   {
     title: "World Map - (Old Site)",
     // href: "/map",
-    href: "https://thestreetartlist.helioho.st/map",
+    href: "https://archive.thestreetartlist.com/map",
     description: "Map of all street art fests, mural projects, etc",
     sub: ["all"],
   },
@@ -172,7 +172,7 @@ export const theListNavbarMenuLinks: {
   {
     title: "The Archive - (Old Site)",
     // href: "/archive",
-    href: "https://thestreetartlist.helioho.st/archive",
+    href: "https://archive.thestreetartlist.com/archive",
     description: "Archive of all events - past and current",
     sub: ["all"],
   },
