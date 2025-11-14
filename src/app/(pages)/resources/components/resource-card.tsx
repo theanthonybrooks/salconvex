@@ -28,6 +28,7 @@ export type ResourceCardProps = Pick<
   | "location"
   | "startDate"
   | "endDate"
+  | "regDeadline"
   | "_creationTime"
 > & {
   type: "online" | "other";
@@ -42,6 +43,7 @@ export const ResourceCard = ({
   location,
   startDate: startDateNum,
   endDate: endDateNum,
+  regDeadline: regDeadlineNum,
   _creationTime: createdAt,
   type,
 }: ResourceCardProps) => {
@@ -50,6 +52,7 @@ export const ResourceCard = ({
   const fullWarning = max - current <= 3;
   const full = max === current;
   const newEvent = createdAt > now - 1000 * 60 * 60 * 24 * 7;
+  const regPast = now > regDeadlineNum;
   const startDate = new Date(startDateNum);
   const endDate = new Date(endDateNum);
   const datePart = startDate.toLocaleDateString("en-US", {
@@ -89,6 +92,7 @@ export const ResourceCard = ({
           full={full}
           newEvent={newEvent}
           past={eventHasPassed}
+          regPast={regPast}
         />
         {type === "online" && (
           <TooltipSimple content="Online Event">
@@ -148,16 +152,23 @@ type CardBadgeProps = {
   full: boolean;
   newEvent: boolean;
   past: boolean;
+  regPast: boolean;
 };
 
-const CardBadge = ({ fullWarning, full, newEvent, past }: CardBadgeProps) => {
+const CardBadge = ({
+  fullWarning,
+  full,
+  newEvent,
+  past,
+  regPast,
+}: CardBadgeProps) => {
   let label: string | null = null;
   let style = "";
 
   if (past) {
     label = "Ended";
     style = "bg-foreground/10";
-  } else if (full || fullWarning) {
+  } else if ((full || fullWarning) && !regPast) {
     label = full ? "Fully Booked" : "Almost Full";
     style = "bg-salPinkLt";
   } else if (newEvent) {
