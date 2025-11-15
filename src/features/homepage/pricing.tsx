@@ -425,7 +425,7 @@ const PricingCard = ({
         activeSub &&
           !isCurrentUserPlan &&
           sameInterval &&
-          "scale-90 transition-transform duration-200 ease-in-out hover:scale-100",
+          "scale-90 transition-transform duration-500 ease-in-out hover:scale-100",
         isOrganizer && "self-start",
         isCurrentUserPlan && "border-3",
         // isFree && "self-start",
