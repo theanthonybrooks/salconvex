@@ -36,9 +36,18 @@ export interface MapboxSuggestion {
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
 const getContinentLabel = (country: Country): string | null => {
+  // console.log({
+  //   name: country.name.common,
+  //   // region: country.region,
+  //   // subregion: country.subregion,
+  //   country,
+  // });
+
   if (
+    country.subregion === "South America" ||
     country.subregion === "North America" ||
-    country.subregion === "South America"
+    country.subregion === "Caribbean" ||
+    country.subregion === "Central America"
   ) {
     return country.subregion;
   }
@@ -52,7 +61,7 @@ const getContinentLabel = (country: Country): string | null => {
 
 // Filter, group, and sort countries
 const groupedCountries: Record<string, Country[]> = rawCountries
-  .filter((country) => country.region !== "Antarctica")
+  .filter((country) => country.region !== "Antarctic")
   .reduce(
     (acc, country) => {
       const group = getContinentLabel(country);

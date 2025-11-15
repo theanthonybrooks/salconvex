@@ -9,6 +9,7 @@ import { Organizer } from "@/types/organizer";
 
 import slugify from "slugify";
 
+import type { Doc } from "~/convex/_generated/dataModel";
 import type { PrimaryContact } from "~/convex/schema";
 
 import { getAuthUserId } from "@convex-dev/auth/server";
@@ -640,7 +641,7 @@ export const getUserOrganizations = query({
     if (user?.role.includes("admin")) {
       // const all = await ctx.db.query("organizations").collect();
       // return all.filter(filterFn);
-      const all =
+      const allOrgs =
         trimmedQuery === ""
           ? await ctx.db
               .query("organizations")
@@ -651,14 +652,44 @@ export const getUserOrganizations = query({
               .query("organizations")
               .withSearchIndex("search_by_slug", (q) => q.search("slug", slug))
               .collect();
-
-      const filteredResults =
+      const filteredOrgs =
         args.query.trim().length > 0
-          ? all.filter((org) =>
+          ? allOrgs.filter((org) =>
               org.name.toLowerCase().includes(args.query?.toLowerCase()),
             )
-          : all;
-      return { data: filteredResults, success: true, error: null };
+          : allOrgs;
+      let allEventOrgs: Doc<"organizations">[] = [];
+      if (trimmedQuery.length > 0) {
+        const events = await ctx.db
+          .query("events")
+          .withSearchIndex("search_by_name", (q) =>
+            q.search("name", args.query),
+          )
+          .collect();
+
+        const filteredEvents = events.filter((event) =>
+          event.name.toLowerCase().includes(args.query?.toLowerCase()),
+        );
+        const eventMainOrgs = Array.from(
+          new Set(filteredEvents.map((event) => event.mainOrgId)),
+        );
+        const eventOrgResults = await Promise.all(
+          eventMainOrgs.map(async (orgId) => {
+            const org = await ctx.db.get(orgId);
+            return org;
+          }),
+        );
+
+        allEventOrgs = eventOrgResults.filter(
+          (org): org is Doc<"organizations"> => org !== null,
+        );
+      }
+      const filteredResults = [...filteredOrgs, ...allEventOrgs];
+      const uniqueResults = Array.from(
+        new Map(filteredResults.map((org) => [org._id, org])).values(),
+      );
+
+      return { data: uniqueResults, success: true, error: null };
     } else {
       const orgs =
         trimmedQuery === ""

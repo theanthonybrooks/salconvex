@@ -406,7 +406,7 @@ const SubmissionFormOC1 = ({
                     onChange={field.onChange}
                     data={enhancedGroupedCountries}
                     placeholder="Select eligible nationalities"
-                    getItemLabel={(country) => country.name.common}
+                    getItemLabel={(country) => country?.name.common}
                     getItemValue={(country) => country.name.common}
                     displayLimit={isMobile ? 1 : 2}
                     enableGroupSelect

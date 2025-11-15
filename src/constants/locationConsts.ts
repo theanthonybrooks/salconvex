@@ -118,17 +118,23 @@ export const EuropeanCountries = [
 export const continentOrder = [
   "North America",
   "Europe",
+  "Caribbean",
+  "Central America",
   "South America",
   "Asia",
   "Oceania",
+  "Africa",
 ];
 
 export const select_continents = [
   { label: "Asia", value: "Asia" },
   { label: "Europe", value: "Europe" },
   { label: "North America", value: "North America" },
+  { label: "Caribbean", value: "Caribbean" },
+  { label: "Central America", value: "Central America" },
   { label: "Oceania", value: "Oceania" },
   { label: "South America", value: "South America" },
+  { label: "Africa", value: "Africa" },
 ];
 
 export const usRegions = {
