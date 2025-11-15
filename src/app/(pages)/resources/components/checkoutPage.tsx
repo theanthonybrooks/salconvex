@@ -42,7 +42,7 @@ import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-con
 import { generateGeneralICSFile } from "@/helpers/addToCalendar";
 import { autoHttps } from "@/helpers/linkFns";
 import { RichTextDisplay } from "@/helpers/richTextFns";
-import { capitalizeWords, getUserFontSizePref } from "@/helpers/stylingFns";
+import { getUserFontSizePref } from "@/helpers/stylingFns";
 import { cn } from "@/helpers/utilsFns";
 
 import { api } from "~/convex/_generated/api";
@@ -732,9 +732,7 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
                         name="link"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>
-                              {capitalizeWords(linkType ?? "")} Link
-                            </FormLabel>
+                            <FormLabel>{linkType} Link</FormLabel>
                             <FormControl>
                               <DebouncedControllerInput
                                 disabled={
@@ -762,8 +760,7 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>
-                              {capitalizeWords(notesDesc ?? "") ||
-                                "Intention/Goal"}
+                              {notesDesc || "Intention/Goal"}
                             </FormLabel>
                             <FormControl>
                               <DebouncedFormTextarea
