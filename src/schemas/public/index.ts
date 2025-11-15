@@ -45,50 +45,46 @@ export const newsletterUpdateSchema = z.object({
 
 export type NewsletterUpdateValues = z.infer<typeof newsletterUpdateSchema>;
 
-export const EventRegistrationSchema = z
-  .object({
-    email: z.email("Must be a valid email address"),
-    name: z.string().min(3, "Name is required"),
-    link: z.url(),
-    notes: z.string().optional(),
-    termsAgreement: z.boolean(),
-  })
-  .superRefine((data, ctx) => {
-    const link = data.link?.trim();
-    const parsed = z
-      .string()
-      .refine(
-        (val) => {
+export const getEventRegistrationSchema = (link?: boolean, notes?: boolean) => {
+  void notes;
+  return z
+    .object({
+      email: z.email("Must be a valid email address"),
+      name: z.string().min(3, "Name is required"),
+      link: link ? z.url() : z.string().optional(),
+      notes: z.string().optional(),
+      termsAgreement: z.boolean(),
+    })
+    .superRefine((data, ctx) => {
+      const link = data.link;
+
+      if (!link) return;
+
+      const parsed = z
+        .string()
+        .refine((val) => {
           try {
             const url = new URL(val);
-
-            // protocol must be http/https
             if (!["http:", "https:"].includes(url.protocol)) return false;
-
-            // reject credentials in the authority section
             if (url.username || url.password) return false;
-
-            // enforce strict domain pattern
             if (!domainRegex.test(url.hostname)) return false;
-
             return true;
           } catch {
             return false;
           }
-        },
-        {
-          message: "Must be a valid website URL (https://example.com)",
-        },
-      )
-      .safeParse(link);
+        })
+        .safeParse(link);
 
-    if (!parsed.success) {
-      ctx.addIssue({
-        code: "custom",
-        message: "Link must be a valid website URL (https://example.com)",
-        path: ["link"],
-      });
-    }
-  });
+      if (!parsed.success) {
+        ctx.addIssue({
+          code: "custom",
+          message: "Link must be a valid website URL (https://example.com)",
+          path: ["link"],
+        });
+      }
+    });
+};
 
-export type EventRegistrationValues = z.infer<typeof EventRegistrationSchema>;
+export type EventRegistrationValues = z.infer<
+  ReturnType<typeof getEventRegistrationSchema>
+>;

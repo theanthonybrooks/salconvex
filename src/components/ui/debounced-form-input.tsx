@@ -49,7 +49,8 @@ export function DebouncedControllerInput<
       //   shouldValidate: true,
       //   shouldDirty: true,
       // });
-      const normalized = transformed ?? undefined;
+      // const normalized = transformed ?? undefined;
+      const normalized = transformed ?? "";
 
       field.onChange(normalized);
       setLocalValue(transformed ?? "");

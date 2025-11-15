@@ -64,7 +64,6 @@ const SubmissionFormEventStep1 = ({
     formState: { errors, dirtyFields },
   } = useFormContext<EventOCFormValues>();
   // const currentValues = getValues();
-
   const [eventNameErrorValue, setEventNameErrorValue] = useState<string | null>(
     null,
   );
@@ -134,7 +133,7 @@ const SubmissionFormEventStep1 = ({
   const noEvent = noEventCategories.includes(category ?? "");
   const noProd = noProdCategories.includes(category ?? "");
   const hasProd = hasProductionCategories.includes(category) && !isOngoing;
-  const prodOnly = prodOnlyCategories.includes(category ?? "");
+  // const prodOnly = prodOnlyCategories.includes(category ?? "");
   const singleProdDate = prodDates?.length === 1;
 
   const eventDateFormatRequired = !!(
@@ -149,41 +148,11 @@ const SubmissionFormEventStep1 = ({
   );
 
   const prodSameAsEvent = eventData?.dates?.prodFormat === "sameAsEvent";
-  console.log(prodSameAsEvent, prodDatesFormat);
   const blankEventDates =
     eventDates?.[0]?.start === "" || eventDates?.[0]?.end === "";
   const orgData = watch("organization");
   const isAdmin = user?.role?.includes("admin") || false;
   const eventOnly = formType === 1;
-
-  // useEffect(() => {
-  //   if (noEvent && prodDatesFormat !== "noProd") {
-  //     setValue("event.dates.prodFormat", "noProd");
-  //     setValue("event.dates.prodDates", [{ start: "", end: "" }]);
-  //   }
-  // }, [noEvent, setValue, prodDatesFormat]);
-
-  useEffect(() => {
-    if (noProd) {
-      setValue("event.dates.eventFormat", "noEvent");
-      setValue("event.dates.eventDates", [{ start: "", end: "" }]);
-      setValue("event.dates.prodFormat", "yearRange");
-      setValue("event.dates.prodDates", [
-        { start: String(eventEdition), end: String(eventEdition) },
-      ]);
-    } else {
-      setValue("event.dates.prodFormat", "setDates");
-      //   setValue("event.dates.eventFormat", "");
-      setValue("event.dates.prodDates", [{ start: "", end: "" }]);
-    }
-  }, [noProd, setValue, eventEdition]);
-
-  useEffect(() => {
-    if (prodOnly) {
-      setValue("event.dates.eventFormat", "noEvent");
-      setValue("event.dates.eventDates", [{ start: "", end: "" }]);
-    }
-  }, [prodOnly, setValue]);
 
   useEffect(() => {
     if (formType === 1) {
@@ -208,6 +177,27 @@ const SubmissionFormEventStep1 = ({
       };
     }
   }, [eventNameValid, eventName, eventEdition, existingOrg]);
+
+  const handleCategoryChange = (value: EventCategory) => {
+    if (value === "event") {
+      setValue("event.dates.eventFormat", "setDates");
+      setValue("event.dates.eventDates", [{ start: "", end: "" }]);
+      setValue("event.dates.prodFormat", "");
+      setValue("event.dates.prodDates", [{ start: "", end: "" }]);
+    } else if (prodOnlyCategories.includes(value)) {
+      setValue("event.dates.eventFormat", "noEvent");
+      setValue("event.dates.eventDates", [{ start: "", end: "" }]);
+      setValue("event.dates.prodFormat", "");
+      setValue("event.dates.prodDates", [{ start: "", end: "" }]);
+    } else {
+      setValue("event.dates.eventFormat", "noEvent");
+      setValue("event.dates.eventDates", [{ start: "", end: "" }]);
+      setValue("event.dates.prodFormat", "yearRange");
+      setValue("event.dates.prodDates", [
+        { start: String(eventEdition), end: String(eventEdition) },
+      ]);
+    }
+  };
 
   return (
     <div
@@ -247,9 +237,10 @@ const SubmissionFormEventStep1 = ({
                     <SelectSimple
                       options={[...eventCategoryOptions]}
                       value={field.value}
-                      onChangeAction={(value) =>
-                        field.onChange(value as EventCategory)
-                      }
+                      onChangeAction={(value) => {
+                        field.onChange(value as EventCategory);
+                        handleCategoryChange(value as EventCategory);
+                      }}
                       placeholder="(select one)"
                       className="h-12 w-full border bg-card text-center text-base sm:h-[50px]"
                     />

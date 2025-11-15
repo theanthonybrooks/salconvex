@@ -114,6 +114,12 @@ export const OnlineEventDialog = ({
       name: "",
       img: "",
       description: "",
+      formOptions: {
+        link: false,
+        linkType: "",
+        notes: false,
+        notesDesc: "",
+      },
       location: isAdmin ? "google meet" : "",
       startDate: Date.now(),
       endDate: Date.now(),
@@ -148,6 +154,7 @@ export const OnlineEventDialog = ({
   } = form;
 
   const formData = watch();
+  const { link, notes } = formData.formOptions ?? {};
   const formReqs = formData.requirements;
   const formTerms = formData.terms;
   const organizer = formData.organizer;
@@ -329,16 +336,6 @@ export const OnlineEventDialog = ({
       }
     }
   }, [type, currentUser, user, organizerData, setValue, organizer]);
-
-  // useEffect(() => {
-  //   if (eventData) {
-  //     form.reset({
-  //       ...eventData,
-  //       requirements: eventData.requirements ?? [],
-  //       terms: eventData.terms ?? [],
-  //     });
-  //   }
-  // }, [eventData, form]);
 
   useEffect(() => {
     if (!open) {
@@ -612,23 +609,6 @@ export const OnlineEventDialog = ({
                   </FormItem>
                 )}
               />
-              {/* <FormField
-                control={form.control}
-                name="img"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="font-bold">Image</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        placeholder="Image URL"
-                        className="w-full"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              /> */}
 
               <FormItem className="col-span-6 mt-2 w-full">
                 <div className="flex items-center justify-between">
@@ -789,6 +769,143 @@ export const OnlineEventDialog = ({
                   )}
                 </div>
               </FormItem>
+              <section
+                className={cn(
+                  "relative col-span-full mt-2 grid w-full grid-cols-1 gap-x-6 rounded-lg border-1.5 border-dashed border-foreground/30 bg-card/40 p-3 pt-6 sm:grid-cols-[auto_1fr]",
+                )}
+              >
+                <p className="absolute -top-4 left-1/2 -translate-x-1/2 rounded-full border border-foreground/50 bg-card px-3 py-1 text-sm">
+                  Form Options:
+                </p>
+                <section className="flex flex-col gap-2">
+                  <div className="flex gap-2">
+                    <FormField
+                      control={form.control}
+                      name="formOptions.link"
+                      render={({ field }) => (
+                        <FormItem className="flex items-center gap-2 space-y-0">
+                          <FormControl>
+                            <Checkbox
+                              className="text-base"
+                              tabIndex={3}
+                              checked={field.value}
+                              onCheckedChange={(checked) =>
+                                field.onChange(checked)
+                              }
+                            />
+                          </FormControl>
+                          <FormLabel className="font-bold hover:cursor-pointer">
+                            Link
+                          </FormLabel>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    {link && (
+                      <FormField
+                        control={form.control}
+                        name="formOptions.linkType"
+                        render={({ field }) => (
+                          <FormItem className="col-start-2 flex items-center gap-2 space-y-0">
+                            <FormLabel className="font-bold">+ Type:</FormLabel>
+                            <FormControl>
+                              <DebouncedControllerInput
+                                field={field}
+                                type="text"
+                                className="h-8 w-30 rounded border-gray-300 bg-card"
+                                debounceMs={50}
+                                maxLength={40}
+                                tabIndex={3}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    )}
+                  </div>
+                  <div className="flex gap-2">
+                    <FormField
+                      control={form.control}
+                      name="formOptions.notes"
+                      render={({ field }) => (
+                        <FormItem className="flex items-center gap-2 space-y-0">
+                          <FormControl>
+                            <Checkbox
+                              className="text-base"
+                              tabIndex={3}
+                              checked={field.value}
+                              onCheckedChange={(checked) =>
+                                field.onChange(checked)
+                              }
+                            />
+                          </FormControl>
+                          <FormLabel className="font-bold hover:cursor-pointer">
+                            Notes
+                          </FormLabel>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {notes && (
+                      <FormField
+                        control={form.control}
+                        name="formOptions.notesDesc"
+                        render={({ field }) => (
+                          <FormItem className="col-start-2 flex items-center gap-2 space-y-0">
+                            <FormLabel className="font-bold">
+                              + Title:
+                            </FormLabel>
+                            <FormControl>
+                              <DebouncedControllerInput
+                                field={field}
+                                type="text"
+                                className="h-8 w-30 rounded border-gray-300 bg-card"
+                                debounceMs={50}
+                                maxLength={40}
+                                tabIndex={3}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    )}
+                  </div>
+                </section>
+                {notes && (
+                  <FormField
+                    control={form.control}
+                    name="formOptions.notesPlaceholder"
+                    render={({ field }) => {
+                      const isEmpty = field.value?.trim().length === 0;
+                      return (
+                        <FormItem className="">
+                          <FormLabel className="font-bold">
+                            Notes Placeholder
+                          </FormLabel>
+                          <FormControl>
+                            <DebouncedFormTextarea
+                              field={field}
+                              maxLength={300}
+                              placeholder="What would you like for the notes placeholder to say?"
+                              className={cn(
+                                "max-h-15 min-h-10 w-full resize-none",
+                                isEmpty && "h-10",
+                              )}
+                              containerClassName={cn(
+                                "rounded-lg border-gray-300 bg-card",
+                              )}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      );
+                    }}
+                  />
+                )}
+              </section>
               <FormField
                 control={form.control}
                 name="organizerBio"

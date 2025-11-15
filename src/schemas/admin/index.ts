@@ -6,31 +6,55 @@ import { supportCategoryValidator } from "@/constants/supportConsts";
 
 import { z } from "zod";
 
-export const resourcesSchema = z.object({
-  name: z.string().min(3, "Name is required"),
-  img: z.string().optional(),
-  description: z.string().min(10, "Description is required"),
-  location: z.string().min(3, "Location is required"),
-  startDate: z.number(),
-  endDate: z.number(),
-  regDeadline: z.number(),
-  price: z.number(),
-  capacity: z.object({
-    max: z.number(),
-    current: z.number().optional(),
-  }),
-  organizer: z.string(),
-  organizerBio: z.string(),
-  terms: z
-    .array(z.string().trim().min(1, "Term cannot be empty"))
-    .min(1, "At least one term is required"),
-  requirements: z
-    .array(z.string().trim().min(1, "Requirement cannot be empty"))
-    .min(1, "At least one requirement is required"),
+export const resourcesSchema = z
+  .object({
+    name: z.string().min(3, "Name is required"),
+    img: z.string().optional(),
+    description: z.string().min(10, "Description is required"),
+    formOptions: z.object({
+      link: z.boolean(),
+      linkType: z.string(),
+      notes: z.boolean(),
+      notesDesc: z.string(),
+      notesPlaceholder: z.string(),
+    }),
+    location: z.string().min(3, "Location is required"),
+    startDate: z.number(),
+    endDate: z.number(),
+    regDeadline: z.number(),
+    price: z.number(),
+    capacity: z.object({
+      max: z.number(),
+      current: z.number().optional(),
+    }),
+    organizer: z.string(),
+    organizerBio: z.string(),
+    terms: z
+      .array(z.string().trim().min(1, "Term cannot be empty"))
+      .min(1, "At least one term is required"),
+    requirements: z
+      .array(z.string().trim().min(1, "Requirement cannot be empty"))
+      .min(1, "At least one requirement is required"),
 
-  //   updatedAt: z.optional(z.number()),
-  //   createdAt: z.number(),
-});
+    //   updatedAt: z.optional(z.number()),
+    //   createdAt: z.number(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.formOptions?.notes && !data.formOptions?.notesDesc) {
+      ctx.addIssue({
+        code: "custom",
+        message: "Description is required if including notes",
+        path: ["formOptions", "notesDesc"],
+      });
+    }
+    if (data.formOptions?.link && !data.formOptions?.linkType) {
+      ctx.addIssue({
+        code: "custom",
+        message: "Link type is required if including a link",
+        path: ["formOptions", "linkType"],
+      });
+    }
+  });
 
 export type ResourcesType = z.infer<typeof resourcesSchema>;
 

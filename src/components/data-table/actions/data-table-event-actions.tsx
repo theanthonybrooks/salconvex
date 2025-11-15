@@ -21,7 +21,11 @@ import { Id } from "~/convex/_generated/dataModel";
 import { useMutation } from "convex/react";
 
 export interface EventActionProps {
-  eventId: string;
+  eventId: Id<"events">;
+}
+
+export interface DuplicateEventProps extends EventActionProps {
+  onDuplicate: () => void;
 }
 
 export interface CopyActionProps extends EventActionProps {
@@ -87,11 +91,15 @@ export const GoToSocialPost = ({ slug, edition }: BaseEventActionProps) => {
   );
 };
 
-export const DuplicateEvent = ({ eventId }: EventActionProps) => {
+export const DuplicateEvent = ({
+  eventId,
+  onDuplicate,
+}: DuplicateEventProps) => {
   const duplicateEvent = useMutation(api.events.event.duplicateEvent);
   const handleDuplicate = async () => {
     try {
       await duplicateEvent({ eventId: eventId as Id<"events"> });
+      onDuplicate();
       toast.success("Event duplicated!");
     } catch (error) {
       console.error("Failed to duplicate event:", error);
@@ -112,10 +120,10 @@ export const DuplicateEvent = ({ eventId }: EventActionProps) => {
 export const DeleteEvent = ({ eventId, isAdmin }: DeleteEventActionProps) => {
   const confirm = useConfirmAction().confirm;
   const deleteEvent = useMutation(api.events.event.deleteEvent);
-
+  console.log(eventId, isAdmin);
   const handleDelete = async () => {
     try {
-      await deleteEvent({ eventId: eventId as Id<"events">, isAdmin });
+      await deleteEvent({ eventId });
       toast.success("Event deleted!");
     } catch (error) {
       console.error("Failed to delete event:", error);
@@ -124,7 +132,17 @@ export const DeleteEvent = ({ eventId, isAdmin }: DeleteEventActionProps) => {
   };
   return (
     <DropdownMenuItem
-      onClick={() => {
+      // onClick={() => {
+      //   confirm({
+      //     label: isAdmin ? "Delete Event & Open Calls" : "Delete Event",
+      //     description: isAdmin
+      //       ? "Are you sure you want to delete this event? This will also delete any associated open calls."
+      //       : "Are you sure you want to delete this event? You can only delete drafts and any published events will be archived.",
+      //     onConfirm: handleDelete,
+      //   });
+      // }}
+      onSelect={(e) => {
+        e.preventDefault(); // keeps dropdown open
         confirm({
           label: isAdmin ? "Delete Event & Open Calls" : "Delete Event",
           description: isAdmin

@@ -511,17 +511,24 @@ export const duplicateOC = mutation({
     const eventId = openCall.eventId;
     const event = await ctx.db.get(eventId);
     if (!event) return null;
-    const existingOcEdition = openCall.basicInfo.dates.edition;
+    const latestEvent = await ctx.db
+      .query("events")
+      .withIndex("by_slug_edition", (q) => q.eq("slug", event.slug))
+      .order("desc")
+      .first();
+
+    const latestEdition = latestEvent?.dates.edition ?? null;
+
     let eventName = event.name;
     let eventSlug = event.slug;
     // let edition = existingOcEdition;
-    let edition = event.dates.edition;
 
-    if (event.dates.edition !== new Date().getFullYear()) {
-      edition = new Date().getFullYear();
-    }
+    const edition =
+      latestEdition && latestEdition >= new Date().getFullYear()
+        ? latestEdition + 1
+        : new Date().getFullYear();
 
-    console.log(edition);
+    // console.log(edition);
 
     //  else {
     //   edition = existingOcEdition + 1;
@@ -558,7 +565,7 @@ export const duplicateOC = mutation({
       blurb: event.blurb,
       about: event.about,
       links: event.links,
-      otherInfo: event.otherInfo,
+      // otherInfo: event.otherInfo,
       timeLine: event.timeLine,
       active: event.active,
       mainOrgId: event.mainOrgId,

@@ -271,7 +271,6 @@ export function DataTable<TData, TValue>({
   useEffect(() => {
     if (selectedRow && Object.keys(selectedRow).length > 0) {
       // setRowSelection(selectedRow);
-      // console.log("dogs");
     } else {
       setRowSelection({});
     }
@@ -301,6 +300,24 @@ export function DataTable<TData, TValue>({
   useEffect(() => {
     table.setPageSize(pageSize);
   }, [table, pageSize]);
+
+  // useEffect(() => {
+  //   if (!data.length) return;
+  //   console.log("fuckery 2");
+
+  //   const newSelection = { 0: true };
+  //   setRowSelection(newSelection);
+  // }, [data]);
+
+  // useEffect(() => {
+  //   const selectedKey = Object.keys(rowSelection)[0];
+
+  //   console.log("fuckery", selectedKey);
+  //   // const selectedRow =
+  //   //   selectedKey !== undefined ? data[Number(selectedKey)] : null;
+
+  //   // onRowSelect?.(selectedRow, rowSelection);
+  // }, [rowSelection]);
 
   // useEffect(() => {
   //   if (!data.length) return;

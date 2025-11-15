@@ -11,6 +11,7 @@ import slugify from "slugify";
 
 import type { Doc } from "~/convex/_generated/dataModel";
 import type { PrimaryContact } from "~/convex/schema";
+import { sanitizeStringMap } from "@/helpers/utilsFns";
 
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { Id } from "~/convex/_generated/dataModel";
@@ -508,13 +509,8 @@ export const updateOrganization = mutation({
     if (!organization) {
       throw new ConvexError("Organization not found");
     }
-    const sanitizedLinks = {
-      ...args.links,
-      email:
-        args.links?.email?.trim() === "none@mail.com"
-          ? undefined
-          : args.links?.email,
-    };
+
+    const sanitizedLinks = sanitizeStringMap(args.links);
 
     await ctx.db.patch(organization._id, {
       name: args.name.trim(),
@@ -643,11 +639,7 @@ export const getUserOrganizations = query({
       // return all.filter(filterFn);
       const allOrgs =
         trimmedQuery === ""
-          ? await ctx.db
-              .query("organizations")
-              // .withIndex("by_slug", (q) => q.eq("slug", "weiner"))
-              .order("asc")
-              .collect()
+          ? await ctx.db.query("organizations").order("asc").collect()
           : await ctx.db
               .query("organizations")
               .withSearchIndex("search_by_slug", (q) => q.search("slug", slug))

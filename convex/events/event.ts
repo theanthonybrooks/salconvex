@@ -9,6 +9,8 @@ import { Organizer } from "@/types/organizer";
 
 import slugify from "slugify";
 
+import { sanitizeStringMap } from "@/helpers/utilsFns";
+
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { internal } from "~/convex/_generated/api";
 import { Id } from "~/convex/_generated/dataModel";
@@ -853,12 +855,9 @@ export const checkEventNameExists = query({
       if (sameEvent === true || (sameEdition === false && sameOrg === true))
         continue;
 
-      if (
-        sameEvent !== undefined &&
-        !sameEvent &&
-        sameEdition === true &&
-        sameOrg === true
-      ) {
+      if (sameEvent === false && sameEdition === true && sameOrg === true) {
+        console.log({ sameEvent, sameEdition, sameOrg });
+        console.log(args.eventId, event._id);
         throw new ConvexError(
           `An event with that name and edition already exists. Please choose a different name or edition`,
         );
@@ -1234,17 +1233,13 @@ export const createOrUpdateEvent = mutation({
     const isAdmin = user?.role.includes("admin");
     const organization = await ctx.db.get(args.mainOrgId);
     const linksLength = Object.keys(args.links ?? {}).length;
-    const links = !args.links
+    const { sameAsOrganizer, linkedIn, ...stringLinks } = args.links ?? {};
+    const sanitizedStringLinks = sanitizeStringMap(stringLinks);
+    const sanitizedLinks = !args.links
       ? { sameAsOrganizer: false }
       : linksSameAsOrg || (args.finalStep && linksLength === 1)
         ? { ...organization?.links, sameAsOrganizer: true }
-        : { ...args.links, sameAsOrganizer: false };
-
-    const sanitizedLinks = {
-      ...links,
-      email:
-        links?.email?.trim() === "none@mail.com" ? undefined : links?.email,
-    };
+        : { ...sanitizedStringLinks, sameAsOrganizer: false };
 
     function isValidEventId(id: string): id is Id<"events"> {
       return typeof id === "string" && id.trim() !== "";
@@ -1560,18 +1555,23 @@ export const duplicateEvent = mutation({
     if (!user) throw new Error("User not found");
     const event = await ctx.db.get(args.eventId);
     if (!event) return null;
-    const existingEventEdition = event.dates.edition;
-    let eventEdition = existingEventEdition;
+    const latestEvent = await ctx.db
+      .query("events")
+      .withIndex("by_slug_edition", (q) => q.eq("slug", event.slug))
+      .order("desc")
+      .first();
+    const latestEdition = latestEvent?.dates.edition ?? null;
     let eventName = event.name;
     let eventSlug = event.slug;
 
-    if (eventEdition !== new Date().getFullYear()) {
-      eventEdition = new Date().getFullYear();
-    }
+    const edition =
+      latestEdition && latestEdition >= new Date().getFullYear()
+        ? latestEdition + 1
+        : new Date().getFullYear();
     const { name, slug } = await generateUniqueNameAndSlug(
       ctx,
       event.name,
-      eventEdition,
+      edition,
     );
     eventName = name;
     eventSlug = slug;
@@ -1589,7 +1589,7 @@ export const duplicateEvent = mutation({
         ...event.dates,
         eventDates: [{ start: "", end: "" }],
         prodDates: [],
-        edition: eventEdition,
+        edition,
       },
       location: {
         ...event.location,
@@ -1617,24 +1617,21 @@ export const duplicateEvent = mutation({
 export const deleteEvent = mutation({
   args: {
     eventId: v.id("events"),
-    isAdmin: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new Error("Not authenticated");
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_userId", (q) => q.eq("userId", userId))
-      .unique();
+    const user = await ctx.db.get(userId);
 
-    if (!user) {
-      throw new ConvexError("User not found");
-    }
+    if (!user) throw new ConvexError("User not found");
+    const isAdmin = user.role.includes("admin");
+
     const event = await ctx.db.get(args.eventId);
     if (!event) return null;
-    if (event.state !== "draft" && !args.isAdmin) {
+    if (event.state !== "draft" && !isAdmin) {
       throw new ConvexError("Active events cannot be deleted, only archived");
     }
+    console.log("attempting to delete event");
     const organization = await ctx.db.get(event.mainOrgId);
     if (!organization) throw new ConvexError("Organization not found");
     const orgLogoStorageId = organization.logoStorageId;

@@ -158,13 +158,15 @@ export const getEventColumns = <T extends Event>(
         aria-label="Deselect all"
       />
     ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
+    cell: ({ row }) => {
+      return (
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          aria-label="Select row"
+        />
+      );
+    },
     enableSorting: false,
     enableHiding: false,
     enableResizing: false,
@@ -411,8 +413,19 @@ export const getEventColumns = <T extends Event>(
         const isDashboard = table.options.meta?.pageType === "dashboard";
         const hasOC = !!openCallId;
 
+        const neitherApproved = !ocApproved && !event.approvedAt;
+
+        const handleFirstRowSelect = () => {
+          setTimeout(() => {
+            table.setRowSelection({ 0: true });
+          }, 300);
+        };
+
         return (
-          <div className={cn("flex justify-center", isAdmin && "flex")}>
+          <div
+            className={cn("flex justify-center", isAdmin && "flex")}
+            onClick={(e) => e.stopPropagation()}
+          >
             <ConfirmingDropdown>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -465,6 +478,14 @@ export const getEventColumns = <T extends Event>(
                           {isEditor && isDashboard && (
                             <RenameEventDialog event={event} />
                           )}
+                          {((state === "draft" && neitherApproved) ||
+                            isAdmin) && (
+                            <DeleteEvent
+                              eventId={event._id}
+                              isAdmin={isAdmin}
+                            />
+                          )}
+
                           {isAdmin && hasOC && (
                             <DropdownMenuSub>
                               <DropdownMenuSubTrigger className="flex items-center gap-x-2">
@@ -481,13 +502,11 @@ export const getEventColumns = <T extends Event>(
                               </DropdownMenuPortal>
                             </DropdownMenuSub>
                           )}
-                          <DuplicateEvent eventId={event._id} />
-                          {isAdmin && (
-                            <DeleteEvent
-                              eventId={event._id}
-                              isAdmin={isAdmin}
-                            />
-                          )}
+                          <DuplicateEvent
+                            eventId={event._id}
+                            onDuplicate={handleFirstRowSelect}
+                          />
+
                           {state === "submitted" && isAdmin && (
                             <ApproveEvent eventId={event._id} />
                           )}
@@ -522,12 +541,14 @@ export const getEventColumns = <T extends Event>(
                                 category={eventCategory}
                               />
 
-                              <DuplicateOC openCallId={openCallId} />
+                              <DuplicateOC
+                                openCallId={openCallId}
+                                onDuplicate={handleFirstRowSelect}
+                              />
                               {(isAdmin || !ocApproved) && (
                                 <DeleteOC
                                   openCallId={openCallId}
                                   isAdmin={isAdmin}
-                                  dashboardView={isDashboard}
                                 />
                               )}
                               {ocState === "submitted" && isAdmin && (

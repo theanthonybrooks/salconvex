@@ -9,6 +9,7 @@ import {
   callTypeValues,
   validOCVals,
 } from "@/constants/openCallConsts";
+import { optionalEmail, optionalUrl } from "@/constants/zodConsts";
 
 import { z } from "zod";
 
@@ -31,7 +32,7 @@ export const locationBase = z.object({
   state: z.optional(z.string()),
   stateAbbr: z.optional(z.string()),
   region: z.optional(z.string()),
-  country: z.string(), // base check moved to superRefine
+  country: z.string(),
   countryAbbr: z.string(),
   continent: z.optional(z.string()),
   coordinates: z.optional(
@@ -69,81 +70,25 @@ export const locationSchema = locationBase.superRefine((data, ctx) => {
   }
 });
 
-export const strictUrl = z
-  .string()
-  .min(8, "URL is too short")
-  .refine(
-    (val) =>
-      /^https?:\/\/[a-zA-Z0-9.-]+\.[a-z]{2,}([\/\w\-._~:/?#[\]@!$&'()*+,;=]*)?$/i.test(
-        val,
-      ),
-    {
-      message: "Must be a valid website URL (e.g. https://example.com)",
-    },
-  );
-
-// const isValidUrl = (value: string) =>
-//   /^https?:\/\/(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/[^\s]*)?$/i.test(value);
-// const isValidUrl = (value: string) =>
-//   /^(https?:\/\/)(?!.*\.\.)(?!.*--)(?!.*\.$)(?!.*-$)(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}(\/[a-zA-Z0-9._~!$&'()*+,;=:@%-]*)?$/i.test(
-//     value,
-//   );
-
-// const isValidUrl = (value: string) => {
-//   try {
-//     const url = new URL(value);
-//     return ["http:", "https:"].includes(url.protocol);
-//   } catch {
-//     return false;
-//   }
-// };
-
-// const isValidUrlWithMailto = (value: string) => {
-//   try {
-//     const url = new URL(value);
-//     return ["http:", "https:", "mailto:"].includes(url.protocol);
-//   } catch {
-//     return false;
-//   }
-// };
-
-const linksSchemaLoose = z.object({
-  sameAsOrganizer: z.boolean().optional(),
-  website: z
-    .url({
-      protocol: /^https?$/,
-      hostname: z.regexes.domain,
-      error: "Must be a valid URL (https://example.com)",
-    })
-    .optional(),
-  email: z.email().optional(),
-  instagram: z.string().optional(),
-  facebook: z.string().optional(),
-  threads: z.string().optional(),
-  vk: z.string().optional(),
-  phone: z.string().optional(),
-  phoneExt: z.string().optional(),
-  linkAggregate: z.string().optional(),
-  youTube: z.string().optional(),
-  linkedIn: z.string().optional(),
-  other: z
-    .url({
-      protocol: /^https?$/,
-      hostname: z.regexes.domain,
-      error: "Must be a valid URL (https://example.com)",
-    })
-    .optional(),
-});
+// const linksSchemaLoose = z.object({
+//   sameAsOrganizer: z.boolean().optional(),
+//   website: optionalUrl,
+//   email: optionalEmail,
+//   instagram: z.string().optional(),
+//   facebook: z.string().optional(),
+//   threads: z.string().optional(),
+//   vk: z.string().optional(),
+//   phone: z.string().optional(),
+//   phoneExt: z.string().optional(),
+//   linkAggregate: z.string().optional(),
+//   youTube: z.string().optional(),
+//   linkedIn: z.string().optional(),
+//   other: optionalUrl,
+// });
 
 export const linksSchemaStrictBase = z.object({
-  website: z
-    .url({
-      protocol: /^https?$/,
-      hostname: z.regexes.domain,
-      error: "Must be a valid URL (https://example.com)",
-    })
-    .optional(),
-  email: z.email("Must be a valid email address").optional(),
+  website: optionalUrl,
+  email: optionalEmail,
 
   instagram: z
     .string()
@@ -183,28 +128,10 @@ export const linksSchemaStrictBase = z.object({
 
   phoneExt: z.string().optional(),
 
-  linkAggregate: z
-    .url({
-      protocol: /^https?$/,
-      hostname: z.regexes.domain,
-      error: "Must be a valid URL (https://example.com)",
-    })
-    .optional(),
-  linkedIn: z
-    .url({
-      protocol: /^https?$/,
-      hostname: z.regexes.domain,
-      error: "Must be a valid URL (https://example.com)",
-    })
-    .optional(),
+  linkAggregate: optionalUrl,
+  linkedIn: optionalUrl,
 
-  other: z
-    .url({
-      protocol: /^https?$/,
-      hostname: z.regexes.domain,
-      error: "Must be a valid URL (https://example.com)",
-    })
-    .optional(),
+  other: optionalUrl,
 });
 
 const linksSchemaStrict = linksSchemaStrictBase.extend({
@@ -293,7 +220,8 @@ export const eventBase = z.object({
     ),
     noProdStart: z.boolean(),
   }),
-  links: linksSchemaLoose,
+  // links: linksSchemaLoose,
+  links: linksSchemaStrict,
   otherInfo: z.string().optional(),
   timeLine: z.string().optional(),
   blurb: z.string().optional(),
@@ -449,17 +377,6 @@ export const eventSchema = eventBase.superRefine((data, ctx) => {
       });
     }
   }
-
-  // if (
-  //   data.dates?.noProdStart &&
-  //   (!Array.isArray(prodDates) || prodDates.length === 0 || !prodDates[0].end)
-  // ) {
-  //   ctx.addIssue({
-  //     code: "custom",
-  //     message: "All projects/events must have a production end date",
-  //     path: ["dates", "prodDates"],
-  //   });
-  // }
 });
 
 // const openCallCheckSchema = z.object({

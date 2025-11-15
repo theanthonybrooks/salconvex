@@ -1010,6 +1010,14 @@ export const onlineEventsSchema = {
   imgStorageId: v.optional(v.id("_storage")),
   description: v.string(),
   requirements: v.array(v.string()),
+  formOptions: v.object({
+    link: v.boolean(),
+    linkType: v.optional(v.string()),
+    notes: v.boolean(),
+    notesDesc: v.optional(v.string()),
+    notesPlaceholder: v.optional(v.string()),
+  }),
+
   regDeadline: v.number(),
   startDate: v.number(),
   endDate: v.number(),

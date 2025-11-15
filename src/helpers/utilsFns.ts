@@ -8,54 +8,6 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-// export const setParamIfNotDefault = <T>(
-//   params: URLSearchParams,
-//   key: string,
-//   value: T,
-//   defaultValue: T,
-// ) => {
-//   if (value === defaultValue) {
-//     params.delete(key);
-//   } else {
-//     params.set(key, String(value));
-//   }
-// };
-
-// export const setParamIfNotDefault = <T>(
-//   params: URLSearchParams,
-//   key: string,
-//   value: T,
-//   defaultValue: T,
-// ): void => {
-//   // Handle arrays explicitly
-//   if (Array.isArray(value)) {
-//     if (value.length === 0) {
-//       params.delete(key);
-//       return;
-//     }
-
-//     const isDefaultArray =
-//       Array.isArray(defaultValue) &&
-//       value.length === defaultValue.length &&
-//       value.every((item) => (defaultValue as unknown[]).includes(item));
-
-//     if (isDefaultArray) {
-//       params.delete(key);
-//       return;
-//     }
-
-//     params.set(key, value.join(","));
-//     return;
-//   }
-
-//   // Non-array branch
-//   if (value === defaultValue) {
-//     params.delete(key);
-//   } else {
-//     params.set(key, String(value));
-//   }
-// };
-
 export const setParamIfNotDefault = <T>(
   params: URLSearchParams,
   key: string,
@@ -95,4 +47,12 @@ export function cleanInput(input: string): string {
     allowedTags: [],
     allowedAttributes: {},
   });
+}
+
+export function sanitizeStringMap(
+  obj: Record<string, string | undefined> | undefined,
+) {
+  return Object.fromEntries(
+    Object.entries(obj ?? {}).map(([k, v]) => [k, v?.trim() || undefined]),
+  );
 }

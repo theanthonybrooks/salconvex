@@ -6,7 +6,7 @@ import type { Preloaded } from "convex/react";
 import { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { EventRegistrationSchema } from "@/schemas/public";
+import { getEventRegistrationSchema } from "@/schemas/public";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { capitalize } from "lodash";
 import { useForm } from "react-hook-form";
@@ -42,7 +42,7 @@ import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-con
 import { generateGeneralICSFile } from "@/helpers/addToCalendar";
 import { autoHttps } from "@/helpers/linkFns";
 import { RichTextDisplay } from "@/helpers/richTextFns";
-import { getUserFontSizePref } from "@/helpers/stylingFns";
+import { capitalizeWords, getUserFontSizePref } from "@/helpers/stylingFns";
 import { cn } from "@/helpers/utilsFns";
 
 import { api } from "~/convex/_generated/api";
@@ -60,6 +60,9 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
   const queryResult = usePreloadedQuery(preloaded);
   const event = queryResult?.data;
   const eventOrganizer = event?.organizer;
+  const { link, linkType, notes, notesDesc, notesPlaceholder } =
+    event?.formOptions ?? {};
+
   const userIsRegistered = queryResult?.userRegistration;
   const eventIsDraft = event?.state === "draft";
 
@@ -94,7 +97,7 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
   const canceledRegistration = paid && canceled;
 
   const form = useForm<EventRegistrationValues>({
-    resolver: zodResolver(EventRegistrationSchema),
+    resolver: zodResolver(getEventRegistrationSchema(link, notes)),
     defaultValues: {
       email: user?.email ?? "",
       name: user?.name ?? "",
@@ -314,8 +317,8 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
             src={event.img}
             alt={name}
             width={300}
-            height={150}
-            className=""
+            height={144}
+            className="h-36 w-auto"
           />
         )}
         <h1
@@ -723,81 +726,99 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
                         />
                       </>
                     )}
-                    <FormField
-                      control={form.control}
-                      name="link"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Portfolio Link</FormLabel>
-                          <FormControl>
-                            <DebouncedControllerInput
-                              disabled={
-                                deadlineHasPassed ||
-                                eventHasPassed ||
-                                unpaidRegistration
-                              }
-                              transform={autoHttps}
-                              field={field}
-                              placeholder="ex. example.com"
-                              className="w-full border-foreground bg-card text-base focus:outline-none focus:ring-1 focus:ring-ring focus:ring-offset-1 focus:ring-offset-ring"
-                              debounceMs={50}
-                              tabIndex={1}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="notes"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Intention/Goal</FormLabel>
-                          <FormControl>
-                            <DebouncedFormTextarea
-                              disabled={
-                                deadlineHasPassed ||
-                                eventHasPassed ||
-                                unpaidRegistration
-                              }
-                              field={field}
-                              maxLength={250}
-                              placeholder="Any specific area(s) you would like to focus on?"
-                              className={cn(
-                                "min-h-10 w-full resize-none rounded-lg border-foreground bg-card text-base focus:outline-none focus:ring-1 focus:ring-ring focus:ring-offset-1 focus:ring-offset-ring",
-                                // isEmpty && "h-10",
-                              )}
-                              tabIndex={2}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    {!unpaidRegistration && !editing && (
+                    {link && (
                       <FormField
                         control={form.control}
-                        name="termsAgreement"
+                        name="link"
                         render={({ field }) => (
-                          <FormItem className="my-2 flex items-center gap-2 space-y-0">
+                          <FormItem>
+                            <FormLabel>
+                              {capitalizeWords(linkType ?? "")} Link
+                            </FormLabel>
                             <FormControl>
-                              <Checkbox
-                                disabled={deadlineHasPassed || eventHasPassed}
-                                checked={field.value || false}
-                                onCheckedChange={field.onChange}
-                                className="text-base"
-                                tabIndex={3}
+                              <DebouncedControllerInput
+                                disabled={
+                                  deadlineHasPassed ||
+                                  eventHasPassed ||
+                                  unpaidRegistration
+                                }
+                                transform={autoHttps}
+                                field={field}
+                                placeholder="ex. example.com"
+                                className="w-full border-foreground bg-card text-base focus:outline-none focus:ring-1 focus:ring-ring focus:ring-offset-1 focus:ring-offset-ring"
+                                debounceMs={50}
+                                tabIndex={1}
                               />
                             </FormControl>
-                            <FormLabel className="hover:cursor-pointer">
-                              I have read and agree to the terms of this event
-                              <sup>*</sup>
-                            </FormLabel>
+                            <FormMessage />
                           </FormItem>
                         )}
                       />
                     )}
+                    {notes && (
+                      <FormField
+                        control={form.control}
+                        name="notes"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>
+                              {capitalizeWords(notesDesc ?? "") ||
+                                "Intention/Goal"}
+                            </FormLabel>
+                            <FormControl>
+                              <DebouncedFormTextarea
+                                disabled={
+                                  deadlineHasPassed ||
+                                  eventHasPassed ||
+                                  unpaidRegistration
+                                }
+                                field={field}
+                                maxLength={250}
+                                placeholder={
+                                  notesPlaceholder ||
+                                  "Any specific area(s) you would like to focus on?"
+                                }
+                                className={cn(
+                                  "min-h-10 w-full resize-none text-base",
+                                  // isEmpty && "h-10",
+                                )}
+                                containerClassName={cn(
+                                  "rounded-lg border-foreground bg-card",
+                                )}
+                                tabIndex={2}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    )}
+                    {!unpaidRegistration &&
+                      !editing &&
+                      !deadlineHasPassed &&
+                      !eventHasPassed && (
+                        <FormField
+                          control={form.control}
+                          name="termsAgreement"
+                          render={({ field }) => (
+                            <FormItem className="my-2 flex items-center gap-2 space-y-0">
+                              <FormControl>
+                                <Checkbox
+                                  disabled={deadlineHasPassed || eventHasPassed}
+                                  checked={field.value || false}
+                                  onCheckedChange={field.onChange}
+                                  className="text-base"
+                                  tabIndex={3}
+                                />
+                              </FormControl>
+                              <FormLabel className="hover:cursor-pointer">
+                                I have read and agree to the terms of this event
+                                <sup>*</sup>
+                              </FormLabel>
+                            </FormItem>
+                          )}
+                        />
+                      )}
                     {/* <Label
                       htmlFor="termsAgreement"
                       className="inline-flex items-center gap-2"

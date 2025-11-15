@@ -325,8 +325,9 @@ export const getCurrentUser = query({
       return null;
     }
 
-    console.log("query called: ", user);
-
+    if (!user?.role?.includes("admin")) {
+      console.log("query called: ", user);
+    }
     return { userId, user, userPref };
   },
 });

@@ -78,7 +78,7 @@ export const FormDatePicker = <T extends EventOCFormValues>({
   const data = watch(watchPath) as z.infer<typeof eventBase.shape.dates>;
   const eventData = watch("event");
   const edition = eventData?.dates?.edition;
-
+  console.log(eventData?.dates);
   const eventFormat = eventData?.dates?.eventFormat;
   const hasEventDates = eventFormat !== "noEvent" && eventFormat !== "ongoing";
   const isEvent = type === "event";
@@ -235,6 +235,7 @@ export const FormDatePicker = <T extends EventOCFormValues>({
     const hasNoFields = fields.length === 0;
 
     if (isSetDates && hasNoFields) {
+      console.log("appending");
       append({ start: "", end: "" });
     }
   }, [formatValue, fields.length, append]);
@@ -348,6 +349,7 @@ export const FormDatePicker = <T extends EventOCFormValues>({
             {formatValue === "setDates" && (
               <>
                 {fields.map((field, index) => {
+                  console.log(field);
                   const prevEndDate =
                     index > 0
                       ? (watch(

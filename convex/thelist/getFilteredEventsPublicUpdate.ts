@@ -121,18 +121,20 @@ export const getFilteredEventsPublic = query({
       subscription?.status === "trialing" ||
       isAdmin;
 
-    console.log({
-      event: "getFilteredEventsPublic",
-      userId,
-      userName: user ? userName : null,
-      activeSub: hasActiveSubscription,
-      source,
-      view,
-      sortBy: sortOptions.sortBy,
-      sortDirection: sortOptions.sortDirection ?? "desc",
-      filters,
-      search,
-    });
+    if (!isAdmin) {
+      console.log({
+        event: "getFilteredEventsPublic",
+        userId,
+        userName: user ? userName : null,
+        activeSub: hasActiveSubscription,
+        source,
+        view,
+        sortBy: sortOptions.sortBy,
+        sortDirection: sortOptions.sortDirection ?? "desc",
+        filters,
+        search,
+      });
+    }
     if (thisWeekPg && refDate.getDay() === 0) {
       refDate = addDays(refDate, 1);
     }

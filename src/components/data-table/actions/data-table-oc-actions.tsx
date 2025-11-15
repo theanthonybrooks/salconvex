@@ -1,17 +1,24 @@
 import { OpenCallState } from "@/types/openCallTypes";
-import { api } from "~/convex/_generated/api";
-import { Id } from "~/convex/_generated/dataModel";
-import { useMutation } from "convex/react";
-import { ConvexError } from "convex/values";
-import { LucideFolderCheck, LucideFolderInput } from "lucide-react";
-import { FaCheckDouble, FaRegCopy, FaRegTrashCan } from "react-icons/fa6";
+
 import { toast } from "react-toastify";
+
+import { FaCheckDouble, FaRegCopy, FaRegTrashCan } from "react-icons/fa6";
+import { LucideFolderCheck, LucideFolderInput } from "lucide-react";
 
 import { useConfirmAction } from "@/components/ui/confirmation-dialog-context";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 
+import { api } from "~/convex/_generated/api";
+import { Id } from "~/convex/_generated/dataModel";
+import { useMutation } from "convex/react";
+import { ConvexError } from "convex/values";
+
 interface OCActionProps {
   openCallId: string;
+}
+
+interface DuplicateOCProps extends OCActionProps {
+  onDuplicate: () => void;
 }
 
 interface SubmittedOCProps extends OCActionProps {
@@ -20,15 +27,15 @@ interface SubmittedOCProps extends OCActionProps {
 
 interface DeleteOCActionProps extends OCActionProps {
   isAdmin: boolean | undefined;
-  dashboardView?: boolean;
 }
 
-export const DuplicateOC = ({ openCallId }: OCActionProps) => {
+export const DuplicateOC = ({ openCallId, onDuplicate }: DuplicateOCProps) => {
   const duplicateOC = useMutation(api.openCalls.openCall.duplicateOC);
 
   const handleOpenCallDuplicate = async () => {
     try {
       await duplicateOC({ openCallId: openCallId as Id<"openCalls"> });
+      onDuplicate();
       toast.success("Open call duplicated successfully!", {
         autoClose: 2000,
         pauseOnHover: false,
@@ -54,28 +61,21 @@ export const DuplicateOC = ({ openCallId }: OCActionProps) => {
   );
 };
 
-export const DeleteOC = ({
-  openCallId,
-  isAdmin,
-  dashboardView = true,
-}: DeleteOCActionProps) => {
+export const DeleteOC = ({ openCallId, isAdmin }: DeleteOCActionProps) => {
   const confirm = useConfirmAction().confirm;
   const deleteOC = useMutation(api.openCalls.openCall.deleteOC);
   return (
     <DropdownMenuItem
       onSelect={(e) => {
         e.preventDefault();
-        if (dashboardView) {
-          confirm({
-            label: "Delete Open Call",
-            description: "Are you sure you want to delete this open call?",
-            onConfirm: () => {
-              deleteOC({ openCallId: openCallId as Id<"openCalls">, isAdmin });
-            },
-          });
-        } else {
-          deleteOC({ openCallId: openCallId as Id<"openCalls">, isAdmin });
-        }
+
+        confirm({
+          label: "Delete Open Call",
+          description: "Are you sure you want to delete this open call?",
+          onConfirm: () => {
+            deleteOC({ openCallId: openCallId as Id<"openCalls">, isAdmin });
+          },
+        });
       }}
       className="flex items-center gap-x-1"
     >
