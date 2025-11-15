@@ -119,6 +119,7 @@ export const OnlineEventDialog = ({
         linkType: "",
         notes: false,
         notesDesc: "",
+        notesPlaceholder: "",
       },
       location: isAdmin ? "google meet" : "",
       startDate: Date.now(),

@@ -415,12 +415,12 @@ export const EventOCForm = ({
   const eventDates = eventData?.dates?.eventDates;
   const eventDatesFormat = eventData?.dates?.eventFormat;
   const hasNoEventDates = eventDates?.length === 0 || !eventDates;
-  console.log(
-    eventDates,
-    Boolean(eventDates),
-    hasNoEventDates,
-    eventDates?.length,
-  );
+  // console.log(
+  //   eventDates,
+  //   Boolean(eventDates),
+  //   hasNoEventDates,
+  //   eventDates?.length,
+  // );
   const prodDatesStart = eventData?.dates?.prodDates?.[0]?.start;
   const noProdStart =
     eventData?.dates?.noProdStart ||
