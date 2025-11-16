@@ -63,7 +63,7 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
     {
       showHidden: true,
       bookmarkedOnly: false,
-      limit: 100,
+      limit: 20,
       eventTypes: [],
       eventCategories: [],
     },
@@ -126,6 +126,7 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               events: filteredResults,
+              otherCount: otherOpenCallCount,
               fontSize: dateFontSize,
               displayRange,
               source,
@@ -343,7 +344,7 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
                 </button> */}
                 <button
                   type="button"
-                  className="absolute right-10 top-2 z-10 hidden rounded bg-card/80 p-1 group-hover:block"
+                  className="absolute right-2 top-2 z-10 hidden rounded bg-card/80 p-1 group-hover:block"
                   title={
                     excludedIds.includes(event._id)
                       ? "Add to list"

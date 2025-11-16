@@ -471,7 +471,7 @@ export const getFilteredEventsPublic = query({
           org?.orgName?.toLowerCase().includes(searchTerm?.toLowerCase()),
         );
       } else if (searchType === "loc" && searchTerm) {
-        console.log("searching by location");
+        // console.log("searching by location");
         const [locs, countryAbbrs, orgLocs, orgCountryAbbrs] =
           await Promise.all([
             ctx.db

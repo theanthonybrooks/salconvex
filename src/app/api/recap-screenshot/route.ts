@@ -8,7 +8,8 @@ export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
   try {
-    const { events, displayRange, source, fontSize } = await req.json();
+    const { events, otherCount, displayRange, source, fontSize } =
+      await req.json();
 
     // if (!events?.length) {
     //   return NextResponse.json(
@@ -55,7 +56,7 @@ export async function POST(req: NextRequest) {
 
     try {
       const payload = JSON.parse(
-        JSON.stringify({ events, displayRange, source, fontSize }),
+        JSON.stringify({ events, otherCount, displayRange, source, fontSize }),
       );
       await page.evaluateOnNewDocument((data: RecapData) => {
         (window as unknown as { __RECAP_DATA__: RecapData }).__RECAP_DATA__ =

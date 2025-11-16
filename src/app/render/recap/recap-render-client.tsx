@@ -14,6 +14,7 @@ import RecapPost from "@/features/events/ui/thisweek-recap/recap-post";
 
 export interface RecapData {
   events: PublicEventPreviewData[];
+  otherCount: number;
   displayRange: string;
   source: "thisweek" | "nextweek";
   fontSize: number | null;
@@ -37,7 +38,7 @@ export default function RecapRenderClient() {
 
   if (!data) return <p id="recap-loading">Loading recap...</p>;
 
-  const { events, displayRange, fontSize } = data;
+  const { events, displayRange, fontSize, otherCount } = data;
 
   return (
     <div className="flex flex-col gap-6 bg-white p-6 text-black">
@@ -54,7 +55,7 @@ export default function RecapRenderClient() {
           index={i}
         />
       ))}
-      <RecapLastPage id="recap-last-page" openCallCount={events.length} />
+      <RecapLastPage id="recap-last-page" openCallCount={otherCount} />
       <RecapEndCover id="recap-end-cover" />
     </div>
   );
