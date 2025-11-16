@@ -30,7 +30,7 @@ const SignOutBtn = ({ children, email, className }: SignOutBtnProps) => {
         localStorage.clear();
 
         await signOut();
-        console.log({ pathname, thelist: pathname.includes("/thelist") });
+        // console.log({ pathname, thelist: pathname.includes("/thelist") });
         if (pathname.includes("/thelist")) {
           router.push("/auth/sign-in");
         }

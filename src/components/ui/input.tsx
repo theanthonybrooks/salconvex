@@ -1,4 +1,5 @@
 import type { VariantProps } from "class-variance-authority";
+
 import * as React from "react";
 import { cva } from "class-variance-authority";
 
@@ -124,7 +125,11 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     return (
       <input
         type={type}
-        className={cn(baseClasses, className)}
+        className={cn(
+          baseClasses,
+          className,
+          "disabled:border-foreground/50 disabled:opacity-50",
+        )}
         ref={ref}
         {...props}
       />

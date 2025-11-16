@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Eye, EyeOff } from "lucide-react";
 import { ControllerRenderProps, FieldPath, FieldValues } from "react-hook-form";
+
+import { Eye, EyeOff } from "lucide-react";
 
 import { Input, InputProps } from "@/components/ui/input";
 import { PasswordChecklist } from "@/components/ui/password-checklist";
@@ -50,6 +51,8 @@ export function PasswordInput<
       <div
         className={cn(
           "relative rounded-lg border-1.5 border-foreground focus-within:bg-white focus-within:ring-1 focus-within:ring-foreground",
+          (isPending || disabled) &&
+            "pointer-events-none border-foreground/50 opacity-50",
           className,
         )}
       >

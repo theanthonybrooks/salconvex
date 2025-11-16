@@ -286,7 +286,7 @@ const SignInCard = ({ switchFlow, forgotPasswordHandler }: SignInCardProps) => {
           type="button"
           className="w-full min-w-[8.5rem] gap-2 bg-salYellow focus:bg-salYellow/70 focus-visible:translate-x-[3px] focus-visible:translate-y-[-3px] focus-visible:shadow-slg md:bg-white"
           onClick={() => onProviderSignIn("google")}
-          disabled={pendingOAuth}
+          disabled={pendingOAuth || pending}
           tabIndex={1}
         >
           {isLoading === "google" ? (
