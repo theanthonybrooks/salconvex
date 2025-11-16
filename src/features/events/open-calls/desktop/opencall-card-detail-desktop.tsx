@@ -61,6 +61,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
   const userPref = userData?.userPref ?? null;
   const fontSizePref = getUserFontSizePref(userPref?.fontSize);
   const fontSize = fontSizePref?.body;
+  const isArtist = user?.accountType?.includes("artist");
   const isAdmin = user?.role?.includes("admin");
   const isCreator = user?.role?.includes("creator");
   const hasActiveSubscription =
@@ -396,7 +397,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                 {`$${basicInfo?.appFee}`}
               </p>
             )}
-            {bothValid && (!isUserOrg || isCreator) && (
+            {bothValid && ((!isUserOrg && !isAdmin) || isCreator) && (
               <>
                 <ApplyButton
                   src="ocPage"
@@ -468,9 +469,9 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
               />
             )}
 
-            {((isAdmin && !bothValid) || isUserOrg) && (
+            {(isAdmin || isUserOrg) && (
               <>
-                {isAdmin && oneValid && (
+                {isAdmin && oneValid && !bothValid && (
                   <Separator thickness={2} className="my-2" />
                 )}
                 <ApproveBtn
@@ -636,8 +637,8 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
               publicPreview={!hasActiveSubscription}
               fontSize={fontSize}
             />
-            <div className="mt-6 flex w-full justify-end xl:hidden">
-              {((isAdmin && !bothValid) || isUserOrg) && (
+            <div className="mt-6 flex w-full flex-col items-center gap-3 xl:hidden">
+              {(isAdmin || isUserOrg) && (
                 <>
                   <ApproveBtn
                     user={user}
@@ -653,11 +654,14 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                     appLink={outputAppLink}
                     isHidden={hidden}
                     isUserOrg={Boolean(isUserOrg || isAdmin)}
-                    className="mx-auto mt-1 w-full max-w-52"
+                    className="sm:max-w-75 mx-auto mt-1 w-full max-w-52"
                   />
                 </>
               )}
-              {!isUserOrg && (
+              {isAdmin && isArtist && (
+                <Separator thickness={2} className="my-2 max-w-60" />
+              )}
+              {(!isUserOrg || isAdmin || isCreator) && isArtist && (
                 <ApplyButton
                   src="ocPage"
                   user={user}
@@ -680,7 +684,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                   isHidden={hidden}
                   eventCategory={eventCategory}
                   appFee={basicInfo?.appFee ?? 0}
-                  className="mx-auto w-full max-w-52"
+                  className="mx-auto w-full max-w-52 lg:px-0"
                   detailCard
                   finalButton
                 />

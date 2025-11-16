@@ -23,43 +23,45 @@ import "react-phone-number-input/style.css";
 
 import type { OrganizationValues } from "@/schemas/organizer";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 
 import { Button } from "@/components/ui/button";
 
 type FormLinksInputProps = {
-  handleCheckSchema?: () => void;
-  dashBoardView?: boolean;
+  placeholder?: string;
 };
 
 export type OrgLinkPath = `links.${OrgLinkField}`;
 
-export const OrgLinksInput = ({
-  handleCheckSchema,
-  dashBoardView,
-}: FormLinksInputProps) => {
+export const OrgLinksInput = ({}: FormLinksInputProps) => {
   const {
     control,
     watch,
     formState: { errors },
   } = useFormContext<OrganizationValues>();
-  const [isExpanded, setIsExpanded] = useState(false);
-
+  const expandedRef = useRef<boolean | null>(null);
   const { isMobile } = useDevice();
   const links = watch("links");
   const location = watch("location");
   const primaryField = watch("contact.primaryContact");
   const orgPhone = links?.phone;
   const orgCountry = location?.countryAbbr;
+  const [isExpanded, setIsExpanded] = useState(true);
+  useEffect(() => {
+    if (Boolean(primaryField) && expandedRef.current === null) {
+      setIsExpanded(false);
+      expandedRef.current = false;
+    } else if (expandedRef.current === false) {
+      setIsExpanded(true);
+      expandedRef.current = true;
+    }
+  }, [primaryField]);
+
+  // console.log(isExpanded, expandedRef.current);
   return (
     <>
-      <div
-        className={cn(
-          "flex max-w-[80dvw] flex-col gap-y-2",
-          dashBoardView && "max-w-full",
-        )}
-      >
+      <div className={cn("flex max-w-[80dvw] flex-col gap-y-2")}>
         <div className="mb-1 flex items-center justify-end gap-2 text-base text-muted-foreground">
           Primary Contact - Required(*)
           <HiArrowTurnRightDown className="size-4 shrink-0 translate-y-1.5" />
@@ -106,7 +108,7 @@ export const OrgLinksInput = ({
                         transform={autoHttps}
                         onBlur={() => {
                           field.onBlur?.();
-                          handleCheckSchema?.();
+
                           // console.log("Blur me", field + type)
                         }}
                       />
@@ -157,7 +159,7 @@ export const OrgLinksInput = ({
                         )}
                         onBlur={() => {
                           field.onBlur?.();
-                          handleCheckSchema?.();
+
                           // console.log("Blur me", field + type)
                         }}
                       />
@@ -217,7 +219,7 @@ export const OrgLinksInput = ({
                           onChange={field.onChange}
                           onBlur={() => {
                             field.onBlur?.();
-                            handleCheckSchema?.();
+
                             // console.log("Blur me", field + type)
                           }}
                         />
@@ -245,7 +247,6 @@ export const OrgLinksInput = ({
                             )}
                             onBlur={() => {
                               field.onBlur?.();
-                              handleCheckSchema?.();
                             }}
                           />
                         )}
@@ -323,7 +324,6 @@ export const OrgLinksInput = ({
                   transform={autoHttps}
                   onBlur={() => {
                     field.onBlur?.();
-                    handleCheckSchema?.();
                   }}
                 />
               )}
@@ -348,7 +348,6 @@ export const OrgLinksInput = ({
                   transform={autoHttps}
                   onBlur={() => {
                     field.onBlur?.();
-                    handleCheckSchema?.();
                   }}
                 />
               )}
@@ -373,14 +372,17 @@ export const OrgLinksInput = ({
                   transform={autoHttps}
                   onBlur={() => {
                     field.onBlur?.();
-                    handleCheckSchema?.();
                   }}
                 />
               )}
             />
           </div>
           <Button
-            onClick={() => setIsExpanded((prev) => !prev)}
+            onClick={() => {
+              setIsExpanded((prev) => !prev);
+              // console.log(isExpanded);
+              expandedRef.current = !isExpanded;
+            }}
             variant="link"
             // className="hover:scale-100 hover:underline"
           >

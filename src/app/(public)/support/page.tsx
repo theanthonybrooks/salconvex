@@ -313,7 +313,7 @@ const SupportPage = () => {
                 control={form.control}
                 name="message"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem emptyError>
                     <FormLabel>Message</FormLabel>
 
                     <FormControl>

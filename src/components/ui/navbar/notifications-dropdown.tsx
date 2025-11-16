@@ -51,6 +51,7 @@ export const NotificationsDropdown = ({
       <TooltipSimple
         content="View Nofitications"
         side="bottom"
+        align="start"
         disabled={open || tooltipDisabled}
       >
         <DropdownMenuTrigger asChild>

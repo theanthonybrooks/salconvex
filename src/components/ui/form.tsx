@@ -107,7 +107,7 @@ const FormLabel = React.forwardRef<
       ref={ref}
       className={cn(
         "leading-normal",
-        hasErrorAndValue && "text-destructive",
+        hasErrorAndValue && "rounded text-destructive",
         className,
       )}
       htmlFor={formItemId}
@@ -143,7 +143,7 @@ const FormControl = React.forwardRef<
           : `${formDescriptionId} ${formMessageId}`
       }
       aria-invalid={!!error}
-      className={cn(hasErrorAndValue && "invalid-field")}
+      className={cn(hasErrorAndValue && "invalid-field rounded-lg")}
       {...props}
     />
   );
@@ -172,11 +172,39 @@ const FormMessage = React.forwardRef<
   React.HTMLAttributes<HTMLParagraphElement>
 >(({ className, children, ...props }, ref) => {
   const { error, formMessageId, value, emptyError } = useFormField();
+  // if (!error || typeof error !== "object") return null;
+
+  // if (error) console.log(error, value, emptyError, error.root);
+  // const hasErrorAndValue =
+  //   (!emptyError && String(value)?.length > 0) || emptyError;
+  // const body =
+  //   error && hasErrorAndValue ? String(error.message) : children || "";
+  // if (!body || !children) return null;
+
+  if (!error || typeof error !== "object") return null;
+
+  // Recursively extract the first available error message
+  const extractMessage = (err: unknown): string | null => {
+    if (!err || typeof err !== "object") return null;
+    if ("message" in err && typeof err.message === "string") return err.message;
+
+    // Search nested keys (depth-first)
+    for (const key of Object.keys(err)) {
+      const nested = extractMessage((err as Record<string, unknown>)[key]);
+      if (nested) return nested;
+    }
+
+    return null;
+  };
+
+  const message = extractMessage(error);
+  // console.log(extractMessage(error));
   const hasErrorAndValue =
     (!emptyError && String(value)?.length > 0) || emptyError;
-  const body = error && hasErrorAndValue ? String(error.message) : children;
+  const body = message || children || "";
 
-  if (!body) return null;
+  console.log(emptyError, hasErrorAndValue);
+  if ((!body && !children) || !hasErrorAndValue) return null;
 
   return (
     <p

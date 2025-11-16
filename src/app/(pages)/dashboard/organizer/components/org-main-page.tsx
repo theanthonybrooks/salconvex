@@ -72,10 +72,12 @@ export const OrgMainPage = () => {
   };
 
   useEffect(() => {
-    if (userOrgs.length > 0) {
+    if (userOrgs.length > 0 && !selectedOrg) {
       setSelectedOrg(userOrgs[0]._id);
     }
-  }, [userOrgs]);
+  }, [userOrgs, selectedOrg]);
+
+  // console.log(selectedOrg);
 
   const currentOrg = userOrgs.find((org) => org._id === selectedOrg);
   const isOrgOwner = currentOrg?.ownerId === user?._id;
@@ -160,7 +162,11 @@ export const OrgMainPage = () => {
               variant="card"
             >
               <div id="orgInfo">
-                <OrgInfo orgData={currentOrg} user={user} />
+                <OrgInfo
+                  orgData={currentOrg}
+                  user={user}
+                  key={selectedOrg ?? "no-org"}
+                />
               </div>
               <div id="events">
                 <ResponsiveDataTable

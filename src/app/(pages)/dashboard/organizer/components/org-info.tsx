@@ -1,7 +1,9 @@
+import { defaultOrg } from "@/constants/orgConsts";
+
 import type { OrganizationValues } from "@/schemas/organizer";
 import type { User } from "@/types/user";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { OrgLinksInput } from "@/app/(pages)/dashboard/organizer/components/org-links";
 import { organizationSchema } from "@/schemas/organizer";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -45,31 +47,45 @@ type OrgInfoProps = {
 export const OrgInfo = ({ orgData, user }: OrgInfoProps) => {
   const isAdmin = user?.role?.includes("admin");
   const [pending, setPending] = useState(false);
+
+  const defaultValues = useMemo(
+    () => ({
+      name: orgData?.name || "",
+      location: orgData?.location || defaultOrg.location,
+      logo: orgData?.logo || "",
+      links: orgData?.links || defaultOrg.links,
+      blurb: orgData?.blurb || "",
+      about: orgData?.about || "",
+      contact: {
+        organizer: orgData?.contact?.organizer || "",
+        organizerTitle: orgData?.contact?.organizerTitle || "",
+        primaryContact: orgData?.contact?.primaryContact || "",
+      },
+    }),
+    [orgData],
+  );
+
   const convex = useConvex();
   const generateUploadUrl = useMutation(api.uploads.files.generateUploadUrl);
   const updateOrg = useMutation(api.organizer.organizations.updateOrganization);
   const form = useForm<OrganizationValues>({
     resolver: zodResolver(organizationSchema),
-    defaultValues: {
-      name: orgData?.name ?? "",
-      location: orgData?.location ?? {},
-      logo: orgData?.logo ?? "",
-      links: orgData?.links ?? {},
-      blurb: orgData?.blurb ?? "",
-      about: orgData?.about ?? "",
-      contact: orgData?.contact ?? {},
-    },
+    defaultValues,
     mode: "onChange",
     delayError: 1000,
+    shouldUnregister: true,
   });
 
   const {
     watch,
     handleSubmit,
     reset,
+
     formState: { isValid, isDirty, errors },
   } = form;
+  // const formData = watch();
 
+  if (Object.keys(errors).length > 0) console.log(errors);
   const organizerName = watch("contact.organizer");
 
   const onSubmit = async (values: OrganizationValues) => {
@@ -133,14 +149,35 @@ export const OrgInfo = ({ orgData, user }: OrgInfoProps) => {
     }
   };
 
+  // useEffect(() => {
+  //   if (orgData) {
+  //     reset(defaultValues, { keepValues: false });
+  //   }
+  // }, [reset, orgData, defaultValues]);
   useEffect(() => {
     if (orgData) {
-      reset(orgData);
+      reset(
+        {
+          name: orgData.name || "",
+          location: orgData.location || defaultOrg.location,
+          logo: orgData.logo || "",
+          links: orgData.links || defaultOrg.links,
+          blurb: orgData.blurb || "",
+          about: orgData.about || "",
+          contact: {
+            organizer: orgData.contact?.organizer || "",
+            organizerTitle: orgData.contact?.organizerTitle || "",
+            primaryContact: orgData.contact?.primaryContact || "",
+          },
+        },
+        { keepValues: false },
+      );
     }
-  }, [reset, orgData]);
+  }, [orgData, reset]);
+
   return (
     <div>
-      <Form {...form}>
+      <Form {...form} key={orgData?._id}>
         <form
           className="grid gap-4 px-3 py-4 sm:grid-cols-[1fr_8%_1fr] sm:px-10"
           onSubmit={handleSubmit(onSubmit)}
@@ -349,9 +386,15 @@ export const OrgInfo = ({ orgData, user }: OrgInfoProps) => {
           </div>
         </form>
       </Form>
-      {/* <pre className="scrollable mini text-wrap text-sm text-foreground">
-        {JSON.stringify(orgData, null, 2)}
-      </pre> */}
+      {/*    <pre className="scrollable mini text-wrap text-sm text-foreground">
+        {JSON.stringify(orgData?.links, null, 2)}
+        /~ {JSON.stringify(orgData?.location, null, 2)}
+        /~ {JSON.stringify(orgData?.contact, null, 2)} ~/ ~/
+      </pre>
+      <Separator thickness={4} className="my-4" />
+      <pre className="scrollable mini text-wrap text-sm text-foreground">
+        {JSON.stringify(formData, null, 2)}
+      </pre>*/}
     </div>
   );
 };

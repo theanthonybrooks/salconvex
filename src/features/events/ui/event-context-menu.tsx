@@ -234,7 +234,7 @@ const EventContextMenu = ({
         </DropdownMenuTrigger>
       </TooltipSimple>
       <DropdownMenuContent
-        className="z-[19] w-max min-w-44 sm:text-sm"
+        className="z-[21] w-max min-w-44 sm:text-sm"
         align={align}
       >
         <DropdownMenuLabel>More options</DropdownMenuLabel>
@@ -310,85 +310,88 @@ const EventContextMenu = ({
           </DropdownMenuGroup>
         )}
         {hasValidSub && (!isUserOrg || (isAdmin && !reviewMode)) && (
-          <DropdownMenuGroup>
-            {/* Artist section: */}
+          <>
+            <DropdownMenuGroup>
+              {/* Artist section: */}
 
-            <DropdownMenuItem onClick={onHide}>
-              {/* <div
-                    onClick={onHide}
+              <DropdownMenuItem onClick={onHide}>
+                {/* <div
+                      onClick={onHide}
+                      className={cn(
+                        "cursor-pointer rounded px-4 py-2 text-black/80 hover:bg-salPinkLtHover hover:text-red-700",
+                        nonAdminPublicView && "hidden",
+                      )}
+                    > */}
+                {isHidden ? (
+                  <span className="flex items-center gap-x-2 capitalize">
+                    <EyeOff className="size-4" />
+                    Unhide{" "}
+                    {openCallId !== "" && openCallStatus === "active"
+                      ? "Open Call"
+                      : getEventCategoryLabel(eventCategory)}
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-x-2 capitalize">
+                    <Eye className="size-4" />
+                    Hide{" "}
+                    {openCallId !== "" && openCallStatus === "active"
+                      ? "Open Call"
+                      : getEventCategoryLabel(eventCategory)}
+                  </span>
+                )}
+                {/* </div> */}
+              </DropdownMenuItem>
+
+              {openCallStatus === "active" &&
+                (openCallState === "published" ||
+                  openCallState === "archived") && (
+                  <DropdownMenuItem
+                    onClick={onApply}
                     className={cn(
-                      "cursor-pointer rounded px-4 py-2 text-black/80 hover:bg-salPinkLtHover hover:text-red-700",
+                      // "cursor-pointer rounded px-4 py-2 sm:text-sm hover:bg-salPinkLtHover",
                       nonAdminPublicView && "hidden",
+                      appStatus
+                        ? "text-black/80 hover:text-emerald-700"
+                        : "text-emerald-700 hover:text-black/80",
                     )}
-                  > */}
-              {isHidden ? (
-                <span className="flex items-center gap-x-2 capitalize">
-                  <EyeOff className="size-4" />
-                  Unhide{" "}
-                  {openCallId !== "" && openCallStatus === "active"
-                    ? "Open Call"
-                    : getEventCategoryLabel(eventCategory)}
-                </span>
-              ) : (
-                <span className="flex items-center gap-x-2 capitalize">
-                  <Eye className="size-4" />
-                  Hide{" "}
-                  {openCallId !== "" && openCallStatus === "active"
-                    ? "Open Call"
-                    : getEventCategoryLabel(eventCategory)}
-                </span>
-              )}
-              {/* </div> */}
-            </DropdownMenuItem>
-
-            {openCallStatus === "active" &&
-              (openCallState === "published" ||
-                openCallState === "archived") && (
+                  >
+                    {appStatus ? (
+                      <span className="flex items-center gap-x-2 sm:text-sm">
+                        <CircleX className="size-4" />
+                        Mark as Not Applied
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-x-2 sm:text-sm">
+                        <CheckCircle className="size-4" />
+                        Mark as Applied
+                      </span>
+                    )}
+                  </DropdownMenuItem>
+                )}
+              {hasApplied && isBookmarked !== undefined && (
                 <DropdownMenuItem
-                  onClick={onApply}
+                  onClick={onBookmark}
                   className={cn(
                     // "cursor-pointer rounded px-4 py-2 sm:text-sm hover:bg-salPinkLtHover",
                     nonAdminPublicView && "hidden",
-                    appStatus
-                      ? "text-black/80 hover:text-emerald-700"
-                      : "text-emerald-700 hover:text-black/80",
                   )}
                 >
-                  {appStatus ? (
+                  {isBookmarked ? (
                     <span className="flex items-center gap-x-2 sm:text-sm">
-                      <CircleX className="size-4" />
-                      Mark as Not Applied
+                      <FaBookmark className="size-4 text-red-500" />
+                      Remove Bookmark
                     </span>
                   ) : (
                     <span className="flex items-center gap-x-2 sm:text-sm">
-                      <CheckCircle className="size-4" />
-                      Mark as Applied
+                      <FaRegBookmark className="size-4" />
+                      Bookmark Event
                     </span>
                   )}
                 </DropdownMenuItem>
               )}
-            {hasApplied && isBookmarked !== undefined && (
-              <DropdownMenuItem
-                onClick={onBookmark}
-                className={cn(
-                  // "cursor-pointer rounded px-4 py-2 sm:text-sm hover:bg-salPinkLtHover",
-                  nonAdminPublicView && "hidden",
-                )}
-              >
-                {isBookmarked ? (
-                  <span className="flex items-center gap-x-2 sm:text-sm">
-                    <FaBookmark className="size-4 text-red-500" />
-                    Remove Bookmark
-                  </span>
-                ) : (
-                  <span className="flex items-center gap-x-2 sm:text-sm">
-                    <FaRegBookmark className="size-4" />
-                    Bookmark Event
-                  </span>
-                )}
-              </DropdownMenuItem>
-            )}
-          </DropdownMenuGroup>
+            </DropdownMenuGroup>
+            {isAdmin && <DropdownMenuSeparator />}
+          </>
         )}
 
         {hasActiveSubscription && !isArtist && !isUserOrg && !isAdmin && (
@@ -401,7 +404,6 @@ const EventContextMenu = ({
 
         {isAdmin && (
           <DropdownMenuGroup>
-            <DropdownMenuSeparator />
             <DropdownMenuLabel>Admin</DropdownMenuLabel>
 
             {reviewMode &&
@@ -547,7 +549,7 @@ const EventContextMenu = ({
               <DropdownMenuItem>
                 <Link
                   href={`mailto:${orgOwnerEmail}?subject=${capitalize(eventName ?? "")} submission`}
-                  className="flex items-center gap-x-2 px-4 py-2 hover:bg-salPinkLtHover sm:text-sm"
+                  className="flex items-center gap-x-2 sm:text-sm"
                 >
                   <Mail className="size-4" />
                   Contact Org

@@ -114,7 +114,7 @@ const SubmissionFormOrgStep = ({
     selection: Record<string, boolean>,
   ) => {
     const shouldBeNew = Object.keys(selection).length === 0;
-    console.log(shouldBeNew, newOrgEvent);
+    // console.log(shouldBeNew, newOrgEvent);
     if (newOrgEvent !== shouldBeNew) {
       setNewOrgEvent(shouldBeNew);
     }

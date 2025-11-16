@@ -142,7 +142,7 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
   {
     accessorKey: "subscription",
     id: "subscription",
-    minSize: 120,
+    minSize: 160,
     maxSize: 200,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Subscription" />
@@ -392,7 +392,7 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
     accessorKey: "location",
     id: "location",
     minSize: 120,
-    maxSize: 200,
+    maxSize: 260,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Location" />
     ),
@@ -589,7 +589,7 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
     accessorKey: "source",
     id: "source",
     minSize: 120,
-    maxSize: 150,
+    maxSize: 250,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Source" />
     ),
@@ -624,7 +624,10 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
       // console.log(table.options)
 
       return (
-        <div className={cn("flex justify-center")}>
+        <div
+          className={cn("flex justify-center")}
+          onClick={(e) => e.stopPropagation()}
+        >
           <ConfirmingDropdown>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

@@ -133,8 +133,11 @@ interface MultiSelectProps<T extends string>
 
   showArrow?: boolean;
 
-  /** Show compact version of the component without side separator and down chevron*/
+  /** Show compact version of the component without side separator and down chevron. Shows only [num] selected in a single badge rather than displaying multiple options.*/
   compact?: boolean;
+
+  condensed?: boolean;
+  /** Similar to compact, aside from it still showing the X icon. May combine these at some point when I have a chance to dig in and see what differs */
 
   animation?: number;
 
@@ -168,7 +171,7 @@ interface MultiSelectProps<T extends string>
   groupClassName?: string;
   height?: number;
   shortResults?: boolean;
-  condensed?: boolean;
+
   value?: string[];
   id?: string;
   limit?: number;

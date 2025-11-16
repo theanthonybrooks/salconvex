@@ -422,6 +422,22 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
         >
           <div id="event">
             <EventCard event={event} format="desktop" aboutRef={aboutRef} />
+            {(isAdmin || isUserOrg) && (
+              <ApproveBtn
+                user={user}
+                event={event}
+                eventState={eventState}
+                eventCategory={eventCategory}
+                eventId={event._id}
+                openCallId={null}
+                orgId={event.mainOrgId}
+                openCallStatus={null}
+                appStatus={null}
+                isHidden={hidden}
+                isUserOrg={isUserOrg || isAdmin}
+                className="sm:max-w-75 mx-auto mt-6 max-w-52 xl:hidden"
+              />
+            )}
           </div>
           <div id="organizer">
             <OrganizerCard organizer={organizer} format="desktop" />

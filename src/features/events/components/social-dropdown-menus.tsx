@@ -1,7 +1,7 @@
 import { EventData, PostStatus } from "@/types/eventTypes";
 
 import { MdPhoto } from "react-icons/md";
-import { X } from "lucide-react";
+import { CheckIcon, X } from "lucide-react";
 
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
@@ -49,6 +49,21 @@ export const SocialDropdownMenus = ({
   };
   return (
     <>
+      {postStatus && (
+        <DropdownMenuItem
+          className="flex items-center gap-x-2"
+          onClick={() => {
+            window.open(
+              `/thelist/event/${slug}/${edition}/call/social`,
+              "_blank",
+              "noopener,noreferrer",
+            );
+          }}
+        >
+          <MdPhoto className="size-4" />
+          View Socials
+        </DropdownMenuItem>
+      )}
       {!postStatus ? (
         <DropdownMenuItem
           className="flex items-center gap-x-2"
@@ -65,31 +80,24 @@ export const SocialDropdownMenus = ({
           <MdPhoto className="size-4" />
           Make Post
         </DropdownMenuItem>
-      ) : (
-        <DropdownMenuItem
-          className="flex items-center gap-x-2"
-          onClick={() => handlePostEvent(null)}
-        >
-          <X className="size-4" />
-          Cancel Post
-        </DropdownMenuItem>
-      )}
-
-      {postStatus && (
-        <DropdownMenuItem
-          className="flex items-center gap-x-2"
-          onClick={() => {
-            window.open(
-              `/thelist/event/${slug}/${edition}/call/social`,
-              "_blank",
-              "noopener,noreferrer",
-            );
-          }}
-        >
-          <MdPhoto className="size-4" />
-          View Socials
-        </DropdownMenuItem>
-      )}
+      ) : postStatus === "toPost" ? (
+        <>
+          <DropdownMenuItem
+            className="flex items-center gap-x-2"
+            onClick={() => handlePostEvent("posted")}
+          >
+            <CheckIcon className="size-4" />
+            Mark Posted
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            className="flex items-center gap-x-2"
+            onClick={() => handlePostEvent(null)}
+          >
+            <X className="size-4" />
+            Cancel Post
+          </DropdownMenuItem>
+        </>
+      ) : null}
     </>
   );
 };

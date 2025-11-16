@@ -1,4 +1,3 @@
-import { useRouter } from "next/navigation";
 import { ApplicationStatus } from "@/types/applications";
 import {
   EventCategory,
@@ -7,14 +6,17 @@ import {
 } from "@/types/eventTypes";
 import { OpenCallState, OpenCallStatus } from "@/types/openCallTypes";
 import { User } from "@/types/user";
-import { api } from "~/convex/_generated/api";
-import { Id } from "~/convex/_generated/dataModel";
-import { useMutation } from "convex/react";
+
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import EventContextMenu from "@/features/events/ui/event-context-menu";
 import { getEventCategoryLabel } from "@/helpers/eventFns";
 import { cn } from "@/helpers/utilsFns";
+
+import { api } from "~/convex/_generated/api";
+import { Id } from "~/convex/_generated/dataModel";
+import { useMutation } from "convex/react";
 
 interface ApproveBtnProps {
   user: User | null;
@@ -77,11 +79,11 @@ export const ApproveBtn = ({
   };
 
   return (
-    <div className="flex w-full flex-col items-center gap-y-2">
+    <div className={cn("flex w-full flex-col items-center gap-y-2", className)}>
       <p className="text-sm">
         {isAdmin ? "Admin Only Actions" : "Organization Actions"}
       </p>
-      <div className={cn("flex w-full items-center justify-center", className)}>
+      <div className={cn("flex w-full items-center justify-center")}>
         {isAdmin && (
           <Button
             variant={

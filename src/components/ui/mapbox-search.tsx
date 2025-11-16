@@ -1,6 +1,13 @@
 import { USAddressFormatCountries } from "@/constants/locationConsts";
+import { defaultOrg } from "@/constants/orgConsts";
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import {
   countryToContinentMap,
@@ -47,7 +54,7 @@ interface MapboxInputFullProps {
 
 export const MapboxInputFull = ({
   id,
-  reset,
+  // reset,
   value,
   onChange,
   // onSelect,
@@ -71,16 +78,22 @@ export const MapboxInputFull = ({
 
   const fullLocation = value?.full ?? null;
   const newLocation = value?.full !== inputValue && !isFocused;
+  const clearLocation = !value?.full && inputValue.trim()?.length > 0;
 
-  const emptyObject: FullLocation = {
-    full: inputValue,
-    city: "",
-    state: "",
-    stateAbbr: "",
-    country: "",
-    countryAbbr: "",
-    coordinates: { latitude: 0, longitude: 0 },
-  };
+  // console.log(clearLocation, newLocation);
+
+  const emptyObject: FullLocation = useMemo(
+    () => ({
+      full: "",
+      city: "",
+      state: "",
+      stateAbbr: "",
+      country: "",
+      countryAbbr: "",
+      coordinates: { latitude: 0, longitude: 0 },
+    }),
+    [],
+  );
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (!isFocused && inputValue.trim().length > 0) {
@@ -116,7 +129,8 @@ export const MapboxInputFull = ({
     setInputValue("");
     setSuggestions([]);
     setHighlightedIndex(0);
-  }, []);
+    onChange(defaultOrg.location);
+  }, [onChange]);
 
   const handleSelect = (s: MapboxSuggestion) => {
     // console.log(s);
@@ -353,13 +367,22 @@ export const MapboxInputFull = ({
     }
   }, [fullLocation, value, newLocation]);
 
+  // const lastResetRef = useRef(reset);
+
+  // useEffect(() => {
+  //   if (reset !== lastResetRef.current) {
+  //     lastResetRef.current = reset;
+  //     handleReset();
+  //   }
+  // }, [reset, handleReset, onChange]);
+
   useEffect(() => {
-    if (reset) {
+    // console.log(clearLocation, isFocused);
+    if (isFocused) return;
+    if (clearLocation) {
       handleReset();
-      // console.log("resetting", reset);
     }
-  }, [reset, handleReset]);
-  // console.log(inputValue, "mapbox", value?.full);
+  }, [handleReset, clearLocation, isFocused]);
 
   return (
     <div ref={wrapperRef} className={cn("relative", className)}>

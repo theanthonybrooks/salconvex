@@ -371,7 +371,7 @@ export const ApplyButton = ({
   return (
     <div
       className={cn(
-        "col-span-full mt-4 flex h-14 max-w-[80dvw] items-center justify-center sm:h-11 sm:max-w-[300px] lg:mt-0 lg:px-4",
+        "sm:max-w-75 col-span-full mt-4 flex h-14 max-w-[80dvw] items-center justify-center sm:h-11 lg:mt-0 lg:px-4",
         !detailCard && "lg:w-[250px]",
         detailCard && "lg:mt-2 lg:w-full",
         className,

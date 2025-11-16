@@ -228,6 +228,7 @@ const SubmissionFormOC1 = ({
   }, [freeCall, setValue]);
 
   useEffect(() => {
+    if (!isAdmin) return;
     if (!openCall?.basicInfo?.dates?.ocStart)
       setValue("openCall.basicInfo.dates.ocStart", new Date().toISOString());
   });
@@ -680,7 +681,7 @@ const SubmissionFormOC1 = ({
                         minDate={minDate}
                         ocEnd={ocEnd}
                         orgTimezone={orgTimezone}
-                        placeholder="Deadline"
+                        placeholder="Select Deadline"
                         isAdmin={isAdmin}
                       />
                     )}

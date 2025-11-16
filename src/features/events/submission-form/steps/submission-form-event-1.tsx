@@ -276,6 +276,7 @@ const SubmissionFormEventStep1 = ({
                     )}
                     badgeClassName="py-2 lg:py-2 lg:text-sm bg-card"
                     textClassName="text-base"
+                    condensed={isMobile}
                     options={[...eventTypeOptions]}
                     onValueChange={(value) => {
                       field.onChange(value);
@@ -445,7 +446,7 @@ const SubmissionFormEventStep1 = ({
                       </p>
                     </div>
 
-                    <div className="mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+                    <div className="mx-auto mb-3 flex w-full flex-col gap-2 sm:mb-0 lg:min-w-[300px] lg:max-w-md">
                       <Label htmlFor="event.name" className="sr-only">
                         {getEventCategoryLabel(category, true)} About
                       </Label>

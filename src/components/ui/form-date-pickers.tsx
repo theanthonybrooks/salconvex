@@ -78,7 +78,7 @@ export const FormDatePicker = <T extends EventOCFormValues>({
   const data = watch(watchPath) as z.infer<typeof eventBase.shape.dates>;
   const eventData = watch("event");
   const edition = eventData?.dates?.edition;
-  console.log(eventData?.dates);
+  // console.log(eventData?.dates);
   const eventFormat = eventData?.dates?.eventFormat;
   const hasEventDates = eventFormat !== "noEvent" && eventFormat !== "ongoing";
   const isEvent = type === "event";

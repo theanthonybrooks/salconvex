@@ -226,7 +226,7 @@ const SubmissionFormEventStep2 = ({
                             </SelectGroup>
                           </>
                         )}
-                        {isAdmin && (
+                        {isAdmin && !eventOnly && (
                           <SelectItem
                             fit
                             value="Unknown"

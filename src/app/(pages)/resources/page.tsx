@@ -42,7 +42,7 @@ const ResourcesPage = () => {
         <p className={cn("font-bold")}>Online Events</p>
         <div
           className={cn(
-            "mx-auto grid gap-8 sm:grid-cols-2 sm:justify-around lg:grid-cols-3 2xl:grid-cols-4",
+            "mx-auto grid gap-8 sm:grid-cols-2 sm:justify-around lg:grid-cols-3 3xl:grid-cols-4",
           )}
         >
           <>

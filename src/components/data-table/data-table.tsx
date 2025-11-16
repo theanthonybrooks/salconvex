@@ -263,10 +263,6 @@ export function DataTable<TData, TValue>({
     setRowSelection({ [preloadedEvent]: true });
     hasSelectedPreload.current = true;
   }, [preloadedEvent, hasPreloadedEvent, rowSelection]);
-  // useEffect(() => {
-  //   if (!hasPreloadedEvent || Object.keys(rowSelection)?.length > 0) return;
-  //   setRowSelection({ [preloadedEvent]: true });
-  // }, [table, preloadedEvent, hasPreloadedEvent, rowSelection]);
 
   useEffect(() => {
     if (selectedRow && Object.keys(selectedRow).length > 0) {
@@ -300,39 +296,6 @@ export function DataTable<TData, TValue>({
   useEffect(() => {
     table.setPageSize(pageSize);
   }, [table, pageSize]);
-
-  // useEffect(() => {
-  //   if (!data.length) return;
-  //   console.log("fuckery 2");
-
-  //   const newSelection = { 0: true };
-  //   setRowSelection(newSelection);
-  // }, [data]);
-
-  // useEffect(() => {
-  //   const selectedKey = Object.keys(rowSelection)[0];
-
-  //   console.log("fuckery", selectedKey);
-  //   // const selectedRow =
-  //   //   selectedKey !== undefined ? data[Number(selectedKey)] : null;
-
-  //   // onRowSelect?.(selectedRow, rowSelection);
-  // }, [rowSelection]);
-
-  // useEffect(() => {
-  //   if (!data.length) return;
-
-  //   // Get the first row index (or whichever should be "newest")
-  //   const firstRowIndex = 0;
-
-  //   // If no row is selected yet, or if the new data length increased, select first
-  //   const hasSelection = Object.keys(rowSelection).length > 0;
-
-  //   if (!hasSelection) {
-  //     setRowSelection({ [firstRowIndex]: true });
-  //     onRowSelect?.(data[firstRowIndex], { [firstRowIndex]: true });
-  //   }
-  // }, [data, rowSelection, onRowSelect]);
 
   return (
     <div className={cn("w-full space-y-4 pb-3", outerContainerClassName)}>

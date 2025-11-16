@@ -412,6 +412,14 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
         userType: ["public"],
         deviceType: ["all"],
       },
+      {
+        title: "Resources",
+        path: "/resources",
+        category: "resources",
+        public: true,
+        userType: ["public"],
+        deviceType: ["all"],
+      },
 
       // {
       //   title: "Collaborators",

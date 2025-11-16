@@ -285,7 +285,10 @@ export const artistColumns: ColumnDef<ArtistColumnProps>[] = [
       // console.log(table.options)
 
       return (
-        <div className={cn("flex justify-center")}>
+        <div
+          className={cn("flex justify-center")}
+          onClick={(e) => e.stopPropagation()}
+        >
           <ConfirmingDropdown>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

@@ -78,6 +78,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   const router = useRouter();
   const [activeStep, setActiveStep] = useState(0);
   const [formType, setFormType] = useState<number>(0);
+  console.log(formType);
   const [editedSections, setEditedSections] = useState<
     ("event" | "openCall")[]
   >([]);
@@ -274,13 +275,13 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   const eventCategory = eventData?.category;
 
   // const eventLogo = eventData?.logo;
-  console.log(
-    newOrgEvent,
-    activeStep,
-    eventData,
-    eventId,
-    canClearEventData.current,
-  );
+  // console.log(
+  //   newOrgEvent,
+  //   activeStep,
+  //   eventData,
+  //   eventId,
+  //   canClearEventData.current,
+  // );
 
   const clearEventDataTrigger =
     (newOrgEvent && activeStep === 0 && eventId && canClearEventData.current) ||
@@ -577,6 +578,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
     if (!isStepValid) return;
     if (hasUserEditedForm) {
       // console.log("hasUserEditedForm 440");
+      if (formType === 0) setFormType(1);
       await handleSave();
     }
     if (formType === 1 && eventData?.hasOpenCall === "Fixed") {

@@ -120,7 +120,7 @@ export const DuplicateEvent = ({
 export const DeleteEvent = ({ eventId, isAdmin }: DeleteEventActionProps) => {
   const confirm = useConfirmAction().confirm;
   const deleteEvent = useMutation(api.events.event.deleteEvent);
-  console.log(eventId, isAdmin);
+  // console.log(eventId, isAdmin);
   const handleDelete = async () => {
     try {
       await deleteEvent({ eventId });
