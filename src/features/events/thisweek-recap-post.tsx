@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { useFilteredEventsQuery } from "@/hooks/use-filtered-events-query";
 import { formatInTimeZone } from "date-fns-tz";
 import { saveAs } from "file-saver";
-import { toJpeg } from "html-to-image";
 import { toast } from "react-toastify";
 
 import {
@@ -28,7 +27,6 @@ import {
 import RecapPost from "@/features/events/ui/thisweek-recap/recap-post";
 import { formatCondensedDateRange } from "@/helpers/dateFns";
 import { cn } from "@/helpers/utilsFns";
-import { waitForImagesToLoad } from "@/lib/imageFns";
 
 import { api } from "~/convex/_generated/api";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
@@ -65,7 +63,7 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
     {
       showHidden: true,
       bookmarkedOnly: false,
-      limit: 20,
+      limit: 100,
       eventTypes: [],
       eventCategories: [],
     },
@@ -127,7 +125,7 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              events: filteredResults, // use the already
+              events: filteredResults,
               fontSize: dateFontSize,
               displayRange,
               source,
@@ -155,17 +153,17 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
     }
   };
 
-  const handleDownloadSingle = async (index: number) => {
-    const node = refs.current[index];
-    if (!node) return;
-    await waitForImagesToLoad([node]);
-    try {
-      const dataUrl = await toJpeg(node, { quality: 0.95 });
-      saveAs(dataUrl, `${displayRange}-recap-${index + 1}.jpg`);
-    } catch (err) {
-      console.error(`Error rendering node ${index}`, err);
-    }
-  };
+  // const handleDownloadSingle = async (index: number) => {
+  //   const node = refs.current[index];
+  //   if (!node) return;
+  //   await waitForImagesToLoad([node]);
+  //   try {
+  //     const dataUrl = await toJpeg(node, { quality: 0.95 });
+  //     saveAs(dataUrl, `${displayRange}-recap-${index + 1}.jpg`);
+  //   } catch (err) {
+  //     console.error(`Error rendering node ${index}`, err);
+  //   }
+  // };
 
   const handleCopyText = () => {
     navigator.clipboard.writeText(captionText).then(() => {
@@ -276,14 +274,14 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
                 refs.current[0] = el;
               }}
             />
-            <button
+            {/* <button
               type="button"
               className="absolute right-2 top-2 z-10 hidden rounded bg-card/80 p-1 group-hover:block"
               onClick={() => handleDownloadSingle(0)}
               title="Download image"
             >
               <ImageIcon className="size-5" />
-            </button>
+            </button> */}
             <div className="absolute left-2 top-2 z-10 hidden w-fit items-center gap-2 rounded bg-card/80 p-1 group-hover:flex">
               <input
                 type="number"
@@ -335,14 +333,14 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
                   event={event}
                   index={visibleIndex}
                 />
-                <button
+                {/* <button
                   type="button"
                   className="absolute right-2 top-2 z-10 hidden rounded bg-card/80 p-1 group-hover:block"
                   onClick={() => handleDownloadSingle(index + 1)}
                   title="Download image"
                 >
                   <ImageIcon className="size-5" />
-                </button>
+                </button> */}
                 <button
                   type="button"
                   className="absolute right-10 top-2 z-10 hidden rounded bg-card/80 p-1 group-hover:block"
@@ -377,14 +375,14 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
                   refs.current[filteredResults.length + 1] = el;
                 }}
               />
-              <button
+              {/* <button
                 type="button"
                 className="absolute right-2 top-2 z-10 hidden rounded bg-card/80 p-1 group-hover:block"
                 onClick={() => handleDownloadSingle(filteredResults.length + 1)}
                 title="Download image"
               >
                 <ImageIcon className="size-5" />
-              </button>
+              </button> */}
             </div>
           )}
           {filteredResults && (
@@ -395,14 +393,14 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
                   refs.current[filteredResults.length + 2] = el;
                 }}
               />
-              <button
+              {/* <button
                 type="button"
                 className="absolute right-2 top-2 z-10 hidden rounded bg-card/80 p-1 group-hover:block"
                 onClick={() => handleDownloadSingle(filteredResults.length + 2)}
                 title="Download image"
               >
                 <ImageIcon className="size-5" />
-              </button>
+              </button> */}
             </div>
           )}
         </div>
