@@ -160,7 +160,7 @@ export function DataTableFacetedFilter<TData, TValue>({
                     <span>{option.label}</span>
                     {(facets?.get(option.value) ??
                     facets?.get(String(option.value))) ? (
-                      <span className="ml-auto size-4 items-center justify-center font-mono text-xs">
+                      <span className="ml-auto min-w-[1rem] items-center justify-end pr-1 text-right font-mono text-xs">
                         {facets.get(option.value) ??
                           facets.get(String(option.value))}
                       </span>
