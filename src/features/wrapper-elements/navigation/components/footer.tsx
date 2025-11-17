@@ -62,13 +62,16 @@ export default function Footer({ className }: { className?: string }) {
   const {
     handleSubmit,
     reset,
+    watch,
     formState: { isValid },
     getFieldState,
   } = form;
-
+  const emailValue = watch("email");
   const emailState = getFieldState("email");
   const emailValid = !emailState?.invalid;
-  const emailDirty = emailState?.isDirty;
+  const emailDirty =
+    emailState?.isDirty && /^.{3,}@.{2,}\..{2,}$/.test(emailValue);
+
   const links = footerLinks;
   const footerText = footerCRText();
   const numColumns = Object.keys(links).length;
@@ -215,7 +218,7 @@ export default function Footer({ className }: { className?: string }) {
                           <FormControl>
                             <Input
                               {...field}
-                              // type="email"
+                              type="email"
                               placeholder="Enter your email"
                               className="h-11 w-full min-w-64 rounded-lg border-foreground bg-background text-foreground placeholder:text-foreground focus:bg-card"
                             />
@@ -276,7 +279,7 @@ export default function Footer({ className }: { className?: string }) {
                 alt="Newsletter sign up. Sign up to receive updates and news about the Street Art List."
                 width={250}
                 height={150}
-                className="mt-4 [@media(max-width:768px)]:w-full"
+                className="mt-4 h-auto w-full md:w-64"
               />
             </div>
           </div>

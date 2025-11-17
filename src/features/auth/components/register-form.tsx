@@ -498,7 +498,7 @@ const RegisterForm = ({ switchFlow }: RegisterFormProps) => {
                           disabled={isPending}
                           {...field}
                           placeholder="email@example.com"
-                          // type="email"
+                          type="email"
                           inputHeight="sm"
                           variant="basic"
                           tabIndex={step === "signUp" ? 3 : -1}

@@ -203,7 +203,7 @@ const FormMessage = React.forwardRef<
     (!emptyError && String(value)?.length > 0) || emptyError;
   const body = message || children || "";
 
-  console.log(emptyError, hasErrorAndValue);
+  // console.log(emptyError, hasErrorAndValue);
   if ((!body && !children) || !hasErrorAndValue) return null;
 
   return (

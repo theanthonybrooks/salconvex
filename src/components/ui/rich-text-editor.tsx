@@ -11,24 +11,21 @@ import Placeholder from "@tiptap/extension-placeholder";
 import TaskItem from "@tiptap/extension-task-item";
 import TaskList from "@tiptap/extension-task-list";
 import Underline from "@tiptap/extension-underline";
-import { EditorContent, useEditor } from "@tiptap/react";
+import {
+  EditorContent,
+  EditorContext,
+  useEditor,
+  useEditorState,
+} from "@tiptap/react";
 import { BubbleMenu } from "@tiptap/react/menus";
 import StarterKit from "@tiptap/starter-kit";
 import { toast } from "react-toastify";
 
-import { FaRemoveFormat, FaUnlink } from "react-icons/fa";
-import {
-  FaBold,
-  FaItalic,
-  FaLink,
-  FaListCheck,
-  FaListOl,
-  FaListUl,
-  FaStrikethrough,
-  FaUnderline,
-} from "react-icons/fa6";
+import { FaRedo, FaRemoveFormat, FaUndo, FaUnlink } from "react-icons/fa";
+import { FaListCheck, FaListOl, FaListUl } from "react-icons/fa6";
 import { Check, CheckIcon, LoaderCircle, Pencil } from "lucide-react";
 
+import { MarkButton } from "@/components/tiptap-ui/mark-button";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -117,6 +114,7 @@ export const RichTextEditor = ({
   const previewRef = useRef<HTMLDivElement>(null);
 
   const linkDialogRef = useRef<HTMLDivElement>(null);
+
   const [editorOpen, setEditorOpen] = useState(false);
 
   const [hoverPreview, setHoverPreview] = useState(false);
@@ -134,6 +132,8 @@ export const RichTextEditor = ({
     .replace(/\s+/g, " ")
     .trim();
   const count = plainText.length;
+
+  const initialContent = tempContent === value;
 
   const editor = useEditor({
     content: tempContent,
@@ -179,6 +179,7 @@ export const RichTextEditor = ({
           class: "underline",
         },
       }),
+      // UiState,
     ],
 
     onUpdate: ({ editor }) => {
@@ -210,6 +211,14 @@ export const RichTextEditor = ({
       },
     },
   });
+  const { canUndo, canRedo } = useEditorState({
+    editor,
+    selector: (ctx) => ({
+      canUndo: (ctx?.editor?.can().undo() && !initialContent) ?? false,
+      canRedo: ctx?.editor?.can().redo() ?? false,
+    }),
+  }) ?? { canUndo: false, canRedo: false };
+
   const hasFormatting =
     (editor && selectionHasAnyMarks(editor)) ||
     editor?.isActive("bold") ||
@@ -314,17 +323,11 @@ export const RichTextEditor = ({
     if (editorOpen && editor) {
       setTempContent(value);
       editor.commands.setContent(value);
-    }
-  }, [editorOpen, editor, value]);
-
-  useEffect(() => {
-    if (editorOpen && editor) {
-      // Wait for the modal to finish mounting visually
       setTimeout(() => {
         editor.commands.focus("end");
       }, 50);
     }
-  }, [editorOpen, editor]);
+  }, [editorOpen, editor, value]);
 
   useEffect(() => {
     if (!editorOpen) return;
@@ -416,6 +419,7 @@ export const RichTextEditor = ({
   };
 
   if (!editor) return null;
+
   const buttonClass = cn(
     asModal &&
       "duration:300 p-3 transition-all ease-in-out hover:-translate-y-1",
@@ -433,297 +437,127 @@ export const RichTextEditor = ({
 
   const noListButtonClass = cn(noList && "!hidden");
 
+  // function insertLabeledListItem(editor: Editor, label: string) {
+  //   editor
+  //     .chain()
+  //     .focus()
+  //     .insertContent({
+  //       type: "paragraph",
+  //       content: [
+  //         {
+  //           type: "text",
+  //           marks: [{ type: "bold" }],
+  //           text: label,
+  //         },
+  //       ],
+  //     })
+  //     .run();
+  // }
+
   const EditorUI = (
-    <div
-      className={cn(
-        "relative flex flex-col rounded p-2",
-        !asModal && "border",
-        asModal && "rich-modal-cont",
-        // bgClassName,
-      )}
-    >
-      {/* Toolbar */}
+    <EditorContext.Provider value={{ editor }}>
       <div
         className={cn(
-          "mb-2 flex gap-2 border-b pb-2",
-          asModal && "justify-between p-2",
+          "flex h-full flex-col rounded p-2",
+          !asModal && "border",
+          asModal &&
+            "rich-modal-cont w-full items-center overflow-hidden px-0 sm:items-start",
+          // bgClassName,
         )}
       >
-        <div className="scrollable mini justx flex flex-wrap items-center gap-2 p-2 pr-8 sm:pr-2">
-          <Button
-            variant="richTextButton"
-            size="richText"
-            type="button"
-            onClick={() => editor.chain().focus().toggleBold().run()}
-            className={cn(
-              buttonClass,
-              editor.isActive("bold") && activeButtonClass,
-            )}
-          >
-            <FaBold className="size-4 shrink-0" />
-          </Button>
-          <Button
-            variant="richTextButton"
-            size="richText"
-            type="button"
-            onClick={() => editor.chain().focus().toggleItalic().run()}
-            className={cn(
-              buttonClass,
-              editor.isActive("italic") && activeButtonClass,
-            )}
-          >
-            <FaItalic className="size-4 shrink-0" />
-          </Button>
-          <Button
-            variant="richTextButton"
-            size="richText"
-            type="button"
-            onClick={() => editor.chain().focus().toggleUnderline().run()}
-            className={cn(
-              buttonClass,
-              editor.isActive("underline") && activeButtonClass,
-            )}
-          >
-            <FaUnderline className="size-4 shrink-0" />
-          </Button>
-          <Button
-            variant="richTextButton"
-            size="richText"
-            type="button"
-            onClick={() => editor.chain().focus().toggleStrike().run()}
-            className={cn(
-              buttonClass,
-              editor.isActive("strike") && activeButtonClass,
-            )}
-          >
-            <FaStrikethrough className="size-4 shrink-0" />
-          </Button>
-
-          <Separator orientation="vertical" className="mx-2 hidden sm:block" />
-          <Button
-            variant="richTextButton"
-            size="richText"
-            type="button"
-            onClick={() => editor.chain().focus().toggleBulletList().run()}
-            className={cn(
-              buttonClass,
-              editor.isActive("bulletList") && activeButtonClass,
-              noListButtonClass,
-            )}
-          >
-            <FaListUl className="size-4 shrink-0" />
-          </Button>
-          <Button
-            variant="richTextButton"
-            size="richText"
-            type="button"
-            onClick={() => editor.chain().focus().toggleOrderedList().run()}
-            className={cn(
-              buttonClass,
-              editor.isActive("orderedList") && activeButtonClass,
-              noListButtonClass,
-            )}
-          >
-            <FaListOl className="size-4 shrink-0" />
-          </Button>
-          {forOpenCall ||
-            (withTaskList && (
-              <Button
-                variant="richTextButton"
-                size="richText"
-                type="button"
-                onClick={() => editor.chain().focus().toggleTaskList().run()}
-                className={cn(
-                  buttonClass,
-                  editor.isActive("taskList")
-                    ? activeButtonClass
-                    : "text-gray-500",
-                  noListButtonClass,
-                )}
-              >
-                <FaListCheck className="size-4 shrink-0" />
-              </Button>
-            ))}
-          <Separator
-            orientation="vertical"
-            className={cn("mx-2 hidden sm:block", noListButtonClass)}
-          />
-
-          <Button
-            variant="richTextButton"
-            size="richText"
-            type="button"
-            onClick={() => {
-              const { from, to } = editor.state.selection;
-              const selectedText = editor.state.doc.textBetween(from, to);
-              setLinkUrl(editor.getAttributes("link")?.href || "");
-              setDisplayText(selectedText || "");
-              setShowLinkInput(true);
-            }}
-            className={cn(
-              buttonClass,
-              editor.isActive("link") && activeButtonClass,
-            )}
-          >
-            <FaLink className="size-4 shrink-0" />
-          </Button>
-
-          <Button
-            variant="richTextButton"
-            size="richText"
-            type="button"
-            onClick={() => editor.chain().focus().unsetLink().run()}
-            className={cn(
-              buttonClass,
-              editor.isActive("link")
-                ? "border-red-800 bg-red-50 font-bold text-black hover:bg-red-100"
-                : "text-gray-400",
-              !hasLink && disabledButtonClass,
-            )}
-          >
-            <FaUnlink className="size-4 shrink-0" />
-          </Button>
-          <Separator orientation="vertical" className="mx-2 hidden sm:block" />
-
-          <Button
-            variant="richTextButton"
-            size="richText"
-            type="button"
-            onClick={() =>
-              editor
-                .chain()
-                .focus()
-                .clearNodes() // reset block-level nodes like lists/headings
-                .unsetAllMarks() // remove inline formatting like bold/italic
-                .run()
-            }
-            className={cn(
-              buttonClass,
-              "text-gray-500",
-              !hasFormatting && disabledButtonClass,
-            )}
-          >
-            <FaRemoveFormat className="size-4 shrink-0" />
-          </Button>
-        </div>
-        {asModal && (
-          <span
-            className={cn(
-              "mr-10 hidden flex-col items-end gap-1 border-foreground/30 pr-4 md:flex",
-              (subtitle || title) && "border-r-2",
-            )}
-          >
-            <p className="font-bold capitalize">{title}</p>{" "}
-            <p className="text-sm">{subtitle}</p>
-          </span>
-        )}
-      </div>
-      <Dialog open={showLinkInput} onOpenChange={setShowLinkInput}>
-        <DialogContent
-          ref={linkDialogRef}
-          className="flex flex-col gap-2 rounded-lg bg-dashboardBgLt"
+        {/* Toolbar */}
+        <div
+          className={cn(
+            "mb-2 flex w-full gap-2 border-b pb-2",
+            asModal && "justify-between p-2",
+          )}
         >
-          <DialogTitle className="sr-only">Link Dialog</DialogTitle>
-          <div className={cn("mb-2 flex flex-col gap-2 px-4 pt-3")}>
-            <label htmlFor="link-url">Link URL:</label>
-            <input
-              id="link-url"
-              type="url"
-              className="h-10 w-full rounded border px-2 py-1 text-base sm:text-sm"
-              placeholder="https://example.com"
-              value={linkUrl}
-              onChange={(e) => setLinkUrl(e.target.value)}
+          <div className="scrollable mini justx flex flex-wrap items-center gap-2 p-2 pr-10 sm:pr-2">
+            <Button
+              variant="richTextButton"
+              size="richText"
+              type="button"
+              disabled={!canUndo}
+              onClick={() => editor.commands.undo()}
+              className={cn(buttonClass)}
+            >
+              <FaUndo className="size-4 shrink-0" />
+            </Button>
+            <Button
+              variant="richTextButton"
+              size="richText"
+              type="button"
+              disabled={!canRedo}
+              onClick={() => editor.commands.redo()}
+              className={cn(buttonClass)}
+            >
+              <FaRedo className="size-4 shrink-0" />
+            </Button>
+            <Separator
+              orientation="vertical"
+              className={cn("mx-2 hidden sm:block", noListButtonClass)}
             />
-            <label htmlFor="display-text">Display text:</label>
-            <input
-              id="display-text"
-              type="text"
-              className="h-10 w-full rounded border px-2 py-1 text-base sm:text-sm"
-              placeholder="Display text"
-              value={displayText}
-              onChange={(e) => setDisplayText(e.target.value)}
+            <MarkButton type="bold" />
+            <MarkButton type="italic" />
+            <MarkButton type="underline" />
+            <MarkButton type="strike" />
+
+            <Separator
+              orientation="vertical"
+              className="mx-2 hidden sm:block"
+            />
+            <Button
+              variant="richTextButton"
+              size="richText"
+              type="button"
+              onClick={() => editor.chain().focus().toggleBulletList().run()}
+              className={cn(
+                buttonClass,
+                // markIsActiveAtCursor("bulletList") && activeButtonClass,
+                editor.isActive("bulletList") && activeButtonClass,
+                noListButtonClass,
+              )}
+            >
+              <FaListUl className="size-4 shrink-0" />
+            </Button>
+            <Button
+              variant="richTextButton"
+              size="richText"
+              type="button"
+              onClick={() => editor.chain().focus().toggleOrderedList().run()}
+              className={cn(
+                buttonClass,
+                // markIsActiveAtCursor("orderedList") && activeButtonClass,
+                editor.isActive("orderedList") && activeButtonClass,
+                noListButtonClass,
+              )}
+            >
+              <FaListOl className="size-4 shrink-0" />
+            </Button>
+            {forOpenCall ||
+              (withTaskList && (
+                <Button
+                  variant="richTextButton"
+                  size="richText"
+                  type="button"
+                  onClick={() => editor.chain().focus().toggleTaskList().run()}
+                  className={cn(
+                    buttonClass,
+                    editor.isActive("taskList")
+                      ? activeButtonClass
+                      : "text-gray-500",
+                    noListButtonClass,
+                  )}
+                >
+                  <FaListCheck className="size-4 shrink-0" />
+                </Button>
+              ))}
+            <Separator
+              orientation="vertical"
+              className={cn("mx-2 hidden sm:block", noListButtonClass)}
             />
 
-            <div className="flex gap-2 pt-4">
-              <Button
-                size="lg"
-                className="flex-1 bg-salPinkLt"
-                variant="salWithShadowHiddenYlw"
-                onClick={() => setShowLinkInput(false)}
-              >
-                Cancel
-              </Button>
-              <Button
-                variant="salWithShadowHidden"
-                size="lg"
-                className="flex-1"
-                onClick={handleLink}
-              >
-                Apply
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
-      {editor && (
-        <BubbleMenu editor={editor} options={{ placement: "top-start" }}>
-          <div className="flex gap-1 rounded-lg border border-foreground/40 bg-card p-2">
-            <Button
-              variant="richTextButton"
-              size="richText"
-              type="button"
-              onClick={() => editor.chain().focus().toggleBold().run()}
-              className={cn(
-                buttonClass,
-                editor.isActive("bold") && activeButtonClass,
-                "p-2",
-              )}
-            >
-              <FaBold className="size-4 shrink-0" />
-            </Button>
-            <Button
-              variant="richTextButton"
-              size="richText"
-              type="button"
-              onClick={() => editor.chain().focus().toggleItalic().run()}
-              className={cn(
-                buttonClass,
-                editor.isActive("italic") && activeButtonClass,
-                "p-2",
-              )}
-            >
-              <FaItalic className="size-4 shrink-0" />
-            </Button>
-            <Button
-              variant="richTextButton"
-              size="richText"
-              type="button"
-              onClick={() => editor.chain().focus().toggleUnderline().run()}
-              className={cn(
-                buttonClass,
-                editor.isActive("underline") && activeButtonClass,
-                "p-2",
-              )}
-            >
-              <FaUnderline className="size-4 shrink-0" />
-            </Button>
-            <Button
-              variant="richTextButton"
-              size="richText"
-              type="button"
-              onClick={() => editor.chain().focus().toggleStrike().run()}
-              className={cn(
-                buttonClass,
-                editor.isActive("strike") && activeButtonClass,
-                "p-2",
-              )}
-            >
-              <FaStrikethrough className="size-4 shrink-0" />
-            </Button>
-            <Button
-              variant="richTextButton"
-              size="richText"
-              type="button"
+            <MarkButton
               onClick={() => {
                 const { from, to } = editor.state.selection;
                 const selectedText = editor.state.doc.textBetween(from, to);
@@ -731,81 +565,223 @@ export const RichTextEditor = ({
                 setDisplayText(selectedText || "");
                 setShowLinkInput(true);
               }}
+              type="link"
+            />
+            <MarkButton
+              onClick={() => editor.chain().focus().unsetLink().run()}
+              type="link"
+              className={cn(
+                "data-[active-state=on]:border-red-800 data-[active-state=on]:bg-red-50 data-[active-state=on]data-[active-state=on]:text-black data-[active-state=on]:hover:bg-red-100",
+              )}
+              disabled={!hasLink}
+              icon={FaUnlink}
+            />
+
+            <Separator
+              orientation="vertical"
+              className="mx-2 hidden sm:block"
+            />
+
+            <Button
+              variant="richTextButton"
+              size="richText"
+              type="button"
+              onClick={() =>
+                editor
+                  .chain()
+                  .focus()
+                  .clearNodes() // reset block-level nodes like lists/headings
+                  .unsetAllMarks() // remove inline formatting like bold/italic
+                  .run()
+              }
               className={cn(
                 buttonClass,
-                editor.isActive("link") && activeButtonClass,
-                "p-2",
+                "text-gray-500",
+                !hasFormatting && disabledButtonClass,
               )}
             >
-              <FaLink className="size-4 shrink-0" />
+              <FaRemoveFormat className="size-4 shrink-0" />
             </Button>
           </div>
-        </BubbleMenu>
-      )}
-      <EditorContent
-        editor={editor}
-        className={cn(
-          "rich-text min-h-[100px] flex-1",
-          asModal && "rich-modal [&_div.ProseMirror]:max-h-[calc(90dvh-140px)]",
-          readOnly && "pointer-events-none cursor-default",
-        )}
-      />
+          {asModal && (
+            <span
+              className={cn(
+                "mr-10 hidden flex-col items-end gap-1 border-foreground/30 pr-4 md:flex",
+                (subtitle || title) && "border-r-2",
+              )}
+            >
+              <p className="font-bold capitalize">{title}</p>{" "}
+              <p className="text-sm">{subtitle}</p>
+            </span>
+          )}
+        </div>
+        <Dialog open={showLinkInput} onOpenChange={setShowLinkInput}>
+          <DialogContent
+            ref={linkDialogRef}
+            className="flex flex-col gap-2 rounded-lg bg-dashboardBgLt"
+          >
+            <DialogTitle className="sr-only">Link Dialog</DialogTitle>
+            <div className={cn("mb-2 flex flex-col gap-2 px-4 pt-3")}>
+              <label htmlFor="link-url">Link URL:</label>
+              <input
+                id="link-url"
+                type="url"
+                className="h-10 w-full rounded border px-2 py-1 text-base sm:text-sm"
+                placeholder="https://example.com"
+                value={linkUrl}
+                onChange={(e) => setLinkUrl(e.target.value)}
+              />
+              <label htmlFor="display-text">Display text:</label>
+              <input
+                id="display-text"
+                type="text"
+                className="h-10 w-full rounded border px-2 py-1 text-base sm:text-sm"
+                placeholder="Display text"
+                value={displayText}
+                onChange={(e) => setDisplayText(e.target.value)}
+              />
 
-      <div
-        className={cn(
-          "absolute bottom-4 right-6 flex w-full max-w-[81dvw] flex-col gap-2 rounded bg-card pb-1 sm:w-auto",
-          // bgClassName,
+              <div className="flex gap-2 pt-4">
+                <Button
+                  size="lg"
+                  className="flex-1 bg-salPinkLt"
+                  variant="salWithShadowHiddenYlw"
+                  onClick={() => setShowLinkInput(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="salWithShadowHidden"
+                  size="lg"
+                  className="flex-1"
+                  onClick={handleLink}
+                >
+                  Apply
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+        {editor && (
+          <>
+            <BubbleMenu editor={editor} options={{ placement: "top-start" }}>
+              <div className="flex gap-1 rounded-lg border border-foreground/40 bg-card p-2">
+                <MarkButton type="bold" />
+                <MarkButton type="italic" />
+                <MarkButton type="underline" />
+                <MarkButton type="strike" />
+
+                <MarkButton
+                  onClick={() => {
+                    const { from, to } = editor.state.selection;
+                    const selectedText = editor.state.doc.textBetween(from, to);
+                    setLinkUrl(editor.getAttributes("link")?.href || "");
+                    setDisplayText(selectedText || "");
+                    setShowLinkInput(true);
+                  }}
+                  type="link"
+                />
+              </div>
+            </BubbleMenu>
+            {/* <FloatingElementExample /> */}
+            {/* <FloatingMenu editor={editor}>
+              <div className="flex items-center gap-1 rounded-lg border border-foreground/40 bg-card p-2">
+                <Button
+                  onClick={() => {
+                    editor
+                      .chain()
+                      .focus()
+                      .insertContent([
+                        {
+                          type: "paragraph",
+                          content: [{ type: "text", text: "Section title" }],
+                        },
+                        {
+                          type: "paragraph",
+                          content: [{ type: "text", text: "Body text here…" }],
+                        },
+                      ])
+                      .run();
+                  }}
+                >
+                  Insert Artist Info
+                </Button>
+                <Button
+                  onClick={() => insertLabeledListItem(editor, "Artist Info")}
+                >
+                  Insert Artist Info
+                </Button>
+              </div>
+            </FloatingMenu> */}
+            {/* <DragContextMenu editor={editor} /> */}
+          </>
         )}
-      >
-        <p
+        <EditorContent
+          editor={editor}
           className={cn(
-            "mr-1 flex items-center justify-end gap-1 text-right text-sm text-gray-500",
-            requiredChars && !reqCharsMet && "text-red-500",
-            requiredChars && reqCharsMet && "text-emerald-500",
+            "rich-text scrollable mini darkbar w-full flex-1 px-4",
+            // asModal && "rich-modal [&_div.ProseMirror]:max-h-[calc(90dvh-140px)]",
+            readOnly && "pointer-events-none cursor-default",
+          )}
+        />
+
+        <div
+          className={cn(
+            "flex w-full max-w-[81dvw] flex-col gap-2 rounded bg-card pb-2 sm:w-auto sm:self-end sm:pr-4",
+            // bgClassName,
           )}
         >
-          {editor.storage.characterCount.characters()}/{charLimit}
-          {requiredChars && reqCharsMet && (
-            <Check className="size-3 text-emerald-500" />
-          )}
-        </p>
-
-        <div className="flex flex-col items-center justify-end gap-3 sm:flex-row">
-          {!reqCharsMet && (
-            <p className="text-nowrap text-xs text-red-500 sm:text-sm">
-              Content is too short. Must be at least {requiredChars} characters.
-            </p>
-          )}
-          <div className="flex w-full items-center gap-2">
-            {hasUnsavedChanges && (
-              <Button variant="salWithShadowHidden" onClick={handleDiscard}>
-                Discard
-              </Button>
+          <p
+            className={cn(
+              "mr-1 flex items-center justify-end gap-1 text-right text-sm text-gray-500",
+              requiredChars && !reqCharsMet && "text-red-500",
+              requiredChars && reqCharsMet && "text-emerald-500",
             )}
-            <Button
-              disabled={!reqCharsMet}
-              variant="salWithShadowHiddenYlw"
-              onClick={() => {
-                if (hasUnsavedChanges) {
-                  handleAccept();
-                } else {
-                  setEditorOpen(false);
-                }
-              }}
-              className="flex-1 sm:flex-none"
-            >
-              {hasUnsavedChanges ? "Save" : readOnly ? "Close" : "Cancel"}
-              {hasUnsavedChanges && !pending && (
-                <CheckIcon className="ml-1 size-4 shrink-0" />
+          >
+            {editor.storage.characterCount.characters()}/{charLimit}
+            {requiredChars && reqCharsMet && (
+              <Check className="size-3 text-emerald-500" />
+            )}
+          </p>
+
+          <div className="flex flex-col items-center justify-end gap-3 sm:flex-row">
+            {!reqCharsMet && (
+              <p className="text-nowrap text-xs text-red-500 sm:text-sm">
+                Content is too short. Must be at least {requiredChars}{" "}
+                characters.
+              </p>
+            )}
+            <div className="flex w-full items-center gap-2">
+              {hasUnsavedChanges && (
+                <Button variant="salWithShadowHidden" onClick={handleDiscard}>
+                  Discard
+                </Button>
               )}
-              {pending && (
-                <LoaderCircle className="ml-1 size-4 shrink-0 animate-spin" />
-              )}
-            </Button>
+              <Button
+                disabled={!reqCharsMet}
+                variant="salWithShadowHiddenYlw"
+                onClick={() => {
+                  if (hasUnsavedChanges) {
+                    handleAccept();
+                  } else {
+                    setEditorOpen(false);
+                  }
+                }}
+                className="flex-1 sm:flex-none"
+              >
+                {hasUnsavedChanges ? "Save" : readOnly ? "Close" : "Cancel"}
+                {hasUnsavedChanges && !pending && (
+                  <CheckIcon className="ml-1 size-4 shrink-0" />
+                )}
+                {pending && (
+                  <LoaderCircle className="ml-1 size-4 shrink-0 animate-spin" />
+                )}
+              </Button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </EditorContext.Provider>
   );
   if (asModal) {
     return (

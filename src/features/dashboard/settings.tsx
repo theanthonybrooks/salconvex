@@ -676,7 +676,7 @@ export default function SettingsPage() {
                         //TODO: Add this back in when I implement the email verification system
                         disabled={true || pending}
                         id="email"
-                        // type="email"
+                        type="email"
                         placeholder="Your email"
                         className="dark:text-primary-foreground"
                       />

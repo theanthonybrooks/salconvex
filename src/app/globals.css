@@ -4,7 +4,9 @@
 @tailwind components;
 @tailwind utilities;
 
-@import "./styles/react-day-picker.css";
+@import "../styles/react-day-picker.css";
+@import "../styles/_variables.css";
+@import "../styles/_keyframe-animations.css";
 /* @font-face {
   font-family: "Tanker-Regular";
   src: url("/fonts/tanker/Tanker-Regular.ttf") format("truetype");
@@ -1423,15 +1425,16 @@ div:has(> div.react-datepicker__input-container) {
 } */
 
 .rich-text {
-  &.rich-modal {
-    @media (max-width: 768px) {
+  /*&.rich-modal {
+    /~ @media (max-width: 768px) {
       max-width: 85vw;
-    }
+    } ~/
     display: flex;
     & .ProseMirror {
       padding: 1em 2em 2em;
+      @apply pb-25;
     }
-  }
+  }*/
 
   & a {
     font-weight: 600;
@@ -1538,9 +1541,9 @@ div:has(> div.react-datepicker__input-container) {
   -webkit-font-variant-ligatures: none;
   font-variant-ligatures: none;
   font-feature-settings: "liga" 0;
-  @media (width <= 768px) {
+  /* @media (width <= 768px) {
     padding-bottom: 6rem;
-  }
+  } */
 }
 
 .tiptap p.is-editor-empty[data-placeholder]:first-child::before {
@@ -1567,8 +1570,6 @@ div:has(> div.react-datepicker__input-container) {
 .ProseMirror {
   flex: 1;
   min-height: 100px; /* still needed for empty state */
-  max-height: 300px; /* optional */
-  overflow-y: auto;
 }
 /* #endregion */
 
