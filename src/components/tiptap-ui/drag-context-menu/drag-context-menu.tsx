@@ -326,7 +326,7 @@ export const DragContextMenu: React.FC<DragContextMenuProps> = ({
   ...props
 }) => {
   const { editor } = useTiptapEditor(providedEditor);
-  const { aiGenerationActive, isDragging } = useUiEditorState(editor);
+  const { isDragging } = useUiEditorState(editor);
   const isMobile = useIsBreakpoint("max", mobileBreakpoint);
   const [open, setOpen] = useState(false);
   const [node, setNode] = useState<TiptapNode | null>(null);
@@ -409,7 +409,7 @@ export const DragContextMenu: React.FC<DragContextMenuProps> = ({
         <ButtonGroup
           orientation="horizontal"
           style={{
-            ...(aiGenerationActive || isMobile || isTextSelectionValid(editor)
+            ...(isMobile || isTextSelectionValid(editor)
               ? { opacity: 0, pointerEvents: "none" }
               : {}),
             ...(isDragging ? { opacity: 0 } : {}),
