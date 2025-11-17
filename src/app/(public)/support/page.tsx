@@ -269,7 +269,7 @@ const SupportPage = () => {
                         <FormControl>
                           <Input
                             {...field}
-                            type="email"
+                            // type="email"
                             placeholder="ex. email@mail.com"
                             className={cn(
                               "w-full border-foreground bg-card",

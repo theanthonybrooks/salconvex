@@ -1,12 +1,14 @@
+import { searchDialogVariants } from "@/constants/dialogConsts";
+
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { DashIcon } from "@radix-ui/react-icons";
 import { Command } from "cmdk";
-import { usePreloadedQuery } from "convex/react";
 import { AnimatePresence, motion } from "framer-motion";
-import { CircleX, X } from "lucide-react";
+
 import { IoSearch } from "react-icons/io5";
+import { CircleX, X } from "lucide-react";
 
 import { DialogTitle } from "@/components/ui/dialog";
 import {
@@ -17,7 +19,8 @@ import {
 } from "@/components/ui/drawer";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { cn } from "@/helpers/utilsFns";
-import { searchDialogVariants } from "@/constants/dialogConsts";
+
+import { usePreloadedQuery } from "convex/react";
 
 export interface CommandItem {
   label?: string;
@@ -76,13 +79,13 @@ export const CommandMenuCustom = <T extends CommandItem>({
   }, [shortcut]);
 
   useEffect(() => {
-    if (open) {
+    if (open && !isMobile) {
       setTimeout(() => {
         inputRef.current?.focus();
         inputRef.current?.select();
       }, 0);
     }
-  }, [open]);
+  }, [open, isMobile]);
 
   // Keyboard shortcut handler (depends only on setOpen)
   useEffect(() => {

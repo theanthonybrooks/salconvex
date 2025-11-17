@@ -317,7 +317,7 @@ const SignInCard = ({ switchFlow, forgotPasswordHandler }: SignInCardProps) => {
                       <Input
                         disabled={pending || pendingOAuth}
                         {...field}
-                        type="email"
+                        // type="email"
                         inputHeight="default"
                         variant="basic"
                         tabIndex={2}

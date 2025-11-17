@@ -1,17 +1,25 @@
 "use client";
-import { Button } from "@/components/ui/button";
-import { Link } from "@/components/ui/custom-link";
-import { Input } from "@/components/ui/input";
+
 import {
   FOOTER_LINKS as footerLinks,
   SOCIAL_MEDIA_LINKS,
 } from "@/constants/links";
+import { infoEmail } from "@/constants/siteInfo";
 import { footerCRText } from "@/constants/text";
-import { cn } from "@/helpers/utilsFns";
-import { useQuery } from "convex-helpers/react/cache";
-import { useAction, useMutation, usePreloadedQuery } from "convex/react";
+
+import { useState } from "react";
+import Image from "next/image";
+import { NewsletterFormValues, newsletterSignupSchema } from "@/schemas/public";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
+
+import { FaRegEnvelope } from "react-icons/fa";
+import { PiHeartBold } from "react-icons/pi";
 import { ArrowRight, CheckCircle, LoaderCircle } from "lucide-react";
 
+import { Button } from "@/components/ui/button";
+import { Link } from "@/components/ui/custom-link";
 import {
   Form,
   FormControl,
@@ -19,19 +27,15 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { infoEmail } from "@/constants/siteInfo";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { getUserFontSizePref } from "@/helpers/stylingFns";
-import { NewsletterFormValues, newsletterSignupSchema } from "@/schemas/public";
-import { zodResolver } from "@hookform/resolvers/zod";
-import Image from "next/image";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { FaRegEnvelope } from "react-icons/fa";
-import { PiHeartBold } from "react-icons/pi";
-import { toast } from "react-toastify";
+import { cn } from "@/helpers/utilsFns";
+
 import { api } from "~/convex/_generated/api";
+import { useQuery } from "convex-helpers/react/cache";
+import { useAction, useMutation, usePreloadedQuery } from "convex/react";
 
 export default function Footer({ className }: { className?: string }) {
   const { preloadedUserData } = useConvexPreload();
@@ -46,6 +50,7 @@ export default function Footer({ className }: { className?: string }) {
       firstName: "",
     },
     mode: "onChange",
+    delayError: 1000,
   });
   // const {
   //   register,
@@ -210,7 +215,7 @@ export default function Footer({ className }: { className?: string }) {
                           <FormControl>
                             <Input
                               {...field}
-                              type="email"
+                              // type="email"
                               placeholder="Enter your email"
                               className="h-11 w-full min-w-64 rounded-lg border-foreground bg-background text-foreground placeholder:text-foreground focus:bg-card"
                             />
@@ -242,7 +247,11 @@ export default function Footer({ className }: { className?: string }) {
                   <div className="mt-3 sm:ml-3 sm:mt-0">
                     <Button
                       type="submit"
-                      variant="salWithShadowHidden"
+                      variant={
+                        isValid
+                          ? "salWithShadowHidden"
+                          : "salWithShadowHiddenBg"
+                      }
                       className="flex w-full items-center justify-center gap-2 font-bold md:w-[150px]"
                       disabled={subAction === "subbing" || !isValid}
                     >

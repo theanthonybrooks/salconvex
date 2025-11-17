@@ -9,7 +9,11 @@ import {
   callTypeValues,
   validOCVals,
 } from "@/constants/openCallConsts";
-import { optionalEmail, optionalUrl } from "@/constants/zodConsts";
+import {
+  optionalEmail,
+  optionalUrl,
+  unicodeEmail,
+} from "@/constants/zodConsts";
 
 import { z } from "zod";
 
@@ -853,7 +857,7 @@ export const getOpenCallStep1Schema = (isAdmin: boolean = false) => {
     }
 
     if (appLinkFormat === "mailto:") {
-      const parsed = z.email().safeParse(appLink);
+      const parsed = unicodeEmail.safeParse(appLink);
 
       if (!parsed.success) {
         ctx.addIssue({

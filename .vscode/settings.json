@@ -41,7 +41,8 @@
     "Resend",
     "Component",
     "Artist Highlight",
-    "Old Site"
+    "Old Site",
+    "Zod"
   ],
   "typescript.tsdk": "node_modules\\typescript\\lib",
   "python.analysis.autoImportCompletions": true

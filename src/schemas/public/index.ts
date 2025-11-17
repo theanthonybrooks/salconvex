@@ -3,6 +3,7 @@ import {
   NewsletterType,
   newsletterTypeOptions,
 } from "@/constants/newsletterConsts";
+import { unicodeEmail } from "@/constants/zodConsts";
 
 import { z } from "zod";
 
@@ -14,7 +15,7 @@ const newsletterTypeValues = newsletterTypeOptions.map(
 
 export const contactSchema = z.object({
   name: z.string().min(3, "Name must be at least 3 characters"),
-  email: z.email("Must be a valid email address"),
+  email: unicodeEmail,
   category: z.string().nonempty("Category is required"),
   message: z.string().min(10, "Message must be at least 10 characters"),
 });
@@ -22,14 +23,14 @@ export const contactSchema = z.object({
 export type ContactFormValues = z.infer<typeof contactSchema>;
 
 export const newsletterSignupSchema = z.object({
-  email: z.email("Must be a valid email address"),
+  email: unicodeEmail,
   firstName: z.string().min(3, "First name is required"),
 });
 
 export type NewsletterFormValues = z.infer<typeof newsletterSignupSchema>;
 
 export const newsletterStatusSchema = z.object({
-  email: z.email("Must be a valid email address"),
+  email: unicodeEmail,
   // frequency: z.union([z.literal("monthly"), z.literal("weekly")]),
 });
 
@@ -49,7 +50,7 @@ export const getEventRegistrationSchema = (link?: boolean, notes?: boolean) => {
   void notes;
   return z
     .object({
-      email: z.email("Must be a valid email address"),
+      email: unicodeEmail,
       name: z.string().min(3, "Name is required"),
       link: link ? z.url() : z.string().optional(),
       notes: z.string().optional(),

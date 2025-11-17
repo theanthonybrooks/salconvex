@@ -265,13 +265,13 @@ export const AccountTypeSwitch = ({
           <p>
             Want to <span className="font-bold">add</span> an event/open call?
           </p>
-        ) : !hasSub ? (
+        ) : hasSub ? (
           <p>
-            Want to <span className="font-bold">apply</span> to open calls?
+            Want to <span className="font-bold">manage</span> your plan?
           </p>
         ) : (
           <p>
-            Want to <span className="font-bold">manage</span> your plan?
+            Want to <span className="font-bold">apply</span> to open calls?
           </p>
         )}
         <Button

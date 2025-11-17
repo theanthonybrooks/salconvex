@@ -1,9 +1,9 @@
 "use client";
 
+import { User } from "@/types/user";
+
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { User } from "@/types/user";
-import { usePreloadedQuery } from "convex/react";
 import { isBefore } from "date-fns";
 
 import {
@@ -18,6 +18,8 @@ import { ArtistProfileForm } from "@/features/artists/artist-profile-form-dialog
 import { EventOCForm } from "@/features/events/event-add-form";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { cn } from "@/helpers/utilsFns";
+
+import { usePreloadedQuery } from "convex/react";
 
 // type BaseTaskValues = {
 //   title: string
@@ -136,9 +138,10 @@ export const AccountSubscribeForm = ({
         showCloseButton={false}
         onEscapeKeyDown={(e) => e.preventDefault()}
         className={cn(
-          "max-h-dvh w-full max-w-full bg-card md:h-auto md:max-w-[max(60rem,60vw)]",
+          "max-h-dvh w-full max-w-full bg-card md:h-auto",
           // "scrollable",
           className,
+          isArtist && "md:max-w-[max(60rem,32vw)]",
           !isArtist &&
             "h-dvh md:h-full md:max-w-full xl:max-h-[95vh] xl:max-w-[98vw]",
         )}

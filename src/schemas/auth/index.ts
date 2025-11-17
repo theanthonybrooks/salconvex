@@ -1,3 +1,5 @@
+import { unicodeEmail } from "@/constants/zodConsts";
+
 import { z } from "zod";
 
 export const passwordValidation = new RegExp(
@@ -22,8 +24,8 @@ export const passwordRules = [
 ];
 
 export const LoginSchema = z.object({
-  email: z
-    .email({ message: "Email is required" })
+  email: unicodeEmail
+    // z.email({ message: "Email is required" })
     .transform((val) => val.toLowerCase()),
   password: z
     .string()
@@ -40,9 +42,9 @@ export const RegisterSchema = z
   .object({
     firstName: z.string().min(1, { message: "First name is required" }),
     lastName: z.string().min(1, { message: "Last name is required" }),
-    email: z
-      .email({ message: "Email is required" })
-      .transform((val) => val.toLowerCase()),
+    email:
+      // .email({ message: "Email is required" })
+      unicodeEmail.transform((val) => val.toLowerCase()),
     password: z
       .string()
       .regex(passwordValidation, {
@@ -85,8 +87,8 @@ export const RegisterSchema = z
 export const UpdateUserSchema = z.object({
   firstName: z.string().min(1, { message: "First name is required" }),
   lastName: z.string().min(1, { message: "Last name is required" }),
-  email: z
-    .email({ message: "Email is required" })
+  email: unicodeEmail
+    // z.email({ message: "Email is required" })
     .transform((val) => val.toLowerCase()),
   name: z.string().optional(),
   organizationName: z.string().optional(),
@@ -95,21 +97,21 @@ export const UpdateUserSchema = z.object({
 export type UpdateUserSchemaValues = z.infer<typeof UpdateUserSchema>;
 
 export const ResendOtpSchema = z.object({
-  email: z
-    .email({ message: "Email is required" })
-    .transform((val) => val.toLowerCase()),
+  email:
+    // z.email({ message: "Email is required" })
+    unicodeEmail.transform((val) => val.toLowerCase()),
 });
 
 export const VerifyOtpSchema = z.object({
-  email: z
-    .email({ message: "Email is required" })
+  email: unicodeEmail
+    // z.email({ message: "Email is required" })
     .transform((val) => val.toLowerCase()),
   otp: z.string().min(6, { message: "The code must be 6 digits" }),
 });
 
 export const ForgotPasswordSchema = z.object({
-  email: z
-    .email({ message: "Email is required" })
+  email: unicodeEmail
+    // z.email({ message: "Email is required" })
     .transform((val) => val.toLowerCase()),
 });
 
