@@ -1,5 +1,7 @@
 "use client";
 
+import { appStatusOptionValues } from "@/constants/data-table-constants";
+
 import { ColumnDef } from "@tanstack/react-table";
 import { formatInTimeZone } from "date-fns-tz";
 
@@ -97,6 +99,7 @@ export const bookmarkColumns: ColumnDef<BookmarkColumnsProps>[] = [
   },
   {
     accessorKey: "edition",
+    accessorFn: (row) => String(row.edition),
     id: "edition",
     minSize: 80,
     maxSize: 80,
@@ -245,15 +248,30 @@ export const bookmarkColumns: ColumnDef<BookmarkColumnsProps>[] = [
 
   {
     accessorKey: "eventIntent",
+    accessorFn: (row) => {
+      const raw = row.eventIntent;
+      if (appStatusOptionValues.includes(String(raw))) {
+        return "applied";
+      }
+      return raw ?? "-";
+    },
     id: "eventIntent",
+
     minSize: 130,
     maxSize: 200,
     filterFn: (row, columnId, filterValue) => {
       if (!Array.isArray(filterValue)) return true;
-      const value = row.getValue(columnId);
-      if (!value && filterValue.includes("-")) return true;
-      return filterValue.includes(value);
+
+      const raw = row.getValue(columnId);
+
+      // Normalize: anything in appStatusOptionValues becomes "applied"
+      const normalized = appStatusOptionValues.includes(String(raw))
+        ? "applied"
+        : (raw ?? "-");
+
+      return filterValue.includes(normalized);
     },
+
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Reason" />
     ),

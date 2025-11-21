@@ -93,6 +93,8 @@ export const applicationColumns: ColumnDef<ApplicationColumnsProps>[] = [
   },
   {
     accessorKey: "edition",
+    accessorFn: (row) => String(row.edition),
+
     id: "edition",
     minSize: 80,
     maxSize: 80,

@@ -16,7 +16,6 @@ import {
   CalendarHeart,
   CheckCircle,
   CircleCheck,
-  CircleX,
   Clock,
   DollarSign,
   House,
@@ -92,11 +91,11 @@ export const bookmarkIntents = [
     label: "Contact",
     icon: Mail,
   },
-  {
-    value: "rejected",
-    label: "Rejected",
-    icon: CircleX,
-  },
+  // {
+  //   value: "rejected",
+  //   label: "Rejected",
+  //   icon: CircleX,
+  // },
   {
     value: "applied",
     label: "Applied",
@@ -137,6 +136,8 @@ export const appStatusOptions = [
     icon: LucideBadgeCheck,
   },
 ];
+
+export const appStatusOptionValues = appStatusOptions.map((opt) => opt.value);
 
 export const eventStates = [
   {

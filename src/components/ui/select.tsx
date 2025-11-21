@@ -316,7 +316,7 @@ export const SelectSimple = ({
                     {option.icon && <option.icon className="size-4" />}
                     <p
                       className={cn(
-                        option.disabled && "line-through",
+                        // option.disabled && "line-through",
                         iconOnly && "hidden",
                       )}
                     >

@@ -5,6 +5,8 @@ import {
   positiveApplicationStatuses,
 } from "@/types/applications";
 
+import { capitalize } from "lodash";
+
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { SelectSimple } from "@/components/ui/select";
 import { useArtistApplicationActions } from "@/features/artists/helpers/appActions";
@@ -56,7 +58,6 @@ export const BookmarkListActionSelector = ({
         !(
           (isPast && opt.value === "planned") ||
           (!isPast && opt.value === "missed") ||
-          opt.value === "rejected" ||
           (!openCallId && opt.value === "applied")
         ),
     ),
@@ -64,7 +65,7 @@ export const BookmarkListActionSelector = ({
       ? [
           {
             value,
-            label: value,
+            label: capitalize(value),
             disabled: true,
           },
         ]

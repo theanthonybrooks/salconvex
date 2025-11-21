@@ -93,6 +93,8 @@ export const hiddenColumns: ColumnDef<hiddenColumnsProps>[] = [
   },
   {
     accessorKey: "edition",
+    accessorFn: (row) => String(row.edition),
+
     id: "edition",
     minSize: 80,
     maxSize: 80,
