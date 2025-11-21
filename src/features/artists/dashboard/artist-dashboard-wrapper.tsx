@@ -75,11 +75,16 @@ export function ArtistDashboardTableWrapper({
           data={bookmarkData ?? []}
           columns={bookmarkColumns}
           defaultVisibility={{
-            prodEnd: false,
-            eventStart: false,
-            eventEnd: false,
             mobile: {
               edition: false,
+              prodEnd: false,
+              eventStart: false,
+              eventEnd: false,
+            },
+            desktop: {
+              prodEnd: false,
+              eventStart: false,
+              eventEnd: false,
             },
           }}
           minimalView={!isSidebarCollapsed}
