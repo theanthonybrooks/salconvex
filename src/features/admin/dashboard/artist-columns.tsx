@@ -119,6 +119,10 @@ export const artistColumns: ColumnDef<ArtistColumnProps>[] = [
 
   {
     accessorKey: "instagram",
+    accessorFn: (row) => {
+      const value = row.instagram;
+      return value ? true : false;
+    },
     id: "instagram",
     minSize: 90,
     maxSize: 200,

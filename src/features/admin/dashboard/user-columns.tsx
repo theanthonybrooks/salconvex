@@ -489,6 +489,7 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
 
   {
     accessorKey: "accountType",
+
     id: "accountType",
     minSize: 180,
     maxSize: 200,
@@ -499,17 +500,17 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
       const types = row.getValue(columnId) as string[];
       if (!Array.isArray(filterValue)) return true;
       if (filterValue.includes("both")) {
-        // Only include rows where BOTH "artist" AND "organizer" are present
         return types.includes("artist") && types.includes("organizer");
       }
-      // Otherwise, include if any filterValue matches any type
       return filterValue.some((f) => types.includes(f));
     },
     getUniqueValues: (row) => {
       const value = row.accountType;
-      if (Array.isArray(value)) return value;
-      if (typeof value === "string") return [value];
-      return [];
+      if (!Array.isArray(value)) return [];
+      if (value.includes("artist") && value.includes("organizer")) {
+        return ["artist", "organizer", "both"];
+      }
+      return value;
     },
     cell: ({ row }) => {
       const { accountType, _id: userId } = row.original;

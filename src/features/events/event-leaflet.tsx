@@ -145,7 +145,7 @@ export default function MapComponent({
     });
   };
 
-  console.log(zoomLevel);
+  // console.log(zoomLevel);
 
   return (
     <div className={cn(containerClassName)}>

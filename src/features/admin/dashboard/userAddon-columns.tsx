@@ -87,7 +87,6 @@ export const userAddOnColumns: ColumnDef<UserAddOnColumnsProps>[] = [
     ),
     cell: ({ row }) => {
       const { email } = row.original;
-      // return <OnlineEventStatusBtn eventId={row.original._id} state={state} />;
       return (
         <Link
           href={`mailto:${email ?? ""}`}
@@ -147,6 +146,10 @@ export const userAddOnColumns: ColumnDef<UserAddOnColumnsProps>[] = [
   },
   {
     accessorKey: "canceled",
+    accessorFn: (row) => {
+      const status = row.canceled;
+      return status ? "true" : "false";
+    },
     id: "canceled",
     minSize: 50,
     maxSize: 60,
