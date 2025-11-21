@@ -125,17 +125,6 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
     api.userAddOns.onlineEvents.updateRegistration,
   );
 
-  // useEffect(() => {
-  //   if (!user || isPending) return;
-  //   form.reset({
-  //     email: user.email ?? "",
-  //     name: user.name ?? "",
-  //     link: registration?.link ?? "",
-  //     notes: registration?.notes ?? "",
-  //     termsAgreement: unpaidRegistration,
-  //   });
-  // }, [user, registration, unpaidRegistration, isPending, form]);
-  // if (queryResult?.success === false) router.push("/404");
   if (!event) return <FullPageLoading />;
   const {
     capacity,
