@@ -72,7 +72,7 @@ export default function DashboardSideBar({
   } = useDashboard();
 
   const statusKey = subStatus ? subStatus : "none";
-  const isAdmin = role?.includes("admin");
+  const isAdmin = role?.includes("admin") || false;
   const userType = user?.accountType;
   const userRole = user?.role;
   const fontSizePref = getUserFontSizePref(userPref?.fontSize);

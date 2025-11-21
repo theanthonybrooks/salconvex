@@ -1,5 +1,6 @@
 "use client";
 
+import type { EventLocation } from "@/types/eventTypes";
 import { EventCategory, EventType } from "@/types/eventTypes";
 
 import { ColumnDef } from "@tanstack/react-table";
@@ -8,12 +9,14 @@ import { DataTableColumnHeader } from "@/components/data-table/DataTableColumnHe
 import { Link } from "@/components/ui/custom-link";
 import { ListActionSelector } from "@/features/artists/dashboard/data-tables/bookmark-hidden-selector";
 import { getEventCategoryLabel, getEventTypeLabel } from "@/helpers/eventFns";
+import { getFormattedLocationString } from "@/helpers/locationFns";
 import { cn } from "@/helpers/utilsFns";
 
 import { Id } from "~/convex/_generated/dataModel";
 
 export const hiddenColumnLabels: Record<string, string> = {
   name: "Event Name",
+  location: "Location",
   edition: "Edition",
   category: "Category",
   type: "Type",
@@ -23,6 +26,7 @@ export const hiddenColumnLabels: Record<string, string> = {
 interface hiddenColumnsProps {
   _id: Id<"events">;
   name: string;
+  location: EventLocation;
   edition: number;
   category: EventCategory;
   type: EventType[];
@@ -95,12 +99,72 @@ export const hiddenColumns: ColumnDef<hiddenColumnsProps>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Edition" />
     ),
-    cell: ({ row }) => (
-      <span className="block w-full text-center text-sm">
-        {row.getValue("edition")}
-      </span>
-    ),
+    cell: ({ row }) => {
+      const { edition } = row.original;
+      return (
+        <span className="block w-full text-center text-sm">{edition}</span>
+      );
+    },
+    filterFn: (row, id, value) => {
+      return value.includes(String(row.getValue(id)));
+    },
   },
+  {
+    accessorKey: "location",
+    id: "location",
+    minSize: 120,
+    maxSize: 400,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Location" />
+    ),
+    cell: ({ row }) => {
+      const { location } = row.original;
+      return (
+        <div className="truncate text-center font-medium">
+          {getFormattedLocationString(location)}
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "country",
+    id: "country",
+    minSize: 90,
+    maxSize: 300,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Country" />
+    ),
+    cell: ({ row }) => {
+      const { location } = row.original;
+      return (
+        <div className="truncate text-center font-medium">
+          {location.country}
+        </div>
+      );
+    },
+    filterFn: (row, id, value) => {
+      console.log(row.getValue(id));
+      return value.includes(row.getValue(id));
+    },
+  },
+  {
+    accessorKey: "city",
+    id: "city",
+    minSize: 90,
+    maxSize: 300,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="City" />
+    ),
+    cell: ({ row }) => {
+      const { location } = row.original;
+      return (
+        <div className="truncate text-center font-medium">
+          {location.city ?? "-"}
+        </div>
+      );
+    },
+  },
+
   {
     accessorKey: "category",
     id: "category",
@@ -148,8 +212,8 @@ export const hiddenColumns: ColumnDef<hiddenColumnsProps>[] = [
   {
     accessorKey: "hiddenStatus",
     id: "hiddenStatus",
-    minSize: 90,
-    maxSize: 90,
+    minSize: 50,
+    maxSize: 50,
 
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Status" />

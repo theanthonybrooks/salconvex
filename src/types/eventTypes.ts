@@ -23,6 +23,7 @@ export type PostStatusOptions = PostStatusType | "all";
 export type PostStatus = PostStatusType;
 
 export type EventData = Doc<"events">;
+export type EventLocation = EventData["location"];
 
 export type EnrichedEventData = EventData & {
   isUserOrg: boolean;

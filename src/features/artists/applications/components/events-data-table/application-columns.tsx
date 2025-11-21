@@ -14,7 +14,7 @@ import { Id } from "~/convex/_generated/dataModel";
 
 export const applicationColumnLabels: Record<string, string> = {
   name: "Event Name",
-  dates_edition: "Edition",
+  edition: "Edition",
   eventStart: "Event Start",
   eventEnd: "Event End",
   productionStart: "Production Start",
@@ -29,7 +29,7 @@ export const applicationColumnLabels: Record<string, string> = {
 interface ApplicationColumnsProps {
   _id: Id<"applications">;
   name: string;
-  dates_edition: number;
+  edition: number;
   eventStart: string;
   eventEnd: string;
   productionStart: string;
@@ -81,7 +81,7 @@ export const applicationColumns: ColumnDef<ApplicationColumnsProps>[] = [
       return (
         <div className={cn("truncate text-center font-medium")}>
           <Link
-            href={`/thelist/event/${eventSlug}/${row.getValue("dates_edition")}/call`}
+            href={`/thelist/event/${eventSlug}/${row.getValue("edition")}/call`}
             target="_blank"
             className="max-w-[25ch] truncate"
           >
@@ -92,18 +92,19 @@ export const applicationColumns: ColumnDef<ApplicationColumnsProps>[] = [
     },
   },
   {
-    accessorKey: "dates_edition",
-    id: "dates_edition",
+    accessorKey: "edition",
+    id: "edition",
     minSize: 80,
     maxSize: 80,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Edition" />
     ),
     cell: ({ row }) => (
-      <span className="text-center text-sm">
-        {row.getValue("dates_edition")}
-      </span>
+      <p className="text-center text-sm">{row.getValue("edition")}</p>
     ),
+    filterFn: (row, id, value) => {
+      return value.includes(String(row.getValue(id)));
+    },
   },
   {
     accessorKey: "eventStart",

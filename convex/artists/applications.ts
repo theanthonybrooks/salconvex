@@ -1,6 +1,6 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
-import { v } from "convex/values";
 import { mutation, query } from "~/convex/_generated/server";
+import { v } from "convex/values";
 
 export const updateApplicationStatus = mutation({
   args: {
@@ -158,7 +158,7 @@ export const getArtistApplications2 = query({
         _id: app._id,
         name: event?.name ?? "Unknown Event",
         slug: event?.slug ?? "unknown",
-        dates_edition: event?.dates.edition ?? 0,
+        edition: event?.dates.edition ?? 0,
         eventStart: event?.dates.eventDates[0].start ?? "-",
         eventEnd: event?.dates.eventDates?.at(-1)?.end ?? "-",
         productionStart: event?.dates.prodDates?.[0]?.start ?? "-",

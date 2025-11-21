@@ -56,8 +56,8 @@ export function ArtistDashboardTableWrapper({
           data={applicationData ?? []}
           columns={applicationColumns}
           defaultVisibility={{
-            dates_edition: false,
             manualApplied: false,
+            eventStart: false,
             productionEnd: false,
             eventEnd: false,
           }}
@@ -75,10 +75,12 @@ export function ArtistDashboardTableWrapper({
           data={bookmarkData ?? []}
           columns={bookmarkColumns}
           defaultVisibility={{
-            edition: false,
             prodEnd: false,
             eventStart: false,
             eventEnd: false,
+            mobile: {
+              edition: false,
+            },
           }}
           minimalView={!isSidebarCollapsed}
           tableType="bookmarks"
@@ -101,6 +103,11 @@ export function ArtistDashboardTableWrapper({
           defaultVisibility={{
             mobile: {
               edition: false,
+              location: false,
+              city: false,
+            },
+            desktop: {
+              location: isSidebarCollapsed,
             },
           }}
         />

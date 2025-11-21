@@ -1,3 +1,6 @@
+import { FaBookmark, FaRegBookmark } from "react-icons/fa6";
+import { Eye, EyeClosed } from "lucide-react";
+
 import { SelectSimple } from "@/components/ui/select";
 
 import { api } from "~/convex/_generated/api";
@@ -32,14 +35,26 @@ export const ListActionSelector = ({
 
   return (
     <SelectSimple
+      iconOnly
       value={initialValue}
       onChangeAction={(val) => {
         handleChange(val === "yes", bookmarked ? "bookmarked" : "hidden");
       }}
       placeholder="-"
+      className={
+        initialValue === "yes" && bookmarked ? "text-red-600" : undefined
+      }
       options={[
-        { value: "yes", label: yesValue },
-        { value: "no", label: noValue },
+        {
+          value: "yes",
+          label: yesValue,
+          icon: hidden ? EyeClosed : FaBookmark,
+          className: bookmarked
+            ? "text-red-600 hover:text-red-600 pointer-events-none focus:text-red-600"
+            : "pointer-events-none",
+          // disabled: bookmarked,
+        },
+        { value: "no", label: noValue, icon: hidden ? Eye : FaRegBookmark },
       ]}
     />
   );

@@ -45,6 +45,16 @@ import { EventStateType } from "~/convex/schema";
 // interface DataTableRowActionsProps<TData> {
 //   row: Row<TData>;
 // }
+const startYear = 2025;
+const endYear = new Date().getFullYear() + 1;
+
+const editionOptions = Array.from(
+  { length: endYear - startYear + 1 },
+  (_, i) => {
+    const year = startYear + i;
+    return { value: String(year), label: String(year) };
+  },
+);
 
 export const labels = [
   {
@@ -439,15 +449,31 @@ export const TABLE_FILTERS: TableFilterConfig = {
       title: "Status",
       options: appStatusOptions,
     },
+    {
+      columnId: "edition",
+      title: "Edition",
+      options: editionOptions,
+    },
   ],
   bookmarks: [
     {
       columnId: "eventIntent",
-      title: "Intent",
+      title: "Reason",
       options: bookmarkIntents,
+    },
+    {
+      columnId: "edition",
+      title: "Edition",
+      options: editionOptions,
     },
   ],
   organizations: [],
   organizationStaff: [],
-  hidden: [],
+  hidden: [
+    {
+      columnId: "edition",
+      title: "Edition",
+      options: editionOptions,
+    },
+  ],
 };

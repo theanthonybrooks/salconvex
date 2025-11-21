@@ -43,6 +43,7 @@ interface BookmarkColumnsProps {
   bookmarkNote: string;
   eventIntent: string;
   applicationStatus: string | null;
+  openCallId: Id<"openCalls"> | null;
 }
 
 export const bookmarkColumns: ColumnDef<BookmarkColumnsProps>[] = [
@@ -107,6 +108,9 @@ export const bookmarkColumns: ColumnDef<BookmarkColumnsProps>[] = [
         {row.getValue("edition")}
       </span>
     ),
+    filterFn: (row, id, value) => {
+      return value.includes(String(row.getValue(id)));
+    },
   },
   {
     accessorKey: "deadline",
@@ -238,29 +242,11 @@ export const bookmarkColumns: ColumnDef<BookmarkColumnsProps>[] = [
       </span>
     ),
   },
-  {
-    accessorKey: "bookmarkStatus",
-    id: "bookmarkStatus",
-    minSize: 180,
-    maxSize: 200,
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Status" />
-    ),
-    cell: ({ row }) => {
-      const { bookmarkStatus: value } = row.original;
-      return (
-        <ListActionSelector
-          key={row.original._id}
-          eventId={row.original._id}
-          bookmarked={value}
-        />
-      );
-    },
-  },
+
   {
     accessorKey: "eventIntent",
     id: "eventIntent",
-    minSize: 180,
+    minSize: 130,
     maxSize: 200,
     filterFn: (row, columnId, filterValue) => {
       if (!Array.isArray(filterValue)) return true;
@@ -275,6 +261,7 @@ export const bookmarkColumns: ColumnDef<BookmarkColumnsProps>[] = [
       const {
         eventIntent: value,
         applicationStatus: appStatus,
+        openCallId,
         isPast,
       } = row.original;
       return (
@@ -283,6 +270,7 @@ export const bookmarkColumns: ColumnDef<BookmarkColumnsProps>[] = [
           eventId={row.original._id}
           initialValue={value}
           appStatus={appStatus}
+          openCallId={openCallId}
           isPast={isPast}
         />
       );
@@ -293,7 +281,7 @@ export const bookmarkColumns: ColumnDef<BookmarkColumnsProps>[] = [
   {
     accessorKey: "bookmarkNote",
     id: "bookmarkNote",
-    minSize: 120,
+    minSize: 160,
     maxSize: 400,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Notes" />
@@ -305,6 +293,25 @@ export const bookmarkColumns: ColumnDef<BookmarkColumnsProps>[] = [
         <BookmarkNotesInput
           notes={row.getValue("bookmarkNote")}
           bookmark={bookmark}
+        />
+      );
+    },
+  },
+  {
+    accessorKey: "bookmarkStatus",
+    id: "bookmarkStatus",
+    minSize: 50,
+    maxSize: 50,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Status" />
+    ),
+    cell: ({ row }) => {
+      const { bookmarkStatus: value } = row.original;
+      return (
+        <ListActionSelector
+          key={row.original._id}
+          eventId={row.original._id}
+          bookmarked={value}
         />
       );
     },

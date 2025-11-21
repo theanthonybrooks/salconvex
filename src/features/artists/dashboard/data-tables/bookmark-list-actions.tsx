@@ -7,6 +7,7 @@ import {
 
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { SelectSimple } from "@/components/ui/select";
+import { useArtistApplicationActions } from "@/features/artists/helpers/appActions";
 
 import { api } from "~/convex/_generated/api";
 import { Id } from "~/convex/_generated/dataModel";
@@ -16,6 +17,7 @@ interface BookmarkListActionSelectorProps {
   eventId: Id<"events">;
   initialValue?: string;
   appStatus?: ApplicationStatus;
+  openCallId: Id<"openCalls"> | null;
   isPast?: boolean;
 }
 
@@ -23,9 +25,12 @@ export const BookmarkListActionSelector = ({
   eventId,
   initialValue: value,
   appStatus,
+  openCallId,
   isPast,
 }: BookmarkListActionSelectorProps) => {
   const updateListAction = useMutation(api.artists.listActions.updateBookmark);
+  const { toggleAppActions } = useArtistApplicationActions();
+
   const disabledValue =
     (typeof appStatus === "string" &&
       !positiveApplicationStatuses.includes(appStatus ?? "")) ||
@@ -36,11 +41,24 @@ export const BookmarkListActionSelector = ({
       eventId,
       intent,
     });
+    if (intent === "applied" && openCallId) {
+      toggleAppActions({
+        openCallId,
+        manualApplied: true,
+      });
+    }
   };
 
   const options = [
     ...bookmarkIntents.filter(
-      (opt) => opt.value !== "-" && !(isPast && opt.value === "planned"),
+      (opt) =>
+        opt.value !== "-" &&
+        !(
+          (isPast && opt.value === "planned") ||
+          (!isPast && opt.value === "missed") ||
+          opt.value === "rejected" ||
+          (!openCallId && opt.value === "applied")
+        ),
     ),
     ...(value && !bookmarkIntents.some((opt) => opt.value === value)
       ? [

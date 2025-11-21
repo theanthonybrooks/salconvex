@@ -13,6 +13,7 @@ import {
   LucideIcon,
 } from "lucide-react";
 
+import { TooltipSimple } from "@/components/ui/tooltip";
 import { cn } from "@/helpers/utilsFns";
 
 const Select = SelectPrimitive.Root;
@@ -211,6 +212,7 @@ interface SelectSimpleProps {
   fontSize?: string;
   hasReset?: boolean;
   center?: boolean;
+  iconOnly?: boolean;
 }
 
 export const SelectSimple = ({
@@ -228,6 +230,7 @@ export const SelectSimple = ({
   fontSize,
   hasReset,
   center,
+  iconOnly,
 }: SelectSimpleProps) => {
   const selectOptions = [
     ...options,
@@ -247,7 +250,6 @@ export const SelectSimple = ({
     <Select
       value={value}
       onValueChange={(val) => {
-        console.log(val);
         if (val === "-") {
           onChangeAction("");
           return;
@@ -299,17 +301,29 @@ export const SelectSimple = ({
                 center={center}
                 fontSize={fontSize}
               >
-                <span className="flex items-center gap-x-1">
-                  {option.premium && (
-                    <span className="flex items-center gap-0">
-                      (<DollarSign className="size-3" />)
-                    </span>
-                  )}
-                  {option.icon && <option.icon className="size-4" />}
-                  <p className={cn(option.disabled && "line-through")}>
-                    {option.label}
-                  </p>
-                </span>
+                <TooltipSimple
+                  content={option.label}
+                  className="z-top"
+                  side="left"
+                  disabled={!iconOnly}
+                >
+                  <span className="flex items-center gap-x-1">
+                    {option.premium && (
+                      <span className="flex items-center gap-0">
+                        (<DollarSign className="size-3" />)
+                      </span>
+                    )}
+                    {option.icon && <option.icon className="size-4" />}
+                    <p
+                      className={cn(
+                        option.disabled && "line-through",
+                        iconOnly && "hidden",
+                      )}
+                    >
+                      {option.label}
+                    </p>
+                  </span>
+                </TooltipSimple>
               </SelectItem>
             ))}
           </div>

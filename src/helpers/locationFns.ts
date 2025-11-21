@@ -311,8 +311,6 @@ export function getFormattedLocationString(
   const ukLocation =
     countryAbbr === "GB" && abbreviated ? `${state}, UK` : null;
 
-  if (countryAbbr === "GB") console.log({ abbreviated, ukLocation });
-
   return [
     locale,
     city && !isValidStateAbbr ? city : null,

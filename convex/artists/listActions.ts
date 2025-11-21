@@ -2,10 +2,13 @@ import {
   ApplicationStatus,
   positiveApplicationStatuses,
 } from "@/types/applications";
+
+import type { Id } from "~/convex/_generated/dataModel";
+
 import { getAuthUserId } from "@convex-dev/auth/server";
+import { mutation, query } from "~/convex/_generated/server";
 import { getAll } from "convex-helpers/server/relationships";
 import { v } from "convex/values";
-import { mutation, query } from "~/convex/_generated/server";
 
 export const getHiddenEvents = query({
   args: {},
@@ -50,12 +53,15 @@ export const getHiddenEvents = query({
     return events
       .filter((e) => e !== null)
       .map((e) => ({
-        ...e,
+        // ...e,
+        _id: e._id,
+        name: e.name,
+        slug: e.slug,
         edition: e.dates.edition,
         category: e.category,
         type: e.type,
+        location: e.location,
         hiddenStatus: true,
-        slug: e.slug,
       }));
   },
 });
@@ -155,6 +161,7 @@ export const getBookmarkedEventsWithDetails = query({
     for (const event of nonNullEvents) {
       const metadata = bookmarkedMap.get(event._id);
       let applicationStatus: string | null = null;
+      let openCallId: Id<"openCalls"> | null = null;
       let eventIntent: string = "";
       let deadline: string = "-";
       let isPast: boolean = false;
@@ -167,6 +174,7 @@ export const getBookmarkedEventsWithDetails = query({
         .first();
 
       if (openCall) {
+        openCallId = openCall._id;
         deadline = openCall.basicInfo.dates.ocEnd ?? "-";
         const now = new Date();
         const deadlineDate = new Date(deadline);
@@ -215,6 +223,7 @@ export const getBookmarkedEventsWithDetails = query({
         eventIntent,
         bookmarkNote: metadata?.bookmarkNote ?? "",
         applicationStatus,
+        openCallId,
       });
     }
 

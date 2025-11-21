@@ -1,13 +1,13 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { api } from "~/convex/_generated/api";
-import { makeUseQueryWithStatus } from "convex-helpers/react";
-import { useQueries } from "convex-helpers/react/cache";
-import { usePreloadedQuery } from "convex/react";
 import { formatDistanceToNow } from "date-fns";
+
+import { FaGear, FaRegBookmark } from "react-icons/fa6";
+import { PiPiggyBank } from "react-icons/pi";
 import {
   EyeOff,
+  IdCard,
   LucideCalendar,
   LucideCalendarPlus2,
   LucideCircleCheck,
@@ -21,8 +21,6 @@ import {
   TrendingUp,
   Users,
 } from "lucide-react";
-import { FaGear, FaRegBookmark } from "react-icons/fa6";
-import { PiPiggyBank } from "react-icons/pi";
 
 import { Button } from "@/components/ui/button";
 import { CanceledBanner } from "@/components/ui/canceled-banner";
@@ -42,6 +40,11 @@ import { countApplicationsByTimeRange } from "@/helpers/applicationFns";
 import { getEventCategoryLabel } from "@/helpers/eventFns";
 import { getUserFontSizePref } from "@/helpers/stylingFns";
 import { cn } from "@/helpers/utilsFns";
+
+import { api } from "~/convex/_generated/api";
+import { makeUseQueryWithStatus } from "convex-helpers/react";
+import { useQueries } from "convex-helpers/react/cache";
+import { usePreloadedQuery } from "convex/react";
 
 export default function Dashboard() {
   const router = useRouter();
@@ -294,16 +297,28 @@ export default function Dashboard() {
               </Button>
             )}
             {hasActiveSubscription && (
-              <Button
-                asChild
-                variant="salWithShadowHiddenYlw"
-                className="w-full justify-start gap-2"
-              >
-                <Link variant="standard" href="/dashboard/billing">
-                  <PiPiggyBank className="size-5" />
-                  Manage Billing
-                </Link>
-              </Button>
+              <>
+                <Button
+                  asChild
+                  variant="salWithShadowHiddenYlw"
+                  className="w-full justify-start gap-2"
+                >
+                  <Link variant="standard" href="/dashboard/artist">
+                    <IdCard className="size-5" />
+                    Artist Profile
+                  </Link>
+                </Button>
+                <Button
+                  asChild
+                  variant="salWithShadowHiddenYlw"
+                  className="w-full justify-start gap-2"
+                >
+                  <Link variant="standard" href="/dashboard/billing">
+                    <PiPiggyBank className="size-5" />
+                    Manage Billing
+                  </Link>
+                </Button>
+              </>
             )}
             <Button
               asChild

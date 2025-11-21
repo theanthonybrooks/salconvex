@@ -310,7 +310,6 @@ export const ApplyButton = ({
 
   const onBookmark = async () => {
     if (orgPreview) return;
-    console.log(isBookmarked);
     // setIsBookmarked(!isBookmarked);
     toggleListAction({ bookmarked: !isBookmarked });
 
@@ -371,7 +370,7 @@ export const ApplyButton = ({
   return (
     <div
       className={cn(
-        "sm:max-w-75 col-span-full mt-4 flex h-14 max-w-[80dvw] items-center justify-center sm:h-11 lg:mt-0 lg:px-4",
+        "col-span-full mt-4 flex h-14 max-w-[80dvw] items-center justify-center sm:h-11 sm:max-w-75 lg:mt-0 lg:px-4",
         !detailCard && "lg:w-[250px]",
         detailCard && "lg:mt-2 lg:w-full",
         className,
