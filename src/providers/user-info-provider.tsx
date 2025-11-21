@@ -1,5 +1,7 @@
 "use client";
 
+import { IBAN_COUNTRIES } from "@/constants/locationConsts";
+
 import type { ReactNode } from "react";
 
 import { createContext, useContext, useEffect, useState } from "react";
@@ -86,8 +88,11 @@ async function getClientCurrency(): Promise<CurrencyOptions> {
     const res = await fetch("https://ipapi.co/json/");
     if (!res.ok) throw new Error("Failed to fetch location");
     const data = await res.json();
+    const country = data.country;
+    if (country && IBAN_COUNTRIES.has(country)) {
+      currency = "eur";
+    }
     // console.log("data", data);
-    currency = data.currency === "EUR" ? "eur" : "usd";
   } catch (error) {
     console.error("Error fetching client location:", error);
   } finally {

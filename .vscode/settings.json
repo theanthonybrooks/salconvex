@@ -42,7 +42,8 @@
     "Component",
     "Artist Highlight",
     "Old Site",
-    "Zod"
+    "Zod",
+    "User"
   ],
   "typescript.tsdk": "node_modules\\typescript\\lib",
   "python.analysis.autoImportCompletions": true

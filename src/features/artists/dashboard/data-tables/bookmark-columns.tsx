@@ -23,7 +23,7 @@ export const bookmarkColumnLabels: Record<string, string> = {
   prodStart: "Production Start",
   prodEnd: "Production End",
   bookmarkStatus: "Status",
-  eventIntent: "Intent",
+  eventIntent: "Reason",
   bookmarkNote: "Notes",
 };
 
@@ -269,7 +269,7 @@ export const bookmarkColumns: ColumnDef<BookmarkColumnsProps>[] = [
       return filterValue.includes(value);
     },
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Intent" />
+      <DataTableColumnHeader column={column} title="Reason" />
     ),
     cell: ({ row }) => {
       const {

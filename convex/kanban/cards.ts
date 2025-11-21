@@ -18,57 +18,67 @@ export const searchCards = query({
     searchTerm: v.optional(v.string()),
     category: v.array(supportCategoryValidator),
     assignedId: v.optional(v.id("users")),
-    searchType: v.optional(
-      v.union(v.literal("title"), v.literal("description")),
-    ),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
     const user = userId ? await ctx.db.get(userId) : null;
     const isCreator = user?.role?.includes("creator") ?? false;
     const searchTerm = args.searchTerm?.trim() ?? "";
+    const searchLower = searchTerm.toLowerCase();
 
-    let q = ctx.db
-      .query("todoKanban")
-      .withSearchIndex(
-        args.searchType === "title" ? "search_by_title" : "search_by_desc",
-        (q) => {
-          let filter = q.search(
-            args.searchType === "title" ? "title" : "description",
-            searchTerm,
-          );
+    if (!searchTerm) return [];
 
-          if (args.purpose && args.purpose !== "todo") {
-            filter = filter.eq("purpose", args.purpose);
-          }
+    const base = ctx.db.query("todoKanban");
 
-          // Use filterField for single category, post-filter for multiple
-          if (args.category.length === 1) {
-            filter = filter.eq("category", args.category[0]);
-          }
+    const titleQuery = base.withSearchIndex("search_by_title", (q) => {
+      let filter = q.search("title", searchTerm);
+      if (args.purpose && args.purpose !== "todo") {
+        filter = filter.eq("purpose", args.purpose);
+      }
+      if (args.category.length === 1) {
+        filter = filter.eq("category", args.category[0]);
+      }
+      return filter;
+    });
 
-          return filter;
-        },
-      );
+    const descriptionQuery = base.withSearchIndex("search_by_desc", (q) => {
+      let filter = q.search("description", searchTerm);
+      if (args.purpose && args.purpose !== "todo") {
+        filter = filter.eq("purpose", args.purpose);
+      }
+      if (args.category.length === 1) {
+        filter = filter.eq("category", args.category[0]);
+      }
+      return filter;
+    });
 
-    const results = await q.collect();
-    const filteredResults = results.filter((r) =>
-      r.description?.toLowerCase()?.includes(searchTerm?.toLowerCase()),
-    );
-    let output = filteredResults;
+    const [byTitle, byDescription] = await Promise.all([
+      titleQuery.collect(),
+      descriptionQuery.collect(),
+    ]);
 
-    // Post-filter for multiple categories
-    if (args.category.length > 1) {
-      output = filteredResults.filter((q) =>
-        args.category.includes(q.category),
-      );
+    const byId = new Map<string, (typeof byTitle)[number]>();
+    for (const doc of [...byTitle, ...byDescription]) {
+      byId.set(doc._id.toString(), doc);
     }
+    let output = Array.from(byId.values());
+
+    output = output.filter(
+      (card) =>
+        card.title?.toLowerCase().includes(searchLower) ||
+        card.description?.toLowerCase().includes(searchLower),
+    );
+
+    if (args.category.length > 1) {
+      output = output.filter((card) => args.category.includes(card.category));
+    }
+
     if (args.assignedId) {
       output = output.filter(
-        (q) =>
-          q.assignedId === args.assignedId ||
-          (isCreator && !q.assignedId) ||
-          q.secondaryAssignedId === args.assignedId,
+        (card) =>
+          card.assignedId === args.assignedId ||
+          (isCreator && !card.assignedId) ||
+          card.secondaryAssignedId === args.assignedId,
       );
     }
 
