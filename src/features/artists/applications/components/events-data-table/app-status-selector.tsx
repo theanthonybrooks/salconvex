@@ -1,8 +1,6 @@
-import { useState } from "react";
 import { ArtistStatus, artistStatusOptions } from "@/types/applications";
-import { api } from "~/convex/_generated/api";
-import { Id } from "~/convex/_generated/dataModel";
-import { useMutation } from "convex/react";
+
+import { useState } from "react";
 
 import { ConfirmDialog } from "@/components/ui/confirmation-dialog";
 import {
@@ -14,6 +12,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/helpers/utilsFns";
+
+import { api } from "~/convex/_generated/api";
+import { Id } from "~/convex/_generated/dataModel";
+import { useMutation } from "convex/react";
 
 interface AppStatusSelectorProps {
   applicationId: Id<"applications">;
@@ -69,7 +71,7 @@ export const AppStatusSelector = ({
       >
         <SelectTrigger
           className={cn(
-            "mx-auto w-fit min-w-40 font-medium",
+            "mx-auto w-fit min-w-30 font-medium",
             // statusColor,
             // textColor,
           )}

@@ -188,7 +188,7 @@ export const applicationColumns: ColumnDef<ApplicationColumnsProps>[] = [
   {
     accessorKey: "applicationStatus",
     id: "applicationStatus",
-    minSize: 180,
+    minSize: 120,
     maxSize: 200,
     filterFn: (row, columnId, filterValue) => {
       if (!Array.isArray(filterValue)) return true;
