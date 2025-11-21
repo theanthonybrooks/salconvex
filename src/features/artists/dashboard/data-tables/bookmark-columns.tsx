@@ -253,7 +253,7 @@ export const bookmarkColumns: ColumnDef<BookmarkColumnsProps>[] = [
       if (appStatusOptionValues.includes(String(raw))) {
         return "applied";
       }
-      return raw ?? "-";
+      return raw || "-";
     },
     id: "eventIntent",
 
@@ -267,7 +267,7 @@ export const bookmarkColumns: ColumnDef<BookmarkColumnsProps>[] = [
       // Normalize: anything in appStatusOptionValues becomes "applied"
       const normalized = appStatusOptionValues.includes(String(raw))
         ? "applied"
-        : (raw ?? "-");
+        : raw || "-";
 
       return filterValue.includes(normalized);
     },

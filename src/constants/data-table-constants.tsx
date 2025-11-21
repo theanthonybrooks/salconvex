@@ -105,7 +105,7 @@ export const bookmarkIntents = [
     value: "-",
     label: "None",
     icon: X,
-    disabled: true,
+    // disabled: true,
   },
 ];
 
