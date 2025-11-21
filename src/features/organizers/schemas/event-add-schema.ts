@@ -1,3 +1,4 @@
+import { eventStateValues } from "@/constants/data-table-constants";
 import {
   eventCategoryValues,
   eventFormatValues,
@@ -17,7 +18,6 @@ import {
 
 import { z } from "zod";
 
-import { eventStateValues } from "@/components/data-table/data-table-constants";
 import { cleanHtml } from "@/helpers/richTextFns";
 import {
   domainRegex,

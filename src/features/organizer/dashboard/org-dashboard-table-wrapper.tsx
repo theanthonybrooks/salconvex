@@ -1,8 +1,8 @@
 "use client";
 
-import { useDashboard } from "@/app/(pages)/dashboard/_components/dashboard-context";
+import { useDashboard } from "@/app/(pages)/dashboard/_components/DashboardContext";
 
-import { ResponsiveDataTable } from "@/components/data-table/data-table-wrapper";
+import { ResponsiveDataTable } from "@/components/data-table/DataTableWrapper";
 import { orgColumns } from "@/features/organizers/dashboard/data-tables/organizer-columns";
 
 import { api } from "~/convex/_generated/api";

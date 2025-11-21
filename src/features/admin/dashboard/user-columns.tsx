@@ -7,8 +7,8 @@ import { BsRobot } from "react-icons/bs";
 import { FaEnvelope } from "react-icons/fa6";
 import { LucideClipboardCopy, MoreHorizontal, User } from "lucide-react";
 
-import { DeleteUser } from "@/components/data-table/actions/data-table-admin-user-actions";
-import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
+import { DeleteUser } from "@/components/data-table/actions/DataTableAdminUserActions";
+import { DataTableColumnHeader } from "@/components/data-table/DataTableColumnHeader";
 import { Button } from "@/components/ui/button";
 import { ConfirmingDropdown } from "@/components/ui/confirmation-dialog-context";
 import { CopyableItem } from "@/components/ui/copyable-item";

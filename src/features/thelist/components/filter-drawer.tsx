@@ -180,10 +180,9 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
         name: org?.orgData?.orgName,
         path: `/thelist/organizer/${org?.orgData?.orgSlug}`,
         meta:
-          getSearchLocationString(
-            org?.orgData?.orgLocation ?? org?.location,
-            true,
-          ) ||
+          getSearchLocationString(org?.orgData?.orgLocation ?? org?.location, {
+            full: true,
+          }) ||
           org.location?.full ||
           "",
       }));
@@ -196,7 +195,7 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
         hasActiveSubscription && eventView,
       ),
       meta:
-        getSearchLocationString(event.location, true) ||
+        getSearchLocationString(event.location, { full: true }) ||
         event.location?.full ||
         "",
       ocStatus: getOpenCallStatusLabel({ event }),
@@ -333,10 +332,9 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
         name: org.orgData?.orgName ?? "",
         path: `/thelist/organizer/${org.orgData?.orgSlug}`,
         meta:
-          getSearchLocationString(
-            org.orgData?.orgLocation ?? org.location,
-            true,
-          ) ??
+          getSearchLocationString(org.orgData?.orgLocation ?? org.location, {
+            full: true,
+          }) ??
           org.location?.full ??
           "",
       }));

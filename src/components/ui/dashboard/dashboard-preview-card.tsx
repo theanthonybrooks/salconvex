@@ -1,8 +1,9 @@
 "use client";
 
-import { useDashboard } from "@/app/(pages)/dashboard/_components/dashboard-context";
-import { LucideIcon } from "lucide-react";
+import { useDashboard } from "@/app/(pages)/dashboard/_components/DashboardContext";
 import { IconType } from "react-icons";
+
+import { LucideIcon } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "@/components/ui/custom-link";

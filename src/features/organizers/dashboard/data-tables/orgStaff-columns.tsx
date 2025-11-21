@@ -5,7 +5,7 @@ import type { OrgStaffData } from "@/types/organizer";
 
 import { ColumnDef } from "@tanstack/react-table";
 
-import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
+import { DataTableColumnHeader } from "@/components/data-table/DataTableColumnHeader";
 
 export const orgStaffColumnLabels: Record<string, string> = {
   name: "Name",

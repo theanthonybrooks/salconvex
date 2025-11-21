@@ -1,3 +1,5 @@
+import { IBAN_COUNTRIES } from "@/constants/locationConsts";
+
 import { ArtistFull } from "@/types/artist";
 
 import slugify from "slugify";
@@ -82,6 +84,28 @@ export const updateOrCreateArtist = mutation({
       ? slugify(args.artistName, { lower: true, strict: true })
       : null;
 
+    const subscription = await ctx.db
+      .query("userSubscriptions")
+      .withIndex("userId", (q) => q.eq("userId", userId))
+      .first();
+    const activeSub =
+      subscription?.status === "active" || subscription?.status === "trialing";
+    console.log("activeSub", activeSub);
+    if (!activeSub) {
+      const resCountryAbbr = args.artistResidency?.countryAbbr;
+      const europeanArtist =
+        resCountryAbbr && IBAN_COUNTRIES.has(resCountryAbbr);
+      const userPreferences = await ctx.db
+        .query("userPreferences")
+        .withIndex("by_userId", (q) => q.eq("userId", userId))
+        .first();
+      console.log({ resCountryAbbr, europeanArtist, userPreferences });
+      if (europeanArtist && !activeSub && userPreferences) {
+        await ctx.db.patch(userPreferences._id, {
+          currency: "eur",
+        });
+      }
+    }
     if (!artist) {
       if (!userHasArtistType) {
         await ctx.db.patch(user._id, {

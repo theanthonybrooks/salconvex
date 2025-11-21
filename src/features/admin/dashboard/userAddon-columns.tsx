@@ -3,7 +3,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 
 import type { UserAddOnStatus } from "~/convex/schema";
-import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
+import { DataTableColumnHeader } from "@/components/data-table/DataTableColumnHeader";
 import { Link } from "@/components/ui/custom-link";
 import {
   UpdateOrder,

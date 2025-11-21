@@ -1,6 +1,6 @@
 "use client";
 
-import { ResourceCard } from "@/app/(pages)/resources/components/resource-card";
+import { ResourceCard } from "@/app/(pages)/resources/components/ResourceCard";
 
 import { Link } from "@/components/ui/custom-link";
 import { cn } from "@/helpers/utilsFns";

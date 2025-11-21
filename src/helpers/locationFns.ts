@@ -1,5 +1,6 @@
 import {
   continentOrder,
+  COUNTRIES_REQUIRING_STATE,
   EU_COUNTRIES,
   usRegions,
 } from "@/constants/locationConsts";
@@ -260,7 +261,9 @@ export function getOrganizerLocationString(
 ): string {
   const { location } = organizer;
   const isValidStateAbbr =
-    location?.stateAbbr && /^[A-Za-z]+$/.test(location?.stateAbbr);
+    location?.stateAbbr &&
+    /^[A-Za-z]+$/.test(location?.stateAbbr) &&
+    COUNTRIES_REQUIRING_STATE.includes(location?.countryAbbr ?? "");
 
   const parts = [
     !abbreviated && location?.locale && `${location.locale}`,
@@ -275,10 +278,14 @@ export function getOrganizerLocationString(
 }
 export function getSearchLocationString(
   location: EventData["location"] | OrgLocationProps["location"],
-  full?: boolean,
+  options?: { full?: boolean },
 ): string {
   const { locale, city, countryAbbr, stateAbbr } = location;
-  const isValidStateAbbr = stateAbbr && /^[A-Za-z]+$/.test(stateAbbr);
+  const { full = false } = options ?? {};
+  const isValidStateAbbr =
+    stateAbbr &&
+    /^[A-Za-z]+$/.test(stateAbbr) &&
+    COUNTRIES_REQUIRING_STATE.includes(countryAbbr);
 
   const parts = [
     locale && full && `${locale}`,
@@ -292,24 +299,29 @@ export function getSearchLocationString(
 
 export function getFormattedLocationString(
   location: LocationFull,
-  abbreviated?: boolean,
+  options?: { wrap?: boolean; abbreviated?: boolean },
 ): string {
   const { locale, city, stateAbbr, state, country, countryAbbr } = location;
-  const isValidStateAbbr = stateAbbr && /^[A-Za-z]+$/.test(stateAbbr);
+  const { wrap = false, abbreviated = false } = options ?? {};
+
+  const isValidStateAbbr =
+    stateAbbr &&
+    /^[A-Za-z]+$/.test(stateAbbr) &&
+    COUNTRIES_REQUIRING_STATE.includes(countryAbbr);
+  const ukLocation =
+    countryAbbr === "GB" && abbreviated ? `${state}, UK` : null;
+
+  if (countryAbbr === "GB") console.log({ abbreviated, ukLocation });
 
   return [
     locale,
-    city,
-    city && isValidStateAbbr ? stateAbbr : null,
+    city && !isValidStateAbbr ? city : null,
+    city && isValidStateAbbr ? `${city}, ${stateAbbr}` : null,
     !city && state ? state : null,
-    countryAbbr === "US"
-      ? "USA"
-      : countryAbbr === "GB" && abbreviated
-        ? "UK"
-        : country,
+    countryAbbr === "US" ? "USA" : ukLocation ? ukLocation : country,
   ]
     .filter(Boolean)
-    .join(", ");
+    .join(wrap ? ",\n" : ", ");
 }
 
 type Location = {

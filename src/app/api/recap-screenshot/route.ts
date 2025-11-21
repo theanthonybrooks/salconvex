@@ -1,8 +1,8 @@
-import type { RecapData } from "@/app/render/recap/recap-render-client";
+import type { RecapData } from "@/app/render/recap/RecapRenderClient";
 
-import { NextRequest, NextResponse } from "next/server";
 import chromium from "@sparticuz/chromium";
 import JSZip from "jszip";
+import { NextRequest, NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 

@@ -4,7 +4,7 @@ import type { OrganizationValues } from "@/schemas/organizer";
 import type { User } from "@/types/user";
 
 import { useEffect, useMemo, useState } from "react";
-import { OrgLinksInput } from "@/app/(pages)/dashboard/organizer/components/org-links";
+import { OrgLinksInput } from "@/app/(pages)/dashboard/organizer/components/OrgLinks";
 import { organizationSchema } from "@/schemas/organizer";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";

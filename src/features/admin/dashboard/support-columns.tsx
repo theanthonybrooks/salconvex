@@ -2,11 +2,11 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { Id } from "~/convex/_generated/dataModel";
+
 import { LucideClipboardCopy, MoreHorizontal } from "lucide-react";
 
-import { ArtistFeatureSelect } from "@/components/data-table/actions/data-table-admin-artist-actions";
-import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
+import { ArtistFeatureSelect } from "@/components/data-table/actions/DataTableAdminArtistActions";
+import { DataTableColumnHeader } from "@/components/data-table/DataTableColumnHeader";
 import { Button } from "@/components/ui/button";
 import { ConfirmingDropdown } from "@/components/ui/confirmation-dialog-context";
 import { CopyableItem } from "@/components/ui/copyable-item";
@@ -22,6 +22,8 @@ import {
 import { TooltipSimple } from "@/components/ui/tooltip";
 import { ConvexDashboardLink } from "@/features/events/ui/convex-dashboard-link";
 import { cn } from "@/helpers/utilsFns";
+
+import { Id } from "~/convex/_generated/dataModel";
 
 export const artistColumnLabels: Record<string, string> = {
   name: "Name",

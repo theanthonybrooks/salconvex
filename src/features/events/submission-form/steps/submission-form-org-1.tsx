@@ -8,7 +8,7 @@ import { Controller, useFormContext } from "react-hook-form";
 
 import { LucideChevronLeft, LucideChevronRight } from "lucide-react";
 
-import { DataTable } from "@/components/data-table/data-table";
+import { DataTable } from "@/components/data-table/DataTable";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Link } from "@/components/ui/custom-link";
 import { Label } from "@/components/ui/label";

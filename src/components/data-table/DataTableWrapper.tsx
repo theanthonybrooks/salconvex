@@ -1,9 +1,9 @@
-import type { AdminActions } from "@/components/data-table/data-table";
+import type { AdminActions } from "@/components/data-table/DataTable";
 import type { PageTypes, TableTypes } from "@/types/tanstack-table";
 import type { ColumnDef } from "@tanstack/react-table";
 import type { ReactNode } from "react";
 
-import { DataTable } from "@/components/data-table/data-table";
+import { DataTable } from "@/components/data-table/DataTable";
 import { cn } from "@/helpers/utilsFns";
 
 type MaybeResponsive<T> =

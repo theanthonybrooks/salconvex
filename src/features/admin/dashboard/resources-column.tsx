@@ -7,7 +7,7 @@ import slugify from "slugify";
 import { Check, Pencil } from "lucide-react";
 
 import type { OnlineEventStateType } from "~/convex/schema";
-import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
+import { DataTableColumnHeader } from "@/components/data-table/DataTableColumnHeader";
 import { Button } from "@/components/ui/button";
 import {
   DeleteEventBtn,

@@ -15,8 +15,8 @@ import {
   X,
 } from "lucide-react";
 
-import { DeleteNewsletterSubscription } from "@/components/data-table/actions/data-table-admin-user-actions";
-import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
+import { DeleteNewsletterSubscription } from "@/components/data-table/actions/DataTableAdminUserActions";
+import { DataTableColumnHeader } from "@/components/data-table/DataTableColumnHeader";
 import { Button } from "@/components/ui/button";
 import { ConfirmingDropdown } from "@/components/ui/confirmation-dialog-context";
 import { Link } from "@/components/ui/custom-link";

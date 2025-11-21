@@ -8,8 +8,8 @@ import { LucideClipboardCopy, MoreHorizontal } from "lucide-react";
 import {
   ArtistAdminNotesInput,
   ArtistFeatureSelect,
-} from "@/components/data-table/actions/data-table-admin-artist-actions";
-import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
+} from "@/components/data-table/actions/DataTableAdminArtistActions";
+import { DataTableColumnHeader } from "@/components/data-table/DataTableColumnHeader";
 import { Button } from "@/components/ui/button";
 import { ConfirmingDropdown } from "@/components/ui/confirmation-dialog-context";
 import { CopyableItem } from "@/components/ui/copyable-item";

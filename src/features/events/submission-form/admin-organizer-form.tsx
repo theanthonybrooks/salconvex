@@ -9,7 +9,7 @@ import { User } from "@/types/user";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useDashboard } from "@/app/(pages)/dashboard/_components/dashboard-context";
+import { useDashboard } from "@/app/(pages)/dashboard/_components/DashboardContext";
 import { getExternalRedirectHtml } from "@/utils/loading-page-html";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { debounce, merge } from "lodash";

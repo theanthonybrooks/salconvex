@@ -1,5 +1,5 @@
+import RecapRenderClient from "@/app/render/recap/RecapRenderClient";
 import { notFound } from "next/navigation";
-import RecapRenderClient from "@/app/render/recap/recap-render-client";
 
 export default async function RecapRenderPage({
   searchParams,

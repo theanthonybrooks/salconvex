@@ -3,7 +3,7 @@ import type { AdminActionType } from "@/types/tanstack-table";
 import { InfoIcon } from "lucide-react";
 
 import type { Id } from "~/convex/_generated/dataModel";
-import { ResponsiveDataTable } from "@/components/data-table/data-table-wrapper";
+import { ResponsiveDataTable } from "@/components/data-table/DataTableWrapper";
 import { Button } from "@/components/ui/button";
 import { orgStaffColumns } from "@/features/organizers/dashboard/data-tables/orgStaff-columns";
 import { cn } from "@/helpers/utilsFns";

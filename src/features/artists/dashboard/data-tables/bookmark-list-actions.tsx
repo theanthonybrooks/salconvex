@@ -1,9 +1,10 @@
+import { bookmarkIntents } from "@/constants/data-table-constants";
+
 import {
   ApplicationStatus,
   positiveApplicationStatuses,
 } from "@/types/applications";
 
-import { bookmarkIntents } from "@/components/data-table/data-table-constants";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { SelectSimple } from "@/components/ui/select";
 

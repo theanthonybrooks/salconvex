@@ -1,10 +1,11 @@
 import { Metadata } from "next";
-import EventDetail from "@/app/(pages)/(artist)/thelist/components/event-page";
+import EventDetail from "@/app/(pages)/(artist)/thelist/components/EventPage";
+
+import { capitalize } from "@/helpers/utilsFns";
+
 import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
 import { api } from "~/convex/_generated/api";
 import { fetchQuery } from "convex/nextjs";
-
-import { capitalize } from "@/helpers/utilsFns";
 
 type Props = {
   params: Promise<{ slug: string }>;

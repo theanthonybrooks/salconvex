@@ -2,7 +2,7 @@ import { OpenCallData } from "@/types/openCallTypes";
 
 import { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
-import OpenCallSocials from "@/app/(pages)/(artist)/thelist/components/open-call-socials";
+import OpenCallSocials from "@/app/(pages)/(artist)/thelist/components/OpenCallSocials";
 
 import { capitalize } from "@/helpers/utilsFns";
 

@@ -11,6 +11,8 @@ interface EventDatesProps {
   format: "desktop" | "mobile";
   preview?: boolean;
   className?: string;
+  itemClassName?: string;
+  moreCountClassName?: string;
   type?: "event" | "production";
 }
 
@@ -20,6 +22,8 @@ const EventDates = ({
   format,
   preview = false,
   className,
+  itemClassName,
+  moreCountClassName,
   type = "event",
 }: EventDatesProps) => {
   const isMobile = format === "mobile";
@@ -49,15 +53,15 @@ const EventDates = ({
 
   if (forEvent) {
     if (isOngoing) {
-      return <span className="flex flex-col gap-1">Ongoing</span>;
+      return <span>Ongoing</span>;
     } else if (dates?.eventFormat === "noEvent") {
       if (!preview) {
-        return <span className="flex flex-col gap-1">No Event Dates</span>;
+        return <span>No Event Dates</span>;
       }
     }
   }
   if (forProd && dates?.prodFormat === "sameAsEvent") {
-    return <span className="flex flex-col gap-1">Same as Event Dates</span>;
+    return <span>Same as Event Dates</span>;
   }
 
   // if (forProd && !mappedProdDates) {
@@ -78,7 +82,10 @@ const EventDates = ({
                 isLastVisible && mappedEventDates?.length > eventSliceLimit;
 
               return (
-                <span key={index} className="flex flex-col gap-1">
+                <span
+                  key={index}
+                  className={cn("flex flex-col gap-1", itemClassName)}
+                >
                   {formatEventDates(
                     start || "",
                     end || "",
@@ -88,7 +95,12 @@ const EventDates = ({
                   )}
 
                   {shouldShowPlus && (
-                    <p className="text-sm italic text-foreground">
+                    <p
+                      className={cn(
+                        "text-sm italic text-foreground",
+                        moreCountClassName,
+                      )}
+                    >
                       {shouldShowPlus &&
                         `+${mappedEventDates?.length - eventSliceLimit} more date${mappedEventDates?.length - eventSliceLimit > 1 ? "s" : ""}`}
                     </p>

@@ -92,7 +92,9 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
   const [activeTab, setActiveTab] = useState("event");
   const { toggleListAction } = useToggleListAction(event._id);
 
-  const locationString = getFormattedLocationString(location);
+  const locationString = getFormattedLocationString(location, {
+    abbreviated: true,
+  });
   const updateUserLastActive = useMutation(api.users.updateUserLastActive);
 
   const onBookmark = async () => {
@@ -435,7 +437,7 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
                 appStatus={null}
                 isHidden={hidden}
                 isUserOrg={isUserOrg || isAdmin}
-                className="sm:max-w-75 mx-auto mt-6 max-w-52 xl:hidden"
+                className="mx-auto mt-6 max-w-52 sm:max-w-75 xl:hidden"
               />
             )}
           </div>

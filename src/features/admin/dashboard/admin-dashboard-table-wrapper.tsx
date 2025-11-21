@@ -3,11 +3,11 @@
 import { TableTypes } from "@/types/tanstack-table";
 
 import { useState } from "react";
-import { useDashboard } from "@/app/(pages)/dashboard/_components/dashboard-context";
+import { useDashboard } from "@/app/(pages)/dashboard/_components/DashboardContext";
 
 import type { Id } from "~/convex/_generated/dataModel";
-import { DataTable } from "@/components/data-table/data-table";
-import { ResponsiveDataTable } from "@/components/data-table/data-table-wrapper";
+import { DataTable } from "@/components/data-table/DataTable";
+import { ResponsiveDataTable } from "@/components/data-table/DataTableWrapper";
 import { useAdminPreload } from "@/features/admin/admin-preload-context";
 import { artistColumns } from "@/features/admin/dashboard/artist-columns";
 import { newsletterColumns } from "@/features/admin/dashboard/newsletter-columns";

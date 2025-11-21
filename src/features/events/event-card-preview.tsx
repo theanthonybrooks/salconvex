@@ -7,12 +7,7 @@ import type { User } from "@/types/user";
 import { usePathname, useRouter } from "next/navigation";
 
 import { FaRegCheckSquare } from "react-icons/fa";
-import {
-  FaBookmark,
-  FaMapLocationDot,
-  FaRegBookmark,
-  FaRegSquare,
-} from "react-icons/fa6";
+import { FaBookmark, FaRegBookmark, FaRegSquare } from "react-icons/fa6";
 import {
   CheckCircleIcon,
   CircleDollarSignIcon,
@@ -41,6 +36,7 @@ import {
   getEventCategoryLabel,
   getEventTypeLabel,
 } from "@/helpers/eventFns";
+import { getFormattedLocationString } from "@/helpers/locationFns";
 import { RichTextDisplay } from "@/helpers/richTextFns";
 import { getUserFontSizePref } from "@/helpers/stylingFns";
 import { cn } from "@/helpers/utilsFns";
@@ -148,34 +144,16 @@ const EventCardPreview = ({
   const noCategories =
     categories === null || Object.keys(categories).length === 0;
 
-  const { locale, city, stateAbbr, country, countryAbbr } = location;
-  const hasCoordinates = !!location.coordinates;
-  const coordinates = location.coordinates || { latitude: 0, longitude: 0 };
-  const { latitude, longitude } = coordinates;
+  // const hasCoordinates = !!location.coordinates;
+  // const coordinates = location.coordinates || { latitude: 0, longitude: 0 };
+  // const { latitude, longitude } = coordinates;
 
-  const locationParts: string[] = [];
   const hasOpenCall = openCallStatus === "active";
 
-  const isValidStateAbbr = stateAbbr && /^[A-Za-z]+$/.test(stateAbbr);
-
-  if (locale) locationParts.push(locale);
-
-  if (city && isValidStateAbbr) {
-    locationParts.push(`${city}, ${stateAbbr}`);
-  } else if (city) {
-    locationParts.push(city);
-  } else if (isValidStateAbbr) {
-    locationParts.push(stateAbbr);
-  }
-
-  if (countryAbbr === "US") {
-    locationParts.push("USA");
-    // locationParts.push(countryAbbr);
-  } else if (country) {
-    locationParts.push(country);
-  }
-
-  const locationString = locationParts.join(",\n");
+  const locationString = getFormattedLocationString(location, {
+    wrap: true,
+    abbreviated: true,
+  });
 
   // console.log("appStatus", appStatus);
   //Todo: This should technically override the status if cleared and remove any application status for that event for that user
@@ -344,7 +322,7 @@ const EventCardPreview = ({
             />
           </div>
           {isCurrentlyOpen && (
-            <span className={cn("flex items-center gap-x-1", fontSize)}>
+            <span className={cn("flex items-start gap-x-1", fontSize)}>
               <p className={"font-semibold"}>
                 {basicInfo.callType === "Fixed" ? "Deadline" : "Status"}:
               </p>
@@ -684,7 +662,7 @@ const EventCardPreview = ({
               ))}
             </div>
             {/* TODO: Add a link to the map */}
-
+            {/* 
             {hasCoordinates && (
               <a
                 href={`https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`}
@@ -692,7 +670,7 @@ const EventCardPreview = ({
               >
                 <FaMapLocationDot className="size-4" /> View on Map
               </a>
-            )}
+            )} */}
           </div>
         </div>
         {isCurrentlyOpen ? (
@@ -888,7 +866,7 @@ const EventCardPreview = ({
             openCall={event.openCallStatus}
             publicView={publicPreview || isUserOrg ? false : publicView}
             appFee={basicInfo ? basicInfo.appFee : 0}
-            className="ipad:hidden max-w-40"
+            className="max-w-40 ipad:hidden"
           />
 
           <ApplyButton
@@ -917,7 +895,7 @@ const EventCardPreview = ({
             eventCategory={eventCategory}
             isPreview={true}
             appFee={basicInfo ? basicInfo.appFee : 0}
-            className="ipad:flex hidden"
+            className="hidden ipad:flex"
             fontSize={fontSize}
           />
           {isCurrentlyOpen && basicInfo.callFormat && (

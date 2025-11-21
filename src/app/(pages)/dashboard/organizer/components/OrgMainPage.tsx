@@ -4,12 +4,12 @@ import type { ColumnDef } from "@tanstack/react-table";
 
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import { OrgInfo } from "@/app/(pages)/dashboard/organizer/components/org-info";
-import { StaffPage } from "@/app/(pages)/dashboard/organizer/components/staff-page";
+import { OrgInfo } from "@/app/(pages)/dashboard/organizer/components/OrgInfo";
+import { StaffPage } from "@/app/(pages)/dashboard/organizer/components/StaffPage";
 import { motion } from "framer-motion";
 
 import type { Doc, Id } from "~/convex/_generated/dataModel";
-import { ResponsiveDataTable } from "@/components/data-table/data-table-wrapper";
+import { ResponsiveDataTable } from "@/components/data-table/DataTableWrapper";
 import { Card } from "@/components/ui/card";
 import { LoadingBalls } from "@/components/ui/loading-balls";
 import { SearchMappedSelect } from "@/components/ui/mapped-select";

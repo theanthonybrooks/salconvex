@@ -1,7 +1,8 @@
 import { ReactNode } from "react";
 import { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { DashboardWrapper } from "@/app/(pages)/dashboard/_components/dashboard-wrapper";
+import { DashboardWrapper } from "@/app/(pages)/dashboard/_components/DashboardWrapper";
+
 import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
 import { api } from "~/convex/_generated/api";
 import { fetchQuery } from "convex/nextjs";

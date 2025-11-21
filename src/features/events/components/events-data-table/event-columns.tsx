@@ -17,7 +17,7 @@ import { Globe, LucideClipboardCopy, MoreHorizontal } from "lucide-react";
 import {
   DataTableAdminOrgActions,
   DataTableAdminOrgStateActions,
-} from "@/components/data-table/actions/data-table-admin-org-actions";
+} from "@/components/data-table/actions/DataTableAdminOrgActions";
 import {
   ApproveEvent,
   ArchiveEvent,
@@ -26,21 +26,21 @@ import {
   DuplicateEvent,
   GoToEvent,
   ReactivateEvent,
-} from "@/components/data-table/actions/data-table-event-actions";
-import { DataTableEventEdition } from "@/components/data-table/actions/data-table-event-edition";
+} from "@/components/data-table/actions/DataTableEventActions";
+import { DataTableEventEdition } from "@/components/data-table/actions/DataTableEventEdition";
 import {
   DataTableEventName,
   RenameEventDialog,
-} from "@/components/data-table/actions/data-table-event-name";
+} from "@/components/data-table/actions/DataTableEventName";
 import {
   ApproveBoth,
   ApproveOC,
   DeleteOC,
   DuplicateOC,
   ReactivateOC,
-} from "@/components/data-table/actions/data-table-oc-actions";
-import { DataTableOrgInfo } from "@/components/data-table/actions/data-table-org-info";
-import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
+} from "@/components/data-table/actions/DataTableOCActions";
+import { DataTableOrgInfo } from "@/components/data-table/actions/DataTableOrgInfo";
+import { DataTableColumnHeader } from "@/components/data-table/DataTableColumnHeader";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ConfirmingDropdown } from "@/components/ui/confirmation-dialog-context";

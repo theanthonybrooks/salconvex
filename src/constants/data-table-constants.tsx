@@ -3,7 +3,7 @@
 import { eventTypeOptions } from "@/constants/eventConsts";
 import { onlineEventCategories } from "@/constants/resourcesConsts";
 
-import type { DataTableFacetedFilterOption } from "@/components/data-table/data-table-faceted-filter";
+import type { DataTableFacetedFilterOption } from "@/components/data-table/DataTableFacetedFilter";
 import type { PageTypes, TableTypes } from "@/types/tanstack-table";
 
 import { FaMoneyBill } from "react-icons/fa6";

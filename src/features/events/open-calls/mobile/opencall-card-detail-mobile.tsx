@@ -119,7 +119,9 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
   const [activeTab, setActiveTab] = useState("opencall");
   const [hasMounted, setHasMounted] = useState(false);
 
-  const locationString = getFormattedLocationString(location);
+  const locationString = getFormattedLocationString(location, {
+    abbreviated: true,
+  });
 
   const { toggleListAction } = useToggleListAction(event._id);
 

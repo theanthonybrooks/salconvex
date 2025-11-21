@@ -17,15 +17,15 @@ import {
   DataTableAdminOrgStateActions,
   OrgDuplicateEvent,
   OrgDuplicateOC,
-} from "@/components/data-table/actions/data-table-admin-org-actions";
+} from "@/components/data-table/actions/DataTableAdminOrgActions";
 import {
   ArchiveEvent,
   DeleteEvent,
   GoToEvent,
   ReactivateEvent,
-} from "@/components/data-table/actions/data-table-event-actions";
-import { RenameEventDialog } from "@/components/data-table/actions/data-table-event-name";
-import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
+} from "@/components/data-table/actions/DataTableEventActions";
+import { RenameEventDialog } from "@/components/data-table/actions/DataTableEventName";
+import { DataTableColumnHeader } from "@/components/data-table/DataTableColumnHeader";
 import { Button } from "@/components/ui/button";
 import { ConfirmingDropdown } from "@/components/ui/confirmation-dialog-context";
 import { CopyableItem } from "@/components/ui/copyable-item";

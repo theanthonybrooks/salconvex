@@ -86,7 +86,9 @@ export const EventCardDetailMobile = (props: EventCardProps) => {
   const [activeTab, setActiveTab] = useState("event");
   const [hasMounted, setHasMounted] = useState(false);
 
-  const locationString = getFormattedLocationString(location);
+  const locationString = getFormattedLocationString(location, {
+    abbreviated: true,
+  });
 
   const hasEventDates = eventStart && eventEnd;
   const eventAbout = event?.about ?? "";
@@ -226,7 +228,7 @@ export const EventCardDetailMobile = (props: EventCardProps) => {
               {getEventCategoryLabel(eventCategory)}
             </p>
             {eventType && eventCategory === "event" && (
-              <p className={cn("flex items-center gap-x-1", fontSize)}>
+              <p className={cn("flex items-start gap-x-1", fontSize)}>
                 <span className="font-semibold">Type:</span>{" "}
                 {eventType.map((type, index) => {
                   return (

@@ -1,5 +1,7 @@
 "use client";
 
+import { TABLE_FILTERS } from "@/constants/data-table-constants";
+
 import { TableTypes } from "@/types/tanstack-table";
 
 import { useEffect, useState } from "react";
@@ -10,8 +12,7 @@ import { toast } from "react-toastify";
 import { TbFilterX } from "react-icons/tb";
 import { X } from "lucide-react";
 
-import { TABLE_FILTERS } from "@/components/data-table/data-table-constants";
-import { DataTableViewOptions } from "@/components/data-table/data-table-view-options";
+import { DataTableViewOptions } from "@/components/data-table/DataTableViewOptions";
 import { AlertDialogSimple } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,7 +24,7 @@ import { useDevice } from "@/providers/device-provider";
 import { api } from "~/convex/_generated/api";
 import { Id } from "~/convex/_generated/dataModel";
 import { useMutation } from "convex/react";
-import { DataTableFacetedFilter } from "./data-table-faceted-filter";
+import { DataTableFacetedFilter } from "./DataTableFacetedFilter";
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;

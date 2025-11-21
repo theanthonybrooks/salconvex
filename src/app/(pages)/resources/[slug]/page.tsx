@@ -3,7 +3,7 @@ import { DEFAULT_ICON } from "@/constants/pageTitles";
 import type { Metadata } from "next";
 
 import { notFound } from "next/navigation";
-import { CheckoutPage } from "@/app/(pages)/resources/components/checkoutPage";
+import { CheckoutPage } from "@/app/(pages)/resources/components/CheckoutPage";
 import { capitalize } from "lodash";
 
 import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";

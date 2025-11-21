@@ -1,3 +1,5 @@
+import { noProdCategories } from "@/constants/eventConsts";
+
 import { EventData } from "@/types/eventTypes";
 
 import { RefObject, useState } from "react";
@@ -201,7 +203,7 @@ export const EventCard = ({
               </AccordionContent>
             </AccordionItem>
           )}
-          {event && (
+          {event && !noProdCategories.includes(eventCategory) && (
             <AccordionItem value="dates">
               <AccordionTrigger title="Dates:" fontSize={fontSize} />
               <AccordionContent className={cn(fontSize)}>

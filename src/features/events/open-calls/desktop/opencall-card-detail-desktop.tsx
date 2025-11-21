@@ -136,7 +136,9 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
     basicInfo.callType,
   );
 
-  const locationString = getFormattedLocationString(location);
+  const locationString = getFormattedLocationString(location, {
+    abbreviated: true,
+  });
   const onBookmark = async () => {
     if (!hasActiveSubscription) {
       router.push("/pricing?type=artist");
@@ -654,7 +656,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                     appLink={outputAppLink}
                     isHidden={hidden}
                     isUserOrg={Boolean(isUserOrg || isAdmin)}
-                    className="sm:max-w-75 mx-auto mt-1 w-full max-w-52"
+                    className="mx-auto mt-1 w-full max-w-52 sm:max-w-75"
                   />
                 </>
               )}

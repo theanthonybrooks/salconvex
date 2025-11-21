@@ -4,7 +4,7 @@ import { ApplicationStatus } from "@/types/applications";
 
 import { ColumnDef } from "@tanstack/react-table";
 
-import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
+import { DataTableColumnHeader } from "@/components/data-table/DataTableColumnHeader";
 import { Link } from "@/components/ui/custom-link";
 import { AppNotesInput } from "@/features/artists/applications/components/events-data-table/app-notes-input";
 import { AppStatusSelector } from "@/features/artists/applications/components/events-data-table/app-status-selector";

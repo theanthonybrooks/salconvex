@@ -272,7 +272,6 @@ export const ArtistProfileForm = ({
       setTimeout(() => {
         if (!hasCurrentSub) {
           onClick();
-          console.log("onClick");
         } else {
           // console.log("handleManageSubscription");
           // handleManageSubscription();

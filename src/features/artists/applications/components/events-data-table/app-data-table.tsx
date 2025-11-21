@@ -19,7 +19,7 @@ import {
   VisibilityState,
 } from "@tanstack/react-table";
 
-import { DataTablePagination } from "@/components/data-table/data-table-pagination";
+import { DataTablePagination } from "@/components/data-table/DataTablePagination";
 import {
   Table,
   TableBody,

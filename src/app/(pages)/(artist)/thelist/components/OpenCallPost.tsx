@@ -1,7 +1,7 @@
 import { OpenCallData } from "@/types/openCallTypes";
 
 import Image from "next/image";
-import { PostSettings } from "@/app/(pages)/(artist)/thelist/components/open-call-socials";
+import { PostSettings } from "@/app/(pages)/(artist)/thelist/components/OpenCallSocials";
 
 import EventDates from "@/features/events/components/event-dates";
 import { EligibilityLabelServer } from "@/features/events/open-calls/components/eligibilty-label-server";
@@ -14,7 +14,7 @@ import {
 import { getFormattedLocationString } from "@/helpers/locationFns";
 import { cn } from "@/helpers/utilsFns";
 
-import styles from "./OpenCallPostDetail.module.css";
+import styles from "./openCallPost.module.css";
 
 interface OpenCallPostProps {
   data: OpenCallData | null;
@@ -53,7 +53,9 @@ export const OpenCallPost = ({ data, postSettings }: OpenCallPostProps) => {
   const hasBudgetRange = budgetMax && budgetMax > 0;
   const hasBudget = !!(budgetMin > 0 || hasBudgetRange);
   const hasRate = !!budgetRate && budgetRate > 0;
-  const locationString = getFormattedLocationString(location);
+  const locationString = getFormattedLocationString(location, {
+    abbreviated: true,
+  });
 
   return (
     <div
@@ -73,6 +75,8 @@ export const OpenCallPost = ({ data, postSettings }: OpenCallPostProps) => {
           limit={1}
           preview={true}
           type="event"
+          itemClassName="gap-0"
+          moreCountClassName="font-normal text-end"
         />
       </section>
       <section className="w-full">

@@ -1,6 +1,7 @@
 "use client";
 
-import TheListNavBar from "@/app/(pages)/(artist)/thelist/components/artist-navbar";
+import TheListNavBar from "@/app/(pages)/(artist)/thelist/components/ArtistNavbar";
+
 import NavBar from "./navbar";
 
 interface NavBarWrapperProps {

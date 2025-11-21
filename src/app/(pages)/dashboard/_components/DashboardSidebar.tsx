@@ -10,7 +10,7 @@ import { User } from "@/types/user";
 import { Fragment, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useDashboard } from "@/app/(pages)/dashboard/_components/dashboard-context";
+import { useDashboard } from "@/app/(pages)/dashboard/_components/DashboardContext";
 import { AnimatePresence, motion, Variants } from "framer-motion";
 
 import { MdChevronRight } from "react-icons/md";

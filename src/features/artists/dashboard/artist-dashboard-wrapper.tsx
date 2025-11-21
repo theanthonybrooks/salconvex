@@ -2,9 +2,9 @@
 
 import { TableTypes } from "@/types/tanstack-table";
 
-import { useDashboard } from "@/app/(pages)/dashboard/_components/dashboard-context";
+import { useDashboard } from "@/app/(pages)/dashboard/_components/DashboardContext";
 
-import { ResponsiveDataTable } from "@/components/data-table/data-table-wrapper";
+import { ResponsiveDataTable } from "@/components/data-table/DataTableWrapper";
 import { applicationColumns } from "@/features/artists/applications/components/events-data-table/application-columns";
 import { bookmarkColumns } from "@/features/artists/dashboard/data-tables/bookmark-columns";
 import { hiddenColumns } from "@/features/artists/dashboard/data-tables/hidden-columns";

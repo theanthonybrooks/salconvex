@@ -3,7 +3,7 @@
 import { OpenCallData } from "@/types/openCallTypes";
 
 import { ComponentType, useEffect, useState } from "react";
-import { OpenCallPost } from "@/app/(pages)/(artist)/thelist/components/open-call-post";
+import { OpenCallPost } from "@/app/(pages)/(artist)/thelist/components/OpenCallPost";
 import { toast } from "react-toastify";
 
 import { BiPhotoAlbum } from "react-icons/bi";
