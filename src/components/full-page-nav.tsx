@@ -363,7 +363,7 @@ const FullPageNav = ({
                 variants={mobileImageVariants}
                 animate={isOpen}
                 transition={{ duration: 0.25, ease: [0.83, 0, 0.1, 1] }}
-                className={cn("absolute left-5 top-5 md:hidden")}
+                className={cn("absolute left-5 top-5 lg:hidden")}
               >
                 <Link href="/">
                   <Image
@@ -408,23 +408,14 @@ const FullPageNav = ({
       {/* /~ Fullscreen Menu Overlay ~/ */}
       <AnimatePresence>
         {/* Expanding content */}
-        {/* *
-         *
-         *
-         *
-         * */}
+
         {/* //---------------------- Block/Flex? (Mobile) Layout ---------------------- */}
-        {/* *
-         *
-         *
-         *
-         * */}
 
         <motion.div
           id="mobile-menu"
           key="mobile-menu"
           className={cn(
-            "fixed right-5 top-5 box-border h-full w-full bg-background xl:hidden",
+            "fixed right-5 top-5 box-border h-full w-full bg-background lg:hidden",
           )}
           variants={getMobileMenuVariants(isScrolled)}
           animate={isOpen}
@@ -720,7 +711,7 @@ const FullPageNav = ({
           <motion.div
             key="desktop-menu"
             className={cn(
-              "fixed right-5 top-5 box-border hidden h-dvh w-full bg-background xl:block",
+              "fixed right-5 top-5 box-border hidden h-dvh w-full bg-background lg:block",
               isOpen === "open" || isOpen === "closed"
                 ? "bg-background"
                 : "bg-none",
@@ -740,7 +731,7 @@ const FullPageNav = ({
             >
               {isOpen === "open" && (
                 <>
-                  <div className="row-span-1 grid w-screen grid-cols-1 divide-x-1.5 divide-solid divide-foreground overflow-hidden px-5 md:grid-cols-2">
+                  <div className="row-span-1 grid w-screen grid-cols-1 divide-x-1.5 divide-solid divide-foreground overflow-hidden px-5 md:grid-cols-[40%_60%]">
                     {/* Column 1 - Main Titles */}
                     <motion.div
                       className="scrollable mini darkbar flex items-start justify-center p-4 py-8"

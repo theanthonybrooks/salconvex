@@ -48,7 +48,8 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl[0]),
-  // viewport: 'width=device-width, initial-scale=1, maximum-scale=1',
+  viewport:
+    "width=device-width, initial-scale=1 interactive-widget=resizes-content",
   title: {
     default: "Home",
     template: `%s | The Street Art List`,
