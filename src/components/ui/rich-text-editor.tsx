@@ -202,7 +202,7 @@ export const RichTextEditor = ({
     },
     editorProps: {
       attributes: {
-        class: "scrollable justy mini darkbar px-4",
+        class: "scrollable justy mini darkbar px-4 h-full",
       },
       handleKeyDown(view, event) {
         const isCmdEnter = event.metaKey && event.key === "Enter";
@@ -746,7 +746,7 @@ export const RichTextEditor = ({
           editor={editor}
           className={cn(
             "rich-text scrollable invis w-full flex-1 md:px-4",
-            asModal && "rich-modal [&_div.ProseMirror]:h-full",
+            // asModal && "rich-modal [&_div.ProseMirror]:h-full",
             readOnly && "pointer-events-none cursor-default",
           )}
         />
@@ -886,8 +886,8 @@ export const RichTextEditor = ({
         <Dialog open={editorOpen} onOpenChange={handleDialogChange}>
           <DialogContent
             className={cn(
-              "h-[90svh] w-[90vw] max-w-full rounded-lg bg-card p-0 sm:h-[90dvh] sm:w-[95vw]",
-              "top-4 translate-y-0 sm:top-1/2 sm:-translate-y-1/2",
+              "h-screen w-screen max-w-full bg-card p-0 sm:h-[90dvh] sm:w-[95vw] sm:rounded-lg",
+              "top-0 translate-y-0 sm:top-1/2 sm:-translate-y-1/2",
               isFocused && isMobile && "h-[55svh]",
               dialogClassName,
             )}

@@ -1530,7 +1530,6 @@ div:has(> div.react-datepicker__input-container) {
 /* Placeholder support for Tiptap */
 .ProseMirror {
   /* min-height: 100px; */
-  padding: 0.5rem;
   cursor: text;
   outline: none;
   white-space: pre-wrap;
