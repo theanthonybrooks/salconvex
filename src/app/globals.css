@@ -1568,7 +1568,7 @@ div:has(> div.react-datepicker__input-container) {
 
 /* #endregion */
 
-/*global.css
+/*
 .rich-text ul[data-type="taskList"] {
   @apply list-none pl-6;
 }
