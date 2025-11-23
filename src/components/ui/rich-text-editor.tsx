@@ -888,7 +888,7 @@ export const RichTextEditor = ({
             className={cn(
               "h-dvh w-screen max-w-full bg-card p-0 sm:h-[90dvh] sm:w-[95vw] sm:rounded-lg",
               "top-0 translate-y-0 sm:top-1/2 sm:-translate-y-1/2",
-              isFocused && isMobile && "h-[60svh]",
+              isFocused && isMobile && "h-[64svh]",
               dialogClassName,
             )}
             overlayClassName={cn("z-[31]")}
