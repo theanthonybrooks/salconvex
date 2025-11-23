@@ -201,6 +201,9 @@ export const RichTextEditor = ({
       }
     },
     editorProps: {
+      attributes: {
+        class: "scrollable justy mini darkbar px-4",
+      },
       handleKeyDown(view, event) {
         const isCmdEnter = event.metaKey && event.key === "Enter";
         const isCtrlEnter = event.ctrlKey && event.key === "Enter";
@@ -215,6 +218,7 @@ export const RichTextEditor = ({
       },
     },
   });
+  const isFocused = editor?.isFocused;
   const { canUndo, canRedo } = useEditorState({
     editor,
     selector: (ctx) => ({
@@ -741,8 +745,8 @@ export const RichTextEditor = ({
         <EditorContent
           editor={editor}
           className={cn(
-            "rich-text scrollable mini darkbar w-full flex-1 px-4",
-            // asModal && "rich-modal [&_div.ProseMirror]:max-h-[calc(90dvh-140px)]",
+            "rich-text scrollable invis w-full flex-1 md:px-4",
+            asModal && "rich-modal [&_div.ProseMirror]:h-full",
             readOnly && "pointer-events-none cursor-default",
           )}
         />
@@ -884,6 +888,7 @@ export const RichTextEditor = ({
             className={cn(
               "h-[90svh] w-[90vw] max-w-full rounded-lg bg-card p-0 sm:h-[90dvh] sm:w-[95vw]",
               "top-4 translate-y-0 sm:top-1/2 sm:-translate-y-1/2",
+              isFocused && isMobile && "h-[55svh]",
               dialogClassName,
             )}
             overlayClassName={cn("z-[31]")}

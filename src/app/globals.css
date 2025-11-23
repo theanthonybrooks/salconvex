@@ -1417,9 +1417,7 @@ div:has(> div.react-datepicker__input-container) {
 }
 /* #endregion */
 /* #region ------------- Rich Text -------------- */
-.ProseMirror {
-  @apply scrollable justy mini;
-}
+
 /* .rich-modal-cont {
   max-width: 90vw;
 } */
@@ -1544,6 +1542,8 @@ div:has(> div.react-datepicker__input-container) {
   /* @media (width <= 768px) {
     padding-bottom: 6rem;
   } */
+  flex: 1;
+  min-height: 100px; /* still needed for empty state */
 }
 
 .tiptap p.is-editor-empty[data-placeholder]:first-child::before {
@@ -1567,10 +1567,6 @@ div:has(> div.react-datepicker__input-container) {
   padding: 0.5rem;
 }
 
-.ProseMirror {
-  flex: 1;
-  min-height: 100px; /* still needed for empty state */
-}
 /* #endregion */
 
 /*global.css
