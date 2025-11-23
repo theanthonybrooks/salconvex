@@ -113,7 +113,7 @@ export const RichTextEditor = ({
   tabIndex,
   withTaskList,
 }: Props) => {
-  const isMobile = useIsMobile();
+  const isMobile = useIsMobile(768);
   const previewRef = useRef<HTMLDivElement>(null);
 
   const linkDialogRef = useRef<HTMLDivElement>(null);

@@ -46,10 +46,22 @@ import { api } from "~/convex/_generated/api";
 import "../styles/react-day-picker.css";
 import "./globals.css";
 
+import type { Viewport } from "next";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  interactiveWidget: "resizes-content",
+
+  // Also supported but less commonly used
+  // interactiveWidget: 'resizes-visual',
+};
+
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl[0]),
-  viewport:
-    "width=device-width, initial-scale=1 interactive-widget=resizes-content",
+
   title: {
     default: "Home",
     template: `%s | The Street Art List`,
