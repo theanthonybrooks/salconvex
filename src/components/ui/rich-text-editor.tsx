@@ -886,7 +886,7 @@ export const RichTextEditor = ({
         <Dialog open={editorOpen} onOpenChange={handleDialogChange}>
           <DialogContent
             className={cn(
-              "h-screen w-screen max-w-full bg-card p-0 sm:h-[90dvh] sm:w-[95vw] sm:rounded-lg",
+              "h-dvh w-screen max-w-full bg-card p-0 sm:h-[90dvh] sm:w-[95vw] sm:rounded-lg",
               "top-0 translate-y-0 sm:top-1/2 sm:-translate-y-1/2",
               isFocused && isMobile && "h-[60svh]",
               dialogClassName,
