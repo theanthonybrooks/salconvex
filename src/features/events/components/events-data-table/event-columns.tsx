@@ -483,9 +483,7 @@ export const getEventColumns = <T extends Event>(
                             hasOpenCall={false}
                             category={eventCategory}
                           />
-                          {isEditor && isDashboard && (
-                            <RenameEventDialog event={event} />
-                          )}
+                          {isDashboard && <RenameEventDialog event={event} />}
                           {((state === "draft" && neitherApproved) ||
                             isAdmin) && (
                             <DeleteEvent
@@ -564,13 +562,12 @@ export const getEventColumns = <T extends Event>(
                               )}
 
                               {(ocState === "archived" ||
-                                ocState === "published") &&
-                                isEditor && (
-                                  <ReactivateOC
-                                    openCallId={openCallId}
-                                    state={ocState}
-                                  />
-                                )}
+                                ocState === "published") && (
+                                <ReactivateOC
+                                  openCallId={openCallId}
+                                  state={ocState}
+                                />
+                              )}
                               {ocState === "submitted" &&
                                 state === "submitted" &&
                                 isAdmin && (
