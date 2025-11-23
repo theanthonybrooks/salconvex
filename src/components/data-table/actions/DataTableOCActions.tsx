@@ -102,6 +102,23 @@ export const ReactivateOC = ({ openCallId, state }: SubmittedOCProps) => {
     </DropdownMenuItem>
   );
 };
+export const ArchiveOC = ({ openCallId }: OCActionProps) => {
+  const archiveOC = useMutation(api.openCalls.openCall.changeOCStatus);
+  return (
+    <DropdownMenuItem
+      onClick={() => {
+        archiveOC({
+          openCallId: openCallId as Id<"openCalls">,
+          newStatus: "archived",
+        });
+      }}
+      className="flex items-center gap-x-1"
+    >
+      <LucideFolderInput className="size-4" />
+      Archive OC
+    </DropdownMenuItem>
+  );
+};
 
 export const ApproveOC = ({ openCallId }: OCActionProps) => {
   const approveOC = useMutation(api.openCalls.openCall.changeOCStatus);

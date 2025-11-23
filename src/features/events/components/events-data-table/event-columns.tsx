@@ -35,6 +35,7 @@ import {
 import {
   ApproveBoth,
   ApproveOC,
+  ArchiveOC,
   DeleteOC,
   DuplicateOC,
   ReactivateOC,
@@ -519,8 +520,7 @@ export const getEventColumns = <T extends Event>(
                           {state === "published" && (
                             <ArchiveEvent eventId={event._id} />
                           )}
-                          {(state === "archived" ||
-                            (state === "published" && isEditor)) && (
+                          {(state === "archived" || state === "published") && (
                             <ReactivateEvent
                               eventId={event._id}
                               state={state}
@@ -567,6 +567,9 @@ export const getEventColumns = <T extends Event>(
                                   openCallId={openCallId}
                                   state={ocState}
                                 />
+                              )}
+                              {ocState === "published" && isAdmin && (
+                                <ArchiveOC openCallId={openCallId} />
                               )}
                               {ocState === "submitted" &&
                                 state === "submitted" &&

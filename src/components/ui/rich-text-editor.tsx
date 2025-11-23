@@ -5,6 +5,7 @@
 //note-to-self: is the "Editable" toggle useful for this? Perhaps it could be used to show/hide text. I already have something that displays it, though, so I'm not really sure.
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useIsMobile } from "@/hooks/use-media-query";
 import CharacterCount from "@tiptap/extension-character-count";
 import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
@@ -23,6 +24,7 @@ import { toast } from "react-toastify";
 
 import { FaRedo, FaRemoveFormat, FaUndo, FaUnlink } from "react-icons/fa";
 import { FaListCheck, FaListOl, FaListUl } from "react-icons/fa6";
+import { IoOptions } from "react-icons/io5";
 import { Check, CheckIcon, LoaderCircle, Pencil } from "lucide-react";
 
 import { MarkButton } from "@/components/tiptap-ui/mark-button";
@@ -111,12 +113,14 @@ export const RichTextEditor = ({
   tabIndex,
   withTaskList,
 }: Props) => {
+  const isMobile = useIsMobile();
   const previewRef = useRef<HTMLDivElement>(null);
 
   const linkDialogRef = useRef<HTMLDivElement>(null);
 
   const [editorOpen, setEditorOpen] = useState(false);
 
+  const [showMarkButtons, setShowMarkButtons] = useState(!isMobile);
   const [hoverPreview, setHoverPreview] = useState(false);
   const [showLinkInput, setShowLinkInput] = useState(false);
   const [displayText, setDisplayText] = useState("");
@@ -499,109 +503,127 @@ export const RichTextEditor = ({
             />
             <MarkButton type="bold" />
             <MarkButton type="italic" />
-            <MarkButton type="underline" />
-            <MarkButton type="strike" />
 
-            <Separator
-              orientation="vertical"
-              className="mx-2 hidden sm:block"
-            />
             <Button
-              variant="richTextButton"
-              size="richText"
-              type="button"
-              onClick={() => editor.chain().focus().toggleBulletList().run()}
-              className={cn(
-                buttonClass,
-                // markIsActiveAtCursor("bulletList") && activeButtonClass,
-                editor.isActive("bulletList") && activeButtonClass,
-                noListButtonClass,
-              )}
+              variant="icon"
+              onClick={() => setShowMarkButtons((prev) => !prev)}
+              className="sm:hidden"
             >
-              <FaListUl className="size-4 shrink-0" />
+              <IoOptions className="size-6" />
             </Button>
-            <Button
-              variant="richTextButton"
-              size="richText"
-              type="button"
-              onClick={() => editor.chain().focus().toggleOrderedList().run()}
-              className={cn(
-                buttonClass,
-                // markIsActiveAtCursor("orderedList") && activeButtonClass,
-                editor.isActive("orderedList") && activeButtonClass,
-                noListButtonClass,
-              )}
-            >
-              <FaListOl className="size-4 shrink-0" />
-            </Button>
-            {forOpenCall ||
-              (withTaskList && (
+            {showMarkButtons && (
+              <>
+                <MarkButton type="underline" />
+                <MarkButton type="strike" />
+
+                <Separator
+                  orientation="vertical"
+                  className="mx-2 hidden sm:block"
+                />
                 <Button
                   variant="richTextButton"
                   size="richText"
                   type="button"
-                  onClick={() => editor.chain().focus().toggleTaskList().run()}
+                  onClick={() =>
+                    editor.chain().focus().toggleBulletList().run()
+                  }
                   className={cn(
                     buttonClass,
-                    editor.isActive("taskList")
-                      ? activeButtonClass
-                      : "text-gray-500",
+                    // markIsActiveAtCursor("bulletList") && activeButtonClass,
+                    editor.isActive("bulletList") && activeButtonClass,
                     noListButtonClass,
                   )}
                 >
-                  <FaListCheck className="size-4 shrink-0" />
+                  <FaListUl className="size-4 shrink-0" />
                 </Button>
-              ))}
-            <Separator
-              orientation="vertical"
-              className={cn("mx-2 hidden sm:block", noListButtonClass)}
-            />
+                <Button
+                  variant="richTextButton"
+                  size="richText"
+                  type="button"
+                  onClick={() =>
+                    editor.chain().focus().toggleOrderedList().run()
+                  }
+                  className={cn(
+                    buttonClass,
+                    // markIsActiveAtCursor("orderedList") && activeButtonClass,
+                    editor.isActive("orderedList") && activeButtonClass,
+                    noListButtonClass,
+                  )}
+                >
+                  <FaListOl className="size-4 shrink-0" />
+                </Button>
+                {forOpenCall ||
+                  (withTaskList && (
+                    <Button
+                      variant="richTextButton"
+                      size="richText"
+                      type="button"
+                      onClick={() =>
+                        editor.chain().focus().toggleTaskList().run()
+                      }
+                      className={cn(
+                        buttonClass,
+                        editor.isActive("taskList")
+                          ? activeButtonClass
+                          : "text-gray-500",
+                        noListButtonClass,
+                      )}
+                    >
+                      <FaListCheck className="size-4 shrink-0" />
+                    </Button>
+                  ))}
+                <Separator
+                  orientation="vertical"
+                  className={cn("mx-2 hidden sm:block", noListButtonClass)}
+                />
 
-            <MarkButton
-              onClick={() => {
-                const { from, to } = editor.state.selection;
-                const selectedText = editor.state.doc.textBetween(from, to);
-                setLinkUrl(editor.getAttributes("link")?.href || "");
-                setDisplayText(selectedText || "");
-                setShowLinkInput(true);
-              }}
-              type="link"
-            />
-            <MarkButton
-              onClick={() => editor.chain().focus().unsetLink().run()}
-              type="link"
-              className={cn(
-                "data-[active-state=on]:border-red-800 data-[active-state=on]:bg-red-50 data-[active-state=on]data-[active-state=on]:text-black data-[active-state=on]:hover:bg-red-100",
-              )}
-              disabled={!hasLink}
-              icon={FaUnlink}
-            />
+                <MarkButton
+                  onClick={() => {
+                    const { from, to } = editor.state.selection;
+                    const selectedText = editor.state.doc.textBetween(from, to);
+                    setLinkUrl(editor.getAttributes("link")?.href || "");
+                    setDisplayText(selectedText || "");
+                    setShowLinkInput(true);
+                  }}
+                  type="link"
+                />
+                <MarkButton
+                  onClick={() => editor.chain().focus().unsetLink().run()}
+                  type="link"
+                  className={cn(
+                    "data-[active-state=on]:border-red-800 data-[active-state=on]:bg-red-50 data-[active-state=on]data-[active-state=on]:text-black data-[active-state=on]:hover:bg-red-100",
+                  )}
+                  disabled={!hasLink}
+                  icon={FaUnlink}
+                />
 
-            <Separator
-              orientation="vertical"
-              className="mx-2 hidden sm:block"
-            />
+                <Separator
+                  orientation="vertical"
+                  className="mx-2 hidden sm:block"
+                />
 
-            <Button
-              variant="richTextButton"
-              size="richText"
-              type="button"
-              onClick={() =>
-                editor
-                  .chain()
-                  .focus()
-                  .clearNodes() // reset block-level nodes like lists/headings
-                  .unsetAllMarks() // remove inline formatting like bold/italic
-                  .run()
-              }
-              className={cn(
-                buttonClass,
-                "text-gray-500",
-                !hasFormatting && disabledButtonClass,
-              )}
-            >
-              <FaRemoveFormat className="size-4 shrink-0" />
-            </Button>
+                <Button
+                  variant="richTextButton"
+                  size="richText"
+                  type="button"
+                  onClick={() =>
+                    editor
+                      .chain()
+                      .focus()
+                      .clearNodes() // reset block-level nodes like lists/headings
+                      .unsetAllMarks() // remove inline formatting like bold/italic
+                      .run()
+                  }
+                  className={cn(
+                    buttonClass,
+                    "text-gray-500",
+                    !hasFormatting && disabledButtonClass,
+                  )}
+                >
+                  <FaRemoveFormat className="size-4 shrink-0" />
+                </Button>
+              </>
+            )}
           </div>
           {asModal && (
             <span
@@ -618,7 +640,7 @@ export const RichTextEditor = ({
         <Dialog open={showLinkInput} onOpenChange={setShowLinkInput}>
           <DialogContent
             ref={linkDialogRef}
-            className="flex flex-col gap-2 rounded-lg bg-dashboardBgLt"
+            className="top-4 flex translate-y-0 flex-col gap-2 rounded-lg bg-dashboardBgLt sm:top-1/2 sm:-translate-y-1/2"
           >
             <DialogTitle className="sr-only">Link Dialog</DialogTitle>
             <div className={cn("mb-2 flex flex-col gap-2 px-4 pt-3")}>
@@ -860,7 +882,8 @@ export const RichTextEditor = ({
         <Dialog open={editorOpen} onOpenChange={handleDialogChange}>
           <DialogContent
             className={cn(
-              "h-[90dvh] w-[90vw] max-w-full rounded-lg bg-card p-0 sm:w-[95vw]",
+              "h-[90svh] w-[90vw] max-w-full rounded-lg bg-card p-0 sm:h-[90dvh] sm:w-[95vw]",
+              "top-4 translate-y-0 sm:top-1/2 sm:-translate-y-1/2",
               dialogClassName,
             )}
             overlayClassName={cn("z-[31]")}

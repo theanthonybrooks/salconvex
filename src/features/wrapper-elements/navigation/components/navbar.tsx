@@ -14,7 +14,7 @@ import { User } from "@/types/user";
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { useMediaQuery } from "@/hooks/use-media-query";
+import { useIsMobile } from "@/hooks/use-media-query";
 import { useViewportHeight } from "@/hooks/use-viewPort-Height";
 import { motion, useMotionValueEvent, useScroll } from "framer-motion";
 import { useTheme } from "next-themes";
@@ -36,7 +36,6 @@ import { Search } from "@/features/Sidebar/Search";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { NavbarSigninSection } from "@/features/wrapper-elements/navigation/components/navbar-signin-section";
 import { cn } from "@/helpers/utilsFns";
-import { useDevice } from "@/providers/device-provider";
 
 import { AccountTypeBase } from "~/convex/schema";
 import { usePreloadedQuery } from "convex/react";
@@ -89,9 +88,7 @@ export default function NavBar(
     // subStatus,
   }: NavBarProps,
 ) {
-  const { isMobile: isMobileDevice } = useDevice();
-  const isMobileSize = useMediaQuery("(max-width: 1024px)");
-  const isMobile = isMobileDevice || isMobileSize;
+  const isMobile = useIsMobile();
   const { theme } = useTheme();
   const viewportHeight = useViewportHeight();
   const { preloadedUserData, preloadedSubStatus } = useConvexPreload();

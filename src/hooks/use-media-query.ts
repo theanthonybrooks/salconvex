@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 
+import { useDevice } from "@/providers/device-provider";
+
 export function useMediaQuery(query: string) {
   const [matches, setMatches] = useState(() =>
     typeof window === "undefined" ? false : window.matchMedia(query).matches,
@@ -17,4 +19,10 @@ export function useMediaQuery(query: string) {
   }, [query, matches]);
 
   return matches;
+}
+
+export function useIsMobile(): boolean {
+  const { isMobile: isMobileDevice } = useDevice();
+  const isMobileSize = useMediaQuery("(max-width: 1024px)");
+  return isMobileDevice || isMobileSize;
 }
