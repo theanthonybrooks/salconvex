@@ -163,7 +163,7 @@ interface ApplyButtonProps {
   manualApplied: ApplicationStatus;
   // setManualApplied: React.Dispatch<React.SetStateAction<ApplicationStatus>>;
   isBookmarked: boolean;
-  // setIsBookmarked: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsBookmarked?: React.Dispatch<React.SetStateAction<boolean>>;
   isHidden: boolean;
   // setIsHidden: React.Dispatch<React.SetStateAction<boolean>>;
   eventCategory: EventCategory;
@@ -202,7 +202,7 @@ export const ApplyButton = ({
   manualApplied: appStatus,
   // setManualApplied,
   isBookmarked,
-  // setIsBookmarked,
+  setIsBookmarked,
   // setIsHidden,
   isHidden,
   eventCategory,
@@ -310,7 +310,7 @@ export const ApplyButton = ({
 
   const onBookmark = async () => {
     if (orgPreview) return;
-    // setIsBookmarked(!isBookmarked);
+    if (setIsBookmarked) setIsBookmarked(!isBookmarked);
     toggleListAction({ bookmarked: !isBookmarked });
 
     try {

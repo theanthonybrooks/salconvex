@@ -4,6 +4,7 @@ import type { ViewOptions } from "@/features/events/event-list-client";
 import type { MergedEventPreviewData, PostStatus } from "@/types/eventTypes";
 import type { User } from "@/types/user";
 
+import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 
 import { FaRegCheckSquare } from "react-icons/fa";
@@ -98,6 +99,9 @@ const EventCardPreview = ({
     artistNationality,
     posted,
   } = event;
+  const [isBookmarkedOptimistic, setIsBookmarkedOptimistic] =
+    useState(bookmarked);
+
   const fontSizePref = getUserFontSizePref(userPref?.fontSize);
   const fontSize = fontSizePref?.body;
   const fontPref = fontSizePref?.pref;
@@ -194,10 +198,12 @@ const EventCardPreview = ({
     if (publicView) {
       router.push("/pricing?type=artist");
     } else {
-      toggleListAction({ bookmarked: !bookmarked });
+      const newBookmarkState = !isBookmarkedOptimistic;
+      setIsBookmarkedOptimistic(newBookmarkState);
+      toggleListAction({ bookmarked: newBookmarkState });
       try {
         await updateUserLastActive({ email: user?.email ?? "" });
-        if (isAdmin || isUserOrg || bookmarked) return;
+        if (isAdmin || isUserOrg || !newBookmarkState) return;
         updateEventAnalytics({
           eventId: event._id,
           plan: user?.plan ?? 0,
@@ -208,7 +214,7 @@ const EventCardPreview = ({
         });
       } catch (error) {
         console.error("Error updating last active:", error);
-      } finally {
+        setIsBookmarkedOptimistic(!newBookmarkState);
       }
     }
   };
@@ -439,7 +445,7 @@ const EventCardPreview = ({
             appFee={basicInfo ? basicInfo.appFee : 0}
           />
           <div className="flex items-center justify-center gap-x-2">
-            {bookmarked && hasValidSub ? (
+            {isBookmarkedOptimistic && hasValidSub ? (
               <FaBookmark
                 className="size-8 cursor-pointer text-red-600"
                 onClick={onBookmark}
@@ -461,7 +467,7 @@ const EventCardPreview = ({
       >
         <div className="flex flex-col items-center justify-between border-r border-foreground/20 pb-3 pt-5">
           <div className="flex flex-col items-center gap-y-3">
-            {bookmarked && hasValidSub ? (
+            {isBookmarkedOptimistic && hasValidSub ? (
               <TooltipSimple
                 content="Remove Bookmark"
                 delayDuration={0}
@@ -888,8 +894,8 @@ const EventCardPreview = ({
             publicPreview={publicPreview}
             manualApplied={appStatus}
             // setManualApplied={setManualApplied}
-            isBookmarked={bookmarked}
-            // setbookmarked={setbookmarked}
+            isBookmarked={isBookmarkedOptimistic}
+            setIsBookmarked={setIsBookmarkedOptimistic}
             isHidden={hidden}
             // sethidden={sethidden}
             eventCategory={eventCategory}
