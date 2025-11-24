@@ -194,6 +194,7 @@ interface SelectSimpleProps {
     label: React.ReactNode;
     value: string;
     icon?: IconType | LucideIcon;
+    iconSize?: string;
     disabled?: boolean;
     premium?: boolean;
     group?: string;
@@ -313,7 +314,9 @@ export const SelectSimple = ({
                         (<DollarSign className="size-3" />)
                       </span>
                     )}
-                    {option.icon && <option.icon className="size-4" />}
+                    {option.icon && (
+                      <option.icon className={cn("size-4", option.iconSize)} />
+                    )}
                     <p
                       className={cn(
                         // option.disabled && "line-through",

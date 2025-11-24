@@ -2,6 +2,7 @@ import { FaBookmark, FaRegBookmark } from "react-icons/fa6";
 import { Eye, EyeClosed } from "lucide-react";
 
 import { SelectSimple } from "@/components/ui/select";
+import { cn } from "@/helpers/utilsFns";
 
 import { api } from "~/convex/_generated/api";
 import { Id } from "~/convex/_generated/dataModel";
@@ -41,9 +42,11 @@ export const ListActionSelector = ({
         handleChange(val === "yes", bookmarked ? "bookmarked" : "hidden");
       }}
       placeholder="-"
-      className={
-        initialValue === "yes" && bookmarked ? "text-red-600" : undefined
-      }
+      className={cn(
+        "border-transparent",
+
+        initialValue === "yes" && bookmarked ? "text-red-600" : undefined,
+      )}
       options={[
         {
           value: "yes",
@@ -52,9 +55,15 @@ export const ListActionSelector = ({
           className: bookmarked
             ? "text-red-600 hover:text-red-600 pointer-events-none focus:text-red-600"
             : "pointer-events-none",
+          iconSize: "size-5",
           // disabled: bookmarked,
         },
-        { value: "no", label: noValue, icon: hidden ? Eye : FaRegBookmark },
+        {
+          value: "no",
+          label: noValue,
+          icon: hidden ? Eye : FaRegBookmark,
+          iconSize: "size-5",
+        },
       ]}
     />
   );
