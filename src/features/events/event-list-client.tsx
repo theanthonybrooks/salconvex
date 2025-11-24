@@ -177,7 +177,9 @@ const ClientEventList = () => {
   const totalActive = queryResult?.totalActive;
   const totalArchived = queryResult?.totalArchived;
   // const isLoading = !queryResult;
-  const isLoading = !queryResult?.finishedLoading;
+  // const isLoading = !queryResult?.finishedLoading;
+
+  const isLoading = !queryResult?.finishedLoading || !artistData;
   const handleViewChange = (newView: ViewOptions) => {
     setView(newView);
     setSortOptions(getDefaultSortForView(newView));

@@ -4,7 +4,7 @@ import type { ViewOptions } from "@/features/events/event-list-client";
 import type { MergedEventPreviewData, PostStatus } from "@/types/eventTypes";
 import type { User } from "@/types/user";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 
 import { FaRegCheckSquare } from "react-icons/fa";
@@ -101,6 +101,7 @@ const EventCardPreview = ({
   } = event;
   const [isBookmarkedOptimistic, setIsBookmarkedOptimistic] =
     useState(bookmarked);
+  const bookmarkedRef = useRef(bookmarked);
 
   const fontSizePref = getUserFontSizePref(userPref?.fontSize);
   const fontSize = fontSizePref?.body;
@@ -200,6 +201,7 @@ const EventCardPreview = ({
     } else {
       const newBookmarkState = !isBookmarkedOptimistic;
       setIsBookmarkedOptimistic(newBookmarkState);
+      // bookmarkedRef.current = newBookmarkState;
       toggleListAction({ bookmarked: newBookmarkState });
       try {
         await updateUserLastActive({ email: user?.email ?? "" });
@@ -249,6 +251,13 @@ const EventCardPreview = ({
       console.error("Error updating event post status:", error);
     }
   };
+
+  useEffect(() => {
+    if (bookmarkedRef.current !== bookmarked) {
+      setIsBookmarkedOptimistic(bookmarked);
+      bookmarkedRef.current = bookmarked;
+    }
+  }, [bookmarked]);
 
   return (
     <>
