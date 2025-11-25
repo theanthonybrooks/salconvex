@@ -54,7 +54,7 @@ export const NotificationsDropdown = ({
   const queuedEvents = queuedEventsData?.data ?? 0;
   const pendingEvents = submittedEventsData ?? 0;
   const pendingOpenCalls = submittedOpenCallsData ?? 0;
-  const totalPending = pendingOpenCalls + pendingEvents;
+  const totalPending = pendingOpenCalls + pendingEvents + queuedEvents;
   return (
     <DropdownMenu
       onOpenChange={(val) => {
@@ -78,7 +78,7 @@ export const NotificationsDropdown = ({
           >
             <Bell className="size-6" />
             {isAdmin && totalPending > 0 && (
-              <div className="absolute -bottom-[0.05rem] -left-1 flex size-5 items-center justify-center rounded-full border-1.5 border-foreground bg-card text-2xs font-bold hover:scale-105 hover:cursor-pointer">
+              <div className="bg-salPinkMed absolute right-0 top-0 flex size-5 items-center justify-center rounded-full border-1.5 border-salPinkDark text-2xs font-semibold text-card hover:scale-105 hover:cursor-pointer">
                 {totalPending}
               </div>
             )}
@@ -97,7 +97,7 @@ export const NotificationsDropdown = ({
               target="_blank"
             >
               <DropdownMenuItem className="w-full">
-                {pendingEvents} - Pending Events
+                {pendingEvents} - Pending Event{pendingEvents > 1 && "s"}
               </DropdownMenuItem>
             </Link>
           )}
@@ -107,18 +107,19 @@ export const NotificationsDropdown = ({
               target="_blank"
             >
               <DropdownMenuItem className="w-full">
-                {pendingOpenCalls} - Pending Open Calls
+                {pendingOpenCalls} - Pending Open Call
+                {pendingOpenCalls > 1 && "s"}
               </DropdownMenuItem>
             </Link>
           )}
           {queuedEvents > 0 && (
             <Link href="/dashboard/admin/socials" target="_blank">
               <DropdownMenuItem className="w-full">
-                {queuedEvents} - Scheduled Calls
+                {queuedEvents} - Scheduled Call{queuedEvents > 1 && "s"}
               </DropdownMenuItem>
             </Link>
           )}
-          {!pendingEvents && !pendingOpenCalls && (
+          {totalPending === 0 && (
             <DropdownMenuItem className="pointer-events-none w-full">
               No New Notifications
             </DropdownMenuItem>

@@ -53,6 +53,7 @@ export const AdminSocialUpdate = ({
         },
       ]}
       className={cn(
+        "text-sm",
         status === "toPost"
           ? "border-yellow-700 bg-yellow-100 text-yellow-700"
           : status === "posted"
@@ -100,8 +101,8 @@ export const AdminSocialTimePicker = ({
       }}
       label="Select Date"
       minDate={now}
-      withTime={false}
-      inputClassName="border-transparent hover:border-foreground/40"
+      // withTime={false}
+      inputClassName="border-transparent hover:border-foreground/40 text-sm"
     />
   );
 };

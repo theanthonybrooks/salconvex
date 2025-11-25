@@ -51,10 +51,7 @@ export const DuplicateOC = ({ openCallId, onDuplicate }: DuplicateOCProps) => {
     }
   };
   return (
-    <DropdownMenuItem
-      onClick={handleOpenCallDuplicate}
-      className="flex items-center gap-x-1"
-    >
+    <DropdownMenuItem onClick={handleOpenCallDuplicate}>
       <FaRegCopy className="size-4" />
       Duplicate
     </DropdownMenuItem>
@@ -77,7 +74,6 @@ export const DeleteOC = ({ openCallId, isAdmin }: DeleteOCActionProps) => {
           },
         });
       }}
-      className="flex items-center gap-x-1"
     >
       <FaRegTrashCan className="size-4" />
       Delete
@@ -95,7 +91,6 @@ export const ReactivateOC = ({ openCallId, state }: SubmittedOCProps) => {
           newStatus: "submitted",
         });
       }}
-      className="flex items-center gap-x-1"
     >
       <LucideFolderInput className="size-4" />
       {state === "archived" ? "Activate" : "Change to Submitted"}
@@ -112,7 +107,6 @@ export const ArchiveOC = ({ openCallId }: OCActionProps) => {
           newStatus: "archived",
         });
       }}
-      className="flex items-center gap-x-1"
     >
       <LucideFolderInput className="size-4" />
       Archive OC
@@ -130,7 +124,6 @@ export const ApproveOC = ({ openCallId }: OCActionProps) => {
           newStatus: "published",
         });
       }}
-      className="flex items-center gap-x-1"
     >
       <LucideFolderCheck className="size-4" />
       Approve
@@ -148,7 +141,6 @@ export const ApproveBoth = ({ openCallId }: OCActionProps) => {
           target: "both",
         });
       }}
-      className="flex items-center gap-x-1"
     >
       <FaCheckDouble className="size-4" />
       Approve Both

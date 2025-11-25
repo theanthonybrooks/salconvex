@@ -440,26 +440,25 @@ export const orgColumns: ColumnDef<OrgEventData>[] = [
                 <DropdownMenuSeparator />
                 <DropdownMenuLabel>{"Support"}</DropdownMenuLabel>
                 <DropdownMenuItem>
-                  <div className="flex items-center gap-x-1">
-                    <Clipboard className="size-4" />
-                    <CopyableItem copyContent={event._id}>
-                      Event ID
-                    </CopyableItem>
-                  </div>
+                  <CopyableItem
+                    copyContent={event._id}
+                    defaultIcon={<Clipboard className="size-4" />}
+                  >
+                    Event ID
+                  </CopyableItem>
                 </DropdownMenuItem>
                 {openCallId && (
                   <DropdownMenuItem>
-                    <div className="flex items-center gap-x-1">
-                      <Clipboard className="size-4" />
-                      <CopyableItem copyContent={openCallId as string}>
-                        Open Call ID
-                      </CopyableItem>
-                    </div>
+                    <CopyableItem
+                      copyContent={openCallId as string}
+                      defaultIcon={<Clipboard className="size-4" />}
+                    >
+                      Open Call ID
+                    </CopyableItem>
                   </DropdownMenuItem>
                 )}
                 {/* <DropdownMenuItem
                   onClick={() => navigator.clipboard.writeText(event._id)}
-                  className="flex items-center gap-x-2"
                 >
                   <LucideClipboardCopy className="size-4" /> Event ID
                 </DropdownMenuItem> */}

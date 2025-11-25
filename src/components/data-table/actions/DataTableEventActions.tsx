@@ -63,7 +63,6 @@ export const GoToEvent = ({
         const linkPath = `/thelist/event/${slug}/${edition}${hasOpenCall ? "/call" : ""}`;
         window.open(linkPath, "_blank");
       }}
-      className="flex items-center gap-x-1"
     >
       <Eye className="size-4" />
       View{" "}
@@ -83,7 +82,6 @@ export const GoToSocialPost = ({ slug, edition }: BaseEventActionProps) => {
         const linkPath = `/thelist/event/${slug}/${edition}/call/social`;
         window.open(linkPath, "_blank");
       }}
-      className="flex items-center gap-x-1"
     >
       <ImageIcon className="size-4" />
       View Socials
@@ -107,10 +105,7 @@ export const DuplicateEvent = ({
     }
   };
   return (
-    <DropdownMenuItem
-      onClick={handleDuplicate}
-      className="flex items-center gap-x-1"
-    >
+    <DropdownMenuItem onClick={handleDuplicate}>
       <FaRegCopy className="size-4" />
       Duplicate
     </DropdownMenuItem>
@@ -151,7 +146,6 @@ export const DeleteEvent = ({ eventId, isAdmin }: DeleteEventActionProps) => {
           onConfirm: handleDelete,
         });
       }}
-      className="flex items-center gap-x-1"
     >
       <FaRegTrashCan className="size-4" />
       Delete
@@ -171,10 +165,7 @@ export const ArchiveEvent = ({ eventId }: EventActionProps) => {
     }
   };
   return (
-    <DropdownMenuItem
-      onClick={handleArchive}
-      className="flex items-center gap-x-1"
-    >
+    <DropdownMenuItem onClick={handleArchive}>
       <LucideFolderClock className="size-4" />
       Archive
     </DropdownMenuItem>
@@ -197,10 +188,7 @@ export const ReactivateEvent = ({ eventId, state }: SubmittedActionProps) => {
     }
   };
   return (
-    <DropdownMenuItem
-      onClick={handleReactivate}
-      className="flex items-center gap-x-1"
-    >
+    <DropdownMenuItem onClick={handleReactivate}>
       <LucideFolderInput className="size-4" />
       {state === "archived" ? "Activate" : "Change to Submitted"}
     </DropdownMenuItem>
@@ -219,10 +207,7 @@ export const ApproveEvent = ({ eventId }: EventActionProps) => {
     }
   };
   return (
-    <DropdownMenuItem
-      onClick={handleApprove}
-      className="flex items-center gap-x-1"
-    >
+    <DropdownMenuItem onClick={handleApprove}>
       <LucideFolderCheck className="size-4" />
       Approve
     </DropdownMenuItem>

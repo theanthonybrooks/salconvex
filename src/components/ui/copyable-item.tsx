@@ -46,7 +46,7 @@ export const CopyableItem = ({
       <div
         onClick={() => handleCopy()}
         className={cn(
-          "flex cursor-pointer items-center gap-x-1",
+          "flex cursor-pointer items-center gap-x-2",
           className,
           center && "justify-center",
         )}

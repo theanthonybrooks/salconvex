@@ -50,6 +50,7 @@ import { SocialDropdownMenus } from "@/features/events/components/social-dropdow
 import { ConvexDashboardLink } from "@/features/events/ui/convex-dashboard-link";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { getEventCategoryLabel } from "@/helpers/eventFns";
+import { capitalizeWords } from "@/helpers/stylingFns";
 import { capitalize, cn } from "@/helpers/utilsFns";
 import { useDevice } from "@/providers/device-provider";
 
@@ -257,20 +258,18 @@ const EventContextMenu = ({
                 : `Edit ${getEventCategoryLabel(eventCategory, true)}`}
             </DropdownMenuItem> */}
             {appLink && (
-              <DropdownMenuItem>
-                <Link
-                  href={appLink}
-                  target={appLink.includes("mailto:") ? "_self" : "_blank"}
-                  className="flex items-center gap-x-2"
-                >
+              <Link
+                href={appLink}
+                target={appLink.includes("mailto:") ? "_self" : "_blank"}
+              >
+                <DropdownMenuItem>
                   <ArrowRightCircle className="size-4" />
                   Preview Link
-                </Link>
-              </DropdownMenuItem>
+                </DropdownMenuItem>
+              </Link>
             )}
             <DropdownMenuSub>
               <DropdownMenuSubTrigger
-                className="flex items-center gap-x-2"
                 data-side={
                   (buttonTrigger && !eventPage && !isLargeScreen) ||
                   (buttonTrigger && eventPage && isMobile)
@@ -286,7 +285,6 @@ const EventContextMenu = ({
                     <DropdownMenuItem>
                       <CopyableItem
                         copyContent={eventId}
-                        className="gap-x-2"
                         defaultIcon={<FaRegCopy className="size-4" />}
                       >
                         Copy Event ID
@@ -297,7 +295,6 @@ const EventContextMenu = ({
                     <DropdownMenuItem>
                       <CopyableItem
                         copyContent={openCallId}
-                        className="gap-x-2"
                         defaultIcon={<FaRegCopy className="size-4" />}
                       >
                         Copy Open Call ID
@@ -315,31 +312,23 @@ const EventContextMenu = ({
               {/* Artist section: */}
 
               <DropdownMenuItem onClick={onHide}>
-                {/* <div
-                      onClick={onHide}
-                      className={cn(
-                        "cursor-pointer rounded px-4 py-2 text-black/80 hover:bg-salPinkLtHover hover:text-red-700",
-                        nonAdminPublicView && "hidden",
-                      )}
-                    > */}
                 {isHidden ? (
-                  <span className="flex items-center gap-x-2 capitalize">
+                  <>
                     <EyeOff className="size-4" />
                     Unhide{" "}
                     {openCallId !== "" && openCallStatus === "active"
                       ? "Open Call"
-                      : getEventCategoryLabel(eventCategory)}
-                  </span>
+                      : capitalizeWords(getEventCategoryLabel(eventCategory))}
+                  </>
                 ) : (
-                  <span className="flex items-center gap-x-2 capitalize">
+                  <>
                     <Eye className="size-4" />
                     Hide{" "}
                     {openCallId !== "" && openCallStatus === "active"
                       ? "Open Call"
-                      : getEventCategoryLabel(eventCategory)}
-                  </span>
+                      : capitalizeWords(getEventCategoryLabel(eventCategory))}
+                  </>
                 )}
-                {/* </div> */}
               </DropdownMenuItem>
 
               {openCallStatus === "active" &&
@@ -356,15 +345,15 @@ const EventContextMenu = ({
                     )}
                   >
                     {appStatus ? (
-                      <span className="flex items-center gap-x-2 sm:text-sm">
+                      <>
                         <CircleX className="size-4" />
                         Mark as Not Applied
-                      </span>
+                      </>
                     ) : (
-                      <span className="flex items-center gap-x-2 sm:text-sm">
+                      <>
                         <CheckCircle className="size-4" />
                         Mark as Applied
-                      </span>
+                      </>
                     )}
                   </DropdownMenuItem>
                 )}
@@ -377,15 +366,15 @@ const EventContextMenu = ({
                   )}
                 >
                   {isBookmarked ? (
-                    <span className="flex items-center gap-x-2 sm:text-sm">
+                    <>
                       <FaBookmark className="size-4 text-red-500" />
                       Remove Bookmark
-                    </span>
+                    </>
                   ) : (
-                    <span className="flex items-center gap-x-2 sm:text-sm">
+                    <>
                       <FaRegBookmark className="size-4" />
                       Bookmark Event
-                    </span>
+                    </>
                   )}
                 </DropdownMenuItem>
               )}
@@ -410,7 +399,6 @@ const EventContextMenu = ({
               openCallState === "submitted" &&
               eventState === "submitted" && (
                 <DropdownMenuItem
-                  className="flex items-center gap-x-2 sm:text-sm"
                   onClick={() =>
                     approveEvent({ eventId: eventId as Id<"events"> })
                   }
@@ -420,38 +408,34 @@ const EventContextMenu = ({
                 </DropdownMenuItem>
               )}
             {reviewMode && appLink && (
-              <DropdownMenuItem>
-                <Link
-                  href={appLink}
-                  target={appLink.includes("mailto:") ? "_self" : "_blank"}
-                  className="flex items-center gap-x-2"
-                >
+              <Link
+                href={appLink}
+                target={appLink.includes("mailto:") ? "_self" : "_blank"}
+              >
+                <DropdownMenuItem>
                   <ArrowRightCircle className="size-4" />
                   Preview Link
-                </Link>
-              </DropdownMenuItem>
+                </DropdownMenuItem>
+              </Link>
             )}
 
             {/* {eventId && ( */}
-            <DropdownMenuItem asChild>
-              <Link
-                href={`/dashboard/admin/event?_id=${eventId}&sidebar=false`}
-                target="_blank"
-              >
-                <span className="flex items-center gap-x-2 sm:text-sm">
-                  <Pencil className="size-4" />
-                  Edit Event
-                  <p
-                    className={cn("sr-only")}
-                  >{`/dashboard/admin/event?_id=${String(eventId)}&sidebar=false`}</p>
-                </span>
-              </Link>
-            </DropdownMenuItem>
+            <Link
+              href={`/dashboard/admin/event?_id=${eventId}&sidebar=false`}
+              target="_blank"
+            >
+              <DropdownMenuItem>
+                <Pencil className="size-4" />
+                Edit Event
+                <p
+                  className={cn("sr-only")}
+                >{`/dashboard/admin/event?_id=${String(eventId)}&sidebar=false`}</p>
+              </DropdownMenuItem>
+            </Link>
             {/* )} */}
             {postOptions && (
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger
-                  className="flex items-center gap-x-2"
                   data-side={
                     (buttonTrigger && !eventPage && !isLargeScreen) ||
                     (buttonTrigger && eventPage && isMobile)
@@ -476,7 +460,6 @@ const EventContextMenu = ({
             )}
             <DropdownMenuSub>
               <DropdownMenuSubTrigger
-                className="flex items-center gap-x-2"
                 data-side={
                   (buttonTrigger && !eventPage && !isLargeScreen) ||
                   (buttonTrigger && eventPage && isMobile)
@@ -490,22 +473,17 @@ const EventContextMenu = ({
                 <DropdownMenuSubContent className={cn("p-2")}>
                   <>
                     {openCallId && (
-                      <DropdownMenuItem>
-                        <ConvexDashboardLink
-                          table="openCalls"
-                          id={openCallId}
-                          className="flex items-center gap-x-2 sm:text-sm"
-                        >
+                      <ConvexDashboardLink table="openCalls" id={openCallId}>
+                        <DropdownMenuItem>
                           <ArrowRightCircleIcon className="hidden size-4 sm:block" />
                           Go to Convex
-                        </ConvexDashboardLink>
-                      </DropdownMenuItem>
+                        </DropdownMenuItem>
+                      </ConvexDashboardLink>
                     )}
                     {eventId && (
                       <DropdownMenuItem>
                         <CopyableItem
                           copyContent={eventId}
-                          className="gap-x-2"
                           defaultIcon={
                             <FaRegCopy className="hidden size-4 sm:block" />
                           }
@@ -518,7 +496,6 @@ const EventContextMenu = ({
                       <DropdownMenuItem>
                         <CopyableItem
                           copyContent={openCallId}
-                          className="gap-x-2"
                           defaultIcon={
                             <FaRegCopy className="hidden size-4 sm:block" />
                           }
@@ -531,7 +508,6 @@ const EventContextMenu = ({
                       <DropdownMenuItem>
                         <CopyableItem
                           copyContent={mainOrgId}
-                          className="gap-x-2"
                           defaultIcon={
                             <FaRegCopy className="hidden size-4 sm:block" />
                           }
@@ -546,25 +522,24 @@ const EventContextMenu = ({
             </DropdownMenuSub>
 
             {reviewMode && mainOrgId && orgOwnerEmailData && orgOwnerEmail && (
-              <DropdownMenuItem>
-                <Link
-                  href={`mailto:${orgOwnerEmail}?subject=${capitalize(eventName ?? "")} submission`}
-                  className="flex items-center gap-x-2 sm:text-sm"
-                >
+              <Link
+                href={`mailto:${orgOwnerEmail}?subject=${capitalize(eventName ?? "")} submission`}
+              >
+                <DropdownMenuItem>
                   <Mail className="size-4" />
                   Contact Org
-                </Link>
-              </DropdownMenuItem>
+                </DropdownMenuItem>
+              </Link>
             )}
           </DropdownMenuGroup>
         )}
         {!hasActiveSubscription && !isUserOrg && (
           <DropdownMenuGroup>
-            <DropdownMenuItem>
-              <Link href="/pricing">
+            <Link href="/pricing">
+              <DropdownMenuItem>
                 Become a member to bookmark, hide, or apply
-              </Link>
-            </DropdownMenuItem>
+              </DropdownMenuItem>
+            </Link>
           </DropdownMenuGroup>
         )}
       </DropdownMenuContent>

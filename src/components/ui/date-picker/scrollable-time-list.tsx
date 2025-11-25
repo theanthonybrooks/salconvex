@@ -26,6 +26,8 @@ export function ScrollableTimeList({
   const [canScrollDown, setCanScrollDown] = useState(false);
 
   const { scrollYProgress } = useScroll({ container: ref });
+  const isScrollable =
+    ref.current && ref.current.scrollHeight > ref.current.clientHeight;
 
   useMotionValueEvent(scrollYProgress, "change", (latest) => {
     setCanScrollUp(latest > 0.02);
@@ -33,8 +35,8 @@ export function ScrollableTimeList({
   });
 
   return (
-    <div className="relative max-h-80 w-fit overflow-hidden rounded-xl border-1.5">
-      {canScrollUp && (
+    <div className="relative h-80 w-fit overflow-hidden rounded-xl border-1.5">
+      {canScrollUp && isScrollable && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -46,7 +48,7 @@ export function ScrollableTimeList({
       )}
       <motion.div
         ref={ref}
-        className="scrollable mini invis flex h-full max-h-[inherit] w-fit flex-col items-center p-1 px-3 text-sm"
+        className="scrollable mini invis flex h-full max-h-[inherit] w-fit flex-col items-center p-3 text-sm"
       >
         {timeOptions.map((t, i) => {
           const isFirst = i === 0;
@@ -70,7 +72,6 @@ export function ScrollableTimeList({
               const candidate = new Date(date);
               candidate.setHours(hour);
               candidate.setMinutes(minute);
-
               if (candidate.getTime() < min.getTime()) {
                 isDisabled = true;
               }
@@ -98,7 +99,7 @@ export function ScrollableTimeList({
           );
         })}
       </motion.div>
-      {canScrollDown && (
+      {canScrollDown && isScrollable && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}

@@ -43,6 +43,7 @@ body {
 
     /* --sal-yellow-old: hsl(50 100% 72%);#ffe770 */
     --sal-pink-dark: 303 70% 62%; /* #ff7bff #f4a9f6 */
+    --sal-pink-medium: 303 100% 72%;
     --sal-pink: 303 100% 82%; /* #ff7bff #f4a9f6 */
     --sal-pink-light: 303 100% 90%; /* #ff7bff #f4a9f6 */
     --sal-pink-lt-hover: 303 100% 95%; /* #ff7bff #f4a9f6 */

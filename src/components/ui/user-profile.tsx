@@ -152,8 +152,8 @@ export function UserProfile({
               <>
                 {multipleAccountTypes ? (
                   <DropdownMenuSub>
-                    <DropdownMenuSubTrigger>
-                      <LucideLayoutDashboard className="mr-2 size-4" />
+                    <DropdownMenuSubTrigger className="gap-x-1">
+                      <LucideLayoutDashboard className="mr-2 size-4 gap-x-1" />
                       Dashboard
                     </DropdownMenuSubTrigger>
                     <DropdownMenuPortal>
@@ -163,10 +163,10 @@ export function UserProfile({
                             href={`/dashboard/admin/users`}
                             className="underline-offset-2 hover:cursor-pointer hover:underline"
                           >
-                            <DropdownMenuItem className="focus:bg-salYellow/50">
+                            <DropdownMenuItem className="gap-x-1 focus:bg-salYellow/50">
                               <Squirrel className="mr-2 size-4" />
 
-                              <span>Admin</span>
+                              <p>Admin</p>
                             </DropdownMenuItem>
                           </Link>
                         )}
@@ -176,9 +176,9 @@ export function UserProfile({
                             href={artistDashboardLink}
                             className="underline-offset-2 hover:cursor-pointer hover:underline"
                           >
-                            <DropdownMenuItem className="focus:bg-salYellow/50">
+                            <DropdownMenuItem className="gap-x-1 focus:bg-salYellow/50">
                               <PaintRoller className="mr-2 size-4" />
-                              <span>{isAdmin ? "User" : "Artist"}</span>
+                              <p>Artist</p>
                             </DropdownMenuItem>
                           </Link>
                         )}
@@ -187,9 +187,9 @@ export function UserProfile({
                             href={organizerDashboardLink}
                             className="underline-offset-2 hover:cursor-pointer hover:underline"
                           >
-                            <DropdownMenuItem className="focus:bg-salYellow/50">
+                            <DropdownMenuItem className="gap-x-1 focus:bg-salYellow/50">
                               <Users2 className="mr-2 size-4" />
-                              <span>Organizer</span>
+                              <p>Organizer</p>
                             </DropdownMenuItem>
                           </Link>
                         )}
@@ -203,9 +203,9 @@ export function UserProfile({
                     }
                     className="underline-offset-2 hover:cursor-pointer hover:underline"
                   >
-                    <DropdownMenuItem className="focus:bg-salYellow/50">
+                    <DropdownMenuItem className="gap-x-1 focus:bg-salYellow/50">
                       <LucideLayoutDashboard className="mr-2 size-4" />
-                      <span>Dashboard</span>
+                      <p>Dashboard</p>
                     </DropdownMenuItem>
                   </Link>
                 )}
@@ -213,7 +213,7 @@ export function UserProfile({
             )}
 
             <DropdownMenuSub>
-              <DropdownMenuSubTrigger>
+              <DropdownMenuSubTrigger className="gap-x-1">
                 <Settings className="mr-2 size-4" />
                 Settings
               </DropdownMenuSubTrigger>
@@ -223,36 +223,36 @@ export function UserProfile({
                     href="/dashboard/settings/account"
                     className="underline-offset-2 hover:cursor-pointer hover:underline"
                   >
-                    <DropdownMenuItem className="focus:bg-salYellow/50">
+                    <DropdownMenuItem className="gap-x-1 focus:bg-salYellow/50">
                       <User className="mr-2 size-4" />
-                      <span>Account</span>
+                      <p>Account</p>
                     </DropdownMenuItem>
                   </Link>
                   <Link
                     href="/dashboard/settings/notifications"
                     className="underline-offset-2 hover:cursor-pointer hover:underline"
                   >
-                    <DropdownMenuItem className="focus:bg-salYellow/50">
+                    <DropdownMenuItem className="gap-x-1 focus:bg-salYellow/50">
                       <Bell className="mr-2 size-4" />
-                      <span>Notifications</span>
+                      <p>Notifications</p>
                     </DropdownMenuItem>
                   </Link>
                   <Link
                     href="/dashboard/settings/appearance"
                     className="underline-offset-2 hover:cursor-pointer hover:underline"
                   >
-                    <DropdownMenuItem className="focus:bg-salYellow/50">
+                    <DropdownMenuItem className="gap-x-1 focus:bg-salYellow/50">
                       <Sparkles className="mr-2 size-4" />
-                      <span>Appearance</span>
+                      <p>Appearance</p>
                     </DropdownMenuItem>
                   </Link>
                   <Link
                     href="/dashboard/settings/security"
                     className="underline-offset-2 hover:cursor-pointer hover:underline"
                   >
-                    <DropdownMenuItem className="focus:bg-salYellow/50">
+                    <DropdownMenuItem className="gap-x-1 focus:bg-salYellow/50">
                       <Lock className="mr-2 size-4" />
-                      <span>Security</span>
+                      <p>Security</p>
                     </DropdownMenuItem>
                   </Link>
                 </DropdownMenuSubContent>
@@ -263,9 +263,9 @@ export function UserProfile({
                 href="/dashboard/billing"
                 className="underline-offset-2 hover:cursor-pointer hover:underline"
               >
-                <DropdownMenuItem className="focus:bg-salYellow/50">
+                <DropdownMenuItem className="gap-x-1 focus:bg-salYellow/50">
                   <PiPiggyBank className="mr-2 size-4" />
-                  <span>Manage Membership</span>
+                  <p>Manage Membership</p>
                 </DropdownMenuItem>
               </Link>
             )}
@@ -275,9 +275,9 @@ export function UserProfile({
                 href="/pricing?type=artist"
                 className="underline-offset-2 hover:cursor-pointer hover:underline"
               >
-                <DropdownMenuItem className="focus:bg-salYellow/50">
+                <DropdownMenuItem className="gap-x-1 focus:bg-salYellow/50">
                   <PiPiggyBank className="mr-2 size-4" />
-                  <span>Renew Membership</span>
+                  <p>Renew Membership</p>
                 </DropdownMenuItem>
               </Link>
             )}
@@ -287,16 +287,16 @@ export function UserProfile({
             href="/support"
             className="underline-offset-2 hover:cursor-pointer hover:underline"
           >
-            <DropdownMenuItem className="focus:bg-salYellow/50">
+            <DropdownMenuItem className="gap-x-1 focus:bg-salYellow/50">
               <HelpCircle className="mr-2 size-4" />
-              <span>Help & Support</span>
+              <p>Help & Support</p>
             </DropdownMenuItem>
           </Link>
           <DropdownMenuSeparator />
           <SignOutBtn email={user?.email}>
-            <DropdownMenuItem className="focus:bg-salPink/50">
+            <DropdownMenuItem className="gap-x-1 focus:bg-salPink/50">
               <LogOut className="mr-2 size-4" />
-              <span>Log out</span>
+              <p>Log out</p>
             </DropdownMenuItem>
           </SignOutBtn>
         </DropdownMenuContent>

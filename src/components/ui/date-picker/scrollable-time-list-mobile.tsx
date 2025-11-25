@@ -55,7 +55,13 @@ export function MobileTimePicker({
 
   const filteredHours =
     period === minPeriod && !shouldIgnoreMin
-      ? hours.filter((h) => parseInt(h, 10) >= minHour12)
+      ? hours
+          .filter((h) => parseInt(h, 10) >= minHour12)
+          .filter((h) =>
+            !filteredPeriods.includes("AM") && minHour24 >= 13
+              ? h !== "12"
+              : true,
+          )
       : hours;
 
   const filteredMinutes =

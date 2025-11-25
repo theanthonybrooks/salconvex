@@ -472,9 +472,7 @@ export const getEventColumns = <T extends Event>(
                   )}
                   <DropdownMenuGroup>
                     <DropdownMenuSub>
-                      <DropdownMenuSubTrigger className="flex items-center gap-x-2">
-                        Event
-                      </DropdownMenuSubTrigger>
+                      <DropdownMenuSubTrigger>Event</DropdownMenuSubTrigger>
                       <DropdownMenuPortal>
                         <DropdownMenuSubContent className={cn("p-2")}>
                           {/* note-to-self: this is the 'View Event' link */}
@@ -495,7 +493,7 @@ export const getEventColumns = <T extends Event>(
 
                           {isAdmin && hasOC && (
                             <DropdownMenuSub>
-                              <DropdownMenuSubTrigger className="flex items-center gap-x-2">
+                              <DropdownMenuSubTrigger>
                                 <Globe className="size-4" /> Socials
                               </DropdownMenuSubTrigger>
                               <DropdownMenuPortal>
@@ -534,7 +532,7 @@ export const getEventColumns = <T extends Event>(
                     <>
                       <DropdownMenuGroup>
                         <DropdownMenuSub>
-                          <DropdownMenuSubTrigger className="flex items-center gap-x-2">
+                          <DropdownMenuSubTrigger>
                             Open Call
                           </DropdownMenuSubTrigger>
                           <DropdownMenuPortal>
@@ -587,9 +585,7 @@ export const getEventColumns = <T extends Event>(
                   {isAdmin && (
                     <DropdownMenuGroup>
                       <DropdownMenuSub>
-                        <DropdownMenuSubTrigger className="flex items-center gap-x-2">
-                          Convex
-                        </DropdownMenuSubTrigger>
+                        <DropdownMenuSubTrigger>Convex</DropdownMenuSubTrigger>
                         <DropdownMenuPortal>
                           <DropdownMenuSubContent className={cn("p-2")}>
                             <DropdownMenuItem>

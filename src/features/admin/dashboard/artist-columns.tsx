@@ -323,7 +323,6 @@ export const artistColumns: ColumnDef<ArtistColumnProps>[] = [
                   <CopyableItem
                     defaultIcon={<LucideClipboardCopy className="size-4" />}
                     copyContent={artistId}
-                    className="gap-x-2"
                   >
                     User ID
                   </CopyableItem>
@@ -333,7 +332,6 @@ export const artistColumns: ColumnDef<ArtistColumnProps>[] = [
                     <CopyableItem
                       defaultIcon={<LucideClipboardCopy className="size-4" />}
                       copyContent={artistId}
-                      className="gap-x-2"
                     >
                       Artist ID
                     </CopyableItem>

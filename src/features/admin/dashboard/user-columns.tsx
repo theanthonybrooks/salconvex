@@ -647,20 +647,15 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
                 <DropdownMenuLabel>Actions</DropdownMenuLabel>{" "}
                 <DropdownMenuSeparator />
                 <DeleteUser userId={user._id} />
-                <DropdownMenuItem>
-                  <Link
-                    href={`mailto:${user.email}`}
-                    target="_blank"
-                    className="flex items-center gap-x-2"
-                  >
+                <Link href={`mailto:${user.email}`} target="_blank">
+                  <DropdownMenuItem>
                     <FaEnvelope className="size-4" /> Contact
-                  </Link>
-                </DropdownMenuItem>
+                  </DropdownMenuItem>
+                </Link>
                 <DropdownMenuItem>
                   <CopyableItem
                     defaultIcon={<LucideClipboardCopy className="size-4" />}
                     copyContent={user.email}
-                    className="gap-x-2"
                   >
                     Copy Email
                   </CopyableItem>
@@ -669,7 +664,6 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
                   <CopyableItem
                     defaultIcon={<LucideClipboardCopy className="size-4" />}
                     copyContent={user._id}
-                    className="gap-x-2"
                   >
                     User ID
                   </CopyableItem>
@@ -679,7 +673,6 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
                     <CopyableItem
                       defaultIcon={<LucideClipboardCopy className="size-4" />}
                       copyContent={artistId}
-                      className="gap-x-2"
                     >
                       Artist ID
                     </CopyableItem>
@@ -690,7 +683,6 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
                     <CopyableItem
                       defaultIcon={<LucideClipboardCopy className="size-4" />}
                       copyContent={user.customerId}
-                      className="gap-x-2"
                     >
                       Stripe ID
                     </CopyableItem>

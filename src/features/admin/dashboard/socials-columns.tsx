@@ -83,7 +83,7 @@ export const socialColumns: ColumnDef<SocialColumnProps>[] = [
           <Link
             href={`/thelist/event/${slug}/${edition}/call/social`}
             target="_blank"
-            className="truncate"
+            className="truncate text-sm"
             onClick={(e) => e.stopPropagation()}
           >
             {name}
@@ -247,7 +247,7 @@ export const socialColumns: ColumnDef<SocialColumnProps>[] = [
                   <Link
                     href={`/thelist/event/${slug}/${edition}/call/`}
                     target="_blank"
-                    className="flex items-center gap-x-1"
+                    className="flex items-center gap-x-2"
                   >
                     <ArrowRight className="size-4" /> View OC
                   </Link>

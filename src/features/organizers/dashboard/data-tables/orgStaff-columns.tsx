@@ -244,26 +244,23 @@ export const orgStaffColumns: ColumnDef<OrgStaffData>[] = [
   //                 <DropdownMenuSeparator />
   //                 <DropdownMenuLabel>{"Support"}</DropdownMenuLabel>
   //                 <DropdownMenuItem>
-  //                   <div className="flex items-center gap-x-1">
-  //                     <Clipboard className="size-4" />
-  //                     <CopyableItem copyContent={event._id}>
+  //
+  //                     <CopyableItem copyContent={event._id} defaultIcon={<Clipboard className="size-4" />}>
   //                       Event ID
   //                     </CopyableItem>
-  //                   </div>
+  //
   //                 </DropdownMenuItem>
   //                 {openCallId && (
   //                   <DropdownMenuItem>
-  //                     <div className="flex items-center gap-x-1">
-  //                       <Clipboard className="size-4" />
-  //                       <CopyableItem copyContent={openCallId as string}>
+  //
+  //                       <CopyableItem copyContent={openCallId as string} defaultIcon={<Clipboard className="size-4" />}>
   //                         Open Call ID
   //                       </CopyableItem>
-  //                     </div>
+  //
   //                   </DropdownMenuItem>
   //                 )}
   //                 {/* <DropdownMenuItem
   //                   onClick={() => navigator.clipboard.writeText(event._id)}
-  //                   className="flex items-center gap-x-2"
   //                 >
   //                   <LucideClipboardCopy className="size-4" /> Event ID
   //                 </DropdownMenuItem> */}

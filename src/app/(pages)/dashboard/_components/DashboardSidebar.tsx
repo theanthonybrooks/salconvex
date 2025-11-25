@@ -302,9 +302,7 @@ export default function DashboardSideBar({
                                 {pendingEvents > 0 && !collapsedSidebar && (
                                   <span
                                     className={cn(
-                                      "ml-1 inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-semibold",
-                                      collapsedSidebar &&
-                                        "absolute -right-[10px] -top-2 ml-0 border-1.5 border-foreground bg-background px-[7px] py-0 text-2xs",
+                                      "ml-1 inline-flex items-center justify-center rounded-full px-1 py-0.5 text-xs font-semibold",
                                     )}
                                   >
                                     {pendingEvents}
@@ -313,12 +311,19 @@ export default function DashboardSideBar({
                                 {pendingOpenCalls > 0 && !collapsedSidebar && (
                                   <span
                                     className={cn(
-                                      "ml-1 inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-semibold",
-                                      collapsedSidebar &&
-                                        "absolute -right-[10px] -top-2 ml-0 border-1.5 border-foreground bg-background px-[7px] py-0 text-2xs",
+                                      "ml-1 inline-flex items-center justify-center rounded-full px-1 py-0.5 text-xs font-semibold",
                                     )}
                                   >
                                     {pendingOpenCalls}
+                                  </span>
+                                )}
+                                {queuedEvents > 0 && !collapsedSidebar && (
+                                  <span
+                                    className={cn(
+                                      "ml-1 inline-flex items-center justify-center rounded-full px-1 py-0.5 text-xs font-semibold",
+                                    )}
+                                  >
+                                    {queuedEvents}
                                   </span>
                                 )}
                                 {totalEvents > 0 && collapsedSidebar && (

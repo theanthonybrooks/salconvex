@@ -178,8 +178,6 @@ export function DataTable<TData, TValue>({
 
   const [sorting, setSorting] = useState<SortingState>(initialSort);
 
-  console.log(sorting, initialSort);
-
   const table = useReactTable({
     data,
     columns,

@@ -275,20 +275,20 @@ export const supportColumns: ColumnDef<SupportColumnProps>[] = [
               >
                 <DropdownMenuLabel>Actions</DropdownMenuLabel>{" "}
                 <DropdownMenuSeparator />
-                {/* <DropdownMenuItem>
+                {/* 
                   <Link
-                    href={`mailto:${user.email}`}
-                    target="_blank"
-                    className="flex items-center gap-x-2"
+                  href={`mailto:${user.email}`}
+                  target="_blank"
                   >
+                  <DropdownMenuItem>
                     <FaEnvelope className="size-4" /> Contact
+                    </DropdownMenuItem> 
                   </Link>
-                </DropdownMenuItem> */}
+                */}
                 <DropdownMenuItem>
                   <CopyableItem
                     defaultIcon={<LucideClipboardCopy className="size-4" />}
                     copyContent={artistId}
-                    className="gap-x-2"
                   >
                     User ID
                   </CopyableItem>
@@ -298,7 +298,6 @@ export const supportColumns: ColumnDef<SupportColumnProps>[] = [
                     <CopyableItem
                       defaultIcon={<LucideClipboardCopy className="size-4" />}
                       copyContent={artistId}
-                      className="gap-x-2"
                     >
                       Artist ID
                     </CopyableItem>
