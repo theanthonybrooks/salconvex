@@ -6,9 +6,10 @@ import type { PublicEventPreviewData } from "@/types/eventTypes";
 import { useEffect, useState } from "react";
 
 import {
+  RecapCallCount,
   RecapCover,
   RecapEndCover,
-  RecapLastPage,
+  RecapSubmitCTA,
 } from "@/features/events/ui/thisweek-recap/recap-cover";
 import RecapPost from "@/features/events/ui/thisweek-recap/recap-post";
 
@@ -55,7 +56,8 @@ export default function RecapRenderClient() {
           index={i}
         />
       ))}
-      <RecapLastPage id="recap-last-page" openCallCount={otherCount} />
+      <RecapCallCount id="recap-call-count" openCallCount={otherCount} />
+      <RecapSubmitCTA id="recap-submit-cta" />
       <RecapEndCover id="recap-end-cover" />
     </div>
   );

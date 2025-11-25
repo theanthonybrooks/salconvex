@@ -20,9 +20,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import {
+  RecapCallCount,
   RecapCover,
   RecapEndCover,
-  RecapLastPage,
+  RecapSubmitCTA,
 } from "@/features/events/ui/thisweek-recap/recap-cover";
 import RecapPost from "@/features/events/ui/thisweek-recap/recap-post";
 import { formatCondensedDateRange } from "@/helpers/dateFns";
@@ -228,7 +229,8 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
 
     content += `Access to all of the open calls, the ability to bookmark, hide, and track applications starts at $3/month. The coding of the site, searching, reading through, addition of open calls, and these IG posts are all done by me @anthonybrooksart.\n\n`;
 
-    content += `The Street Art List is a platform dedicated to 2D Public Art, sharing mural, graffiti, and street art calls (RFP, RFQ, EOI, etc). Initially starting as an archive of the industy, the site also offers a global map of street art, graffiti jams, and mural festivals/mural projects, yearly event calendar, and resources for artist and organizers. Find out more at thestreetartlist.com.\n\n`;
+    content += `The Street Art List is a platform dedicated to 2D Public Art - Sharing mural, graffiti, and street art calls (RFP, RFQ, EOI, etc). Initially starting as an archive of the industy, the site also offers a global map of street art, graffiti jams, and mural festivals/mural projects (over 1,200 and counting), yearly event calendar, and resources for artist and organizers.\n\n`;
+    content += `Find out more at thestreetartlist.com.\n\n`;
 
     content += `#publicartist #callforartist #artistopencall`;
 
@@ -368,42 +370,29 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
               </div>
             );
           })}
+
           {filteredResults && (
-            <div className="group relative">
-              <RecapLastPage
-                id="recap-last-page"
+            <>
+              <RecapCallCount
+                id="recap-call-count"
                 openCallCount={otherOpenCallCount}
                 ref={(el) => {
                   refs.current[filteredResults.length + 1] = el;
                 }}
               />
-              {/* <button
-                type="button"
-                className="absolute right-2 top-2 z-10 hidden rounded bg-card/80 p-1 group-hover:block"
-                onClick={() => handleDownloadSingle(filteredResults.length + 1)}
-                title="Download image"
-              >
-                <ImageIcon className="size-5" />
-              </button> */}
-            </div>
-          )}
-          {filteredResults && (
-            <div className="group relative">
-              <RecapEndCover
-                id="recap-end-cover"
+              <RecapSubmitCTA
+                id="recap-submit-cta"
                 ref={(el) => {
                   refs.current[filteredResults.length + 2] = el;
                 }}
               />
-              {/* <button
-                type="button"
-                className="absolute right-2 top-2 z-10 hidden rounded bg-card/80 p-1 group-hover:block"
-                onClick={() => handleDownloadSingle(filteredResults.length + 2)}
-                title="Download image"
-              >
-                <ImageIcon className="size-5" />
-              </button> */}
-            </div>
+              <RecapEndCover
+                id="recap-end-cover"
+                ref={(el) => {
+                  refs.current[filteredResults.length + 3] = el;
+                }}
+              />
+            </>
           )}
         </div>
         <div className="flex flex-col gap-y-6 sm:px-4 xl:px-0">

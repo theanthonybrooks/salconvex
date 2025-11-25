@@ -12,7 +12,7 @@ interface RecapCoverProps extends RecapPgBaseProps {
   fontSize: number | null;
 }
 
-interface RecapLastPageProps extends RecapPgBaseProps {
+interface RecapCallCountProps extends RecapPgBaseProps {
   openCallCount: number;
 }
 
@@ -71,7 +71,7 @@ export const RecapEndCover = forwardRef<HTMLDivElement, RecapPgBaseProps>(
       >
         <img
           className="m-auto max-h-full max-w-full"
-          src="/branding/weekly-back-cover2.png"
+          src="/branding/weekly-end-cover.png"
           alt="Open Calls Ending this Week Background"
           height={400}
           width={400}
@@ -79,13 +79,13 @@ export const RecapEndCover = forwardRef<HTMLDivElement, RecapPgBaseProps>(
         />
 
         <section className="absolute bottom-0 flex w-full -translate-y-8 flex-col text-center font-bold">
-          TheStreetArtList.com
+          ( Link In Bio )
         </section>
       </div>
     );
   },
 );
-export const RecapLastPage = forwardRef<HTMLDivElement, RecapLastPageProps>(
+export const RecapCallCount = forwardRef<HTMLDivElement, RecapCallCountProps>(
   ({ openCallCount, id }, ref) => {
     return (
       <div
@@ -106,7 +106,32 @@ export const RecapLastPage = forwardRef<HTMLDivElement, RecapLastPageProps>(
     );
   },
 );
+export const RecapSubmitCTA = forwardRef<HTMLDivElement, RecapPgBaseProps>(
+  ({ id }, ref) => {
+    return (
+      <div
+        id={id}
+        ref={ref}
+        className="relative flex h-[625px] w-[500px] bg-[#feee1f] bg-cover bg-center"
+      >
+        <img
+          className="m-auto max-h-full max-w-full"
+          src="/branding/submit-cta.png"
+          alt="Open Calls Ending this Week CTA"
+          height={400}
+          width={400}
+          crossOrigin="anonymous"
+        />
 
+        <section className="absolute bottom-0 flex w-full -translate-y-8 flex-col text-center font-bold">
+          TheStreetArtList.com
+        </section>
+      </div>
+    );
+  },
+);
+
+RecapSubmitCTA.displayName = "RecapSubmitCTA";
 RecapEndCover.displayName = "RecapEndCover";
 RecapCover.displayName = "RecapCover";
-RecapLastPage.displayName = "RecapLastPage";
+RecapCallCount.displayName = "RecapCallCount";
