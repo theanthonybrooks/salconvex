@@ -1,6 +1,7 @@
 import { useDayPicker } from "react-day-picker";
 
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
+import { CalendarClock } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -10,25 +11,28 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { TooltipSimple } from "@/components/ui/tooltip";
 import { cn } from "@/helpers/utilsFns";
 
-export function CustomDropdownNav() {
+export function CustomDropdownNav({ minDate }: { minDate?: number }) {
   const { goToMonth, months, nextMonth, previousMonth, dayPickerProps } =
     useDayPicker();
-
+  const min = minDate ? new Date(minDate) : null;
+  const today = new Date();
+  const thisYear = today.getFullYear();
+  const thisMonth = today.getMonth();
+  const minYear = min?.getFullYear() ?? new Date().getFullYear() - 1;
   const { startMonth, endMonth } = dayPickerProps;
-  // Get the first displayed month
   const displayMonth = months[0]?.date ?? new Date();
   const year = displayMonth.getFullYear();
   const month = displayMonth.getMonth();
 
+  const isToday = year === thisYear && month === thisMonth;
+
   const monthNames = Array.from({ length: 12 }, (_, i) =>
     new Date(0, i).toLocaleString("default", { month: "long" }),
   );
-  const yearRange = Array.from(
-    { length: 5 },
-    (_, i) => new Date().getFullYear() - 1 + i,
-  );
+  const yearRange = Array.from({ length: 5 }, (_, i) => minYear + i);
 
   const isMonthDisabled = (y: number, m: number) => {
     const testDate = new Date(y, m);
@@ -48,7 +52,7 @@ export function CustomDropdownNav() {
   };
 
   return (
-    <div className="richard my-5 flex w-full items-center justify-between gap-2 px-3 py-2">
+    <div className="richard my-5 flex w-full items-center justify-between gap-2 py-2">
       <Button
         variant="ghost"
         type="button"
@@ -99,6 +103,21 @@ export function CustomDropdownNav() {
         </Select>
       </div>
 
+      <TooltipSimple content="Go to today" side="top" disabled={isToday}>
+        <Button
+          variant="ghost"
+          disabled={isToday}
+          type="button"
+          onClick={() =>
+            goToMonth(new Date(minDate ? new Date(minDate) : new Date()))
+          }
+          className={cn(
+            "h-auto p-1 hover:text-foreground/80 disabled:opacity-20 sm:h-auto",
+          )}
+        >
+          <CalendarClock className="size-5" />
+        </Button>
+      </TooltipSimple>
       <Button
         variant="ghost"
         disabled={!nextMonth}

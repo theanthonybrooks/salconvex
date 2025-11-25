@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { format } from "date-fns";
 import { DayPicker } from "react-day-picker";
+import { toast } from "react-toastify";
 
 import { LoaderCircle } from "lucide-react";
 
@@ -18,6 +19,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { cn } from "@/helpers/utilsFns";
 import { useDevice } from "@/providers/device-provider";
 
 type DayPickerProps = {
@@ -25,6 +27,8 @@ type DayPickerProps = {
   onChange: (date: number | undefined) => void;
   label?: string;
   minDate?: number;
+  withTime?: boolean;
+  inputClassName?: string;
 };
 
 function generateTimeOptions(): string[] {
@@ -47,6 +51,8 @@ export function DateTimePickerField({
   onChange,
   label = "Select date and time",
   minDate,
+  withTime = true,
+  inputClassName,
 }: DayPickerProps) {
   const { isMobile } = useDevice();
   const [open, setOpen] = useState(false);
@@ -71,7 +77,7 @@ export function DateTimePickerField({
   const handleDateSelect = (d: Date | undefined) => {
     if (!d) {
       setDate(undefined);
-      onChange(undefined);
+      // onChange(undefined);
       return;
     }
 
@@ -89,35 +95,15 @@ export function DateTimePickerField({
     updated.setMinutes(m);
 
     setDate(updated);
-    onChange(updated.getTime());
+    // onChange(updated.getTime());
     setHasChanges(true);
   };
 
   const handleTimeSelect = (time: string) => {
     if (!date) return;
-
-    const [hourStr, minuteStr, period] = time.split(/[:\s]/);
-    let hour = parseInt(hourStr);
-    const minute = parseInt(minuteStr);
-    if (period === "PM" && hour < 12) hour += 12;
-    if (period === "AM" && hour === 12) hour = 0;
-
-    const updated = new Date(date);
-    updated.setHours(hour);
-    updated.setMinutes(minute);
-
-    if (minDate) {
-      const min = new Date(minDate);
-      const sameDay =
-        updated.getFullYear() === min.getFullYear() &&
-        updated.getMonth() === min.getMonth() &&
-        updated.getDate() === min.getDate();
-      if (sameDay && updated.getTime() < min.getTime()) return;
-    }
-
     setTimeStr(time);
-    onChange(updated.getTime());
     setHasChanges(true);
+    // onChange(updated.getTime());
   };
 
   const handleClose = () => {
@@ -126,6 +112,59 @@ export function DateTimePickerField({
       setOpen(false);
       setHasChanges(false);
     }, 200);
+  };
+
+  const handleCancel = () => {
+    setDate(initialDate);
+    let timeString = timeStr;
+    if (initialDate) {
+      let h = initialDate.getHours();
+      const m = initialDate.getMinutes();
+      const suffix = h < 12 ? "AM" : "PM";
+      h = ((h + 11) % 12) + 1;
+      timeString = `${h}:${m.toString().padStart(2, "0")} ${suffix}`;
+    } else {
+      timeString = "12:00 AM";
+    }
+    setTimeStr(timeString);
+    handleClose();
+  };
+
+  const handleConfirm = () => {
+    setPending(true);
+    try {
+      if (!date) throw new Error("Date is required");
+      const [hourStr, minuteStr, period] = timeStr.split(/[:\s]/);
+      let hour = parseInt(hourStr);
+      const minute = parseInt(minuteStr);
+      if (period === "PM" && hour < 12) hour += 12;
+      if (period === "AM" && hour === 12) hour = 0;
+
+      const updated = new Date(date);
+      if (withTime) {
+        updated.setHours(hour);
+        updated.setMinutes(minute);
+      } else {
+        updated.setHours(0, 0, 0, 0);
+      }
+
+      if (minDate) {
+        const min = new Date(minDate);
+        const sameDay =
+          updated.getFullYear() === min.getFullYear() &&
+          updated.getMonth() === min.getMonth() &&
+          updated.getDate() === min.getDate();
+        if (sameDay && updated.getTime() < min.getTime())
+          throw new Error("Choose a later date (cannot be in the past)");
+      }
+      onChange(updated.getTime());
+      handleClose();
+    } catch (err) {
+      console.error(err);
+      if (err instanceof Error) toast.error(err.message);
+    } finally {
+      setPending(false);
+    }
   };
 
   useEffect(() => {
@@ -140,7 +179,11 @@ export function DateTimePickerField({
     }
   }, [initialValue]);
 
-  const formattedDisplay = date ? format(date, "MMM d, yy @ h:mm a") : "";
+  const formattedDisplay = date
+    ? withTime
+      ? format(date, "MMM d, yy @ h:mm a")
+      : format(date, "MMM d, yyyy")
+    : "";
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -154,7 +197,10 @@ export function DateTimePickerField({
             readOnly
             value={formattedDisplay}
             placeholder={label}
-            className="cursor-pointer text-center"
+            className={cn(
+              "cursor-pointer bg-transparent text-center",
+              inputClassName,
+            )}
           />
         </div>
       </DialogTrigger>
@@ -162,7 +208,10 @@ export function DateTimePickerField({
       <DialogContent
         showCloseButton={false}
         zIndex="z-[33]"
-        className="flex flex-col items-center justify-center gap-6 bg-card px-4 pt-5 sm:max-w-lg"
+        className={cn(
+          "flex flex-col items-center justify-center gap-6 bg-card px-4 pt-5 sm:max-w-sm",
+          withTime && "sm:max-w-lg",
+        )}
         onOpenAutoFocus={() => {
           requestAnimationFrame(() => {
             const selectedButton = document.querySelector(
@@ -180,7 +229,7 @@ export function DateTimePickerField({
         <DialogDescription className="sr-only">
           Select date and time
         </DialogDescription>
-        <div className="flex flex-col items-center justify-center gap-6 bg-card px-4 pt-5 sm:max-w-lg md:flex-row md:items-end">
+        <div className="flex flex-col items-center justify-center gap-6 pt-5 sm:max-w-lg md:flex-row md:items-end">
           <DayPicker
             mode="single"
             selected={date}
@@ -193,47 +242,41 @@ export function DateTimePickerField({
             required
             hideNavigation
             components={{
-              DropdownNav: CustomDropdownNav,
+              DropdownNav: () => <CustomDropdownNav minDate={minDate} />,
             }}
           />
 
           {/* //note-to-self: has a timeZone prop. */}
 
-          {!isMobile && (
-            <ScrollableTimeList
-              timeOptions={timeOptions}
-              timeStr={timeStr}
-              handleTimeSelect={handleTimeSelect}
-              date={date}
-              minDate={minDate}
-            />
-          )}
+          {withTime && (
+            <>
+              {!isMobile && (
+                <ScrollableTimeList
+                  timeOptions={timeOptions}
+                  timeStr={timeStr}
+                  handleTimeSelect={handleTimeSelect}
+                  date={date}
+                  minDate={minDate}
+                />
+              )}
 
-          {isMobile && (
-            <MobileTimePicker
-              date={date}
-              minDate={minDate}
-              onChange={(newDate) => {
-                if (!newDate) {
-                  onChange(undefined);
-                  return;
-                }
-
-                if (minDate && newDate.getTime() < minDate) return;
-
-                setDate(newDate);
-                onChange(newDate.getTime());
-                setHasChanges(true);
-              }}
-            />
+              {isMobile && (
+                <MobileTimePicker
+                  date={date}
+                  timeStr={timeStr}
+                  minDate={minDate}
+                  onChange={handleTimeSelect}
+                />
+              )}
+            </>
           )}
         </div>
-        <DialogFooter className="flex w-full flex-row gap-2 px-4 pt-3 sm:max-w-lg md:items-end">
+        <DialogFooter className="flex w-full flex-row gap-3 px-4 pt-3 sm:max-w-lg md:items-end">
           <Button
             disabled={pending}
             variant="salWithShadowHidden"
             type="button"
-            onClick={handleClose}
+            onClick={handleCancel}
           >
             Cancel
           </Button>
@@ -241,7 +284,7 @@ export function DateTimePickerField({
             disabled={!hasChanges || pending}
             variant={hasChanges ? "salWithShadowYlw" : "salWithShadowHiddenYlw"}
             type="button"
-            onClick={handleClose}
+            onClick={handleConfirm}
             className="w-full md:max-w-40"
           >
             {pending ? (

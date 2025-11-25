@@ -603,6 +603,7 @@ export const eventSchema = {
   // state: v.string(), //draft, submitted, published, archived
   state: eventStateValidator,
   posted: v.optional(postStatusValidator),
+  postPlannedDate: v.optional(v.number()),
   postedAt: v.optional(v.number()),
   postedBy: v.optional(v.id("users")),
   active: v.optional(v.boolean()),
@@ -1220,6 +1221,7 @@ export default defineSchema({
     .index("by_slug", ["slug"])
     .index("by_slug_edition", ["slug", "dates.edition"])
     .index("by_slug_and_organizerId", ["slug", "organizerId"])
+    .index("by_posted", ["posted"])
     .index("by_organizerId", ["organizerId"])
     .index("by_mainOrgId", ["mainOrgId"])
     .index("by_mainOrgId_and_state", ["mainOrgId", "state"])

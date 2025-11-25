@@ -1,6 +1,10 @@
 import type { AdminActions } from "@/components/data-table/DataTable";
 import type { PageTypes, TableTypes } from "@/types/tanstack-table";
-import type { ColumnDef } from "@tanstack/react-table";
+import type {
+  ColumnDef,
+  ColumnFiltersState,
+  ColumnSort,
+} from "@tanstack/react-table";
 import type { ReactNode } from "react";
 
 import { DataTable } from "@/components/data-table/DataTable";
@@ -24,10 +28,10 @@ type ResponsiveDataTableProps<TData, TValue> = {
   defaultVisibility?: MaybeResponsive<Record<string, boolean>>;
 
   /** Default sort — can differ between desktop and mobile */
-  defaultSort?: MaybeResponsive<{ id: string; desc: boolean }>;
+  defaultSort?: MaybeResponsive<ColumnSort[]>;
 
   /** Default filters (usually shared) */
-  defaultFilters?: MaybeResponsive<{ id: string; value: string[] }[]>;
+  defaultFilters?: MaybeResponsive<ColumnFiltersState>;
   tableType: TableTypes;
   pageType: PageTypes;
   pageSize?: MaybeResponsive<number>;

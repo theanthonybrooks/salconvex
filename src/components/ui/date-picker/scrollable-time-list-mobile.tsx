@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { ChevronDown, ChevronUp } from "lucide-react";
 
@@ -10,63 +10,112 @@ import { cn } from "@/helpers/utilsFns";
 interface MobileTimePickerProps {
   date?: Date;
   minDate?: number;
-  onChange: (newDate: Date) => void;
+  timeStr: string;
+  onChange: (timeStr: string) => void;
+}
+
+function parseTimeStr(str: string) {
+  const [h, m, p] = str.split(/[:\s]/);
+  return {
+    hour12: h,
+    minute: m,
+    period: p,
+  };
 }
 
 export function MobileTimePicker({
-  date,
   minDate,
+  date,
+  timeStr,
   onChange,
 }: MobileTimePickerProps) {
-  const current = date ?? new Date();
-  const hour12 = ((current.getHours() + 11) % 12) + 1;
-  const minute = current.getMinutes();
-  const period = current.getHours() >= 12 ? "PM" : "AM";
+  const min = minDate ? new Date(minDate) : null;
+
+  const minHour24 = min?.getHours() ?? 0;
+  const minMinute = min?.getMinutes() ?? 0;
+
+  const minPeriod = minHour24 >= 12 ? "PM" : "AM";
+  const minHour12 = ((minHour24 + 11) % 12) + 1;
+
+  const { hour12, minute, period } = parseTimeStr(timeStr);
 
   const hours = Array.from({ length: 12 }, (_, i) => (i + 1).toString());
   const minutes = Array.from({ length: 60 }, (_, i) =>
     i.toString().padStart(2, "0"),
   );
-  const periods = ["AM", "PM"];
+  const shouldIgnoreMin =
+    date &&
+    min &&
+    new Date(date).setHours(0, 0, 0, 0) > new Date(min).setHours(0, 0, 0, 0);
 
-  const updateDate = (h: string, m: string, p: string) => {
-    const base = date ? new Date(date) : new Date();
-    let hour = parseInt(h, 10);
-    const minute = parseInt(m, 10);
-    if (p === "PM" && hour < 12) hour += 12;
-    if (p === "AM" && hour === 12) hour = 0;
+  const filteredPeriods = useMemo(
+    () => (minPeriod === "AM" || shouldIgnoreMin ? ["AM", "PM"] : ["PM"]),
+    [minPeriod, shouldIgnoreMin],
+  );
 
-    const newDate = new Date(base);
-    newDate.setHours(hour);
-    newDate.setMinutes(minute);
-    newDate.setSeconds(0);
+  const filteredHours =
+    period === minPeriod && !shouldIgnoreMin
+      ? hours.filter((h) => parseInt(h, 10) >= minHour12)
+      : hours;
 
-    if (minDate && newDate.getTime() < minDate) return;
-    onChange(newDate);
+  const filteredMinutes =
+    period === minPeriod && parseInt(hour12) === minHour12 && !shouldIgnoreMin
+      ? minutes.filter((m) => parseInt(m, 10) >= minMinute)
+      : minutes;
+
+  const updateTime = (h: string, m: string, p: string) => {
+    const timeString = `${h}:${m} ${p}`;
+    onChange(timeString);
   };
 
+  useEffect(() => {
+    const hourValid = filteredHours.includes(hour12.toString());
+    const minuteValid = filteredMinutes.includes(
+      minute.toString().padStart(2, "0"),
+    );
+    const periodValid = filteredPeriods.includes(period);
+
+    if (hourValid && minuteValid && periodValid) return;
+
+    const newPeriod = periodValid ? period : filteredPeriods[0];
+    const newHour = hourValid ? hour12.toString() : filteredHours[0];
+    const newMinute = minuteValid
+      ? minute.toString().padStart(2, "0")
+      : filteredMinutes[0];
+
+    onChange(`${newHour}:${newMinute} ${newPeriod}`);
+  }, [
+    hour12,
+    minute,
+    period,
+    filteredHours,
+    filteredMinutes,
+    filteredPeriods,
+    onChange,
+  ]);
+
   return (
-    <div className="h-30 relative flex w-full max-w-[80dvw] items-center justify-center gap-2 overflow-hidden rounded-xl border-1.5 bg-card p-2">
+    <div className="relative flex h-30 w-full max-w-[80dvw] items-center justify-center gap-2 overflow-hidden rounded-xl border-1.5 bg-card p-2">
       <div className="pointer-events-none absolute left-0 right-0 top-0 z-999 flex h-8 items-start justify-around bg-gradient-to-b from-card to-transparent"></div>
       <Dial
-        items={hours}
+        items={filteredHours}
         selected={hour12.toString()}
         onSelect={(val) =>
-          updateDate(val, minute.toString().padStart(2, "0"), period)
+          updateTime(val, minute.toString().padStart(2, "0"), period)
         }
       />
       <Separator orientation="vertical" thickness={2} className="mx-2" />
       <Dial
-        items={minutes}
+        items={filteredMinutes}
         selected={minute.toString().padStart(2, "0")}
-        onSelect={(val) => updateDate(hour12.toString(), val, period)}
+        onSelect={(val) => updateTime(hour12.toString(), val, period)}
       />
       <Separator orientation="vertical" thickness={2} className="mx-2" />
       <Dial
-        items={periods}
+        items={filteredPeriods}
         selected={period}
         onSelect={(val) =>
-          updateDate(hour12.toString(), minute.toString().padStart(2, "0"), val)
+          updateTime(hour12.toString(), minute.toString().padStart(2, "0"), val)
         }
       />
       <div className="pointer-events-none absolute bottom-0 left-0 right-0 flex h-8 items-end justify-around bg-gradient-to-t from-card to-transparent"></div>
@@ -148,7 +197,7 @@ function Dial({ items, selected, onSelect }: DialProps) {
   }, [selected, items, CENTER_Y]);
 
   return (
-    <div className="h-30 relative flex w-fit flex-col items-center overflow-hidden">
+    <div className="relative flex h-30 w-fit flex-col items-center overflow-hidden">
       <div
         ref={ref}
         onScroll={handleScroll}

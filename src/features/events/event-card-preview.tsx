@@ -189,7 +189,7 @@ const EventCardPreview = ({
   const { toggleListAction } = useToggleListAction(event._id);
   const updateUserLastActive = useMutation(api.users.updateUserLastActive);
   const updateEventPostStatus = useMutation(
-    api.events.event.updateEventPostStatus,
+    api.events.socials.updateEventPostStatus,
   );
   const updateEventAnalytics = useMutation(
     api.analytics.eventAnalytics.markEventAnalytics,

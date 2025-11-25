@@ -24,7 +24,7 @@ import { cn } from "@/helpers/utilsFns";
 
 import { api } from "~/convex/_generated/api";
 import { UserPrefsType } from "~/convex/schema";
-import { makeUseQueryWithStatus } from "convex-helpers/react";
+import { makeUseQueryWithStatus, useQuery } from "convex-helpers/react";
 import { useQueries } from "convex-helpers/react/cache";
 
 const sectionVariants: Variants = {
@@ -86,9 +86,17 @@ export default function DashboardSideBar({
     api.openCalls.openCall.getSubmittedOpenCallCount,
     isAdmin ? {} : "skip",
   );
+
+  const { data: queuedEventsData } = useQuery(
+    api.events.socials.getNumberOfQueuedEvents,
+    isAdmin ? {} : "skip",
+  );
+
+  const queuedEvents = queuedEventsData?.data ? queuedEventsData?.data : 0;
   const pendingOpenCalls = submittedOpenCallsData ?? 0;
   const pendingEvents = submittedEventsData ?? 0;
   const totalPending = pendingOpenCalls + pendingEvents;
+  const totalEvents = pendingOpenCalls + pendingEvents + queuedEvents;
   // console.log(pendingEvents);
   const helpNavItems = navItems.filter((item) => item.label.includes("Help"));
   const filteredNavItems = useMemo(() => {
@@ -313,13 +321,13 @@ export default function DashboardSideBar({
                                     {pendingOpenCalls}
                                   </span>
                                 )}
-                                {totalPending > 0 && collapsedSidebar && (
+                                {totalEvents > 0 && collapsedSidebar && (
                                   <span
                                     className={cn(
                                       "absolute -right-[10px] -top-2 inline-flex items-center justify-center rounded-full border-1.5 border-foreground bg-background px-[7px] py-0.5 text-2xs text-xs font-semibold",
                                     )}
                                   >
-                                    {totalPending}
+                                    {totalEvents}
                                   </span>
                                 )}
                               </>
@@ -387,6 +395,12 @@ export default function DashboardSideBar({
                                     totalPending > 0 && (
                                       <span className="ml-1 inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-semibold">
                                         {totalPending}
+                                      </span>
+                                    )}
+                                  {sectionItem.label === "Post Schedule" &&
+                                    queuedEvents > 0 && (
+                                      <span className="ml-1 inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-semibold">
+                                        {queuedEvents}
                                       </span>
                                     )}
                                 </Link>

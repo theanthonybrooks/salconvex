@@ -37,7 +37,7 @@ export function OrganizerDashboardTableWrapper() {
       tableType="orgEvents"
       pageType="dashboard"
       minimalView={!isSidebarCollapsed}
-      defaultSort={{ id: "lastEditedAt", desc: true }}
+      defaultSort={[{ id: "lastEditedAt", desc: true }]}
       pageSize={{ desktop: 50 }}
     />
   );

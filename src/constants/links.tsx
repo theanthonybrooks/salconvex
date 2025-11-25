@@ -4,6 +4,7 @@ import { JSX } from "react";
 import { IconType } from "react-icons";
 
 import { BsPersonVcard } from "react-icons/bs";
+import { FaMobileAlt } from "react-icons/fa";
 import { FaFacebookF, FaInstagram, FaThreads } from "react-icons/fa6";
 import { LuMegaphone } from "react-icons/lu";
 import { PiGraph } from "react-icons/pi";
@@ -294,6 +295,7 @@ export const dashboardNavItems: DashNavItem[] = [
     sub: [],
     userType: [],
   },
+
   {
     label: "This Week ",
     href: "/admin/thisweek",
@@ -301,6 +303,17 @@ export const dashboardNavItems: DashNavItem[] = [
     subsection: true,
     sectionCat: "events",
     desc: "This Week Recap Post",
+    userRole: ["admin"],
+    sub: [],
+    userType: [],
+  },
+  {
+    label: "Post Schedule",
+    href: "/dashboard/admin/socials",
+    icon: FaMobileAlt,
+    subsection: true,
+    sectionCat: "events",
+    desc: "Post Schedule",
     userRole: ["admin"],
     sub: [],
     userType: [],

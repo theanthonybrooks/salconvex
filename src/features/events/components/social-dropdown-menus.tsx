@@ -32,7 +32,7 @@ export const SocialDropdownMenus = ({
   const userData = usePreloadedQuery(preloadedUserData);
   const user = userData?.user ?? null;
   const updateEventPostStatus = useMutation(
-    api.events.event.updateEventPostStatus,
+    api.events.socials.updateEventPostStatus,
   );
   const { dates, slug, _id: eventId } = socialsEvent;
   const edition = dates.edition;

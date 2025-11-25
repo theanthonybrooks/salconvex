@@ -117,7 +117,7 @@
   border: var(--rdp-day_button-border);
   border-radius: var(--rdp-day_button-border-radius);
   width: 2rem;
-  height: 2.25rem;
+  height: 2rem;
   margin-inline: auto;
 
   &:hover {
@@ -276,6 +276,9 @@
   border: 1.5px solid hsl(var(--foreground));
   border-radius: 12px;
   display: block;
+  width: max-content;
+  margin-inline: auto;
+  padding-inline: 0.5em;
 }
 
 .rdp-nav {
@@ -329,7 +332,7 @@
 .rdp-selected .rdp-day_button {
   border: var(--rdp-selected-border);
   background: hsl(var(--sal-pink-light));
-  height: 2rem;
+  height: 2.25rem;
   width: 2.25rem;
   margin-inline: auto;
   /* border: 2px solid black; */

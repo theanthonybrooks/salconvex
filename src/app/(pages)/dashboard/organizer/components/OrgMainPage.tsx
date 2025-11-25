@@ -190,7 +190,7 @@ export const OrgMainPage = () => {
                       lastEditedAt: false,
                     },
                   }}
-                  defaultSort={{ id: `lastEditedAt`, desc: true }}
+                  defaultSort={[{ id: `lastEditedAt`, desc: true }]}
                   tableType="events"
                   pageType="dashboard"
                   pageSize={{ desktop: 50, mobile: 10 }}
@@ -277,7 +277,7 @@ export const OrgMainPage = () => {
                         lastEditedAt: false,
                       },
                     }}
-                    defaultSort={{ id: `lastEditedAt`, desc: true }}
+                    defaultSort={[{ id: `lastEditedAt`, desc: true }]}
                     tableType="events"
                     pageType="dashboard"
                     pageSize={{ desktop: 50, mobile: 10 }}

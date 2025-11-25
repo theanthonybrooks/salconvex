@@ -470,6 +470,7 @@ export const TABLE_FILTERS: TableFilterConfig = {
   ],
   organizations: [],
   organizationStaff: [],
+  socials: [],
   hidden: [
     {
       columnId: "edition",

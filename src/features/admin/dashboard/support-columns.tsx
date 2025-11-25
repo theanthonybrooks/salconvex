@@ -25,7 +25,7 @@ import { cn } from "@/helpers/utilsFns";
 
 import { Id } from "~/convex/_generated/dataModel";
 
-export const artistColumnLabels: Record<string, string> = {
+export const supportColumnLabels: Record<string, string> = {
   name: "Name",
   nationality: "Nationality",
   documents: "Documents",
@@ -37,7 +37,7 @@ export const artistColumnLabels: Record<string, string> = {
   createdAt: "Created",
 };
 
-export interface ArtistColumnProps {
+export interface SupportColumnProps {
   artistId: Id<"artists">;
   name: string;
   nationality: string[];
@@ -49,7 +49,8 @@ export interface ArtistColumnProps {
   createdAt: number;
 }
 
-export const artistColumns: ColumnDef<ArtistColumnProps>[] = [
+//TODO: Still need to actually make this column definition.
+export const supportColumns: ColumnDef<SupportColumnProps>[] = [
   {
     accessorKey: "name",
     id: "name",

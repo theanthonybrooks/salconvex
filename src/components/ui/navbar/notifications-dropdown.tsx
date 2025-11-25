@@ -3,6 +3,7 @@ import React from "react";
 import { Bell } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { Link } from "@/components/ui/custom-link";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,6 +16,10 @@ import {
 import { TooltipSimple } from "@/components/ui/tooltip";
 import { cn } from "@/helpers/utilsFns";
 
+import { api } from "~/convex/_generated/api";
+import { makeUseQueryWithStatus } from "convex-helpers/react";
+import { useQueries } from "convex-helpers/react/cache";
+
 type NotificationsDropdownProps = {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -22,9 +27,6 @@ type NotificationsDropdownProps = {
   tooltipDisabled: boolean;
   className?: string;
   isAdmin?: boolean;
-  pendingEvents: number;
-  pendingOpenCalls: number;
-  totalPending: number;
 };
 
 export const NotificationsDropdown = ({
@@ -34,10 +36,25 @@ export const NotificationsDropdown = ({
   tooltipDisabled,
   className,
   isAdmin,
-  totalPending,
-  pendingEvents,
-  pendingOpenCalls,
 }: NotificationsDropdownProps) => {
+  const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
+  const { data: submittedEventsData } = useQueryWithStatus(
+    api.events.event.getSubmittedEventCount,
+    isAdmin ? {} : "skip",
+  );
+  const { data: submittedOpenCallsData } = useQueryWithStatus(
+    api.openCalls.openCall.getSubmittedOpenCallCount,
+    isAdmin ? {} : "skip",
+  );
+  const { data: queuedEventsData } = useQueryWithStatus(
+    api.events.socials.getNumberOfQueuedEvents,
+    isAdmin ? {} : "skip",
+  );
+
+  const queuedEvents = queuedEventsData?.data ?? 0;
+  const pendingEvents = submittedEventsData ?? 0;
+  const pendingOpenCalls = submittedOpenCallsData ?? 0;
+  const totalPending = pendingOpenCalls + pendingEvents;
   return (
     <DropdownMenu
       onOpenChange={(val) => {
@@ -75,26 +92,31 @@ export const NotificationsDropdown = ({
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           {pendingEvents > 0 && (
-            <DropdownMenuItem
-              className="w-full"
-              onClick={() => {
-                window.location.href =
-                  "/dashboard/admin/submissions?state=submitted";
-              }}
+            <Link
+              href="/dashboard/admin/submissions?state=submitted"
+              target="_blank"
             >
-              {pendingEvents} - Pending Events
-            </DropdownMenuItem>
+              <DropdownMenuItem className="w-full">
+                {pendingEvents} - Pending Events
+              </DropdownMenuItem>
+            </Link>
           )}
           {pendingOpenCalls > 0 && (
-            <DropdownMenuItem
-              className="w-full"
-              onClick={() => {
-                window.location.href =
-                  "/dashboard/admin/submissions?openCallState=submitted";
-              }}
+            <Link
+              href="/dashboard/admin/submissions?openCallState=submitted"
+              target="_blank"
             >
-              {pendingOpenCalls} - Pending Open Calls
-            </DropdownMenuItem>
+              <DropdownMenuItem className="w-full">
+                {pendingOpenCalls} - Pending Open Calls
+              </DropdownMenuItem>
+            </Link>
+          )}
+          {queuedEvents > 0 && (
+            <Link href="/dashboard/admin/socials" target="_blank">
+              <DropdownMenuItem className="w-full">
+                {queuedEvents} - Scheduled Calls
+              </DropdownMenuItem>
+            </Link>
           )}
           {!pendingEvents && !pendingOpenCalls && (
             <DropdownMenuItem className="pointer-events-none w-full">

@@ -419,7 +419,7 @@ const SubmissionFormOrgStep = ({
               )}
               tableType="events"
               pageType="form"
-              defaultSort={{ id: "lastEditedAt", desc: true }}
+              defaultSort={[{ id: "lastEditedAt", desc: true }]}
               pageSize={5}
               adminActions={{ isAdmin }}
             />
@@ -440,7 +440,7 @@ const SubmissionFormOrgStep = ({
               )}
               tableType="events"
               pageType="form"
-              defaultSort={{ id: "lastEditedAt", desc: true }}
+              defaultSort={[{ id: "lastEditedAt", desc: true }]}
               adminActions={{ isAdmin }}
               defaultVisibility={{
                 _id: false,
@@ -477,7 +477,7 @@ const SubmissionFormOrgStep = ({
               )}
               tableType="events"
               pageType="form"
-              defaultSort={{ id: "lastEditedAt", desc: true }}
+              defaultSort={[{ id: "lastEditedAt", desc: true }]}
               adminActions={{ isAdmin }}
             />
 

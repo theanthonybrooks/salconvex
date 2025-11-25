@@ -64,7 +64,7 @@ export function ArtistDashboardTableWrapper({
           minimalView={!isSidebarCollapsed}
           tableType="applications"
           pageType="dashboard"
-          defaultSort={{ id: `applicationTime`, desc: true }}
+          defaultSort={[{ id: `applicationTime`, desc: true }]}
           pageSize={{ desktop: 50 }}
         />
       )}
@@ -90,7 +90,7 @@ export function ArtistDashboardTableWrapper({
           minimalView={!isSidebarCollapsed}
           tableType="bookmarks"
           pageType="dashboard"
-          defaultSort={{ id: "deadline", desc: false }}
+          defaultSort={[{ id: "deadline", desc: false }]}
           pageSize={{ desktop: 50 }}
         />
       )}
@@ -103,7 +103,7 @@ export function ArtistDashboardTableWrapper({
           minimalView={!isSidebarCollapsed}
           tableType="hidden"
           pageType="dashboard"
-          defaultSort={{ id: "name", desc: false }}
+          defaultSort={[{ id: "name", desc: false }]}
           pageSize={{ desktop: 50 }}
           defaultVisibility={{
             mobile: {

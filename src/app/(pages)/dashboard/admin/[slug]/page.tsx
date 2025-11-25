@@ -45,23 +45,19 @@ export default async function AdminPage({
       return <AnalyticsPage />;
     case "todos":
       return <KanbanBoard purpose={isDesigner ? "design" : "todo"} />;
-    // case "design":
-    //   return <KanbanBoard userRole={user.role?.[0]} purpose="design" />;
     case "submissions":
       return <AdminDashboardTableWrapper page="events" />;
-
-    case "users":
-      return <AdminDashboardTableWrapper page="users" />;
-    case "artists":
-      return <AdminDashboardTableWrapper page="artists" />;
     case "event":
       return <AdminEventForm user={user} />;
+
+    case "users":
+    case "socials":
+    case "artists":
     case "applications":
-      return <AdminDashboardTableWrapper page="applications" />;
     case "newsletter":
-      return <AdminDashboardTableWrapper page="newsletter" />;
     case "resources":
-      return <AdminDashboardTableWrapper page="resources" />;
+      return <AdminDashboardTableWrapper page={slug} />;
+
     default:
       redirect("/dashboard/admin");
   }

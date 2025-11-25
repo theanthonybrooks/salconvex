@@ -12,6 +12,7 @@ import { useAdminPreload } from "@/features/admin/admin-preload-context";
 import { artistColumns } from "@/features/admin/dashboard/artist-columns";
 import { newsletterColumns } from "@/features/admin/dashboard/newsletter-columns";
 import { resourceColumns } from "@/features/admin/dashboard/resources-column";
+import { socialColumns } from "@/features/admin/dashboard/socials-columns";
 import { AdminToolbar } from "@/features/admin/dashboard/user-admin-toolbar";
 import { userColumns } from "@/features/admin/dashboard/user-columns";
 import { userAddOnColumns } from "@/features/admin/dashboard/userAddon-columns";
@@ -57,6 +58,7 @@ export function AdminDashboardTableWrapper({
   const artistsPage = page === "artists";
   const newsletterPage = page === "newsletter";
   const resourcesPage = page === "resources";
+  const socialsPage = page === "socials";
 
   const usersData = useQuery(
     api.users.usersWithSubscriptions,
@@ -84,6 +86,11 @@ export function AdminDashboardTableWrapper({
       : "skip",
   );
 
+  const socialsEvents = useQuery(
+    api.events.socials.getEventsForSocials,
+    socialsPage ? {} : "skip",
+  );
+
   return (
     <>
       {submissionsPage && (
@@ -105,7 +112,7 @@ export function AdminDashboardTableWrapper({
               adminActions={adminActions}
               tableType="events"
               pageType="dashboard"
-              defaultSort={{ id: `lastEditedAt`, desc: true }}
+              defaultSort={[{ id: `lastEditedAt`, desc: true }]}
               pageSize={50}
             />
           </div>
@@ -125,7 +132,7 @@ export function AdminDashboardTableWrapper({
               pageType="dashboard"
               className="mx-auto w-full max-w-[80dvw] overflow-x-auto sm:max-w-[90vw]"
               outerContainerClassName={cn("lg:hidden")}
-              defaultSort={{ id: `lastEditedAt`, desc: true }}
+              defaultSort={[{ id: `lastEditedAt`, desc: true }]}
             />
           </div>
         </>
@@ -148,7 +155,7 @@ export function AdminDashboardTableWrapper({
             }}
             onRowSelect={(row) => setSelectedRow(row?._id ?? null)}
             defaultFilters={[{ id: `state`, value: ["published", "draft"] }]}
-            defaultSort={{ id: `startDate`, desc: true }}
+            defaultSort={[{ id: `startDate`, desc: true }]}
             tableType="resources"
             pageType="dashboard"
             pageSize={10}
@@ -172,7 +179,7 @@ export function AdminDashboardTableWrapper({
                 },
               }}
               defaultFilters={[{ id: `canceled`, value: ["false"] }]}
-              defaultSort={{ id: `createdAt`, desc: true }}
+              defaultSort={[{ id: `createdAt`, desc: true }]}
               tableType="userAddOns"
               pageType="dashboard"
               pageSize={10}
@@ -188,7 +195,7 @@ export function AdminDashboardTableWrapper({
           description="View newsletter subscribers & their preferences"
           data={newsletterData?.subscribers ?? []}
           defaultFilters={[{ id: `active`, value: ["true"] }]}
-          defaultSort={{ id: `createdAt`, desc: true }}
+          defaultSort={[{ id: `createdAt`, desc: true }]}
           columns={newsletterColumns}
           tableType="newsletter"
           pageType="dashboard"
@@ -229,7 +236,7 @@ export function AdminDashboardTableWrapper({
               dates_edition: false,
             },
           }}
-          defaultSort={{ id: `createdAt`, desc: true }}
+          defaultSort={[{ id: `createdAt`, desc: true }]}
           tableType="users"
           pageType="dashboard"
           pageSize={{ desktop: 50, mobile: 10 }}
@@ -248,7 +255,7 @@ export function AdminDashboardTableWrapper({
           tableType="artists"
           pageType="dashboard"
           collapsedSidebar={isSidebarCollapsed}
-          defaultSort={{ id: `createdAt`, desc: true }}
+          defaultSort={[{ id: `createdAt`, desc: true }]}
           pageSize={50}
           defaultFilters={[
             {
@@ -261,6 +268,24 @@ export function AdminDashboardTableWrapper({
             },
             { id: `feature`, value: ["true", "none"] },
           ]}
+        />
+      )}
+      {socialsPage && (
+        <ResponsiveDataTable
+          title="Social Media Posts"
+          description="Planned and posted open calls"
+          columns={socialColumns}
+          data={socialsEvents?.data ?? []}
+          adminActions={adminActions}
+          tableType="socials"
+          pageType="dashboard"
+          collapsedSidebar={isSidebarCollapsed}
+          defaultSort={[
+            { id: "posted", desc: true },
+            { id: "plannedDate", desc: false },
+          ]}
+          pageSize={50}
+          defaultFilters={[]}
         />
       )}
     </>

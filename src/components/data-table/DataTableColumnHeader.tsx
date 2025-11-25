@@ -1,5 +1,13 @@
 import { Column } from "@tanstack/react-table";
-import { ArrowDown, ArrowUp, ChevronsUpDown, EyeOff } from "lucide-react";
+
+import {
+  ArrowDown,
+  ArrowDownNarrowWide,
+  ArrowDownWideNarrow,
+  ArrowUp,
+  ChevronsUpDown,
+  EyeOff,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -43,13 +51,13 @@ export function DataTableColumnHeader<TData, TValue>({
           <Button
             variant="link"
             size="sm"
-            className="h-8 hover:cursor-pointer data-[state=open]:bg-white/50"
+            className="flex h-8 items-center gap-x-1 hover:cursor-pointer data-[state=open]:bg-white/50"
           >
             <span>{title}</span>
             {descSortActive ? (
-              <ArrowDown className="size-4" />
+              <ArrowDownNarrowWide className="size-4" />
             ) : ascSortActive ? (
-              <ArrowUp className="size-4" />
+              <ArrowDownWideNarrow className="size-4" />
             ) : (
               <ChevronsUpDown className="size-4" />
             )}

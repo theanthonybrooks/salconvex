@@ -1730,35 +1730,3 @@ export const deleteMultipleEvents = mutation({
   },
 });
 
-export const updateEventPostStatus = mutation({
-  args: {
-    eventId: v.id("events"),
-    posted: v.optional(
-      v.union(v.literal("posted"), v.literal("toPost"), v.null()),
-    ),
-  },
-  handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) return null;
-
-    const event = await ctx.db.get(args.eventId);
-    if (!event) return null;
-
-    const posted = args.posted ?? undefined;
-
-    await ctx.db.patch(event._id, {
-      posted,
-      ...(args.posted === "posted"
-        ? { postedAt: Date.now() }
-        : { postedAt: undefined }),
-      ...(args.posted === "posted"
-        ? { postedBy: userId }
-        : { postedBy: undefined }),
-    });
-
-    await ctx.runMutation(internal.events.eventLookup.updateLookupPostStatus, {
-      eventId: args.eventId,
-      posted: args.posted ?? undefined,
-    });
-  },
-});

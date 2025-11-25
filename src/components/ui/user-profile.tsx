@@ -40,9 +40,6 @@ import SignOutBtn from "@/features/auth/components/sign-out-btn";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { cn } from "@/helpers/utilsFns";
 
-import { api } from "~/convex/_generated/api";
-import { makeUseQueryWithStatus } from "convex-helpers/react";
-import { useQueries } from "convex-helpers/react/cache";
 import { usePreloadedQuery } from "convex/react";
 
 interface UserProfileProps {
@@ -71,18 +68,6 @@ export function UserProfile({
   const hasActiveSub = subData?.hasActiveSubscription;
   const subStatus = subData?.subStatus;
   // console.log("User subscription:", subscription)
-  const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
-  const { data: submittedEventsData } = useQueryWithStatus(
-    api.events.event.getSubmittedEventCount,
-    isAdmin ? {} : "skip",
-  );
-  const { data: submittedOpenCallsData } = useQueryWithStatus(
-    api.openCalls.openCall.getSubmittedOpenCallCount,
-    isAdmin ? {} : "skip",
-  );
-  const pendingEvents = submittedEventsData ?? 0;
-  const pendingOpenCalls = submittedOpenCallsData ?? 0;
-  const totalPending = pendingOpenCalls + pendingEvents;
 
   const artistDashboardLink = "/dashboard/";
   const organizerDashboardLink = "/dashboard/organizer/";
@@ -97,9 +82,6 @@ export function UserProfile({
           tooltipDisabled={tooltipDisabled}
           className={className}
           isAdmin={isAdmin}
-          totalPending={totalPending}
-          pendingEvents={pendingEvents}
-          pendingOpenCalls={pendingOpenCalls}
         />
       )}
       <DropdownMenu

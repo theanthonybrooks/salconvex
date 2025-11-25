@@ -61,7 +61,7 @@ export const StaffPage = ({ orgId, adminActions, isOwner }: StaffPageProps) => {
             lastEditedAt: false,
           },
         }}
-        defaultSort={{ id: `lastUpdatedAt`, desc: true }}
+        defaultSort={[{ id: `lastUpdatedAt`, desc: true }]}
         tableType="organizationStaff"
         pageType="dashboard"
         pageSize={{ desktop: 20, mobile: 10 }}

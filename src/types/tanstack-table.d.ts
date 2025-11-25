@@ -13,6 +13,7 @@ import { RowData } from "@tanstack/react-table";
 
 export const tableTypes = [
   "events",
+  "socials",
   "orgEvents",
   "organizations",
   "organizationStaff",

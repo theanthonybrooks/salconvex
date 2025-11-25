@@ -202,7 +202,7 @@ export const RichTextEditor = ({
     },
     editorProps: {
       attributes: {
-        class: "scrollable justy mini darkbar px-4 h-full",
+        class: "scrollable justy mini darkbar p-4 h-full",
       },
       handleKeyDown(view, event) {
         const isCmdEnter = event.metaKey && event.key === "Enter";

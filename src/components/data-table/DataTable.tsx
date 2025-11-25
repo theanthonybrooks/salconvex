@@ -92,7 +92,7 @@ interface DataTableProps<TData, TValue> {
   pageType?: PageTypes;
   initialSearchTerm?: string;
   minimalView?: boolean;
-  defaultSort?: ColumnSort;
+  defaultSort?: ColumnSort[];
   defaultFilters?: ColumnFiltersState;
   pageSize?: number;
   isMobile?: boolean;
@@ -169,11 +169,16 @@ export function DataTable<TData, TValue>({
     return defaultFiltersFromUrl;
   });
 
+  // const initialSort = useMemo<SortingState>(() => {
+  //   return defaultSort ? [{ id: defaultSort.id, desc: defaultSort.desc }] : [];
+  // }, [defaultSort]);
   const initialSort = useMemo<SortingState>(() => {
-    return defaultSort ? [{ id: defaultSort.id, desc: defaultSort.desc }] : [];
+    return defaultSort ?? [];
   }, [defaultSort]);
 
   const [sorting, setSorting] = useState<SortingState>(initialSort);
+
+  console.log(sorting, initialSort);
 
   const table = useReactTable({
     data,

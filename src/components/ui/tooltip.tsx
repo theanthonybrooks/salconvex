@@ -81,9 +81,11 @@ TooltipContent.displayName = TooltipPrimitive.Content.displayName;
 
 export { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger };
 
+export type TooltipSides = "top" | "right" | "bottom" | "left";
+
 interface TooltipProps {
   content: React.ReactNode;
-  side?: "top" | "right" | "bottom" | "left";
+  side?: TooltipSides;
   sideOffset?: number;
   align?: "start" | "center" | "end";
   alignOffset?: number;

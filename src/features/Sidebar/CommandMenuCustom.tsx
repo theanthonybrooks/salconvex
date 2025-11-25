@@ -2,7 +2,7 @@ import { searchDialogVariants } from "@/constants/dialogConsts";
 
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { DashIcon } from "@radix-ui/react-icons";
 import { Command } from "cmdk";
 import { AnimatePresence, motion } from "framer-motion";
@@ -58,6 +58,7 @@ export const CommandMenuCustom = <T extends CommandItem>({
   placeholder = `Hello. Is it me you're looking for? Use ctrl + ${shortcut} to search faster.`,
   setSearch,
 }: CommandMenuProps<T>) => {
+  const pathname = usePathname();
   const { preloadedSubStatus, preloadedUserData } = useConvexPreload();
   const subData = usePreloadedQuery(preloadedSubStatus);
   const userData = usePreloadedQuery(preloadedUserData);
@@ -235,7 +236,10 @@ export const CommandMenuCustom = <T extends CommandItem>({
                       {groupItems.map((item) => (
                         <Command.Item
                           key={item.path}
-                          className='flex cursor-pointer items-center gap-2 rounded p-2 pl-5 text-base text-foreground transition-colors hover:bg-stone-100 hover:text-stone-900 data-[selected="true"]:bg-salYellow/40'
+                          className={cn(
+                            'flex cursor-pointer items-center gap-2 rounded p-2 pl-5 text-base text-foreground transition-colors hover:bg-stone-100 hover:text-stone-900 data-[selected="true"]:bg-salYellow/40',
+                            pathname === item.path && "bg-salYellow/40",
+                          )}
                           onSelect={() => {
                             setOpen(false);
                             router.push(item.path);
@@ -341,6 +345,7 @@ export const CommandMenuCustom = <T extends CommandItem>({
                               key={item.path}
                               className={cn(
                                 "group flex cursor-pointer items-start gap-2 rounded p-2 pl-5 text-foreground transition-colors hover:bg-stone-100 hover:text-stone-900 data-[selected='true']:bg-salYellow/40",
+                                pathname === item.path && "bg-salPink/40",
                                 baseFontSize,
                               )}
                               onSelect={() => router.push(item.path)}

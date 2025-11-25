@@ -1,6 +1,9 @@
+import type { TooltipSides } from "@/components/ui/tooltip";
+
 import { ReactNode, useState } from "react";
-import { Check, LucideIcon } from "lucide-react";
 import { toast } from "react-toastify";
+
+import { Check, LucideIcon } from "lucide-react";
 
 import IconComponent from "@/components/ui/icon-component";
 import { TooltipSimple } from "@/components/ui/tooltip";
@@ -14,6 +17,7 @@ interface CopyableItemProps {
   className?: string;
   copyContent?: string;
   center?: boolean;
+  side?: TooltipSides;
 }
 
 export const CopyableItem = ({
@@ -24,6 +28,7 @@ export const CopyableItem = ({
   className,
   copyContent,
   center,
+  side = "left",
 }: CopyableItemProps) => {
   const [copied, setCopied] = useState(false);
   const handleCopy = () => {
@@ -37,12 +42,12 @@ export const CopyableItem = ({
     });
   };
   return (
-    <TooltipSimple content="Click to copy">
+    <TooltipSimple content="Click to copy" side={side}>
       <div
         onClick={() => handleCopy()}
         className={cn(
-          className,
           "flex cursor-pointer items-center gap-x-1",
+          className,
           center && "justify-center",
         )}
       >
