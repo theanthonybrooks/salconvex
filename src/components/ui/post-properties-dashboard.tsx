@@ -40,6 +40,12 @@ const fontSizeOptions = [
   { label: "32 px", value: "32" },
   { label: "34 px", value: "34" },
   { label: "36 px", value: "36" },
+  { label: "38 px", value: "38" },
+  { label: "40 px", value: "40" },
+  { label: "42 px", value: "42" },
+  { label: "44 px", value: "44" },
+  { label: "46 px", value: "46" },
+  { label: "48 px", value: "48" },
 ];
 
 export const PostPropertiesDashboard = ({

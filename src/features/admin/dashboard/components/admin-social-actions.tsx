@@ -101,7 +101,7 @@ export const AdminSocialTimePicker = ({
       }}
       label="Select Date"
       minDate={now}
-      // withTime={false}
+      withTime={false}
       inputClassName="border-transparent hover:border-foreground/40 text-sm"
     />
   );

@@ -76,7 +76,9 @@ const OpenCallSocials = ({ data }: OpenCallSocialsProps) => {
     } else if (eventName.length <= 18 && eventName.length > 10) {
       setPostSettings((prev) => ({ ...prev, fontSize: 32 }));
     } else if (eventName.length <= 10) {
-      setPostSettings((prev) => ({ ...prev, fontSize: 36 }));
+      setPostSettings((prev) => ({ ...prev, fontSize: 40 }));
+    } else if (eventName.length <= 6) {
+      setPostSettings((prev) => ({ ...prev, fontSize: 48 }));
     }
   }, [data]);
   if (!data) return <p>No Data</p>;

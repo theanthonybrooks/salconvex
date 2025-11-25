@@ -228,8 +228,9 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
 
     content += `Access to all of the open calls, the ability to bookmark, hide, and track applications starts at $3/month. The coding of the site, searching, reading through, addition of open calls, and these IG posts are all done by me @anthonybrooksart.\n\n`;
 
-    content += `#opencall #muralfest #publicartopencall #muralfestival #graffitijam #graffiti #streetartfestival #muralproject #callforartist #streetartopencall #urbanart #arteurbana  #eoi #callforartist #rfq #rfp #artistopencall\n`;
-    content += `#artistopportunities #artistopportunity #streetartopencall #streetartcalls`;
+    content += `The Street Art List is a platform dedicated to 2D Public Art, sharing mural, graffiti, and street art calls (RFP, RFQ, EOI, etc). Initially starting as an archive of the industy, the site also offers a global map of street art, graffiti jams, and mural festivals/mural projects, yearly event calendar, and resources for artist and organizers. Find out more at thestreetartlist.com.\n\n`;
+
+    content += `#publicartist #callforartist #artistopencall`;
 
     setCaptionText(content);
     setCharCount(content.length);
