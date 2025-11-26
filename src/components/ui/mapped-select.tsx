@@ -80,6 +80,11 @@ interface SearchMappedSelectProps<T> {
   // width?: string
   className?: string;
   tabIndex?: number;
+  popover?: {
+    align?: "start" | "center" | "end";
+    contentClassName?: string;
+    listClassName?: string;
+  };
 }
 
 export function SearchMappedSelect<T>({
@@ -95,6 +100,7 @@ export function SearchMappedSelect<T>({
   disabled = false,
   placeholder = "Select an option",
   tabIndex = 0,
+  popover,
 }: // width = "w-[280px]",
 SearchMappedSelectProps<T>) {
   const [isOpen, setIsOpen] = useState(false);
@@ -171,7 +177,7 @@ SearchMappedSelectProps<T>) {
         <Button
           variant="outline"
           className={cn(
-            "relative flex h-10 w-full items-center justify-center truncate border-foreground/20 bg-card pr-8 font-normal hover:bg-background/20 sm:w-[280px]",
+            "relative flex h-10 w-full items-center justify-center truncate border-foreground/20 bg-card pr-8 font-normal hover:bg-background/20 sm:max-w-72",
             singleOption && "pointer-events-none",
             className,
           )}
@@ -192,8 +198,11 @@ SearchMappedSelectProps<T>) {
         </Button>
       </PopoverTrigger>
       <PopoverContent
-        align="end"
-        className="w-full min-w-[280px] max-w-[280px] border p-0 sm:max-w-full"
+        align={popover?.align ?? "end"}
+        className={cn(
+          "w-full min-w-[280px] max-w-[280px] border p-0 sm:max-w-full",
+          popover?.contentClassName,
+        )}
         showCloseButton={false}
       >
         <Command shouldFilter={false}>
@@ -204,7 +213,7 @@ SearchMappedSelectProps<T>) {
             onValueChange={setSearchQuery}
             className="pr-18 text-base sm:text-sm lg:text-sm"
           />
-          {value !== "" && (
+          {value && (
             <span className="group absolute right-3 top-2 flex cursor-pointer items-center gap-1 hover:scale-105">
               <p className="text-sm text-foreground/50">Reset</p>
               <X
@@ -213,7 +222,12 @@ SearchMappedSelectProps<T>) {
               />
             </span>
           )}
-          <CommandList className="scrollable mini darkbar max-h-36">
+          <CommandList
+            className={cn(
+              "scrollable mini darkbar max-h-36",
+              popover?.listClassName,
+            )}
+          >
             {Object.entries(filteredData).map(([group, items]) => (
               <CommandGroup key={group} heading={group}>
                 {items.map((item) => {

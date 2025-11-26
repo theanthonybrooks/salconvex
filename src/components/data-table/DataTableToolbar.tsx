@@ -10,7 +10,7 @@ import { Table } from "@tanstack/react-table";
 import { toast } from "react-toastify";
 
 import { TbFilterX } from "react-icons/tb";
-import { X } from "lucide-react";
+import { Filter, FilterX, X } from "lucide-react";
 
 import { DataTableViewOptions } from "@/components/data-table/DataTableViewOptions";
 import { AlertDialogSimple } from "@/components/ui/alert-dialog";
@@ -43,6 +43,7 @@ export function DataTableToolbar<TData>({
     api.events.event.deleteMultipleEvents,
   );
   const [searchActive, setSearchActive] = useState(false);
+  const [showFilters, setShowFilters] = useState(!isMobile);
   const isFiltered = table.getState().columnFilters.length > 0;
   const initialSort = table.initialState.sorting;
   const currentSort = table.getState().sorting;
@@ -132,25 +133,40 @@ export function DataTableToolbar<TData>({
       )}
     >
       <div className="mx-auto flex w-full max-w-[80vw] flex-col items-center gap-3 sm:mx-0 sm:w-auto sm:flex-row">
-        <Input
-          placeholder="Search..."
-          value={
-            (table
-              .getColumn(getColumnLabel(tableType))
-              ?.getFilterValue() as string) ?? ""
-          }
-          onChange={(event) => {
-            table
-              .getColumn(getColumnLabel(tableType))
-              ?.setFilterValue(event.target.value);
-            if (event.target.value.length > 0) {
-              setSearchActive(true);
-            } else {
-              setSearchActive(false);
+        <div className="flex w-full items-center gap-3">
+          <Input
+            placeholder="Search..."
+            value={
+              (table
+                .getColumn(getColumnLabel(tableType))
+                ?.getFilterValue() as string) ?? ""
             }
-          }}
-          className="mx-auto h-12 w-full sm:h-10 sm:w-[150px] lg:w-[200px]"
-        />
+            onChange={(event) => {
+              table
+                .getColumn(getColumnLabel(tableType))
+                ?.setFilterValue(event.target.value);
+              if (event.target.value.length > 0) {
+                setSearchActive(true);
+              } else {
+                setSearchActive(false);
+              }
+            }}
+            className="mx-auto h-12 w-full sm:h-10 sm:w-[150px] lg:w-[200px]"
+          />
+          {isMobile && (
+            <Button
+              variant="outline"
+              className="flex size-12 items-center gap-2 border-foreground/30 p-0 px-2 hover:cursor-pointer hover:bg-white/70 active:scale-90"
+              onClick={() => setShowFilters((prev) => !prev)}
+            >
+              {showFilters ? (
+                <FilterX className="size-4" />
+              ) : (
+                <Filter className="size-4" />
+              )}
+            </Button>
+          )}
+        </div>
         {resourcesTable && isAdmin && (
           <div className="flex items-center gap-3 [@media(max-width:640px)]:w-full [@media(max-width:640px)]:flex-col">
             <OnlineEventDialog type="create">
@@ -163,7 +179,7 @@ export function DataTableToolbar<TData>({
             </OnlineEventDialog>
           </div>
         )}
-        {filters.length > 0 && (
+        {filters.length > 0 && showFilters && (
           <div className="flex items-center gap-3 [@media(max-width:640px)]:w-full [@media(max-width:640px)]:flex-col">
             {filters.map((filter) => {
               const column = table.getColumn(filter.columnId);

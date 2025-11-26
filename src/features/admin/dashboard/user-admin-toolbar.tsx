@@ -54,7 +54,7 @@ export const AdminToolbar = ({ toolbarData }: UserAdminToolbarProps) => {
   return (
     <div
       className={cn(
-        "mx-auto mb-6 flex w-full max-w-[80vw] flex-col items-center justify-between gap-2 sm:max-w-full sm:flex-row",
+        "mx-auto mb-6 flex w-full max-w-[80vw] flex-row items-center justify-between gap-2 sm:max-w-full",
       )}
     >
       <div className="flex flex-col gap-2 sm:flex-row">
@@ -66,7 +66,7 @@ export const AdminToolbar = ({ toolbarData }: UserAdminToolbarProps) => {
           </p>
           <p className="text-sm text-muted-foreground">
             ({currency === "usd" ? "$" : "€"}
-            {formatAmount(totalMonthly) ?? 0} per month)
+            {formatAmount(totalMonthly) ?? 0} / month)
           </p>
         </span>
         <span className="flex items-center gap-2">
@@ -77,7 +77,7 @@ export const AdminToolbar = ({ toolbarData }: UserAdminToolbarProps) => {
           </p>
           <p className="text-sm text-muted-foreground">
             ({currency === "usd" ? "$" : "€"}
-            {formatAmount(totalYearly) ?? 0} per year)
+            {formatAmount(totalYearly) ?? 0} / year)
           </p>
         </span>
       </div>

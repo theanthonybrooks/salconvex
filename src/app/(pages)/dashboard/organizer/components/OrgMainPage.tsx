@@ -96,7 +96,7 @@ export const OrgMainPage = () => {
           "flex flex-col items-center gap-3 sm:flex-row sm:justify-between",
         )}
       >
-        <div className={cn("flex items-center gap-3")}>
+        <div className={cn("flex w-full items-center gap-3 sm:w-max")}>
           <SearchMappedSelect<Doc<"organizations">>
             value={selectedOrg ?? ""}
             disabled={noOrgs}
@@ -107,7 +107,12 @@ export const OrgMainPage = () => {
             getItemValue={(org) => org._id}
             onChange={(val) => setSelectedOrg(val as Id<"organizations">)}
             searchFields={["name", "slug"]}
-            className={cn("max-w-72 justify-start bg-card py-2 sm:h-12")}
+            className={cn("h-12 justify-start bg-card py-2")}
+            popover={{
+              align: "center",
+              contentClassName: "max-w-[90vw] ",
+              listClassName: "max-h-68",
+            }}
             getItemDisplay={(org) => (
               <div className="flex items-center gap-2">
                 <Image

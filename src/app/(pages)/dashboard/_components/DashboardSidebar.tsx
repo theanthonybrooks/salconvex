@@ -300,36 +300,42 @@ export default function DashboardSideBar({
                             {section.heading === "Events" && (
                               <>
                                 {pendingEvents > 0 && !collapsedSidebar && (
-                                  <span
-                                    className={cn(
-                                      "ml-1 inline-flex items-center justify-center rounded-full px-1 py-0.5 text-xs font-semibold",
-                                    )}
-                                  >
-                                    {pendingEvents}
-                                  </span>
+                                  <TooltipSimple content="Pending Events">
+                                    <span
+                                      className={cn(
+                                        "ml-1 inline-flex size-5 items-center justify-center rounded-full text-2xs font-semibold",
+                                      )}
+                                    >
+                                      {pendingEvents}
+                                    </span>
+                                  </TooltipSimple>
                                 )}
                                 {pendingOpenCalls > 0 && !collapsedSidebar && (
-                                  <span
-                                    className={cn(
-                                      "ml-1 inline-flex items-center justify-center rounded-full px-1 py-0.5 text-xs font-semibold",
-                                    )}
-                                  >
-                                    {pendingOpenCalls}
-                                  </span>
+                                  <TooltipSimple content="Pending Open Calls">
+                                    <span
+                                      className={cn(
+                                        "ml-1 inline-flex size-5 items-center justify-center rounded-full text-2xs font-semibold",
+                                      )}
+                                    >
+                                      {pendingOpenCalls}
+                                    </span>
+                                  </TooltipSimple>
                                 )}
                                 {queuedEvents > 0 && !collapsedSidebar && (
-                                  <span
-                                    className={cn(
-                                      "ml-1 inline-flex items-center justify-center rounded-full px-1 py-0.5 text-xs font-semibold",
-                                    )}
-                                  >
-                                    {queuedEvents}
-                                  </span>
+                                  <TooltipSimple content="Queued Posts">
+                                    <span
+                                      className={cn(
+                                        "ml-1 inline-flex size-5 items-center justify-center rounded-full text-2xs font-semibold",
+                                      )}
+                                    >
+                                      {queuedEvents}
+                                    </span>
+                                  </TooltipSimple>
                                 )}
                                 {totalEvents > 0 && collapsedSidebar && (
                                   <span
                                     className={cn(
-                                      "absolute -right-[10px] -top-2 inline-flex items-center justify-center rounded-full border-1.5 border-foreground bg-background px-[7px] py-0.5 text-2xs text-xs font-semibold",
+                                      "absolute right-0 top-0 inline-flex size-5 -translate-y-1/2 translate-x-1/2 items-center justify-center rounded-full border-1.5 border-foreground bg-background text-2xs font-semibold",
                                     )}
                                   >
                                     {totalEvents}
@@ -398,13 +404,13 @@ export default function DashboardSideBar({
                                   </span>
                                   {sectionItem.label === "Submissions" &&
                                     totalPending > 0 && (
-                                      <span className="ml-1 inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-semibold">
+                                      <span className="ml-1 inline-flex size-5 items-center justify-center rounded-full border-1.5 border-foreground/50 text-2xs font-semibold">
                                         {totalPending}
                                       </span>
                                     )}
                                   {sectionItem.label === "Post Schedule" &&
                                     queuedEvents > 0 && (
-                                      <span className="ml-1 inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-semibold">
+                                      <span className="ml-1 inline-flex size-5 items-center justify-center rounded-full border-1.5 border-foreground/50 text-2xs font-semibold">
                                         {queuedEvents}
                                       </span>
                                     )}
