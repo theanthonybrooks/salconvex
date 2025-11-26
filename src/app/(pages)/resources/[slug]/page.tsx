@@ -4,7 +4,6 @@ import type { Metadata } from "next";
 
 import { notFound } from "next/navigation";
 import { CheckoutPage } from "@/app/(pages)/resources/components/CheckoutPage";
-import { capitalize } from "lodash";
 
 import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
 import { api } from "~/convex/_generated/api";
@@ -35,7 +34,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     }
 
     return {
-      title: `${capitalize(result.data.name)}  - Registration`,
+      title: `${result.data.name}  - Registration`,
       icons: DEFAULT_ICON,
     };
   } catch {
