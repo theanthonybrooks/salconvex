@@ -3,6 +3,7 @@
 import { ResourceCard } from "@/app/(pages)/resources/components/ResourceCard";
 
 import { Link } from "@/components/ui/custom-link";
+import { LoadingBalls } from "@/components/ui/loading-balls";
 import { cn } from "@/helpers/utilsFns";
 
 import { api } from "~/convex/_generated/api";
@@ -72,7 +73,7 @@ const ResourcesPage = () => {
             ) : onlineEventsSuccess ? (
               <p>No online events found</p>
             ) : (
-              <p>Loading...</p>
+              <LoadingBalls className="col-span-full" numberOfBalls={4} />
             )}
           </>
         </div>
