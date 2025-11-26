@@ -2,7 +2,7 @@
 
 import { Dispatch, SetStateAction } from "react";
 
-import { ColorPicker } from "@/components/ui/color-picker";
+import GradientGenerator from "@/components/ui/color-picker2";
 import {
   Dialog,
   DialogContent,
@@ -60,7 +60,7 @@ export const PostPropertiesDashboard = ({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent
-        className={cn("max-w-lg bg-card sm:-translate-x-3", className)}
+        className={cn("max-w-[50vw] bg-card sm:-translate-x-3", className)}
         overlayClassName="hidden"
       >
         <DialogHeader>
@@ -99,7 +99,13 @@ export const PostPropertiesDashboard = ({
         </div>
 
         {/* Background Color Control */}
-        <ColorPicker
+        {/* <ColorPicker
+          selectedColor={bgColor}
+          setSelectedColorAction={(newColor) => {
+            onChange({ bgColor: newColor });
+          }}
+        /> */}
+        <GradientGenerator
           selectedColor={bgColor}
           setSelectedColorAction={(newColor) => {
             onChange({ bgColor: newColor });

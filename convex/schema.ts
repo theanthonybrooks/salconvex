@@ -808,6 +808,8 @@ const supportSchema = {
   updatedBy: v.optional(v.id("users")),
 };
 
+
+
 const paletteSchema = v.object({
   name: v.string(),
   value: v.string(),
