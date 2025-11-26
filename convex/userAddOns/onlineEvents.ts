@@ -1,6 +1,8 @@
+import type { SystemIndexes } from "convex/server";
+
 import slugify from "slugify";
 
-import type { Doc, Id } from "~/convex/_generated/dataModel";
+import type { Doc, Id, TableNames } from "~/convex/_generated/dataModel";
 import type {
   ActionCtx,
   MutationCtx,
@@ -16,6 +18,68 @@ import {
   userAddOnStatusValidator,
 } from "~/convex/schema";
 import { ConvexError, v } from "convex/values";
+
+type TableIndexNames =
+  | keyof SystemIndexes // "_id", "_creationTime" indexes [[SystemIndexes](https://docs.convex.dev/api/modules/
+  | "by_slug" // your own indexes for that table
+  | "by_state"
+  | "by_endDate"
+  | "by_imgStorageId"
+  | "by_startDate"
+  | "by_state_endDate"
+  | "by_slug_startDate"
+  | "by_slug_endDate"
+  | "by_slug_state_endDate"
+  | "by_slug_state_startDate"
+  | "by_organizer";
+
+export async function generateUniqueSlugForTable(
+  ctx: MutationCtx,
+  {
+    table,
+    baseName,
+    slugIndexName,
+  }: {
+    table: Extract<TableNames, "onlineEvents">;
+    baseName: string;
+    slugIndexName: TableIndexNames;
+  },
+): Promise<{ slug: string }> {
+  let base = baseName;
+  let suffix = 1;
+
+  const match = baseName.match(/^(.*?)(?:[-\s])(\d+)$/);
+  if (match) {
+    base = match[1];
+    suffix = parseInt(match[2], 10) + 1;
+  }
+
+  const baseSlug = slugify(baseName, { lower: true, strict: true });
+  const existingBaseSlug = await ctx.db
+    .query(table)
+    .withIndex(slugIndexName, (q) => q.eq("slug", baseSlug))
+    .first();
+
+  if (!existingBaseSlug) {
+    return { slug: baseSlug };
+  }
+
+  while (true) {
+    const tryName = match ? `${base} ${suffix}` : `${base}-${suffix}`;
+    const trySlug = slugify(tryName, { lower: true, strict: true });
+
+    const slugExists = await ctx.db
+      .query(table)
+      .withIndex(slugIndexName, (q) => q.eq("slug", trySlug))
+      .unique();
+
+    if (!slugExists) {
+      return { slug: trySlug };
+    }
+
+    suffix++;
+  }
+}
 
 export async function getRegistration(
   ctx: QueryCtx,
@@ -82,6 +146,7 @@ export const getAllOnlineEvents = query({
         return {
           _id: event._id,
           name: event.name,
+          slug: event.slug,
           img: event.img,
           description: event.description,
           startDate: event.startDate,
@@ -120,17 +185,23 @@ export const getOnlineEvent = query({
     const now = Date.now();
     const currentEvent = args.eventId
       ? await ctx.db.get(args.eventId)
-      : await ctx.db
-          .query("onlineEvents")
-          .withIndex("by_slug_state_endDate", (q) =>
-            q
-              .eq("slug", args.slug ?? "")
-              .eq("state", "published")
-              .gt("endDate", now),
-          )
-          .filter((q) => q.lte(q.field("startDate"), now))
-          .order("asc")
-          .first();
+      : isAdmin
+        ? await ctx.db
+            .query("onlineEvents")
+            .withIndex("by_slug", (q) => q.eq("slug", args.slug ?? ""))
+            .order("asc")
+            .first()
+        : await ctx.db
+            .query("onlineEvents")
+            .withIndex("by_slug_state_endDate", (q) =>
+              q
+                .eq("slug", args.slug ?? "")
+                .eq("state", "published")
+                .gt("endDate", now),
+            )
+            .filter((q) => q.lte(q.field("startDate"), now))
+            .order("asc")
+            .first();
 
     if (currentEvent) resultEvent = currentEvent;
 
@@ -227,11 +298,15 @@ export const createOnlineEvent = mutation({
       user?.role?.includes("admin") || user?.role?.includes("staff");
     if (!user || !isAllowedCreator)
       throw new ConvexError("User not allowed to create events");
-    const slug = slugify(args.name, { lower: true, strict: true });
+    const { slug } = await generateUniqueSlugForTable(ctx, {
+      table: "onlineEvents",
+      baseName: args.name,
+      slugIndexName: "by_slug",
+    });
     const event = await ctx.db.insert("onlineEvents", {
       name: args.name,
       img: args.img,
-      slug: slug,
+      slug,
       description: args.description,
       requirements: args.requirements,
       formOptions: args.formOptions,
@@ -261,8 +336,15 @@ export const duplicateOnlineEvent = mutation({
     if (!event) throw new ConvexError("Event not found");
     const { _id, _creationTime, updatedAt, updatedBy, ...eventData } = event;
 
+    const { slug } = await generateUniqueSlugForTable(ctx, {
+      table: "onlineEvents",
+      baseName: event.name,
+      slugIndexName: "by_slug",
+    });
+
     const duplicateEvent = await ctx.db.insert("onlineEvents", {
       ...eventData,
+      slug,
       startDate: Date.now(),
       endDate: Date.now(),
       regDeadline: Date.now(),

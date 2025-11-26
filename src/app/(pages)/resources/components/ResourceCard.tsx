@@ -107,12 +107,13 @@ export const ResourceCard = ({
             alt={name}
             width={225}
             height={100}
-            className="h-25 w-auto"
+            className={cn("h-25 w-auto", eventHasPassed && "opacity-30")}
           />
         ) : (
           <h1
             className={cn(
               "h-25 content-center text-center font-tanker text-[2.5rem] lowercase leading-none tracking-wide",
+              eventHasPassed && "opacity-30",
             )}
           >
             {name}
@@ -170,6 +171,9 @@ const CardBadge = ({
     style = "bg-foreground/10";
   } else if ((full || fullWarning) && !regPast) {
     label = full ? "Fully Booked" : "Almost Full";
+    style = "bg-salPinkLt";
+  } else if (regPast && !past) {
+    label = "Registration Closed";
     style = "bg-salPinkLt";
   } else if (newEvent) {
     label = "New Event";

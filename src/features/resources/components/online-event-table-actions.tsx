@@ -70,7 +70,7 @@ export const OnlineEventStatusBtn = ({
 
 export const GoToOnlineEvent = ({ slug, children }: OnlineEventLinkProps) => {
   return (
-    <Link variant="standard" href={`/resources/${slug}`}>
+    <Link variant="standard" href={`/resources/${slug}`} target="_blank">
       <Button variant="ghost">{children}</Button>
     </Link>
   );

@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import { ColumnDef } from "@tanstack/react-table";
-import slugify from "slugify";
 
 import { Check, Pencil } from "lucide-react";
 
@@ -41,6 +40,7 @@ export const resourcesColumnLabels: Record<string, string> = {
 interface ResourceColumnsProps {
   _id: Id<"onlineEvents">;
   name: string;
+  slug: string;
   img?: string;
   description: string;
   startDate: number;
@@ -93,8 +93,7 @@ export const resourceColumns: ColumnDef<ResourceColumnsProps>[] = [
       <DataTableColumnHeader column={column} title="Name" />
     ),
     cell: ({ row }) => {
-      const { name } = row.original;
-      const slug = slugify(name, { lower: true, strict: true });
+      const { name, slug } = row.original;
       return (
         <div className="truncate font-medium">
           <GoToOnlineEvent slug={slug}>{name}</GoToOnlineEvent>

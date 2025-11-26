@@ -329,7 +329,6 @@ const getGradientAngle = (str: string): number => {
   const angleMatch = str.match(/(\d+)deg/);
   if (angleMatch) return parseInt(angleMatch[1]);
 
-  // Handle "to right", "to bottom", etc if needed, otherwise default to 90 (standard linear default)
   if (str.includes("to right")) return 90;
   if (str.includes("to bottom")) return 180;
   if (str.includes("to left")) return 270;
@@ -346,7 +345,6 @@ const normalizeGradientString = (str: string): string => {
   const isRadial = str.includes("radial-gradient");
   const angle = getGradientAngle(str);
 
-  // parse exact stops with offsets
   const stops = parseGradientStopsFromCss(str);
 
   if (stops.length === 0) return str;
@@ -362,10 +360,6 @@ const normalizeGradientString = (str: string): string => {
   }
 };
 
-/* -------------------------------------------------------------------------- */
-/* MAIN COMPONENT                                                             */
-/* -------------------------------------------------------------------------- */
-
 export default function GradientColorPicker({
   selectedColor,
   setSelectedColorAction,
@@ -379,21 +373,13 @@ export default function GradientColorPicker({
     defaultPalette = "tailwind-light",
   } = options ?? {};
 
-  // --- CONVEX HOOKS ---
   const palettes = useQuery(api.functions.palettes.getPalettes);
   const addPalette = useMutation(api.functions.palettes.addPalette);
   const deletePalette = useMutation(api.functions.palettes.deletePalette);
   const addSwatchMutation = useMutation(api.functions.palettes.addColor);
   const deleteSwatchMutation = useMutation(api.functions.palettes.deleteColor);
 
-  // --- STATE ---
-  // ... inside GradientColorPicker component ...
-
-  // --- INITIALIZATION LOGIC ---
-  // Parse the incoming prop to determine starting state
-  // --- INITIALIZATION LOGIC ---
   const getInitialState = useCallback(() => {
-    // ... (Your existing Defaults object) ...
     const defaultSolidRgba = hslaToRgba({ h: 50, s: 100, l: 72, a: 1 });
     const defaults = {
       type: "solid" as GradientType,
@@ -407,12 +393,8 @@ export default function GradientColorPicker({
 
     if (!selectedColor) return defaults;
 
-    // 2. Parse Gradient
     if (isGradient(selectedColor)) {
-      // --- NEW LOGIC HERE ---
       const parsedStops = parseGradientStopsFromCss(selectedColor);
-
-      // Safety check
       if (parsedStops.length < 2) return defaults;
 
       const type = selectedColor.includes("radial") ? "radial" : "linear";
@@ -424,12 +406,7 @@ export default function GradientColorPicker({
         stops: parsedStops,
         solid: parsedStops[0].color,
       };
-      // ---------------------
-    }
-
-    // 3. Parse Solid
-    else {
-      // ... existing solid logic
+    } else {
       const color = stringToRgba(selectedColor);
       return { ...defaults, type: "solid" as GradientType, solid: color };
     }
@@ -449,14 +426,10 @@ export default function GradientColorPicker({
     seedData.type === "solid" ? "library" : "stops",
   );
 
-  // Palette Selection
   const [activePaletteValue, setActivePaletteValue] = useState<string>("");
   const [newPaletteName, setNewPaletteName] = useState("");
   const [isAddingPalette, setIsAddingPalette] = useState(false);
 
-  // Swatch Selection
-
-  // --- ACTIVE STATE HELPERS ---
   const activeStop = stops.find((s) => s.id === activeStopId) || stops[0];
   const activeColorRgba =
     gradientType === "solid" ? solidColor : activeStop.color;
@@ -464,8 +437,6 @@ export default function GradientColorPicker({
   const activeHex = rgbaToHex(activeColorRgba);
 
   const activePalette = palettes?.find((p) => p.value === activePaletteValue);
-
-  // --- GENERATOR ACTIONS ---
 
   const handleStopChange = (
     id: string,
@@ -516,7 +487,6 @@ export default function GradientColorPicker({
     return `linear-gradient(${angle}deg, ${stopStr})`;
   }, [stops, angle, gradientType, solidColor]);
 
-  // Sync to parent
   useEffect(() => {
     if (firstRender.current) {
       firstRender.current = false;
@@ -583,8 +553,6 @@ export default function GradientColorPicker({
     setActivePaletteValue(palettes?.[0]?.value ?? "tailwind-light");
   }, [palettes, selectedSwatch, activePalette]);
 
-  // --- LIBRARY ACTIONS ---
-
   const handleAddPalette = async () => {
     if (!newPaletteName.trim()) return;
     try {
@@ -612,7 +580,7 @@ export default function GradientColorPicker({
 
   const handleAddSwatch = async () => {
     if (!activePalette) return;
-    if (matchingSwatch || !selectedColor) return; // Already exists
+    if (matchingSwatch || !selectedColor) return;
 
     const valueToSave = selectedColor;
     const gradient = isGradient(valueToSave);
@@ -641,13 +609,11 @@ export default function GradientColorPicker({
   };
 
   const handleSwatchClick = (swatch: Swatch) => {
-    // 1. Strict check: Is this actually a complex gradient string?
     if (!activePalette) return;
     const colorVal = swatch.value;
     if (isGradient(colorVal)) {
       const parsedStops = parseGradientStopsFromCss(colorVal);
 
-      // Edge Case: Single color gradient -> Solid
       if (parsedStops.length === 1) {
         handleActiveColorChange(parsedStops[0].color);
         setSelectedSwatchAction({
@@ -659,25 +625,20 @@ export default function GradientColorPicker({
       }
 
       if (parsedStops.length > 0) {
-        // A. Extract and Set Angle
         const newAngle = getGradientAngle(colorVal);
         setAngle(newAngle);
 
-        // B. Set Stops (using the ones with correct offsets)
         setStops(parsedStops);
         setActiveStopId(parsedStops[0].id);
 
-        // C. Set Type
         if (colorVal.includes("radial")) setGradientType("radial");
         else setGradientType("linear");
       }
     } else {
-      // 2. It is a solid color
       const newColor = stringToRgba(colorVal);
       handleActiveColorChange(newColor);
     }
 
-    // Set the active swatch ID/Value for UI highlighting
     setSelectedSwatchAction({
       value: colorVal,
       _id: swatch._id,
@@ -695,7 +656,6 @@ export default function GradientColorPicker({
 
   return (
     <>
-      {/* Main Preview Area */}
       {showPreview && (
         <div
           className="mb-8 h-64 w-full rounded-2xl border-4 border-white shadow-lg transition-all duration-300 md:h-80"
@@ -703,9 +663,7 @@ export default function GradientColorPicker({
         />
       )}
 
-      {/* Top */}
       <div className="flex flex-col items-start justify-around gap-6 border-b border-slate-100 pb-6 sm:flex-row">
-        {/* Gradient Slider Area */}
         <div className="w-full flex-1 pl-6 sm:max-w-70">
           {gradientType !== "solid" ? (
             <GradientSlider
@@ -748,10 +706,8 @@ export default function GradientColorPicker({
               onChange={(e) => setAngle(Number(e.target.value))}
               className="w-full max-w-11 bg-transparent text-right text-sm font-medium focus:outline-none"
             />
-            {/* <span className="text-xs text-slate-400">°</span> */}
           </div>
 
-          {/* Type & Rotation */}
           <div className="flex flex-wrap items-center justify-end gap-4">
             <div className="flex rounded-lg bg-slate-100 p-1">
               {(["linear", "radial", "solid"] as const).map((t) => (
@@ -768,9 +724,7 @@ export default function GradientColorPicker({
         </div>
       </div>
 
-      {/* Bottom Main */}
       <div className="grid grid-cols-1 divide-y divide-slate-100 md:grid-cols-2 md:divide-x md:divide-y-0">
-        {/* Left: Color Picker */}
         <div
           className={cn(
             "scrollable mini max-h-96 p-6",
@@ -800,7 +754,6 @@ export default function GradientColorPicker({
           />
 
           <div className="mt-6 space-y-4">
-            {/* Hex Input */}
             <div className="flex items-center gap-3">
               <div className="w-16 text-xs font-bold text-slate-400">HEX</div>
               <div className="flex flex-1 items-center rounded border border-slate-200 bg-slate-50 px-3 py-2">
@@ -838,7 +791,6 @@ export default function GradientColorPicker({
               </div>
             </div>
 
-            {/* RGBA / HSLA Inputs */}
             {colorMode === "rgba" ? (
               <div className="grid grid-cols-4 gap-2">
                 {(["r", "g", "b"] as const).map((c) => (
@@ -953,10 +905,7 @@ export default function GradientColorPicker({
           </div>
         </div>
 
-        {/* Right: Stops List / Swatch Library */}
-
         <div className="flex h-full max-h-96 flex-col bg-slate-50/50">
-          {/* Tabs Switcher */}
           <div className="flex border-b border-slate-200">
             <button
               disabled={gradientType === "solid"}
@@ -982,9 +931,7 @@ export default function GradientColorPicker({
             </button>
           </div>
 
-          {/* Content */}
           <div className="scrollable mini flex-1 p-6">
-            {/* STOPS VIEW */}
             {rightPanelTab === "stops" && (
               <div className="space-y-4">
                 <div className="mb-2 flex items-center justify-between">
@@ -1048,10 +995,8 @@ export default function GradientColorPicker({
               </div>
             )}
 
-            {/* LIBRARY VIEW */}
             {rightPanelTab === "library" && activePalette && (
               <div className="space-y-6">
-                {/* Palette Selector */}
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <label className="text-xs font-bold uppercase tracking-wider text-slate-400">
@@ -1187,7 +1132,6 @@ export default function GradientColorPicker({
         </div>
       </div>
 
-      {/* Code Output */}
       {showCode && (
         <div className="group relative mt-8 rounded-xl bg-slate-900 p-6 shadow-2xl">
           <div className="absolute left-0 top-0 h-1 w-full rounded-t-xl bg-gradient-to-r from-blue-500 to-purple-500" />
@@ -1212,10 +1156,6 @@ export default function GradientColorPicker({
     </>
   );
 }
-
-/* -------------------------------------------------------------------------- */
-/* SUB-COMPONENTS                                                             */
-/* -------------------------------------------------------------------------- */
 
 interface GradientSliderProps {
   stops: GradientStop[];
@@ -1455,26 +1395,19 @@ function AdvancedColorPicker({
   };
 
   const handleEyedrop = async () => {
-    // 1. Check feature support
     if (!window.EyeDropper) {
       console.warn("EyeDropper API is not supported in this browser.");
       return;
     }
 
     try {
-      // 2. Instantiate using the new type definition
       const eyeDropper = new window.EyeDropper();
-
-      // 3. Open the picker
       const { sRGBHex } = await eyeDropper.open();
-
-      // 4. Convert and update (Assuming your conversion functions are typed)
       const rgba = hexToRgba(sRGBHex);
       const hsla = rgbaToHsla(rgba);
 
       onChange(hsla);
     } catch (e) {
-      // User cancelled the selection
       console.log("EyeDropper cancelled", e);
     }
   };
