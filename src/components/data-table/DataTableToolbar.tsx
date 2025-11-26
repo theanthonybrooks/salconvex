@@ -6,6 +6,7 @@ import { TableTypes } from "@/types/tanstack-table";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useIsMobile } from "@/hooks/use-media-query";
 import { Table } from "@tanstack/react-table";
 import { toast } from "react-toastify";
 
@@ -19,7 +20,6 @@ import { Input } from "@/components/ui/input";
 import { TooltipSimple } from "@/components/ui/tooltip";
 import { OnlineEventDialog } from "@/features/resources/components/online-event-dialog";
 import { cn } from "@/helpers/utilsFns";
-import { useDevice } from "@/providers/device-provider";
 
 import { api } from "~/convex/_generated/api";
 import { Id } from "~/convex/_generated/dataModel";
@@ -37,7 +37,7 @@ export function DataTableToolbar<TData>({
   setRowSelection,
   initialSearchTerm,
 }: DataTableToolbarProps<TData>) {
-  const { isMobile } = useDevice();
+  const isMobile = useIsMobile(768);
   const router = useRouter();
   const deleteMultipleEvents = useMutation(
     api.events.event.deleteMultipleEvents,
