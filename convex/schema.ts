@@ -808,12 +808,10 @@ const supportSchema = {
   updatedBy: v.optional(v.id("users")),
 };
 
-
-
 const paletteSchema = v.object({
   name: v.string(),
   value: v.string(),
-  createdAt: v.number(),
+
   updatedAt: v.optional(v.number()),
 });
 
@@ -821,7 +819,6 @@ const swatchSchema = v.object({
   paletteId: v.id("palettes"),
   value: v.string(),
   gradient: v.boolean(),
-  createdAt: v.number(),
   updatedAt: v.optional(v.number()),
 });
 

@@ -16,6 +16,7 @@ import {
   X,
 } from "lucide-react";
 
+import type { Doc } from "~/convex/_generated/dataModel";
 import { cn } from "@/helpers/utilsFns";
 
 import { api } from "~/convex/_generated/api";
@@ -46,13 +47,17 @@ interface GradientStop {
   color: RGBA;
 }
 
+export type Swatch = Pick<Doc<"swatches">, "_id" | "value" | "paletteId">;
+
 type GradientType = "linear" | "radial" | "solid";
-type ColorMode = "rgba" | "hsla";
+type ColorMode = "rgba" | "hsla" | "css";
 type RightPanelTab = "stops" | "library";
 
-interface GradientGeneratorProps {
+interface GradientColorPickerProps {
   selectedColor?: string;
+  selectedSwatch?: Swatch;
   setSelectedColorAction?: (color: string) => void;
+  setSelectedSwatchAction: (swatch: Swatch) => void;
   options?: {
     showPreview?: boolean;
     showCode?: boolean;
@@ -64,12 +69,6 @@ interface GradientGeneratorProps {
 /* UTILS                                                                      */
 /* -------------------------------------------------------------------------- */
 
-// UTILS ------------------------------------------------------------------
-
-/**
- * Robustly parses a CSS gradient string to extract color AND offset.
- * Handles "rgba(r,g,b,a) 50%" correctly by respecting parentheses.
- */
 const parseGradientStopsFromCss = (gradientString: string): GradientStop[] => {
   if (!gradientString || !gradientString.includes("(")) return [];
 
@@ -79,12 +78,10 @@ const parseGradientStopsFromCss = (gradientString: string): GradientStop[] => {
     gradientString.lastIndexOf(")"),
   );
 
-  // 2. Remove angle if present (e.g. "45deg, " or "to right, ")
-  // We strip this because we only want the stops part "red 0%, blue 100%"
+  // 2. Remove angle if present
   const stopsString = content.replace(/^(\d+deg|to\s+[a-z\s]+)\s*,\s*/i, "");
 
   // 3. Split by comma, respecting parentheses
-  // (We cannot use .split(',') because rgba() contains commas)
   const rawStops: string[] = [];
   let depth = 0;
   let current = "";
@@ -105,27 +102,45 @@ const parseGradientStopsFromCss = (gradientString: string): GradientStop[] => {
 
   // 4. Process each stop string to separate Color vs Percentage
   return rawStops.map((stopStr, index) => {
-    // Regex to find explicit percentage (e.g. "45.5%")
-    const percentMatch = stopStr.match(/(-?[\d.]+)%/);
+    let colorStr = stopStr;
+    let offsetStr = "";
 
+    // --- NEW LOGIC START ---
+    // Safely separate color from offset by respecting parentheses
+    const lastParenIdx = stopStr.lastIndexOf(")");
+
+    if (lastParenIdx !== -1) {
+      // It is a functional color (rgba, hsl). The offset (if any) is AFTER the function.
+      colorStr = stopStr.substring(0, lastParenIdx + 1).trim();
+      offsetStr = stopStr.substring(lastParenIdx + 1).trim();
+    } else {
+      // It is a Hex or Named color (e.g. "#fff 50%" or "red 100%")
+      // Split by whitespace. If the last part is a %, it's the offset.
+      const parts = stopStr.split(/\s+/);
+      const lastPart = parts[parts.length - 1];
+      if (lastPart.includes("%")) {
+        offsetStr = lastPart;
+        colorStr = stopStr.substring(0, stopStr.lastIndexOf(lastPart)).trim();
+      }
+    }
+    // --- NEW LOGIC END ---
+
+    // Calculate Offset
     let offset = 0;
+    const percentMatch = offsetStr.match(/(-?[\d.]+)%/);
 
     if (percentMatch) {
-      // Use explicit offset
       offset = parseFloat(percentMatch[1]);
     } else {
-      // Fallback: Distribute evenly if no % found (e.g. "red, blue")
+      // Fallback: Distribute evenly
       if (index === 0) offset = 0;
       else if (index === rawStops.length - 1) offset = 100;
       else offset = (index / (rawStops.length - 1)) * 100;
     }
 
-    // Isolate color by removing the percentage part
-    const colorStr = stopStr.replace(/(-?[\d.]+)%/, "").trim();
-
     return {
-      id: Math.random().toString(36).substr(2, 9), // Generate ID
-      offset: Math.min(100, Math.max(0, offset)), // Clamp 0-100
+      id: Math.random().toString(36).substr(2, 9),
+      offset: Math.min(100, Math.max(0, offset)),
       color: stringToRgba(colorStr),
     };
   });
@@ -134,51 +149,14 @@ const parseGradientStopsFromCss = (gradientString: string): GradientStop[] => {
 const isGradient = (val: string) =>
   val.startsWith("linear-gradient") || val.startsWith("radial-gradient");
 
-// Regex to find colors in a gradient string for parsing back
-const extractColorsFromGradient = (str: string): string[] => {
-  const colorRegex =
-    /(#[0-9a-fA-F]{3,8}|rgba?\([\d\s,.]+\)|hsla?\([\d\s,%.]+\))/g;
-  return str.match(colorRegex) || [];
-};
-
 /* -------------------------------------------------------------------------- */
 /* COLOR UTILS                                                                */
 /* -------------------------------------------------------------------------- */
-
-// const stringToRgba = (str: string): RGBA => {
-//   if (!str) return { r: 0, g: 0, b: 0, a: 1 };
-//   if (isGradient(str)) return { r: 0, g: 0, b: 0, a: 1 };
-
-//   if (str.startsWith("rgba")) {
-//     const parts = str.match(/[\d.]+/g);
-//     if (parts && parts.length >= 3) {
-//       return {
-//         r: parseFloat(parts[0]),
-//         g: parseFloat(parts[1]),
-//         b: parseFloat(parts[2]),
-//         a: parts[3] ? parseFloat(parts[3]) : 1,
-//       };
-//     }
-//   }
-
-//   // Handle basic hex or named colors
-//   if (
-//     !str.startsWith("#") &&
-//     !str.startsWith("rgb") &&
-//     !str.startsWith("hsl")
-//   ) {
-//     // simple fallback
-//     return { r: 0, g: 0, b: 0, a: 1 };
-//   }
-
-//   return hexToRgba(str);
-// };
 
 const stringToRgba = (str: string): RGBA => {
   if (!str) return { r: 0, g: 0, b: 0, a: 1 };
   if (isGradient(str)) return { r: 0, g: 0, b: 0, a: 1 };
 
-  // Fix: Handle both 'rgba' and 'rgb' here to prevent circular dependency
   if (str.startsWith("rgb")) {
     const parts = str.match(/[\d.]+/g);
     if (parts && parts.length >= 3) {
@@ -191,7 +169,18 @@ const stringToRgba = (str: string): RGBA => {
     }
   }
 
-  // Handle basic hex or named colors
+  if (str.startsWith("hsl")) {
+    const parts = str.match(/[\d.]+/g);
+    if (parts && parts.length >= 3) {
+      const h = parseFloat(parts[0]);
+      const s = parseFloat(parts[1]);
+      const l = parseFloat(parts[2]);
+      const a = parts[3] ? parseFloat(parts[3]) : 1;
+
+      return hslaToRgba({ h, s, l, a });
+    }
+  }
+
   if (
     !str.startsWith("#") &&
     !str.startsWith("rgb") &&
@@ -202,29 +191,6 @@ const stringToRgba = (str: string): RGBA => {
 
   return hexToRgba(str);
 };
-
-// const hexToRgba = (hex: string): RGBA => {
-//   if (!hex || isGradient(hex)) return { r: 0, g: 0, b: 0, a: 1 };
-
-//   let c: string[] | number = hex.startsWith("#")
-//     ? hex.substring(1).split("")
-//     : [];
-//   if (c.length === 0 && hex.startsWith("rgb")) {
-//     return stringToRgba(hex); // fallback loop
-//   }
-//   if (c.length === 0) return { r: 0, g: 0, b: 0, a: 1 };
-
-//   if (c.length === 3) {
-//     c = [c[0], c[0], c[1], c[1], c[2], c[2]];
-//   }
-//   const hexValue = parseInt("0x" + c.join(""), 16);
-//   return {
-//     r: (hexValue >> 16) & 255,
-//     g: (hexValue >> 8) & 255,
-//     b: hexValue & 255,
-//     a: 1,
-//   };
-// };
 
 const hexToRgba = (hex: string): RGBA => {
   if (!hex || isGradient(hex)) return { r: 0, g: 0, b: 0, a: 1 };
@@ -372,36 +338,6 @@ const getGradientAngle = (str: string): number => {
   return 45;
 };
 
-// This converts a loose CSS string (Hex, implicit stops)
-// into the STRICT format your generator produces (RGBA, explicit stops)
-// const normalizeGradientString = (str: string): string => {
-//   if (!isGradient(str)) {
-//     // If solid, just return the RGBA string
-//     return rgbaToString(stringToRgba(str));
-//   }
-
-//   const isRadial = str.includes("radial-gradient");
-//   const angle = getGradientAngle(str);
-
-//   // Use your existing extract logic
-//   const colors = extractColorsFromGradient(str);
-
-//   if (colors.length === 0) return str;
-
-//   // Re-create the stops exactly how generateCSS does
-//   const stopsStr = colors
-//     .map((c, i) => {
-//       const rgba = rgbaToString(stringToRgba(c));
-//       const offset = (i / (colors.length - 1)) * 100;
-//       // Format: "rgba(r,g,b,a) 0%"
-//       return `${rgba} ${offset}%`;
-//     })
-//     .join(", ");
-
-//   if (isRadial) return `radial-gradient(circle, ${stopsStr})`;
-//   return `linear-gradient(${angle}deg, ${stopsStr})`;
-// };
-
 const normalizeGradientString = (str: string): string => {
   if (!isGradient(str)) {
     return rgbaToString(stringToRgba(str));
@@ -430,11 +366,13 @@ const normalizeGradientString = (str: string): string => {
 /* MAIN COMPONENT                                                             */
 /* -------------------------------------------------------------------------- */
 
-export default function GradientGenerator({
+export default function GradientColorPicker({
   selectedColor,
   setSelectedColorAction,
+  selectedSwatch,
+  setSelectedSwatchAction,
   options,
-}: GradientGeneratorProps = {}): JSX.Element {
+}: GradientColorPickerProps): JSX.Element {
   const {
     showPreview,
     showCode,
@@ -449,7 +387,7 @@ export default function GradientGenerator({
   const deleteSwatchMutation = useMutation(api.functions.palettes.deleteColor);
 
   // --- STATE ---
-  // ... inside GradientGenerator component ...
+  // ... inside GradientColorPicker component ...
 
   // --- INITIALIZATION LOGIC ---
   // Parse the incoming prop to determine starting state
@@ -459,7 +397,7 @@ export default function GradientGenerator({
     const defaultSolidRgba = hslaToRgba({ h: 50, s: 100, l: 72, a: 1 });
     const defaults = {
       type: "solid" as GradientType,
-      angle: 90,
+      angle: 45,
       stops: [
         { id: "1", offset: 0, color: { r: 246, g: 211, b: 101, a: 1 } },
         { id: "2", offset: 100, color: { r: 253, g: 160, b: 133, a: 1 } },
@@ -483,7 +421,7 @@ export default function GradientGenerator({
       return {
         type: type as GradientType,
         angle,
-        stops: parsedStops, // Use the stops we parsed with correct offsets
+        stops: parsedStops,
         solid: parsedStops[0].color,
       };
       // ---------------------
@@ -497,34 +435,26 @@ export default function GradientGenerator({
     }
   }, [selectedColor]);
 
-  // Compute this once on mount/prop change
-  // We use a REF to ensure we only calculate this "seed" data when the component first loads
-  // to prevents jitter if selectedColor changes slightly during editing.
+  const firstRender = useRef(true);
   const seedData = useRef(getInitialState()).current;
 
-  // --- STATE (Initialized from seedData) ---
   const [gradientType, setGradientType] = useState<GradientType>(seedData.type);
   const [angle, setAngle] = useState<number>(seedData.angle);
   const [stops, setStops] = useState<GradientStop[]>(seedData.stops);
   const [solidColor, setSolidColor] = useState<RGBA>(seedData.solid);
-
-  // ... rest of your state (activeStopId, etc)
   const [activeStopId, setActiveStopId] = useState<string>("1");
   const [colorMode, setColorMode] = useState<ColorMode>("hsla");
-  const [copied, setCopied] = useState<boolean>(false);
-
+  const [copied, setCopied] = useState<"css" | "hex" | false>(false);
   const [rightPanelTab, setRightPanelTab] = useState<RightPanelTab>(
     seedData.type === "solid" ? "library" : "stops",
   );
 
   // Palette Selection
-  const [activePaletteValue, setActivePaletteValue] =
-    useState<string>("tailwind-light");
+  const [activePaletteValue, setActivePaletteValue] = useState<string>("");
   const [newPaletteName, setNewPaletteName] = useState("");
   const [isAddingPalette, setIsAddingPalette] = useState(false);
 
   // Swatch Selection
-  const [activeSwatch, setActiveSwatch] = useState<string>("");
 
   // --- ACTIVE STATE HELPERS ---
   const activeStop = stops.find((s) => s.id === activeStopId) || stops[0];
@@ -533,25 +463,7 @@ export default function GradientGenerator({
   const activeColorHsla = rgbaToHsla(activeColorRgba);
   const activeHex = rgbaToHex(activeColorRgba);
 
-  console.log({ activeSwatch, selectedColor });
-
-  // Find full palette object based on selected slug
   const activePalette = palettes?.find((p) => p.value === activePaletteValue);
-
-  // // Check if current color exists in palette (simple string match)
-  // const matchingSwatch = activePalette?.colors?.find(
-  //   (c) => c.value === activeSwatch,
-  // );
-  // ... inside component
-
-  const firstRender = useRef(true);
-
-  // // --- INITIALIZATION ---
-  // useEffect(() => {
-  //   if (palettes && palettes.length > 0 && !activePaletteValue) {
-  //     setActivePaletteValue(palettes[0].value);
-  //   }
-  // }, [palettes, activePaletteValue]);
 
   // --- GENERATOR ACTIONS ---
 
@@ -624,46 +536,52 @@ export default function GradientGenerator({
     generateCSS,
   ]);
 
+  useEffect(() => {
+    if (activeStopId !== "1" || gradientType === "solid") return;
+    if (selectedSwatch && stops.length > 0) {
+      setActiveStopId(stops[0].id);
+    }
+  }, [gradientType, selectedSwatch, stops, activeStopId]);
+
   const copyCSS = (): void => {
     navigator.clipboard.writeText(`background: ${generateCSS()};`);
-    setCopied(true);
+    setCopied("css");
     setTimeout(() => setCopied(false), 2000);
   };
 
   const handleTypeSwitch = (type: GradientType) => {
     setGradientType(type);
     if (type === "solid" && gradientType !== "solid") {
+      console.log(activeStop);
       setSolidColor(activeStop.color);
       setRightPanelTab("library");
     }
   };
 
-  // 1. Generate the current CSS based on state
   const currentCSS = generateCSS();
 
-  // 2. Find a match by normalizing the palette colors to match the generator format
-  const matchingSwatch = activePalette?.colors?.find((c) => {
-    // Normalize the saved swatch string to look like our generator output
-    const normalizedSwatch = normalizeGradientString(c.value);
-    return normalizedSwatch === currentCSS;
-  });
+  const matchingSwatch =
+    selectedSwatch &&
+    selectedSwatch.paletteId === activePalette?._id &&
+    normalizeGradientString(selectedSwatch.value) === currentCSS
+      ? selectedSwatch
+      : undefined;
 
-  // 3. Determine if the user has edited since selecting
-  // We compare the normalized version of the active swatch against current
-  const changedSwatch = !matchingSwatch;
+  useEffect(() => {
+    if (!palettes || activePalette) return;
+    if (selectedSwatch) {
+      const paletteForSwatch = palettes.find(
+        (p) => p._id === selectedSwatch.paletteId,
+      );
 
-  console.log({
-    currentCSS,
-    activeSwatch,
-    normalizedActive: activeSwatch
-      ? normalizeGradientString(activeSwatch)
-      : null,
-    matchFound: !!matchingSwatch,
-  });
+      if (paletteForSwatch) {
+        setActivePaletteValue(paletteForSwatch.value);
+        return;
+      }
+    }
 
-  // const changedSwatch = activeSwatch !== selectedColor;
-
-  console.log(changedSwatch);
+    setActivePaletteValue(palettes?.[0]?.value ?? "tailwind-light");
+  }, [palettes, selectedSwatch, activePalette]);
 
   // --- LIBRARY ACTIONS ---
 
@@ -675,6 +593,7 @@ export default function GradientGenerator({
         value: slugify(newPaletteName),
       });
       setNewPaletteName("");
+      setActivePaletteValue(slugify(newPaletteName));
       setIsAddingPalette(false);
     } catch (e) {
       console.error("Failed to add palette", e);
@@ -693,7 +612,7 @@ export default function GradientGenerator({
 
   const handleAddSwatch = async () => {
     if (!activePalette) return;
-    if ((matchingSwatch && !changedSwatch) || !selectedColor) return; // Already exists
+    if (matchingSwatch || !selectedColor) return; // Already exists
 
     const valueToSave = selectedColor;
     const gradient = isGradient(valueToSave);
@@ -721,15 +640,21 @@ export default function GradientGenerator({
     }
   };
 
-  const handleSwatchClick = (colorVal: string) => {
+  const handleSwatchClick = (swatch: Swatch) => {
     // 1. Strict check: Is this actually a complex gradient string?
+    if (!activePalette) return;
+    const colorVal = swatch.value;
     if (isGradient(colorVal)) {
       const parsedStops = parseGradientStopsFromCss(colorVal);
 
       // Edge Case: Single color gradient -> Solid
       if (parsedStops.length === 1) {
         handleActiveColorChange(parsedStops[0].color);
-        setActiveSwatch(normalizeGradientString(colorVal));
+        setSelectedSwatchAction({
+          value: normalizeGradientString(colorVal),
+          _id: swatch._id,
+          paletteId: activePalette._id,
+        });
         return;
       }
 
@@ -753,47 +678,12 @@ export default function GradientGenerator({
     }
 
     // Set the active swatch ID/Value for UI highlighting
-    setActiveSwatch(colorVal);
+    setSelectedSwatchAction({
+      value: colorVal,
+      _id: swatch._id,
+      paletteId: activePalette._id,
+    });
   };
-
-  // const handleSwatchClick = (colorVal: string) => {
-  //   setActiveSwatch(colorVal);
-
-  //   // 1. Strict check: Is this actually a complex gradient string?
-  //   if (isGradient(colorVal)) {
-  //     const extractedColors = extractColorsFromGradient(colorVal);
-
-  //     // Edge Case: If a gradient string was saved but only contains 1 color,
-  //     // treat it as a solid color update instead of resetting all stops.
-  //     if (extractedColors.length === 1) {
-  //       const newColor = stringToRgba(extractedColors[0]);
-  //       handleActiveColorChange(newColor);
-  //       return;
-  //     }
-
-  //     if (extractedColors.length > 0) {
-  //       // Apply as gradient (REPLACES all current stops)
-  //       const newStops = extractedColors.map((c, i) => ({
-  //         id: Math.random().toString(36).substr(2, 9),
-  //         offset: (i / (extractedColors.length - 1)) * 100,
-  //         color: stringToRgba(c),
-  //       }));
-  //       setStops(newStops);
-  //       setActiveStopId(newStops[0].id);
-
-  //       // Determine type roughly
-  //       if (colorVal.includes("radial")) setGradientType("radial");
-  //       else setGradientType("linear");
-  //     }
-  //   } else {
-  //     // 2. It is a solid color
-  //     const newColor = stringToRgba(colorVal);
-
-  //     // Use the shared handler to ensure exact same behavior as the color picker
-  //     handleActiveColorChange(newColor);
-  //   }
-  // };
-  // --- RENDER ---
 
   if (palettes === undefined) {
     return (
@@ -804,14 +694,7 @@ export default function GradientGenerator({
   }
 
   return (
-    <div className="mx-auto max-w-5xl">
-      {/* Header */}
-      <div className="sr-only mb-6 flex items-center justify-between">
-        <h1 className="sr-only bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-3xl font-bold text-transparent">
-          CSS Gradient Generator
-        </h1>
-      </div>
-
+    <>
       {/* Main Preview Area */}
       {showPreview && (
         <div
@@ -820,48 +703,56 @@ export default function GradientGenerator({
         />
       )}
 
-      {/* Editor Card */}
-      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl">
-        {/* Top Controls */}
-        <div className="grid grid-cols-1 items-center gap-8 border-b border-slate-100 p-6 lg:grid-cols-12">
-          {/* Gradient Slider Area */}
-          <div className="space-y-4 lg:col-span-6">
-            {gradientType !== "solid" ? (
-              <GradientSlider
-                stops={stops}
-                activeStopId={activeStopId}
-                onStopChange={handleStopChange}
-                onSelect={setActiveStopId}
-                onAdd={addStop}
-              />
-            ) : (
-              <div className="flex h-12 items-center rounded-lg border border-slate-100 bg-slate-50 px-4 text-sm text-slate-500">
-                Gradient controls are disabled in Solid mode. Use the Color
-                Picker below.
-              </div>
-            )}
-          </div>
-          {gradientType === "linear" && (
-            <div className="col-span-2 flex items-center gap-2 rounded-lg bg-slate-100 p-1">
-              <div className="group relative flex size-8 cursor-pointer items-center justify-center overflow-hidden rounded-md bg-white shadow-sm">
-                <div
-                  className="absolute h-[2px] w-full bg-slate-800"
-                  style={{ transform: `rotate(${angle}deg)` }}
-                />
-                <div className="z-10 size-2 rounded-full bg-blue-500" />
-              </div>
-              <input
-                type="number"
-                value={angle}
-                onChange={(e) => setAngle(Number(e.target.value))}
-                className="w-9 bg-transparent text-right text-sm font-medium focus:outline-none"
-              />
-              {/* <span className="text-xs text-slate-400">°</span> */}
+      {/* Top */}
+      <div className="flex flex-col items-start justify-around gap-6 border-b border-slate-100 pb-6 sm:flex-row">
+        {/* Gradient Slider Area */}
+        <div className="w-full flex-1 pl-6 sm:max-w-70">
+          {gradientType !== "solid" ? (
+            <GradientSlider
+              stops={stops}
+              activeStopId={activeStopId}
+              onStopChange={handleStopChange}
+              onSelect={setActiveStopId}
+              onAdd={addStop}
+            />
+          ) : (
+            <div className="flex h-12 items-center rounded-lg border border-slate-100 bg-slate-50 px-4 text-xs text-slate-500">
+              Gradient controls are disabled in Solid mode. Use the Color Picker
+              below.
             </div>
           )}
+        </div>
+
+        <div
+          className={cn(
+            "flex w-full items-center justify-around gap-6 sm:w-auto",
+          )}
+        >
+          <div
+            className={cn(
+              "flex w-fit min-w-10 items-center gap-2 rounded-lg bg-slate-100 p-1",
+              gradientType === "radial" && "pointer-events-none invisible",
+              gradientType === "solid" && "hidden",
+            )}
+          >
+            <div className="group relative flex size-8 cursor-pointer items-center justify-center overflow-hidden rounded-md bg-white shadow-sm">
+              <div
+                className="absolute h-[2px] w-full bg-slate-800"
+                style={{ transform: `rotate(${angle}deg)` }}
+              />
+              <div className="z-10 size-2 rounded-full bg-blue-500" />
+            </div>
+            <input
+              type="number"
+              value={angle}
+              onChange={(e) => setAngle(Number(e.target.value))}
+              className="w-full max-w-11 bg-transparent text-right text-sm font-medium focus:outline-none"
+            />
+            {/* <span className="text-xs text-slate-400">°</span> */}
+          </div>
 
           {/* Type & Rotation */}
-          <div className="flex flex-wrap items-center justify-end gap-4 lg:col-span-4">
+          <div className="flex flex-wrap items-center justify-end gap-4">
             <div className="flex rounded-lg bg-slate-100 p-1">
               {(["linear", "radial", "solid"] as const).map((t) => (
                 <button
@@ -875,393 +766,423 @@ export default function GradientGenerator({
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Bottom Controls */}
-        <div className="grid grid-cols-1 divide-y divide-slate-100 md:grid-cols-2 md:divide-x md:divide-y-0">
-          {/* Left: Color Picker */}
-          <div
-            className={cn(
-              "scrollable mini max-h-96 p-6",
-              gradientType === "solid" ? "mx-auto w-full max-w-lg" : "",
-            )}
-          >
-            <div className="mb-4 flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                Color Picker
-              </span>
-              <div className="flex rounded-md bg-slate-100 p-0.5">
-                {(["rgba", "hsla"] as const).map((mode) => (
-                  <button
-                    key={mode}
-                    onClick={() => setColorMode(mode)}
-                    className={`rounded px-2 py-0.5 text-[10px] uppercase transition-colors ${colorMode === mode ? "bg-white text-blue-600 shadow" : "text-slate-500"}`}
-                  >
-                    {mode}
-                  </button>
-                ))}
+      {/* Bottom Main */}
+      <div className="grid grid-cols-1 divide-y divide-slate-100 md:grid-cols-2 md:divide-x md:divide-y-0">
+        {/* Left: Color Picker */}
+        <div
+          className={cn(
+            "scrollable mini max-h-96 p-6",
+            gradientType === "solid" ? "mx-auto w-full max-w-lg" : "",
+          )}
+        >
+          <div className="mb-4 flex items-center justify-between">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+              Color Picker
+            </span>
+            <div className="flex rounded-md bg-slate-100 p-0.5">
+              {(["rgba", "hsla", "css"] as const).map((mode) => (
+                <button
+                  key={mode}
+                  onClick={() => setColorMode(mode)}
+                  className={`rounded px-2 py-0.5 text-[10px] uppercase transition-colors ${colorMode === mode ? "bg-white text-blue-600 shadow" : "text-slate-500"}`}
+                >
+                  {mode}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <AdvancedColorPicker
+            color={activeColorHsla}
+            onChange={(hsla) => handleActiveColorChange(hslaToRgba(hsla))}
+          />
+
+          <div className="mt-6 space-y-4">
+            {/* Hex Input */}
+            <div className="flex items-center gap-3">
+              <div className="w-16 text-xs font-bold text-slate-400">HEX</div>
+              <div className="flex flex-1 items-center rounded border border-slate-200 bg-slate-50 px-3 py-2">
+                <span className="mr-1 text-slate-400">#</span>
+                <input
+                  type="text"
+                  value={
+                    copied === "hex" ? "Copied!" : activeHex.replace("#", "")
+                  }
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (/^[0-9A-Fa-f]{0,6}$/.test(val)) {
+                      if (val.length === 6)
+                        handleActiveColorChange(hexToRgba("#" + val));
+                    }
+                  }}
+                  className="w-full bg-transparent font-mono text-sm uppercase focus:outline-none"
+                />
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(activeHex).then(() => {
+                      setCopied("hex");
+                      setTimeout(() => setCopied(false), 2000);
+                    });
+                  }}
+                  className={cn(
+                    "rounded-mdpx-3 flex items-center gap-2 py-1.5 text-xs font-bold transition-all",
+                    copied === "hex"
+                      ? "text-green-700"
+                      : "text-muted-foreground hover:text-foreground",
+                  )}
+                >
+                  {copied === "hex" ? <Check size={14} /> : <Copy size={14} />}
+                </button>
               </div>
             </div>
 
-            <AdvancedColorPicker
-              color={activeColorHsla}
-              onChange={(hsla) => handleActiveColorChange(hslaToRgba(hsla))}
-            />
-
-            <div className="mt-6 space-y-4">
-              {/* Hex Input */}
-              <div className="flex items-center gap-3">
-                <div className="w-16 text-xs font-bold text-slate-400">HEX</div>
-                <div className="flex flex-1 items-center rounded border border-slate-200 bg-slate-50 px-3 py-2">
-                  <span className="mr-1 text-slate-400">#</span>
-                  <input
-                    type="text"
-                    value={activeHex.replace("#", "")}
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      if (/^[0-9A-Fa-f]{0,6}$/.test(val)) {
-                        if (val.length === 6)
-                          handleActiveColorChange(hexToRgba("#" + val));
-                      }
-                    }}
-                    className="w-full bg-transparent font-mono text-sm uppercase focus:outline-none"
-                  />
-                </div>
-              </div>
-
-              {/* RGBA / HSLA Inputs */}
-              {colorMode === "rgba" ? (
-                <div className="grid grid-cols-4 gap-2">
-                  {(["r", "g", "b"] as const).map((c) => (
-                    <div
-                      key={c}
-                      className="rounded border border-slate-200 bg-slate-50 p-1 text-center"
-                    >
-                      <div className="mb-1 text-[10px] uppercase text-slate-400">
-                        {c}
-                      </div>
-                      <input
-                        type="number"
-                        min="0"
-                        max="255"
-                        value={activeColorRgba[c]}
-                        onChange={(e) =>
-                          handleActiveColorChange({
-                            ...activeColorRgba,
-                            [c]: parseInt(e.target.value) || 0,
-                          })
-                        }
-                        className="w-full bg-transparent text-center font-mono text-sm focus:outline-none"
-                      />
-                    </div>
-                  ))}
-                  <div className="rounded border border-slate-200 bg-slate-50 p-1 text-center">
+            {/* RGBA / HSLA Inputs */}
+            {colorMode === "rgba" ? (
+              <div className="grid grid-cols-4 gap-2">
+                {(["r", "g", "b"] as const).map((c) => (
+                  <div
+                    key={c}
+                    className="rounded border border-slate-200 bg-slate-50 p-1 text-center"
+                  >
                     <div className="mb-1 text-[10px] uppercase text-slate-400">
-                      A
+                      {c}
                     </div>
                     <input
                       type="number"
                       min="0"
-                      max="100"
-                      value={Math.round(activeColorRgba.a * 100)}
+                      max="255"
+                      value={activeColorRgba[c]}
                       onChange={(e) =>
                         handleActiveColorChange({
                           ...activeColorRgba,
-                          a: parseInt(e.target.value) / 100 || 0,
+                          [c]: parseInt(e.target.value) || 0,
                         })
                       }
                       className="w-full bg-transparent text-center font-mono text-sm focus:outline-none"
                     />
                   </div>
+                ))}
+                <div className="rounded border border-slate-200 bg-slate-50 p-1 text-center">
+                  <div className="mb-1 text-[10px] uppercase text-slate-400">
+                    A
+                  </div>
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    value={Math.round(activeColorRgba.a * 100)}
+                    onChange={(e) =>
+                      handleActiveColorChange({
+                        ...activeColorRgba,
+                        a: parseInt(e.target.value) / 100 || 0,
+                      })
+                    }
+                    className="w-full bg-transparent text-center font-mono text-sm focus:outline-none"
+                  />
                 </div>
-              ) : (
-                <div className="grid grid-cols-4 gap-2">
-                  {(["h", "s", "l"] as const).map((c) => (
-                    <div
-                      key={c}
-                      className="rounded border border-slate-200 bg-slate-50 p-1 text-center"
-                    >
-                      <div className="mb-1 text-[10px] uppercase text-slate-400">
-                        {c}
-                      </div>
-                      <input
-                        type="number"
-                        min="0"
-                        max={c === "h" ? 360 : 100}
-                        value={activeColorHsla[c]}
-                        onChange={(e) =>
-                          handleActiveColorChange(
-                            hslaToRgba({
-                              ...activeColorHsla,
-                              [c]: parseInt(e.target.value) || 0,
-                            }),
-                          )
-                        }
-                        className="w-full bg-transparent text-center font-mono text-sm focus:outline-none"
-                      />
-                    </div>
-                  ))}
-                  <div className="rounded border border-slate-200 bg-slate-50 p-1 text-center">
+              </div>
+            ) : colorMode === "hsla" ? (
+              <div className="grid grid-cols-4 gap-2">
+                {(["h", "s", "l"] as const).map((c) => (
+                  <div
+                    key={c}
+                    className="rounded border border-slate-200 bg-slate-50 p-1 text-center"
+                  >
                     <div className="mb-1 text-[10px] uppercase text-slate-400">
-                      A
+                      {c}
                     </div>
                     <input
                       type="number"
                       min="0"
-                      max="100"
-                      value={Math.round(activeColorHsla.a * 100)}
+                      max={c === "h" ? 360 : 100}
+                      value={activeColorHsla[c]}
                       onChange={(e) =>
                         handleActiveColorChange(
                           hslaToRgba({
                             ...activeColorHsla,
-                            a: parseInt(e.target.value) / 100 || 0,
+                            [c]: parseInt(e.target.value) || 0,
                           }),
                         )
                       }
                       className="w-full bg-transparent text-center font-mono text-sm focus:outline-none"
                     />
                   </div>
+                ))}
+                <div className="rounded border border-slate-200 bg-slate-50 p-1 text-center">
+                  <div className="mb-1 text-[10px] uppercase text-slate-400">
+                    A
+                  </div>
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    value={Math.round(activeColorHsla.a * 100)}
+                    onChange={(e) =>
+                      handleActiveColorChange(
+                        hslaToRgba({
+                          ...activeColorHsla,
+                          a: parseInt(e.target.value) / 100 || 0,
+                        }),
+                      )
+                    }
+                    className="w-full bg-transparent text-center font-mono text-sm focus:outline-none"
+                  />
                 </div>
+              </div>
+            ) : (
+              <pre className="scrollable justx mini relative break-all rounded bg-slate-900 pl-3 pr-12 pt-3 font-mono text-sm leading-relaxed text-slate-300">
+                <button
+                  onClick={copyCSS}
+                  className={cn(
+                    "absolute right-0 flex items-center gap-2 rounded-md bg-slate-800 px-3 py-1.5 text-xs font-bold transition-all",
+                    copied === "css"
+                      ? "text-green-400"
+                      : "text-slate-400 hover:bg-slate-700 hover:text-white",
+                  )}
+                >
+                  {copied === "css" ? <Check size={14} /> : <Copy size={14} />}
+                </button>
+                <p className="absolute left-2 top-0 text-2xs text-green-400">
+                  CSS Preview
+                </p>
+                {generateCSS()};
+              </pre>
+            )}
+          </div>
+        </div>
+
+        {/* Right: Stops List / Swatch Library */}
+
+        <div className="flex h-full max-h-96 flex-col bg-slate-50/50">
+          {/* Tabs Switcher */}
+          <div className="flex border-b border-slate-200">
+            <button
+              disabled={gradientType === "solid"}
+              onClick={() => setRightPanelTab("stops")}
+              className={cn(
+                "flex-1 py-3 text-xs font-bold uppercase tracking-wider transition-colors disabled:pointer-events-none disabled:opacity-50",
+                rightPanelTab === "stops"
+                  ? "border-b-2 border-blue-600 bg-white text-blue-600"
+                  : "text-slate-400 hover:bg-slate-100/50 hover:text-slate-600",
               )}
-            </div>
+            >
+              <div className="flex items-center justify-center gap-2">
+                <SlidersHorizontal size={14} /> Stops
+              </div>
+            </button>
+            <button
+              onClick={() => setRightPanelTab("library")}
+              className={`flex-1 py-3 text-xs font-bold uppercase tracking-wider transition-colors ${rightPanelTab === "library" ? "border-b-2 border-blue-600 bg-white text-blue-600" : "text-slate-400 hover:bg-slate-100/50 hover:text-slate-600"}`}
+            >
+              <div className="flex items-center justify-center gap-2">
+                <SwatchBook size={14} /> Library
+              </div>
+            </button>
           </div>
 
-          {/* Right: Stops List / Swatch Library */}
-
-          <div className="flex h-full max-h-96 flex-col bg-slate-50/50">
-            {/* Tabs Switcher */}
-            <div className="flex border-b border-slate-200">
-              <button
-                disabled={gradientType === "solid"}
-                onClick={() => setRightPanelTab("stops")}
-                className={cn(
-                  "flex-1 py-3 text-xs font-bold uppercase tracking-wider transition-colors disabled:pointer-events-none disabled:opacity-50",
-                  rightPanelTab === "stops"
-                    ? "border-b-2 border-blue-600 bg-white text-blue-600"
-                    : "text-slate-400 hover:bg-slate-100/50 hover:text-slate-600",
-                )}
-              >
-                <div className="flex items-center justify-center gap-2">
-                  <SlidersHorizontal size={14} /> Stops
+          {/* Content */}
+          <div className="scrollable mini flex-1 p-6">
+            {/* STOPS VIEW */}
+            {rightPanelTab === "stops" && (
+              <div className="space-y-4">
+                <div className="mb-2 flex items-center justify-between">
+                  <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                    Active Stops
+                  </span>
+                  <button
+                    onClick={() => addStop()}
+                    className="flex items-center gap-1 rounded-full bg-blue-50 px-3 py-1.5 text-xs font-bold text-blue-600 transition-colors hover:bg-blue-100"
+                  >
+                    <Plus size={14} /> Add
+                  </button>
                 </div>
-              </button>
-              <button
-                onClick={() => setRightPanelTab("library")}
-                className={`flex-1 py-3 text-xs font-bold uppercase tracking-wider transition-colors ${rightPanelTab === "library" ? "border-b-2 border-blue-600 bg-white text-blue-600" : "text-slate-400 hover:bg-slate-100/50 hover:text-slate-600"}`}
-              >
-                <div className="flex items-center justify-center gap-2">
-                  <SwatchBook size={14} /> Library
-                </div>
-              </button>
-            </div>
 
-            {/* Content */}
-            <div className="scrollable mini flex-1 p-6">
-              {/* STOPS VIEW */}
-              {rightPanelTab === "stops" && (
-                <div className="space-y-4">
-                  <div className="mb-2 flex items-center justify-between">
-                    <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                      Active Stops
-                    </span>
-                    <button
-                      onClick={() => addStop()}
-                      className="flex items-center gap-1 rounded-full bg-blue-50 px-3 py-1.5 text-xs font-bold text-blue-600 transition-colors hover:bg-blue-100"
-                    >
-                      <Plus size={14} /> Add
-                    </button>
-                  </div>
-
-                  <div className="space-y-2">
-                    {[...stops]
-                      .sort((a, b) => a.offset - b.offset)
-                      .map((stop) => (
+                <div className="space-y-2">
+                  {[...stops]
+                    .sort((a, b) => a.offset - b.offset)
+                    .map((stop) => (
+                      <div
+                        key={stop.id}
+                        onClick={() => setActiveStopId(stop.id)}
+                        className={`group flex cursor-pointer items-center gap-3 rounded-lg border p-2 transition-all ${activeStopId === stop.id ? "border-blue-400 bg-white shadow-sm" : "border-transparent bg-transparent hover:bg-slate-100"}`}
+                      >
                         <div
-                          key={stop.id}
-                          onClick={() => setActiveStopId(stop.id)}
-                          className={`group flex cursor-pointer items-center gap-3 rounded-lg border p-2 transition-all ${activeStopId === stop.id ? "border-blue-400 bg-white shadow-sm" : "border-transparent bg-transparent hover:bg-slate-100"}`}
-                        >
-                          <div
-                            className="h-8 w-8 rounded border border-slate-200 shadow-sm"
-                            style={{ background: rgbaToString(stop.color) }}
-                          />
-                          <div className="flex-1 font-mono text-xs uppercase text-slate-600">
-                            {rgbaToHex(stop.color)}
-                          </div>
-                          <div className="relative w-16">
-                            <input
-                              type="number"
-                              value={Math.round(stop.offset)}
-                              onChange={(e) => {
-                                const val = Math.max(
-                                  0,
-                                  Math.min(100, parseInt(e.target.value) || 0),
-                                );
-                                handleStopChange(stop.id, { offset: val });
-                              }}
-                              className="w-full rounded bg-slate-100 px-2 py-1 text-right text-xs font-medium focus:outline-blue-500"
-                            />
-                            <span className="pointer-events-none absolute right-6 top-1.5 text-[10px] text-slate-400">
-                              %
-                            </span>
-                          </div>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              deleteStop(stop.id);
+                          className="h-8 w-8 rounded border border-slate-200 shadow-sm"
+                          style={{ background: rgbaToString(stop.color) }}
+                        />
+                        <div className="flex-1 font-mono text-xs uppercase text-slate-600">
+                          {rgbaToHex(stop.color)}
+                        </div>
+                        <div className="relative w-16">
+                          <input
+                            type="number"
+                            value={Math.round(stop.offset)}
+                            onChange={(e) => {
+                              const val = Math.max(
+                                0,
+                                Math.min(100, parseInt(e.target.value) || 0),
+                              );
+                              handleStopChange(stop.id, { offset: val });
                             }}
-                            className="rounded-md p-1.5 text-slate-300 opacity-0 transition-all hover:bg-red-50 hover:text-red-500 group-hover:opacity-100"
-                            disabled={stops.length <= 2}
+                            className="w-full rounded bg-slate-100 px-2 py-1 text-right text-xs font-medium focus:outline-blue-500"
+                          />
+                          <span className="pointer-events-none absolute right-6 top-1.5 text-[10px] text-slate-400">
+                            %
+                          </span>
+                        </div>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            deleteStop(stop.id);
+                          }}
+                          className="rounded-md p-1.5 text-slate-300 opacity-0 transition-all hover:bg-red-50 hover:text-red-500 group-hover:opacity-100"
+                          disabled={stops.length <= 2}
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            )}
+
+            {/* LIBRARY VIEW */}
+            {rightPanelTab === "library" && activePalette && (
+              <div className="space-y-6">
+                {/* Palette Selector */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                      Palette
+                    </label>
+                    <div className="flex gap-1">
+                      {!isAddingPalette && (
+                        <>
+                          <button
+                            onClick={() => setIsAddingPalette(true)}
+                            className="rounded p-1 text-slate-400 hover:bg-blue-50 hover:text-blue-600"
+                            title="Create New Palette"
+                          >
+                            <Plus size={14} />
+                          </button>
+                          <button
+                            onClick={handleDeletePalette}
+                            className="rounded p-1 text-slate-400 hover:bg-red-50 hover:text-red-600"
+                            disabled={!palettes || palettes.length <= 1}
+                            title="Delete Current Palette"
                           >
                             <Trash2 size={14} />
                           </button>
-                        </div>
-                      ))}
-                  </div>
-                </div>
-              )}
-
-              {/* LIBRARY VIEW */}
-              {rightPanelTab === "library" && activePalette && (
-                <div className="space-y-6">
-                  {/* Palette Selector */}
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <label className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                        Palette
-                      </label>
-                      <div className="flex gap-1">
-                        {!isAddingPalette && (
-                          <>
-                            <button
-                              onClick={() => setIsAddingPalette(true)}
-                              className="rounded p-1 text-slate-400 hover:bg-blue-50 hover:text-blue-600"
-                              title="Create New Palette"
-                            >
-                              <Plus size={14} />
-                            </button>
-                            <button
-                              onClick={handleDeletePalette}
-                              className="rounded p-1 text-slate-400 hover:bg-red-50 hover:text-red-600"
-                              disabled={!palettes || palettes.length <= 1}
-                              title="Delete Current Palette"
-                            >
-                              <Trash2 size={14} />
-                            </button>
-                          </>
-                        )}
-                      </div>
+                        </>
+                      )}
                     </div>
-
-                    {isAddingPalette ? (
-                      <div className="flex gap-2 duration-200 animate-in fade-in slide-in-from-top-2">
-                        <input
-                          autoFocus
-                          type="text"
-                          placeholder="Palette Name..."
-                          value={newPaletteName}
-                          onChange={(e) => setNewPaletteName(e.target.value)}
-                          className="flex-1 rounded border border-slate-300 bg-white px-2 py-1.5 text-sm focus:outline-blue-500"
-                          onKeyDown={(e) =>
-                            e.key === "Enter" && handleAddPalette()
-                          }
-                        />
-                        <button
-                          onClick={handleAddPalette}
-                          className="rounded bg-blue-600 p-1.5 text-white hover:bg-blue-700"
-                        >
-                          <Check size={14} />
-                        </button>
-                        <button
-                          onClick={() => setIsAddingPalette(false)}
-                          className="rounded bg-slate-200 p-1.5 text-slate-600 hover:bg-slate-300"
-                        >
-                          <X size={14} />
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="relative">
-                        <select
-                          value={activePaletteValue}
-                          onChange={(e) =>
-                            setActivePaletteValue(e.target.value)
-                          }
-                          className="w-full appearance-none rounded-lg border border-slate-200 bg-white px-3 py-2 pr-8 text-sm text-slate-700 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100"
-                        >
-                          {palettes.map((p) => (
-                            <option key={p._id} value={p.value}>
-                              {p.name}
-                            </option>
-                          ))}
-                        </select>
-                        <div className="pointer-events-none absolute right-3 top-2.5 text-slate-400">
-                          <PaletteIcon size={14} />
-                        </div>
-                      </div>
-                    )}
                   </div>
 
-                  {/* Swatches Grid */}
-                  <div>
-                    <div className="mb-3 flex items-center justify-between">
-                      <span className="text-xs font-medium text-slate-500">
-                        {activePalette.colors?.length || 0} Swatches
-                      </span>
+                  {isAddingPalette ? (
+                    <div className="flex gap-2 duration-200 animate-in fade-in slide-in-from-top-2">
+                      <input
+                        autoFocus
+                        type="text"
+                        placeholder="Palette Name..."
+                        value={newPaletteName}
+                        onChange={(e) => setNewPaletteName(e.target.value)}
+                        className="flex-1 rounded border border-slate-300 bg-white px-2 py-1.5 text-sm focus:outline-blue-500"
+                        onKeyDown={(e) =>
+                          e.key === "Enter" && handleAddPalette()
+                        }
+                      />
                       <button
-                        onClick={
-                          !changedSwatch && matchingSwatch
-                            ? handleDeleteSwatch
-                            : handleAddSwatch
-                        }
-                        className={`flex items-center gap-1 rounded px-2 py-1 text-xs font-bold transition-colors ${
-                          !changedSwatch && matchingSwatch
-                            ? "bg-red-50 text-red-600 hover:bg-red-100"
-                            : "bg-blue-50 text-blue-600 hover:bg-blue-100"
-                        }`}
-                        title={
-                          !changedSwatch && matchingSwatch
-                            ? "Delete this color from library"
-                            : "Add currently selected color to library"
-                        }
+                        onClick={handleAddPalette}
+                        className="rounded bg-blue-600 p-1.5 text-white hover:bg-blue-700"
                       >
-                        {!changedSwatch && matchingSwatch ? (
-                          <Trash2 size={12} />
-                        ) : (
-                          <Save size={12} />
-                        )}
-                        {!changedSwatch && matchingSwatch
-                          ? "Delete Swatch"
-                          : "Save Color"}
+                        <Check size={14} />
+                      </button>
+                      <button
+                        onClick={() => setIsAddingPalette(false)}
+                        className="rounded bg-slate-200 p-1.5 text-slate-600 hover:bg-slate-300"
+                      >
+                        <X size={14} />
                       </button>
                     </div>
-
-                    {!activePalette.colors ||
-                    activePalette.colors.length === 0 ? (
-                      <div className="rounded-lg border-2 border-dashed border-slate-200 py-8 text-center text-xs text-slate-400">
-                        No colors yet.
-                        <br />
-                        Save the current color!
-                      </div>
-                    ) : (
-                      <div className="grid grid-cols-6 gap-2">
-                        {activePalette.colors.map((colorObj, idx) => (
-                          <div
-                            key={`${colorObj.value}-${idx}`}
-                            className={`group relative aspect-square w-full cursor-pointer overflow-hidden rounded-md border shadow-sm transition-all ${
-                              colorObj.value === activeSwatch
-                                ? "z-10 scale-105 border-blue-500 ring-2 ring-blue-500"
-                                : "border-slate-200 ring-0 hover:z-10 hover:ring-2 hover:ring-blue-300"
-                            }`}
-                            style={{ background: colorObj.value }}
-                            onClick={() => handleSwatchClick(colorObj.value)}
-                            title={colorObj.value}
-                          />
+                  ) : (
+                    <div className="relative">
+                      <select
+                        value={activePaletteValue}
+                        onChange={(e) => setActivePaletteValue(e.target.value)}
+                        className="w-full appearance-none rounded-lg border border-slate-200 bg-white px-3 py-2 pr-8 text-sm text-slate-700 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100"
+                      >
+                        {palettes.map((p) => (
+                          <option key={p._id} value={p.value}>
+                            {p.name}
+                          </option>
                         ))}
+                      </select>
+                      <div className="pointer-events-none absolute right-3 top-2.5 text-slate-400">
+                        <PaletteIcon size={14} />
                       </div>
-                    )}
-                  </div>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
+
+                {/* Swatches Grid */}
+                <div>
+                  <div className="mb-3 flex items-center justify-between">
+                    <span className="text-xs font-medium text-slate-500">
+                      {activePalette.colors?.length || 0} Swatches
+                    </span>
+                    <button
+                      onClick={
+                        matchingSwatch ? handleDeleteSwatch : handleAddSwatch
+                      }
+                      className={`flex items-center gap-1 rounded px-2 py-1 text-xs font-bold transition-colors ${
+                        matchingSwatch
+                          ? "bg-red-50 text-red-600 hover:bg-red-100"
+                          : "bg-blue-50 text-blue-600 hover:bg-blue-100"
+                      }`}
+                      title={
+                        matchingSwatch
+                          ? "Delete this color from library"
+                          : "Add currently selected color to library"
+                      }
+                    >
+                      {matchingSwatch ? (
+                        <Trash2 size={12} />
+                      ) : (
+                        <Save size={12} />
+                      )}
+                      {matchingSwatch ? "Delete Swatch" : "Save Color"}
+                    </button>
+                  </div>
+
+                  {!activePalette.colors ||
+                  activePalette.colors.length === 0 ? (
+                    <div className="rounded-lg border-2 border-dashed border-slate-200 py-8 text-center text-xs text-slate-400">
+                      No colors yet.
+                      <br />
+                      Save the current color!
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-6 gap-2">
+                      {activePalette.colors.map((swatch, idx) => (
+                        <div
+                          key={`${swatch.value}-${idx}`}
+                          className={`group relative aspect-square w-full cursor-pointer overflow-hidden rounded-md border shadow-sm transition-all ${
+                            swatch.value === selectedSwatch?.value
+                              ? "z-10 scale-105 border-blue-500 ring-2 ring-blue-500"
+                              : "border-slate-200 ring-0 hover:z-10 hover:ring-2 hover:ring-blue-300"
+                          }`}
+                          style={{ background: swatch.value }}
+                          onClick={() => handleSwatchClick(swatch)}
+                          title={swatch.value}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -1276,10 +1197,10 @@ export default function GradientGenerator({
             </label>
             <button
               onClick={copyCSS}
-              className={`flex items-center gap-2 rounded-md px-3 py-1.5 text-xs font-bold transition-all ${copied ? "bg-green-500/20 text-green-400" : "bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white"}`}
+              className={`flex items-center gap-2 rounded-md px-3 py-1.5 text-xs font-bold transition-all ${copied === "css" ? "bg-green-500/20 text-green-400" : "bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white"}`}
             >
-              {copied ? <Check size={14} /> : <Copy size={14} />}
-              {copied ? "Copied!" : "Copy to Clipboard"}
+              {copied === "css" ? <Check size={14} /> : <Copy size={14} />}
+              {copied === "css" ? "Copied!" : "Copy to Clipboard"}
             </button>
           </div>
           <pre className="whitespace-pre-wrap break-all font-mono text-sm leading-relaxed text-slate-300">
@@ -1288,7 +1209,7 @@ export default function GradientGenerator({
           </pre>
         </div>
       )}
-    </div>
+    </>
   );
 }
 
@@ -1303,214 +1224,6 @@ interface GradientSliderProps {
   onSelect: (id: string) => void;
   onAdd: (offset: number) => void;
 }
-
-// function GradientSlider({
-//   stops,
-//   activeStopId,
-//   onStopChange,
-//   onSelect,
-//   onAdd,
-// }: GradientSliderProps): JSX.Element {
-//   const sliderRef = useRef<HTMLDivElement>(null);
-
-//   const handleMouseDown = (
-//     e: React.MouseEvent<HTMLDivElement>,
-//     id: string,
-//   ): void => {
-//     e.stopPropagation();
-//     onSelect(id);
-//     const handleMove = (moveEvent: MouseEvent): void => {
-//       if (sliderRef.current) {
-//         const rect = sliderRef.current.getBoundingClientRect();
-//         const percent = Math.max(
-//           0,
-//           Math.min(100, ((moveEvent.clientX - rect.left) / rect.width) * 100),
-//         );
-//         onStopChange(id, { offset: percent });
-//       }
-//     };
-//     const handleUp = (): void => {
-//       document.removeEventListener("mousemove", handleMove);
-//       document.removeEventListener("mouseup", handleUp);
-//     };
-//     document.addEventListener("mousemove", handleMove);
-//     document.addEventListener("mouseup", handleUp);
-//   };
-
-//   const handleBarClick = (e: React.MouseEvent<HTMLDivElement>): void => {
-//     if (sliderRef.current) {
-//       const rect = sliderRef.current.getBoundingClientRect();
-//       const clickX = e.clientX - rect.left;
-//       const percent = Math.max(0, Math.min(100, (clickX / rect.width) * 100));
-//       onAdd(percent);
-//     }
-//   };
-
-//   return (
-//     <div
-//       className="group relative flex h-12 cursor-crosshair select-none items-center"
-//       ref={sliderRef}
-//       // onClick={handleBarClick}
-//     >
-//       <div className="absolute inset-0 my-auto h-4 rounded-full bg-[url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAIklEQVQYV2NkYGRkYIAAdiCkIP6HwgcY0ISQBTBw//9PAwA8RgfN890tNwAAAABJRU5ErkJggg==')] opacity-30"></div>
-//       <div
-//         className="absolute inset-0 my-auto h-4 rounded-full border border-black/5 shadow-inner"
-//         style={{
-//           background: `linear-gradient(to right, ${stops
-//             .sort((a, b) => a.offset - b.offset)
-//             .map((s) => `${rgbaToString(s.color)} ${s.offset}%`)
-//             .join(", ")})`,
-//         }}
-//       />
-//       {stops.map((stop) => (
-//         <div
-//           key={stop.id}
-//           className="absolute bottom-0 top-0 z-10 w-4 cursor-grab hover:z-20 active:cursor-grabbing"
-//           style={{ left: `calc(${stop.offset}% - 8px)` }}
-//           onClick={(e) => {
-//             e.stopPropagation();
-//             onSelect(stop.id);
-//           }}
-//           onMouseDown={(e) => handleMouseDown(e, stop.id)}
-//         >
-//           <div
-//             className={`flex h-full w-4 flex-col items-center justify-center transition-transform ${activeStopId === stop.id ? "z-30 scale-110" : "scale-100"}`}
-//           >
-//             <div
-//               className={`mb-0.5 h-0 w-0 border-b-[6px] border-l-[6px] border-r-[6px] border-l-transparent border-r-transparent ${activeStopId === stop.id ? "border-b-slate-800" : "border-b-slate-400"}`}
-//             />
-//             <div
-//               className={`h-8 w-4 rounded-[2px] border-2 shadow-sm ${activeStopId === stop.id ? "border-slate-800 ring-2 ring-slate-800/20" : "border-white"}`}
-//               style={{ backgroundColor: rgbaToString(stop.color) }}
-//             ></div>
-//             <div
-//               className={`mt-0.5 h-0 w-0 border-l-[6px] border-r-[6px] border-t-[6px] border-l-transparent border-r-transparent ${activeStopId === stop.id ? "border-t-slate-800" : "border-t-slate-400"}`}
-//             />
-//           </div>
-//         </div>
-//       ))}
-//     </div>
-//   );
-// }
-
-// function GradientSlider({
-//   stops,
-//   activeStopId,
-//   onStopChange,
-//   onSelect,
-//   onAdd,
-// }: GradientSliderProps): JSX.Element {
-//   const sliderRef = useRef<HTMLDivElement>(null);
-
-//   const handleMouseDown = (
-//     e: React.MouseEvent<HTMLDivElement>,
-//     id: string,
-//   ): void => {
-//     // 1. Stop propagation immediately so the 'Track' doesn't catch this
-//     e.stopPropagation();
-//     e.preventDefault(); // Prevents text selection/native drag behavior
-
-//     // 2. Select immediately on press
-//     onSelect(id);
-
-//     const handleMove = (moveEvent: MouseEvent): void => {
-//       if (sliderRef.current) {
-//         const rect = sliderRef.current.getBoundingClientRect();
-//         const percent = Math.max(
-//           0,
-//           Math.min(100, ((moveEvent.clientX - rect.left) / rect.width) * 100),
-//         );
-//         onStopChange(id, { offset: percent });
-//       }
-//     };
-
-//     const handleUp = (): void => {
-//       document.removeEventListener("mousemove", handleMove);
-//       document.removeEventListener("mouseup", handleUp);
-//     };
-
-//     document.addEventListener("mousemove", handleMove);
-//     document.addEventListener("mouseup", handleUp);
-//   };
-
-//   const handleBarClick = (e: React.MouseEvent<HTMLDivElement>): void => {
-//     if (sliderRef.current) {
-//       const rect = sliderRef.current.getBoundingClientRect();
-//       const clickX = e.clientX - rect.left;
-//       const percent = Math.max(0, Math.min(100, (clickX / rect.width) * 100));
-//       onAdd(percent);
-//     }
-//   };
-
-//   return (
-//     <div
-//       ref={sliderRef}
-//       className="group relative flex h-20 select-none items-center"
-//       // REMOVED onClick={handleBarClick} FROM HERE
-//     >
-//       {/* --- TRACK LAYER (Siblings to Stops) --- */}
-//       {/* This layer strictly handles "Add Stop" clicks */}
-//       <div
-//         className="absolute inset-0 cursor-crosshair"
-//         onClick={handleBarClick}
-//       >
-//         {/* Checkerboard Pattern */}
-//         <div className="absolute inset-0 my-auto h-4 rounded-full bg-[url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAIklEQVQYV2NkYGRkYIAAdiCkIP6HwgcY0ISQBTBw//9PAwA8RgfN890tNwAAAABJRU5ErkJggg==')] opacity-30" />
-
-//         {/* Gradient Preview */}
-//         <div
-//           className="absolute inset-0 my-auto h-4 rounded-full border border-black/5 shadow-inner"
-//           style={{
-//             background: `linear-gradient(to right, ${stops
-//               .sort((a, b) => a.offset - b.offset)
-//               .map((s) => `${rgbaToString(s.color)} ${s.offset}%`)
-//               .join(", ")})`,
-//           }}
-//         />
-//       </div>
-
-//       {/* --- STOPS LAYER (Siblings to Track) --- */}
-//       {/* These sit visually on top (z-index) but do NOT bubble click events to the Track div */}
-//       {stops.map((stop) => (
-//         <div
-//           key={stop.id}
-//           className="absolute bottom-0 top-0 z-10 w-4 cursor-grab hover:z-20 active:cursor-grabbing"
-//           style={{ left: `calc(${stop.offset}% - 8px)` }}
-//           onMouseDown={(e) => handleMouseDown(e, stop.id)}
-//         >
-//           <div
-//             className={`flex h-full w-4 flex-col items-center justify-center transition-transform ${
-//               activeStopId === stop.id ? "z-30 scale-110" : "scale-100"
-//             }`}
-//           >
-//             <div
-//               className={`mb-0.5 h-0 w-0 border-b-[6px] border-l-[6px] border-r-[6px] border-l-transparent border-r-transparent ${
-//                 activeStopId === stop.id
-//                   ? "border-b-slate-800"
-//                   : "border-b-slate-400"
-//               }`}
-//             />
-//             <div
-//               className={`h-8 w-4 rounded-[2px] border-2 shadow-sm ${
-//                 activeStopId === stop.id
-//                   ? "border-slate-800 ring-2 ring-slate-800/20"
-//                   : "border-white"
-//               }`}
-//               style={{ backgroundColor: rgbaToString(stop.color) }}
-//             />
-//             <div
-//               className={`mt-0.5 h-0 w-0 border-l-[6px] border-r-[6px] border-t-[6px] border-l-transparent border-r-transparent ${
-//                 activeStopId === stop.id
-//                   ? "border-t-slate-800"
-//                   : "border-t-slate-400"
-//               }`}
-//             />
-//           </div>
-//         </div>
-//       ))}
-//     </div>
-//   );
-// }
 
 function GradientSlider({
   stops,
@@ -1550,7 +1263,6 @@ function GradientSlider({
     document.addEventListener("mouseup", handleUp);
   };
 
-  // --- TRACK CLICK HANDLER (Unchanged) ---
   const handleBarClick = (e: React.MouseEvent<HTMLDivElement>): void => {
     if (sliderRef.current) {
       const rect = sliderRef.current.getBoundingClientRect();
@@ -1563,17 +1275,15 @@ function GradientSlider({
   return (
     <div
       ref={sliderRef}
-      className="group relative flex h-16 select-none items-center" // Increased height (h-16) to accommodate inputs below
+      className="group relative flex h-16 select-none items-center"
     >
-      {/* --- TRACK LAYER --- */}
       <div
-        className="absolute inset-x-0 top-3 h-6 cursor-crosshair rounded-full" // Positioned top-3 to align with handles
+        className="absolute inset-x-0 top-3 h-6 cursor-crosshair rounded-full"
         onClick={handleBarClick}
       >
         {/* Checkerboard Pattern */}
         <div className="absolute inset-0 h-full w-full rounded-full bg-[url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAIklEQVQYV2NkYGRkYIAAdiCkIP6HwgcY0ISQBTBw//9PAwA8RgfN890tNwAAAABJRU5ErkJggg==')] opacity-30" />
 
-        {/* Gradient Preview */}
         <div
           className="absolute inset-0 h-full w-full rounded-full border border-black/5 shadow-inner"
           style={{
@@ -1585,15 +1295,12 @@ function GradientSlider({
         />
       </div>
 
-      {/* --- STOPS LAYER --- */}
       {stops.map((stop) => (
         <div
           key={stop.id}
-          // The wrapper is positioned, but we remove cursor-grab here to be specific on the handle
           className="absolute top-0 z-10 flex w-4 flex-col items-center"
           style={{ left: `calc(${stop.offset}% - 8px)` }}
         >
-          {/* 1. THE DRAGGABLE HANDLE */}
           <div
             className="cursor-grab hover:z-20 active:cursor-grabbing"
             onMouseDown={(e) => handleMouseDown(e, stop.id)}
@@ -1641,6 +1348,16 @@ function GradientSlider({
       ))}
     </div>
   );
+}
+
+interface EyeDropper {
+  open(options?: { signal?: AbortSignal }): Promise<{ sRGBHex: string }>;
+}
+
+declare global {
+  interface Window {
+    EyeDropper: new () => EyeDropper;
+  }
 }
 
 interface AdvancedColorPickerProps {
@@ -1737,6 +1454,31 @@ function AdvancedColorPicker({
     handleMove(e.nativeEvent);
   };
 
+  const handleEyedrop = async () => {
+    // 1. Check feature support
+    if (!window.EyeDropper) {
+      console.warn("EyeDropper API is not supported in this browser.");
+      return;
+    }
+
+    try {
+      // 2. Instantiate using the new type definition
+      const eyeDropper = new window.EyeDropper();
+
+      // 3. Open the picker
+      const { sRGBHex } = await eyeDropper.open();
+
+      // 4. Convert and update (Assuming your conversion functions are typed)
+      const rgba = hexToRgba(sRGBHex);
+      const hsla = rgbaToHsla(rgba);
+
+      onChange(hsla);
+    } catch (e) {
+      // User cancelled the selection
+      console.log("EyeDropper cancelled", e);
+    }
+  };
+
   return (
     <div className="select-none space-y-4">
       <div
@@ -1787,7 +1529,10 @@ function AdvancedColorPicker({
             />
           </div>
         </div>
-        <div className="h-10 w-10 rounded-full border border-slate-200 bg-[url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAIklEQVQYV2NkYGRkYIAAdiCkIP6HwgcY0ISQBTBw//9PAwA8RgfN890tNwAAAABJRU5ErkJggg==')] shadow-sm">
+        <div
+          className="h-10 w-10 rounded-full border border-slate-200 bg-[url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAIklEQVQYV2NkYGRkYIAAdiCkIP6HwgcY0ISQBTBw//9PAwA8RgfN890tNwAAAABJRU5ErkJggg==')] shadow-sm hover:cursor-pointer"
+          onClick={handleEyedrop}
+        >
           <div
             className="h-full w-full rounded-full"
             style={{ backgroundColor: hslaToString(color) }}

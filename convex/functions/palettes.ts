@@ -1,5 +1,5 @@
-import { v } from "convex/values";
 import { internalMutation, mutation, query } from "~/convex/_generated/server";
+import { v } from "convex/values";
 
 export const getPalettes = query({
   args: {},
@@ -20,7 +20,6 @@ export const addPalette = mutation({
     return await ctx.db.insert("palettes", {
       name,
       value,
-      createdAt: Date.now(),
     });
   },
 });
@@ -36,7 +35,6 @@ export const addColor = mutation({
       paletteId,
       value,
       gradient,
-      createdAt: Date.now(),
     });
   },
 });
@@ -79,8 +77,6 @@ export const deletePalette = mutation({
 export const seedPalettes = internalMutation({
   args: {},
   handler: async (ctx) => {
-    const now = Date.now();
-
     // Shared helper
     const ensurePalette = async (
       name: string,
@@ -98,7 +94,6 @@ export const seedPalettes = internalMutation({
       const paletteId = await ctx.db.insert("palettes", {
         name,
         value,
-        createdAt: now,
       });
 
       for (const c of colors) {
@@ -106,7 +101,6 @@ export const seedPalettes = internalMutation({
           paletteId,
           value: c.value,
           gradient: Boolean(c.gradient),
-          createdAt: now,
         });
       }
 

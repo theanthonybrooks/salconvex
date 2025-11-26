@@ -1,5 +1,6 @@
 "use client";
 
+import type { Swatch } from "@/components/ui/color-picker2";
 import { OpenCallData } from "@/types/openCallTypes";
 
 import { ComponentType, useEffect, useState } from "react";
@@ -9,6 +10,7 @@ import { toast } from "react-toastify";
 import { BiPhotoAlbum } from "react-icons/bi";
 import {
   ArrowLeft,
+  Banana,
   LetterText,
   LoaderCircle,
   LucideIcon,
@@ -17,6 +19,7 @@ import {
 
 import { Link } from "@/components/ui/custom-link";
 import { PostCaptionDialog } from "@/components/ui/post-caption-dialog";
+import { PostOptionDialog } from "@/components/ui/post-options-dialog";
 import { PostPropertiesDashboard } from "@/components/ui/post-properties-dashboard";
 import { cn } from "@/helpers/utilsFns";
 
@@ -26,6 +29,7 @@ interface OpenCallSocialsProps {
 export interface PostSettings {
   fontSize: number;
   bgColor: string;
+  bgColorSwatch?: Swatch;
   budget: boolean;
 }
 
@@ -38,9 +42,16 @@ const OpenCallSocials = ({ data }: OpenCallSocialsProps) => {
     budget: false,
   });
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [optionDialogOpen, setOptionDialogOpen] = useState(false);
   const [textDialogOpen, setTextDialogOpen] = useState(false);
 
   const postMenuItems: MenuItem[] = [
+    {
+      key: "postOptions",
+      icon: Banana,
+      onClick: () => setOptionDialogOpen(true),
+    },
+
     {
       key: "caption",
       icon: LetterText,
@@ -153,28 +164,31 @@ const OpenCallSocials = ({ data }: OpenCallSocialsProps) => {
           <p>Social Media Post</p>
           <div className="group relative">
             <PostMenu items={postMenuItems} loading={loading} />
-
             <div
               className={cn(
-                "origin-top-left scale-[0.72] border-3 sm:scale-100",
+                "origin-top-left scale-[0.55] sm:scale-100 sm:border-3",
               )}
             >
               <OpenCallPost data={data} postSettings={postSettings} />
             </div>
 
             <PostPropertiesDashboard
-              fontSize={postSettings.fontSize}
               bgColor={postSettings.bgColor}
-              budget={postSettings.budget}
+              bgColorSwatch={postSettings.bgColorSwatch}
               onChange={handlePostSettingsChange}
               open={settingsOpen}
               setOpen={setSettingsOpen}
             />
-
             <PostCaptionDialog
               data={data}
               open={textDialogOpen}
               setOpenAction={setTextDialogOpen}
+            />
+            <PostOptionDialog
+              onChangeAction={handlePostSettingsChange}
+              settings={postSettings}
+              open={optionDialogOpen}
+              setOpenAction={setOptionDialogOpen}
             />
           </div>
         </section>
