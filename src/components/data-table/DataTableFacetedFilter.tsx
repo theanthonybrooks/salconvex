@@ -120,7 +120,7 @@ export function DataTableFacetedFilter<TData, TValue>({
       >
         <Command>
           <CommandInput placeholder={title} />
-          <CommandList className="scrollable mini darkbar justy">
+          <CommandList className="darkbar">
             <CommandEmpty>No results found.</CommandEmpty>
             <CommandGroup>
               {options.map((option) => {

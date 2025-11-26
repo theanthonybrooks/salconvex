@@ -310,7 +310,7 @@ export function DataTable<TData, TValue>({
       <div className={cn("rounded-md border", className)}>
         <Table
           containerClassname={cn(
-            "scrollable, short-screen h-fit max-h-[calc(85dvh-13rem)] rounded-md sm:max-h-[calc(85dvh-13rem)] 3xl:max-h-[calc(85dvh-10rem)]",
+            "short-screen h-fit max-h-[calc(85dvh-13rem)] rounded-md sm:max-h-[calc(85dvh-13rem)] 3xl:max-h-[calc(85dvh-10rem)]",
             tableClassName,
           )}
           className={cn(hasRows && "table-fixed")}

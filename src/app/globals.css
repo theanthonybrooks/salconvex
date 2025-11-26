@@ -486,6 +486,14 @@ a {
     background: hsl(var(--primary) / 0.3);
   }
 }
+
+@media (min-width: 1024px) {
+  .scrollable.miniy.fullbar::-webkit-scrollbar,
+  .scrollable.mini.fullbar::-webkit-scrollbar {
+    width: 0.55em;
+  }
+}
+
 .scrollable.mini.darkbar::-webkit-scrollbar-thumb,
 .scrollable.miniy.darkbar::-webkit-scrollbar-thumb {
   background: hsl(var(--primary) / 0.65);

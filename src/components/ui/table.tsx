@@ -10,7 +10,7 @@ const Table = React.forwardRef<HTMLTableElement, TableProps>(
   ({ className, containerClassname, ...props }, ref) => (
     <div
       className={cn(
-        "scrollable miniy relative w-full",
+        "scrollable miniy fullbar relative w-full",
 
         containerClassname,
       )}

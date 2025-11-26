@@ -201,14 +201,22 @@ export const continentOrder = [
 ];
 
 export const select_continents = [
-  { label: "Asia", value: "Asia" },
-  { label: "Europe", value: "Europe" },
   { label: "North America", value: "North America" },
-  { label: "Caribbean", value: "Caribbean" },
-  { label: "Central America", value: "Central America" },
-  { label: "Oceania", value: "Oceania" },
   { label: "South America", value: "South America" },
+  { label: "Europe", value: "Europe" },
+  { label: "Oceania", value: "Oceania" },
   { label: "Africa", value: "Africa" },
+  { label: "Asia", value: "Asia" },
+  // { label: "Caribbean", value: "Caribbean" },
+  // { label: "Central America", value: "Central America" },
+  // { label: "Antarctica", value: "Antarctica" },
+  // { label: "Australia", value: "Australia" },
+  // { label: "Europe", value: "Europe1" },
+  // { label: "North America", value: "North America1" },
+  // { label: "Caribbean", value: "Caribbean1" },
+  // { label: "Central America", value: "Central America1" },
+  // { label: "Oceania", value: "Oceania1" },
+  // { label: "South America", value: "South America1" },
 ];
 
 export const usRegions = {

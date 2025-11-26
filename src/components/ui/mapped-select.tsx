@@ -223,10 +223,7 @@ SearchMappedSelectProps<T>) {
             </span>
           )}
           <CommandList
-            className={cn(
-              "scrollable mini darkbar max-h-36",
-              popover?.listClassName,
-            )}
+            className={cn("darkbar max-h-36", popover?.listClassName)}
           >
             {Object.entries(filteredData).map(([group, items]) => (
               <CommandGroup key={group} heading={group}>

@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import { ChevronDown, ChevronUp, X } from "lucide-react";
+
 import {
   MdOutlineCheckBox,
   MdOutlineCheckBoxOutlineBlank,
 } from "react-icons/md";
+import { ChevronDown, ChevronUp, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -222,10 +223,7 @@ export function SearchMappedMultiSelect<T>({
               </span>
             )}
 
-            <CommandList
-              className="scrollable mini darkbar max-h-36"
-              translate="no"
-            >
+            <CommandList className="darkbar max-h-36" translate="no">
               {Object.entries(filteredData).map(([group, items]) => (
                 // <CommandGroup
                 //   key={group}
