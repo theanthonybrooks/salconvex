@@ -4,6 +4,7 @@ import type { PostSettings } from "@/app/(pages)/(artist)/thelist/components/Ope
 import type { Swatch } from "@/components/ui/color-picker2";
 
 import { Dispatch, SetStateAction } from "react";
+import { useIsMobile } from "@/hooks/use-media-query";
 
 import GradientColorPicker from "@/components/ui/color-picker2";
 import {
@@ -31,6 +32,7 @@ export const PostPropertiesDashboard = ({
   open,
   setOpen,
 }: PostPropertiesDashboardProps) => {
+  const isMobile = useIsMobile(768);
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent
@@ -39,18 +41,12 @@ export const PostPropertiesDashboard = ({
           className,
         )}
         overlayClassName="hidden"
+        isDraggable={!isMobile}
+        snapTo="right"
       >
         <DialogHeader>
-          <DialogTitle>Post Properties</DialogTitle>
+          <DialogTitle>Post Styling</DialogTitle>
         </DialogHeader>
-
-        {/* Background Color Control */}
-        {/* <ColorPicker
-          selectedColor={bgColor}
-          setSelectedColorAction={(newColor) => {
-            onChange({ bgColor: newColor });
-          }}
-        /> */}
         <GradientColorPicker
           selectedColor={bgColor}
           selectedSwatch={bgColorSwatch}

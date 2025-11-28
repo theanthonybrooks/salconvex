@@ -10,7 +10,6 @@ import { toast } from "react-toastify";
 import { BiPhotoAlbum } from "react-icons/bi";
 import {
   ArrowLeft,
-  Banana,
   LetterText,
   LoaderCircle,
   LucideIcon,
@@ -44,14 +43,9 @@ const OpenCallSocials = ({ data }: OpenCallSocialsProps) => {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [optionDialogOpen, setOptionDialogOpen] = useState(false);
   const [textDialogOpen, setTextDialogOpen] = useState(false);
+  const [pending, setPending] = useState(false);
 
   const postMenuItems: MenuItem[] = [
-    {
-      key: "postOptions",
-      icon: Banana,
-      onClick: () => setOptionDialogOpen(true),
-    },
-
     {
       key: "caption",
       icon: LetterText,
@@ -62,9 +56,10 @@ const OpenCallSocials = ({ data }: OpenCallSocialsProps) => {
     {
       key: "photos",
       icon: BiPhotoAlbum,
-      onClick: () => {
-        handleDownloadSingle();
-      },
+      // onClick: () => {
+      //   handleDownloadSingle();
+      // },
+      onClick: () => setOptionDialogOpen(true),
       actionable: true,
     },
     {
@@ -99,7 +94,7 @@ const OpenCallSocials = ({ data }: OpenCallSocialsProps) => {
     setPostSettings((prev) => ({ ...prev, ...update }));
   };
 
-  const handleDownloadSingle = async () => {
+  const handleDownload = async () => {
     setLoading(true);
     const { origin } = window.location;
 
@@ -112,6 +107,7 @@ const OpenCallSocials = ({ data }: OpenCallSocialsProps) => {
     const pageUrl = `${origin}/render/post?slug=${slug}&year=${year}&fontSize=${fontSize}&bgColor=${bgColor}&budget=${budget}`;
 
     try {
+      setPending(true);
       await toast.promise(
         (async () => {
           const res = await fetch(
@@ -143,6 +139,7 @@ const OpenCallSocials = ({ data }: OpenCallSocialsProps) => {
       console.error("Failed to create post:", error);
     } finally {
       setLoading(false);
+      setPending(false);
     }
   };
 
@@ -185,10 +182,12 @@ const OpenCallSocials = ({ data }: OpenCallSocialsProps) => {
               setOpenAction={setTextDialogOpen}
             />
             <PostOptionDialog
+              onDownloadAction={handleDownload}
               onChangeAction={handlePostSettingsChange}
               settings={postSettings}
               open={optionDialogOpen}
               setOpenAction={setOptionDialogOpen}
+              pending={pending}
             />
           </div>
         </section>

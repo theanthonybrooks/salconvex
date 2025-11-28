@@ -9,6 +9,17 @@ import { cn } from "@/helpers/utilsFns";
 export type ButtonVariant = VariantProps<typeof buttonVariants>["variant"];
 export type ButtonSize = VariantProps<typeof buttonVariants>["size"];
 
+const salBase =
+  "linear border-2 border-foreground font-medium text-foreground transition-all duration-300 dark:border-primary-foreground dark:text-primary-foreground active:shadow-none bg-card";
+const salShadowBase = cn(
+  salBase,
+  "translate-y-[-3px] shadow-slg hover:translate-x-[-1px] hover:shadow-slgHover focus:translate-x-[-1px] focus:shadow-slgHover active:translate-x-0 active:translate-y-0",
+);
+const salShadowHiddenBase = cn(
+  salBase,
+  "shadow-none hover:translate-x-[3px] hover:translate-y-[-3px] hover:shadow-slg active:translate-x-0 active:translate-y-0 active:shadow-none",
+);
+
 const buttonVariants = cva(
   "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
   {
@@ -31,16 +42,33 @@ const buttonVariants = cva(
         gooeyLeft: `after:bg-linear-to-l relative z-0 overflow-hidden bg-primary from-zinc-400 text-primary-foreground transition-all duration-500 after:absolute after:inset-0 after:-z-10 after:translate-x-[-150%] after:translate-y-[150%] after:scale-[2.5] after:rounded-[100%] after:transition-transform after:duration-1000 hover:after:translate-x-[0%] hover:after:translate-y-[0%]`,
         linkHover1: `relative after:absolute after:bottom-2 after:h-[1px] after:w-2/3 after:origin-bottom-left after:scale-x-100 after:bg-primary after:transition-transform after:duration-300 after:ease-in-out hover:after:origin-bottom-right hover:after:scale-x-0`,
         linkHover2: `relative after:absolute after:bottom-2 after:h-[1px] after:w-2/3 after:origin-bottom-right after:scale-x-0 after:bg-primary after:transition-transform after:duration-300 after:ease-in-out hover:after:origin-bottom-left hover:after:scale-x-100`,
-        salWithShadow: `linear border-2 border-foreground bg-white font-medium text-foreground shadow-slg transition-all duration-300 hover:translate-x-[-1px] hover:shadow-slgHover focus:translate-x-[-1px] focus:shadow-slgHover active:translate-x-[-3px] active:translate-y-[3px] active:shadow-none dark:border-primary-foreground dark:text-primary-foreground`,
-        salWithShadowHidden: `linear border-2 border-foreground bg-white font-medium text-foreground shadow-none transition-all duration-300 hover:translate-x-[3px] hover:translate-y-[-3px] hover:shadow-slg active:translate-x-0 active:translate-y-0 active:shadow-none dark:border-primary-foreground dark:text-primary-foreground`,
-        salWithShadowHiddenPink: `linear border-2 border-foreground bg-salPink font-medium text-foreground shadow-none transition-all duration-300 hover:translate-x-[3px] hover:translate-y-[-3px] hover:shadow-slg active:translate-x-0 active:translate-y-0 active:shadow-none dark:border-primary-foreground dark:text-primary-foreground`,
-        salWithShadowHiddenBg: `linear border-2 border-foreground bg-background font-medium text-foreground shadow-none transition-all duration-300 hover:translate-x-[3px] hover:translate-y-[-3px] hover:shadow-slg active:translate-x-0 active:translate-y-0 active:shadow-none dark:border-primary-foreground dark:text-primary-foreground`,
-        salWithShadowHiddenLeft: `linear !rounded-r-none border-2 border-r border-foreground bg-white font-medium text-foreground shadow-none transition-all duration-300 hover:-translate-x-[3px] hover:translate-y-[-3px] hover:shadow-llg active:translate-x-0 active:translate-y-0 active:shadow-none dark:border-primary-foreground dark:text-primary-foreground`,
-        salWithShadowHiddenVert: `linear border-2 border-foreground bg-white font-medium text-foreground shadow-none transition-all duration-300 hover:translate-y-[-3px] hover:shadow-vlg active:translate-y-0 active:shadow-none dark:border-primary-foreground dark:text-primary-foreground`,
         salWithoutShadow: `focus:bg-salyellow/70 border-2 border-foreground bg-white text-foreground hover:bg-salYellow/80 active:bg-salYellow/70 dark:border-primary-foreground dark:text-primary-foreground`,
-        salWithShadowYlw: `linear border-2 border-foreground bg-salYellow font-medium text-foreground shadow-slg transition-all duration-300 hover:translate-x-[-1px] hover:bg-salYellowLt hover:shadow-slgHover focus:translate-x-[-1px] focus:bg-salYellowLt focus:shadow-slgHover active:translate-x-[-3px] active:translate-y-[3px] active:shadow-none dark:border-primary-foreground dark:text-primary-foreground`,
-        salWithShadowHiddenYlw: `linear border-2 border-foreground bg-salYellow font-medium text-foreground shadow-none transition-all duration-300 hover:translate-x-[3px] hover:translate-y-[-3px] hover:shadow-slg active:translate-x-0 active:translate-y-0 active:shadow-none white:bg-white dark:border-primary-foreground dark:text-primary-foreground`,
-        salWithShadowPink: `linear border-2 border-foreground bg-salPink font-medium text-foreground shadow-slg transition-all duration-300 hover:translate-x-[-1px] hover:bg-salPinkLt hover:shadow-slgHover focus:translate-x-[-1px] focus:bg-salPinkLt focus:shadow-slgHover active:translate-x-[-3px] active:translate-y-[3px] active:shadow-none dark:border-primary-foreground dark:text-primary-foreground`,
+        salWithShadow: cn(salShadowBase),
+
+        salWithShadowYlw: cn(
+          salShadowBase,
+          "bg-salYellow hover:bg-salYellowLt focus:bg-salYellowLt",
+        ),
+
+        salWithShadowPink: cn(
+          salShadowBase,
+          "bg-salPink hover:bg-salPinkLt focus:bg-salPinkLt",
+        ),
+        salWithShadowHidden: cn(salShadowHiddenBase),
+        salWithShadowHiddenYlw: cn(
+          salShadowHiddenBase,
+          "bg-salYellow white:bg-white",
+        ),
+        salWithShadowHiddenPink: cn(salShadowHiddenBase, "bg-salPink"),
+        salWithShadowHiddenBg: cn(salShadowHiddenBase, "bg-background"),
+        salWithShadowHiddenLeft: cn(
+          salShadowHiddenBase,
+          "!rounded-r-none border-r border-foreground hover:-translate-x-[3px] hover:shadow-llg",
+        ),
+        salWithShadowHiddenVert: cn(
+          salShadowHiddenBase,
+          "hover:translate-x-0 hover:shadow-vlg",
+        ),
       },
       size: {
         default: "h-13 px-4 py-2 text-base sm:h-11 sm:text-sm",

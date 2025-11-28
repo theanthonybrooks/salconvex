@@ -29,8 +29,14 @@ export function ThemedProvider({ children }: ThemedProviderProps) {
   // const userTheme = userData?.userPref?.theme;
   const isAdmin = userData?.user?.role?.includes("admin");
   const pathname = usePathname();
-  const forcedTheme =
-    !pathname.startsWith("/auth") && user ? undefined : "default";
+  const whiteRoutes = ["/render/post", "/call/social"];
+  const isWhiteRoute = whiteRoutes.some((route) => pathname.includes(route));
+
+  const forcedTheme = isWhiteRoute
+    ? "white"
+    : !pathname.startsWith("/auth") && user
+      ? undefined
+      : "default";
 
   const [isMounted, setIsMounted] = useState(false);
   useEffect(() => setIsMounted(true), []);

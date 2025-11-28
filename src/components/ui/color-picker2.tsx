@@ -1,6 +1,6 @@
 import type { JSX } from "react";
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import slugify from "slugify";
 
 import {
@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 
 import type { Doc } from "~/convex/_generated/dataModel";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/helpers/utilsFns";
 
 import { api } from "~/convex/_generated/api";
@@ -47,6 +48,16 @@ interface GradientStop {
   color: RGBA;
 }
 
+type Defaults = {
+  type: GradientType;
+  angle: number;
+  stops: GradientStop[];
+  solid: RGBA;
+};
+
+const defaultSolidColor = { r: 255, g: 231, b: 112, a: 1 };
+// const whiteRGBA = { r: 255, g: 255, b: 255, a: 1 };
+
 export type Swatch = Pick<Doc<"swatches">, "_id" | "value" | "paletteId">;
 
 type GradientType = "linear" | "radial" | "solid";
@@ -57,7 +68,7 @@ interface GradientColorPickerProps {
   selectedColor?: string;
   selectedSwatch?: Swatch;
   setSelectedColorAction?: (color: string) => void;
-  setSelectedSwatchAction: (swatch: Swatch) => void;
+  setSelectedSwatchAction: (swatch: Swatch | undefined) => void;
   options?: {
     showPreview?: boolean;
     showCode?: boolean;
@@ -153,9 +164,26 @@ const isGradient = (val: string) =>
 /* COLOR UTILS                                                                */
 /* -------------------------------------------------------------------------- */
 
+const generateCSS = (props: {
+  gradientType: GradientType;
+  stops: GradientStop[];
+  solidColor: RGBA;
+  angle: number;
+}): string => {
+  const { gradientType, stops, solidColor, angle } = props;
+
+  if (gradientType === "solid") return rgbaToString(solidColor);
+  const sortedStops = [...stops].sort((a, b) => a.offset - b.offset);
+  const stopStr = sortedStops
+    .map((s) => `${rgbaToString(s.color)} ${s.offset}%`)
+    .join(", ");
+  if (gradientType === "radial") return `radial-gradient(circle, ${stopStr})`;
+  return `linear-gradient(${angle}deg, ${stopStr})`;
+};
+
 const stringToRgba = (str: string): RGBA => {
-  if (!str) return { r: 0, g: 0, b: 0, a: 1 };
-  if (isGradient(str)) return { r: 0, g: 0, b: 0, a: 1 };
+  if (!str) return defaultSolidColor;
+  if (isGradient(str)) return defaultSolidColor;
 
   if (str.startsWith("rgb")) {
     const parts = str.match(/[\d.]+/g);
@@ -186,21 +214,20 @@ const stringToRgba = (str: string): RGBA => {
     !str.startsWith("rgb") &&
     !str.startsWith("hsl")
   ) {
-    return { r: 0, g: 0, b: 0, a: 1 };
+    return defaultSolidColor;
   }
-
   return hexToRgba(str);
 };
 
 const hexToRgba = (hex: string): RGBA => {
-  if (!hex || isGradient(hex)) return { r: 0, g: 0, b: 0, a: 1 };
+  if (!hex || isGradient(hex)) return defaultSolidColor;
 
   let c: string[] | number = hex.startsWith("#")
     ? hex.substring(1).split("")
     : [];
 
   // Fix: Removed the fallback to stringToRgba here to stop infinite loops
-  if (c.length === 0) return { r: 0, g: 0, b: 0, a: 1 };
+  if (c.length === 0) return defaultSolidColor;
 
   if (c.length === 3) {
     c = [c[0], c[0], c[1], c[1], c[2], c[2]];
@@ -297,7 +324,8 @@ const hslaToString = ({ h, s, l, a }: HSLA): string =>
 
 const interpolateColor = (stops: GradientStop[], offset: number): RGBA => {
   const sorted = [...stops].sort((a, b) => a.offset - b.offset);
-  if (sorted.length === 0) return { r: 0, g: 0, b: 0, a: 1 };
+  // if (sorted.length === 0) return { r: 0, g: 0, b: 0, a: 1 };
+  if (sorted.length === 0) return defaultSolidColor;
   if (offset <= sorted[0].offset) return { ...sorted[0].color };
   if (offset >= sorted[sorted.length - 1].offset)
     return { ...sorted[sorted.length - 1].color };
@@ -379,16 +407,15 @@ export default function GradientColorPicker({
   const addSwatchMutation = useMutation(api.functions.palettes.addColor);
   const deleteSwatchMutation = useMutation(api.functions.palettes.deleteColor);
 
-  const getInitialState = useCallback(() => {
-    const defaultSolidRgba = hslaToRgba({ h: 50, s: 100, l: 72, a: 1 });
-    const defaults = {
-      type: "solid" as GradientType,
+  function getInitialState(selectedColor?: string): Defaults {
+    const defaults: Defaults = {
+      type: "solid",
       angle: 45,
       stops: [
         { id: "1", offset: 0, color: { r: 246, g: 211, b: 101, a: 1 } },
         { id: "2", offset: 100, color: { r: 253, g: 160, b: 133, a: 1 } },
       ],
-      solid: defaultSolidRgba,
+      solid: defaultSolidColor,
     };
 
     if (!selectedColor) return defaults;
@@ -397,23 +424,57 @@ export default function GradientColorPicker({
       const parsedStops = parseGradientStopsFromCss(selectedColor);
       if (parsedStops.length < 2) return defaults;
 
-      const type = selectedColor.includes("radial") ? "radial" : "linear";
-      const angle = getGradientAngle(selectedColor);
-
       return {
-        type: type as GradientType,
-        angle,
+        type: selectedColor.includes("radial") ? "radial" : "linear",
+        angle: getGradientAngle(selectedColor),
         stops: parsedStops,
         solid: parsedStops[0].color,
       };
-    } else {
-      const color = stringToRgba(selectedColor);
-      return { ...defaults, type: "solid" as GradientType, solid: color };
     }
-  }, [selectedColor]);
+
+    const color = stringToRgba(selectedColor);
+    return { ...defaults, type: "solid" as GradientType, solid: color };
+  }
+
+  // const getInitialState = useCallback(() => {
+  //   const defaults = {
+  //     type: "solid" as GradientType,
+  //     angle: 45,
+  //     stops: [
+  //       { id: "1", offset: 0, color: { r: 246, g: 211, b: 101, a: 1 } },
+  //       { id: "2", offset: 100, color: { r: 253, g: 160, b: 133, a: 1 } },
+  //     ],
+  //     solid: defaultSolidColor,
+  //   };
+
+  //   if (!selectedColor) return defaults;
+  //   if (!firstRender.current) return defaults;
+  //   console.log("initialStateChange", selectedColor);
+  //   if (isGradient(selectedColor)) {
+  //     const parsedStops = parseGradientStopsFromCss(selectedColor);
+  //     if (parsedStops.length < 2) return defaults;
+
+  //     const type = selectedColor.includes("radial") ? "radial" : "linear";
+  //     const angle = getGradientAngle(selectedColor);
+
+  //     return {
+  //       type: type as GradientType,
+  //       angle,
+  //       stops: parsedStops,
+  //       solid: parsedStops[0].color,
+  //     };
+  //   } else {
+  //     const color = stringToRgba(selectedColor);
+  //     return { ...defaults, type: "solid" as GradientType, solid: color };
+  //   }
+  // }, [selectedColor]);
 
   const firstRender = useRef(true);
-  const seedData = useRef(getInitialState()).current;
+  // const seedData = useRef(getInitialState()).current;
+  const seedData = useMemo(
+    () => getInitialState(selectedColor),
+    [selectedColor],
+  );
 
   const [gradientType, setGradientType] = useState<GradientType>(seedData.type);
   const [angle, setAngle] = useState<number>(seedData.angle);
@@ -427,6 +488,7 @@ export default function GradientColorPicker({
   );
 
   const [activePaletteValue, setActivePaletteValue] = useState<string>("");
+  // const [matchingSwatch, setMatchingSwatch] = useState<boolean>(false);
   const [newPaletteName, setNewPaletteName] = useState("");
   const [isAddingPalette, setIsAddingPalette] = useState(false);
 
@@ -435,6 +497,10 @@ export default function GradientColorPicker({
     gradientType === "solid" ? solidColor : activeStop.color;
   const activeColorHsla = rgbaToHsla(activeColorRgba);
   const activeHex = rgbaToHex(activeColorRgba);
+  const cleanActiveHex = activeHex.replace("#", "");
+  const [activeHexValue, setActiveHexValue] = useState<string>(cleanActiveHex);
+  const currentCSS = generateCSS({ gradientType, stops, solidColor, angle });
+  // const [hexInput, setHexInput] = useState(activeHex.replace("#", ""));
 
   const activePalette = palettes?.find((p) => p.value === activePaletteValue);
 
@@ -447,7 +513,16 @@ export default function GradientColorPicker({
     );
   };
 
-  const handleActiveColorChange = (newRgba: RGBA): void => {
+  const handleActiveColorChange = (
+    newRgba: RGBA,
+    check?: { source: "swatch" | "input" | "colorPicker" | null },
+  ): void => {
+    // const fromSwatch = check?.source === "swatch";
+    const fromInput = check?.source === "input";
+
+    // setMatchingSwatch(fromSwatch);
+
+    if (!fromInput) setActiveHexValue(rgbaToHex(newRgba).replace("#", ""));
     if (gradientType === "solid") {
       setSolidColor(newRgba);
     } else {
@@ -468,6 +543,7 @@ export default function GradientColorPicker({
       ),
     );
     setActiveStopId(newId);
+    setActiveHexValue(rgbaToHex(newColor).replace("#", ""));
   };
 
   const deleteStop = (id: string): void => {
@@ -477,34 +553,22 @@ export default function GradientColorPicker({
     if (activeStopId === id) setActiveStopId(newStops[0].id);
   };
 
-  const generateCSS = useCallback((): string => {
-    if (gradientType === "solid") return rgbaToString(solidColor);
-    const sortedStops = [...stops].sort((a, b) => a.offset - b.offset);
-    const stopStr = sortedStops
-      .map((s) => `${rgbaToString(s.color)} ${s.offset}%`)
-      .join(", ");
-    if (gradientType === "radial") return `radial-gradient(circle, ${stopStr})`;
-    return `linear-gradient(${angle}deg, ${stopStr})`;
-  }, [stops, angle, gradientType, solidColor]);
-
   useEffect(() => {
     if (firstRender.current) {
       firstRender.current = false;
       return;
     }
     if (setSelectedColorAction) {
-      const css = generateCSS();
-      if (selectedColor !== css) setSelectedColorAction(css);
+      if (selectedColor !== currentCSS) setSelectedColorAction(currentCSS);
     }
-  }, [
-    stops,
-    angle,
-    gradientType,
-    solidColor,
-    setSelectedColorAction,
-    selectedColor,
-    generateCSS,
-  ]);
+  }, [currentCSS, setSelectedColorAction, selectedColor]);
+
+  // useEffect(() => {
+  //   const trimmedActiveHex = activeHex.replace("#", "");
+  //   if (trimmedActiveHex !== hexInputRef.current) {
+  //     hexInputRef.current = trimmedActiveHex;
+  //   }
+  // }, [activeHex]);
 
   useEffect(() => {
     if (activeStopId !== "1" || gradientType === "solid") return;
@@ -514,7 +578,7 @@ export default function GradientColorPicker({
   }, [gradientType, selectedSwatch, stops, activeStopId]);
 
   const copyCSS = (): void => {
-    navigator.clipboard.writeText(`background: ${generateCSS()};`);
+    navigator.clipboard.writeText(`background: ${currentCSS};`);
     setCopied("css");
     setTimeout(() => setCopied(false), 2000);
   };
@@ -522,13 +586,10 @@ export default function GradientColorPicker({
   const handleTypeSwitch = (type: GradientType) => {
     setGradientType(type);
     if (type === "solid" && gradientType !== "solid") {
-      console.log(activeStop);
       setSolidColor(activeStop.color);
       setRightPanelTab("library");
     }
   };
-
-  const currentCSS = generateCSS();
 
   const matchingSwatch =
     selectedSwatch &&
@@ -563,6 +624,7 @@ export default function GradientColorPicker({
       setNewPaletteName("");
       setActivePaletteValue(slugify(newPaletteName));
       setIsAddingPalette(false);
+      // if (matchingSwatch) setMatchingSwatch(false);
     } catch (e) {
       console.error("Failed to add palette", e);
     }
@@ -573,6 +635,7 @@ export default function GradientColorPicker({
     try {
       await deletePalette({ paletteId: activePalette._id });
       setActivePaletteValue(palettes?.[0]?.value ?? defaultPalette);
+      // if (matchingSwatch) setMatchingSwatch(false);
     } catch (e) {
       console.error("Failed to delete palette", e);
     }
@@ -586,23 +649,28 @@ export default function GradientColorPicker({
     const gradient = isGradient(valueToSave);
 
     try {
-      await addSwatchMutation({
+      const result = await addSwatchMutation({
         paletteId: activePalette._id,
         value: valueToSave,
         gradient: gradient,
       });
+      if (!result || !result.success) throw new Error("Failed to add swatch");
+      setSelectedSwatchAction(result.swatch as Swatch);
+      // setMatchingSwatch(true);
     } catch (e) {
       console.error("Failed to add swatch", e);
     }
   };
 
   const handleDeleteSwatch = async () => {
-    if (!activePalette || !matchingSwatch) return;
+    if (!activePalette || !selectedSwatch) return;
     try {
       await deleteSwatchMutation({
         paletteId: activePalette._id,
-        value: matchingSwatch.value,
+        value: selectedSwatch.value,
       });
+      if (matchingSwatch) setSelectedSwatchAction(undefined);
+      // if (matchingSwatch) setMatchingSwatch(false);
     } catch (e) {
       console.error("Failed to delete swatch", e);
     }
@@ -610,21 +678,15 @@ export default function GradientColorPicker({
 
   const handleSwatchClick = (swatch: Swatch) => {
     if (!activePalette) return;
+    if (activeHex === swatch.value) return;
     const colorVal = swatch.value;
+    const currentIsGradient = isGradient(currentCSS);
+
     if (isGradient(colorVal)) {
       const parsedStops = parseGradientStopsFromCss(colorVal);
 
-      if (parsedStops.length === 1) {
-        handleActiveColorChange(parsedStops[0].color);
-        setSelectedSwatchAction({
-          value: normalizeGradientString(colorVal),
-          _id: swatch._id,
-          paletteId: activePalette._id,
-        });
-        return;
-      }
-
       if (parsedStops.length > 0) {
+        // setMatchingSwatch(true);
         const newAngle = getGradientAngle(colorVal);
         setAngle(newAngle);
 
@@ -636,7 +698,9 @@ export default function GradientColorPicker({
       }
     } else {
       const newColor = stringToRgba(colorVal);
-      handleActiveColorChange(newColor);
+      handleActiveColorChange(newColor, {
+        source: !currentIsGradient ? "swatch" : null,
+      });
     }
 
     setSelectedSwatchAction({
@@ -644,6 +708,16 @@ export default function GradientColorPicker({
       _id: swatch._id,
       paletteId: activePalette._id,
     });
+  };
+
+  const handleStopClick = (id: string) => {
+    setActiveStopId(id);
+
+    setActiveHexValue(
+      rgbaToHex(
+        stops.find((s) => s.id === id)?.color ?? defaultSolidColor,
+      ).replace("#", ""),
+    );
   };
 
   if (palettes === undefined) {
@@ -659,7 +733,7 @@ export default function GradientColorPicker({
       {showPreview && (
         <div
           className="mb-8 h-64 w-full rounded-2xl border-4 border-white shadow-lg transition-all duration-300 md:h-80"
-          style={{ background: generateCSS() }}
+          style={{ background: currentCSS }}
         />
       )}
 
@@ -703,6 +777,9 @@ export default function GradientColorPicker({
             <input
               type="number"
               value={angle}
+              step={15}
+              min={0}
+              max={360}
               onChange={(e) => setAngle(Number(e.target.value))}
               className="w-full max-w-11 bg-transparent text-right text-sm font-medium focus:outline-none"
             />
@@ -760,34 +837,41 @@ export default function GradientColorPicker({
                 <span className="mr-1 text-slate-400">#</span>
                 <input
                   type="text"
-                  value={
-                    copied === "hex" ? "Copied!" : activeHex.replace("#", "")
-                  }
+                  value={copied === "hex" ? "COPIED!" : activeHexValue}
                   onChange={(e) => {
-                    const val = e.target.value;
-                    if (/^[0-9A-Fa-f]{0,6}$/.test(val)) {
-                      if (val.length === 6)
-                        handleActiveColorChange(hexToRgba("#" + val));
-                    }
+                    const val = e.target.value.replace("#", "");
+
+                    if (!/^[0-9A-Fa-f]{0,6}$/.test(val)) return;
+                    setActiveHexValue(val);
+                    handleActiveColorChange(hexToRgba("#" + val), {
+                      source: "input",
+                    });
+                  }}
+                  onBlur={() => {
+                    if (activeHexValue.length < 3)
+                      setActiveHexValue(cleanActiveHex);
                   }}
                   className="w-full bg-transparent font-mono text-sm uppercase focus:outline-none"
                 />
-                <button
+                <Button
+                  variant="icon"
+                  size="icon"
                   onClick={() => {
-                    navigator.clipboard.writeText(activeHex).then(() => {
+                    navigator.clipboard.writeText(activeHexValue).then(() => {
                       setCopied("hex");
                       setTimeout(() => setCopied(false), 2000);
                     });
                   }}
+                  disabled={copied === "hex" || activeHexValue.length < 3}
                   className={cn(
-                    "rounded-mdpx-3 flex items-center gap-2 py-1.5 text-xs font-bold transition-all",
+                    "flex size-6 items-center gap-2 py-1.5 text-xs font-bold transition-all",
                     copied === "hex"
                       ? "text-green-700"
                       : "text-muted-foreground hover:text-foreground",
                   )}
                 >
                   {copied === "hex" ? <Check size={14} /> : <Copy size={14} />}
-                </button>
+                </Button>
               </div>
             </div>
 
@@ -899,7 +983,7 @@ export default function GradientColorPicker({
                 <p className="absolute left-2 top-0 text-2xs text-green-400">
                   CSS Preview
                 </p>
-                {generateCSS()};
+                {currentCSS};
               </pre>
             )}
           </div>
@@ -949,48 +1033,91 @@ export default function GradientColorPicker({
                 <div className="space-y-2">
                   {[...stops]
                     .sort((a, b) => a.offset - b.offset)
-                    .map((stop) => (
-                      <div
-                        key={stop.id}
-                        onClick={() => setActiveStopId(stop.id)}
-                        className={`group flex cursor-pointer items-center gap-3 rounded-lg border p-2 transition-all ${activeStopId === stop.id ? "border-blue-400 bg-white shadow-sm" : "border-transparent bg-transparent hover:bg-slate-100"}`}
-                      >
+                    .map((stop) => {
+                      const activeStop = activeStopId === stop.id;
+                      return (
                         <div
-                          className="h-8 w-8 rounded border border-slate-200 shadow-sm"
-                          style={{ background: rgbaToString(stop.color) }}
-                        />
-                        <div className="flex-1 font-mono text-xs uppercase text-slate-600">
-                          {rgbaToHex(stop.color)}
-                        </div>
-                        <div className="relative w-16">
-                          <input
-                            type="number"
-                            value={Math.round(stop.offset)}
-                            onChange={(e) => {
-                              const val = Math.max(
-                                0,
-                                Math.min(100, parseInt(e.target.value) || 0),
-                              );
-                              handleStopChange(stop.id, { offset: val });
-                            }}
-                            className="w-full rounded bg-slate-100 px-2 py-1 text-right text-xs font-medium focus:outline-blue-500"
-                          />
-                          <span className="pointer-events-none absolute right-6 top-1.5 text-[10px] text-slate-400">
-                            %
-                          </span>
-                        </div>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            deleteStop(stop.id);
-                          }}
-                          className="rounded-md p-1.5 text-slate-300 opacity-0 transition-all hover:bg-red-50 hover:text-red-500 group-hover:opacity-100"
-                          disabled={stops.length <= 2}
+                          key={stop.id}
+                          onClick={() => handleStopClick(stop.id)}
+                          className={cn(
+                            "group flex cursor-pointer items-center gap-3 rounded-lg border p-2 transition-all",
+                            activeStop
+                              ? "border-blue-400 bg-white shadow-sm"
+                              : "border-transparent bg-transparent hover:bg-slate-100",
+                          )}
                         >
-                          <Trash2 size={14} />
-                        </button>
-                      </div>
-                    ))}
+                          <div
+                            className="size-8 shrink-0 rounded border border-slate-200 shadow-sm"
+                            style={{ background: rgbaToString(stop.color) }}
+                          />
+                          {activeStop ? (
+                            <div
+                              className={cn(
+                                "flex items-center gap-1 rounded bg-slate-100 px-2 py-0.5 text-right text-xs font-medium focus:outline-blue-500",
+                              )}
+                            >
+                              <span className="text-slate-400">#</span>
+                              <input
+                                type="text"
+                                value={
+                                  copied === "hex" ? "COPIED!" : activeHexValue
+                                }
+                                onChange={(e) => {
+                                  const val = e.target.value.replace("#", "");
+
+                                  if (!/^[0-9A-Fa-f]{0,6}$/.test(val)) return;
+
+                                  // setHexInput(val);
+                                  setActiveHexValue(val);
+                                  handleActiveColorChange(
+                                    hexToRgba("#" + val),
+                                    {
+                                      source: "input",
+                                    },
+                                  );
+                                }}
+                                onBlur={() => {
+                                  if (activeHexValue.length < 3)
+                                    setActiveHexValue(cleanActiveHex);
+                                }}
+                                className="w-full bg-transparent font-mono text-sm uppercase focus:outline-none"
+                              />
+                            </div>
+                          ) : (
+                            <div className="flex-1 font-mono text-xs uppercase text-slate-600">
+                              {rgbaToHex(stop.color)}
+                            </div>
+                          )}
+                          <div className="relative w-16 shrink-0">
+                            <input
+                              type="number"
+                              value={Math.round(stop.offset)}
+                              onChange={(e) => {
+                                const val = Math.max(
+                                  0,
+                                  Math.min(100, parseInt(e.target.value) || 0),
+                                );
+                                handleStopChange(stop.id, { offset: val });
+                              }}
+                              className="w-full rounded bg-slate-100 px-2 py-1 text-right text-xs font-medium focus:outline-blue-500"
+                            />
+                            <span className="pointer-events-none absolute right-6 top-1.5 text-[10px] text-slate-400">
+                              %
+                            </span>
+                          </div>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              deleteStop(stop.id);
+                            }}
+                            className="rounded-md p-1.5 text-slate-300 opacity-0 transition-all hover:bg-red-50 hover:text-red-500 disabled:pointer-events-none disabled:invisible group-hover:opacity-100"
+                            disabled={stops.length <= 2}
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
+                      );
+                    })}
                 </div>
               </div>
             )}
@@ -1097,7 +1224,11 @@ export default function GradientColorPicker({
                       ) : (
                         <Save size={12} />
                       )}
-                      {matchingSwatch ? "Delete Swatch" : "Save Color"}
+                      {matchingSwatch
+                        ? "Delete Swatch"
+                        : gradientType === "solid"
+                          ? "Save Color"
+                          : "Save Gradient"}
                     </button>
                   </div>
 
@@ -1110,19 +1241,28 @@ export default function GradientColorPicker({
                     </div>
                   ) : (
                     <div className="grid grid-cols-6 gap-2">
-                      {activePalette.colors.map((swatch, idx) => (
-                        <div
-                          key={`${swatch.value}-${idx}`}
-                          className={`group relative aspect-square w-full cursor-pointer overflow-hidden rounded-md border shadow-sm transition-all ${
-                            swatch.value === selectedSwatch?.value
-                              ? "z-10 scale-105 border-blue-500 ring-2 ring-blue-500"
-                              : "border-slate-200 ring-0 hover:z-10 hover:ring-2 hover:ring-blue-300"
-                          }`}
-                          style={{ background: swatch.value }}
-                          onClick={() => handleSwatchClick(swatch)}
-                          title={swatch.value}
-                        />
-                      ))}
+                      {activePalette.colors.map((swatch, idx) => {
+                        const activeSwatch =
+                          swatch.value === selectedSwatch?.value &&
+                          matchingSwatch;
+                        return (
+                          <div
+                            key={`${swatch.value}-${idx}`}
+                            className={cn(
+                              "group relative aspect-square w-full cursor-pointer overflow-hidden rounded-md border shadow-sm transition-all",
+                              activeSwatch
+                                ? "z-10 scale-105 cursor-default border-blue-500 ring-2 ring-blue-500"
+                                : "border-slate-200 ring-0 hover:z-10 hover:ring-2 hover:ring-blue-300",
+                            )}
+                            style={{ background: swatch.value }}
+                            onClick={() => {
+                              if (activeSwatch) return;
+                              handleSwatchClick(swatch);
+                            }}
+                            title={swatch.value}
+                          />
+                        );
+                      })}
                     </div>
                   )}
                 </div>
@@ -1148,8 +1288,7 @@ export default function GradientColorPicker({
             </button>
           </div>
           <pre className="whitespace-pre-wrap break-all font-mono text-sm leading-relaxed text-slate-300">
-            <span className="text-purple-400">background</span>: {generateCSS()}
-            ;
+            <span className="text-purple-400">background</span>: {currentCSS};
           </pre>
         </div>
       )}
@@ -1235,57 +1374,63 @@ function GradientSlider({
         />
       </div>
 
-      {stops.map((stop) => (
-        <div
-          key={stop.id}
-          className="absolute top-0 z-10 flex w-4 flex-col items-center"
-          style={{ left: `calc(${stop.offset}% - 8px)` }}
-        >
+      {stops.map((stop) => {
+        const activeStop = activeStopId === stop.id;
+        return (
           <div
-            className="cursor-grab hover:z-20 active:cursor-grabbing"
-            onMouseDown={(e) => handleMouseDown(e, stop.id)}
+            key={stop.id}
+            className={cn(
+              "absolute top-0 z-10 flex w-4 flex-col items-center",
+              activeStop && "z-20",
+            )}
+            style={{ left: `calc(${stop.offset}% - 8px)` }}
           >
             <div
-              className={`flex flex-col items-center justify-center transition-transform ${
-                activeStopId === stop.id ? "z-30 scale-110" : "scale-100"
-              }`}
+              className="cursor-grab hover:z-20 active:cursor-grabbing"
+              onMouseDown={(e) => handleMouseDown(e, stop.id)}
             >
               <div
-                className={`h-11 w-4 rounded-lg border-2 shadow-sm ring-slate-800/20 ${
-                  activeStopId === stop.id
-                    ? "border-slate-800 ring-2"
-                    : "border-white ring-1"
+                className={`flex flex-col items-center justify-center transition-transform ${
+                  activeStop ? "z-30 scale-110" : "scale-100"
                 }`}
-                style={{ backgroundColor: rgbaToString(stop.color) }}
-              />
+              >
+                <div
+                  className={`h-11 w-4 rounded-lg border-2 shadow-sm ring-slate-800/20 ${
+                    activeStop
+                      ? "border-slate-800 ring-2"
+                      : "border-white ring-1"
+                  }`}
+                  style={{ backgroundColor: rgbaToString(stop.color) }}
+                />
+              </div>
             </div>
-          </div>
 
-          <input
-            type="number"
-            min={0}
-            max={100}
-            value={Math.round(stop.offset)}
-            onMouseDown={(e) => e.stopPropagation()}
-            onClick={(e) => {
-              e.stopPropagation();
-              onSelect(stop.id);
-            }}
-            onChange={(e) => {
-              const val = Math.max(
-                0,
-                Math.min(100, parseInt(e.target.value) || 0),
-              );
-              onStopChange(stop.id, { offset: val });
-            }}
-            className={`arrowless mt-2 min-w-8 rounded border bg-white p-1 text-center text-xs font-medium shadow-sm focus:border-border focus:text-sm focus:outline-none focus:ring-1 focus:ring-foreground ${
-              activeStopId === stop.id
-                ? "border-slate-800 text-slate-900"
-                : "border-slate-200 text-slate-500"
-            }`}
-          />
-        </div>
-      ))}
+            <input
+              type="number"
+              min={0}
+              max={100}
+              value={Math.round(stop.offset)}
+              onMouseDown={(e) => e.stopPropagation()}
+              onClick={(e) => {
+                e.stopPropagation();
+                onSelect(stop.id);
+              }}
+              onChange={(e) => {
+                const val = Math.max(
+                  0,
+                  Math.min(100, parseInt(e.target.value) || 0),
+                );
+                onStopChange(stop.id, { offset: val });
+              }}
+              className={`arrowless mt-2 min-w-8 rounded border bg-white p-1 text-center text-xs font-medium shadow-sm focus:border-border focus:text-sm focus:outline-none focus:ring-1 focus:ring-foreground ${
+                activeStop
+                  ? "border-slate-800 text-slate-900"
+                  : "border-slate-200 text-slate-500"
+              }`}
+            />
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -1401,6 +1546,7 @@ function AdvancedColorPicker({
     }
 
     try {
+      console.log("eyedropper");
       const eyeDropper = new window.EyeDropper();
       const { sRGBHex } = await eyeDropper.open();
       const rgba = hexToRgba(sRGBHex);

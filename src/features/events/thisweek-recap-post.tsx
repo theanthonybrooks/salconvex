@@ -1,3 +1,5 @@
+import { promoBlock, recapCaptionIntro } from "@/constants/socialConsts";
+
 import { SortOptions } from "@/types/thelist";
 
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -209,9 +211,7 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
 
     const sortedDates = Object.keys(grouped).sort();
 
-    let content = `A quick rundown of what I've found that's ending in the next 7 days. The links for everything are on The Street Art List website (link in bio).\n\n`;
-    content += `DM or email at hey@thestreetartlist.com with any feedback or things that you think would be useful to include. Also, use the submission form on the site for any open calls that I haven't included!\n\n`;
-    content += `P.S. - Any questions related to the events should be asked to the organizers directly. I'm not organizing anything unless I say otherwise, so I'm unfortunately not able to answer any questions beyond the info provided on the site.\n\n`;
+    let content = recapCaptionIntro + "\n\n";
 
     let counter = 1;
     for (const date of sortedDates) {
@@ -227,12 +227,9 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
       content += "\n";
     }
 
-    content += `Access to all of the open calls, the ability to bookmark, hide, and track applications starts at $3/month. The coding of the site, searching, reading through, addition of open calls, and these IG posts are all done by me @anthonybrooksart.\n\n`;
+    content += `Access to all of the open calls, the ability to bookmark, hide, and track applications starts at $3/month. The coding of the site, searching, reading through, addition of open calls, and these IG posts are all done by me, @anthonybrooksart.\n\n`;
 
-    content += `The Street Art List is a platform dedicated to 2D Public Art - Sharing mural, graffiti, and street art calls (RFP, RFQ, EOI, etc). Initially starting as an archive of the industy, the site also offers a global map of street art, graffiti jams, and mural festivals/mural projects (over 1,200 and counting), yearly event calendar, and resources for artist and organizers.\n\n`;
-    content += `Find out more at thestreetartlist.com.\n\n`;
-
-    content += `#publicartist #callforartist #artistopencall`;
+    content += promoBlock;
 
     setCaptionText(content);
     setCharCount(content.length);
@@ -246,6 +243,9 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
     setAltText(altText);
     setAltCharCount(altText.length);
   }, [filteredResults, displayRange]);
+
+  const mobileScalingClasses =
+    "origin-top-left scale-[0.6] sm:scale-100 -mb-[78rem] sm:mb-0";
 
   return (
     <>
@@ -267,9 +267,14 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
         </Button>
       </div>
 
-      <div className="scrollable mini flex w-full max-w-[90vw] flex-col-reverse gap-6 p-6 sm:grid sm:grid-cols-2">
-        <div className="mx-auto flex w-fit flex-col gap-y-6">
-          <div className="group relative">
+      <div className="scrollable justy mini flex w-full max-w-[90vw] flex-col-reverse gap-6 p-6 sm:grid sm:grid-cols-2">
+        <div
+          className={cn(
+            "mx-auto flex w-fit flex-col gap-y-6",
+            mobileScalingClasses,
+          )}
+        >
+          <div className={cn("group relative")}>
             <RecapCover
               id="recap-cover"
               dateRange={displayRange}
@@ -325,6 +330,7 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
               <div
                 className={cn(
                   "group relative",
+
                   excludedIds.includes(event._id) && "opacity-50 grayscale",
                 )}
                 key={event._id}

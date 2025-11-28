@@ -1,6 +1,7 @@
 "use client";
 
 import { openCallCategoryFields } from "@/constants/openCallConsts";
+import { promoBlock } from "@/constants/socialConsts";
 
 import { OpenCallData } from "@/types/openCallTypes";
 
@@ -112,10 +113,7 @@ export const PostCaptionDialog = ({
     content += `\n🔗 The links and full details for all open calls are on thestreetartlist.com (link in bio). Memberships start at $3/month`;
     content += `\n\nPlease contact the organizers directly with any open call-related questions you may have 💛`;
 
-    content += `\n\nThe Street Art List is a platform dedicated to 2D Public Art - Sharing mural, graffiti, and street art calls (RFP, RFQ, EOI, etc). Initially starting as an archive of the industy, the site also offers a global map of street art, graffiti jams, and mural festivals/mural projects (over 1,200 and counting), yearly event calendar, and resources for artist and organizers.`;
-    content += `\n\nFind out more at thestreetartlist.com.`;
-
-    content += `\n\n#publicartist #callforartist #artistopencall`;
+    content += "\n\n" + promoBlock;
 
     setCaptionText(content);
 

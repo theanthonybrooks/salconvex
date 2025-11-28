@@ -31,11 +31,14 @@ export const addColor = mutation({
     gradient: v.boolean(),
   },
   handler: async (ctx, { paletteId, value, gradient }) => {
-    return await ctx.db.insert("swatches", {
+    const result = await ctx.db.insert("swatches", {
       paletteId,
       value,
       gradient,
     });
+    if (!result) return { success: false, message: "Failed to add swatch" };
+    const swatch = await ctx.db.get(result);
+    return { success: true, swatch, message: "Swatch added successfully" };
   },
 });
 

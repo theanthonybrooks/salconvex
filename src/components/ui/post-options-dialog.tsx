@@ -3,7 +3,9 @@
 import type { PostSettings } from "@/app/(pages)/(artist)/thelist/components/OpenCallSocials";
 
 import { Dispatch, SetStateAction } from "react";
+import { useIsMobile } from "@/hooks/use-media-query";
 
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -36,21 +38,26 @@ const fontSizeOptions = [
 ];
 
 type PostOptionDialogProps = {
+  onDownloadAction: () => void;
   onChangeAction: (props: Partial<PostSettings>) => void;
   settings: PostSettings;
   className?: string;
   open: boolean;
   setOpenAction: Dispatch<SetStateAction<boolean>>;
+  pending: boolean;
 };
 
 export const PostOptionDialog = ({
+  onDownloadAction,
   onChangeAction,
   settings,
   className,
   open,
   setOpenAction,
+  pending,
 }: PostOptionDialogProps) => {
   const { fontSize, budget } = settings;
+  const isMobile = useIsMobile(768);
   return (
     <Dialog open={open} onOpenChange={setOpenAction}>
       <DialogContent
@@ -59,6 +66,8 @@ export const PostOptionDialog = ({
           className,
         )}
         overlayClassName="hidden"
+        isDraggable={!isMobile}
+        snapTo="right"
       >
         <DialogHeader>
           <DialogTitle>Post Options</DialogTitle>
@@ -95,6 +104,13 @@ export const PostOptionDialog = ({
             />
           </div>
         </div>
+        <Button
+          variant="salWithShadowHidden"
+          disabled={pending}
+          onClick={onDownloadAction}
+        >
+          {pending ? "Downloading..." : "Download"}
+        </Button>
       </DialogContent>
     </Dialog>
   );

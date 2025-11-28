@@ -1,6 +1,8 @@
 "use client";
 
 import * as React from "react";
+import { useState } from "react";
+import { useIsMobile } from "@/hooks/use-media-query";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 
 import { X } from "lucide-react";
@@ -36,6 +38,8 @@ interface CustomDialogContentProps
   overlayClassName?: string;
   closeBtnClassName?: string;
   zIndex?: string;
+  isDraggable?: boolean;
+  snapTo?: "left" | "right" | "center";
 }
 
 const DialogContent = React.forwardRef<
@@ -50,36 +54,92 @@ const DialogContent = React.forwardRef<
       showCloseButton = true,
       closeBtnClassName,
       zIndex,
+      isDraggable = false,
+      snapTo = "center",
       ...props
     },
     ref,
-  ) => (
-    <DialogPortal>
-      <DialogOverlay className={cn(overlayClassName, zIndex)} />
-      <DialogPrimitive.Content
-        ref={ref}
-        className={cn(
-          "fixed left-1/2 top-1/2 z-[31] grid w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 rounded border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg",
-          className,
-          zIndex,
-        )}
-        {...props}
-      >
-        {children}
-        {showCloseButton && (
-          <DialogPrimitive.Close
-            className={cn(
-              "focus:outline-hidden absolute right-4 top-4 rounded-sm opacity-70 transition-opacity hover:cursor-pointer hover:opacity-100 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground",
-              closeBtnClassName,
-            )}
-          >
-            <X className="size-8 hover:text-red-600 md:size-6 xl:size-7" />
-            <span className="sr-only">Close</span>
-          </DialogPrimitive.Close>
-        )}
-      </DialogPrimitive.Content>
-    </DialogPortal>
-  ),
+  ) => {
+    const isMobile = useIsMobile(768);
+    const [position, setPosition] = useState({ x: 0, y: 0 });
+    const [isDragging, setIsDragging] = useState(false);
+    const [initialMousePosition, setInitialMousePosition] = useState({
+      x: 0,
+      y: 0,
+    });
+    const [initialPosition, setInitialPosition] = useState({ x: 0, y: 0 });
+    const canDrag = isDraggable && !isMobile;
+    const handleMouseDown = (e: React.MouseEvent) => {
+      if (!canDrag) return;
+      if (e.target !== e.currentTarget) return;
+
+      setIsDragging(true);
+      setInitialMousePosition({ x: e.clientX, y: e.clientY });
+      setInitialPosition({ x: position.x, y: position.y });
+    };
+    const handleMouseMove = (e: React.MouseEvent) => {
+      if (!canDrag) return;
+
+      if (isDragging) {
+        const deltaMove = {
+          x: e.clientX - initialMousePosition.x,
+          y: e.clientY - initialMousePosition.y,
+        };
+        setPosition({
+          x: initialPosition.x + deltaMove.x,
+          y: initialPosition.y + deltaMove.y,
+        });
+      }
+    };
+    const handleMouseUp = () => {
+      if (!canDrag) return;
+      setIsDragging(false);
+    };
+
+    const alignValue = snapTo === "left" ? 95 : snapTo === "center" ? 10 : 5;
+    return (
+      <DialogPortal>
+        <DialogOverlay className={cn(overlayClassName, zIndex)} />
+        <DialogPrimitive.Content
+          ref={ref}
+          className={cn(
+            "fixed left-1/2 top-1/2 z-[31] grid w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 rounded border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg",
+            className,
+            zIndex,
+            canDrag &&
+              "translate-x-auto translate-y-auto scale-100 cursor-grab border-solid",
+            canDrag &&
+              isDragging &&
+              "scale-95 cursor-grabbing border-2 border-dashed",
+          )}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          style={
+            canDrag
+              ? {
+                  transform: `translate(-${alignValue}%, -50%) translate(${position.x}px, ${position.y}px)`,
+                }
+              : undefined
+          }
+          {...props}
+        >
+          {children}
+          {showCloseButton && (
+            <DialogPrimitive.Close
+              className={cn(
+                "focus:outline-hidden absolute right-4 top-4 rounded-sm opacity-70 transition-opacity hover:cursor-pointer hover:opacity-100 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground",
+                closeBtnClassName,
+              )}
+            >
+              <X className="size-8 hover:text-red-600 md:size-6 xl:size-7" />
+              <span className="sr-only">Close</span>
+            </DialogPrimitive.Close>
+          )}
+        </DialogPrimitive.Content>
+      </DialogPortal>
+    );
+  },
 );
 DialogContent.displayName = DialogPrimitive.Content.displayName;
 

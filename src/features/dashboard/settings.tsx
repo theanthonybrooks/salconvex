@@ -765,7 +765,7 @@ export default function SettingsPage() {
               )}
 
               {/* Preferences */}
-              {isArtist && activeSub && (
+              {((isArtist && activeSub) || isAdmin) && (
                 <Card className={cn(isArtist && activeSub && "self-start")}>
                   <CardHeader>
                     <CardTitle>Preferences</CardTitle>
@@ -808,7 +808,7 @@ export default function SettingsPage() {
                             Set your local timezone
                           </p>
                           <p className="hidden text-xs italic text-muted-foreground lg:block">
-                            (if you want it used to display deadlines)
+                            (used for open call deadlines)
                           </p>
                         </span>
                       </div>
@@ -869,78 +869,44 @@ export default function SettingsPage() {
                       />
                     </div>
                     <Separator />
-                    {/* //TODO: Add this back in when I implement the currency conversion logic */}
-                    {/* <div className="flex flex-col items-start justify-start gap-y-2 md:flex-row md:items-center md:justify-between md:gap-y-0">
+
+                    <div className="flex flex-col items-start justify-start gap-2 md:flex-row md:items-center md:justify-between">
                       <div className="space-y-0.5">
-                        <Label className={fontSize}>Currency</Label>
+                        <Label className={fontSize}>Auto-Apply</Label>
+
                         <p className="text-sm text-muted-foreground">
-                          Set your preferred currency
+                          Automatically mark open calls as &quot;Applied&quot;
+                          after clicking Apply
                         </p>
                       </div>
-
-                      <SearchMappedSelect<Currency>
-                        disabled
-                        className="sm:w-[120px]"
-                        value={
-                          userPref?.currency
-                            ? userPref.currency.toUpperCase()
-                            : "USD"
-                        }
-                        onChange={(value) => {
+                      <Select
+                        value={String(userPref?.autoApply ?? true)}
+                        onValueChange={(value) =>
                           handleUpdateUserPrefs({
-                            currency: value === "EUR" ? "eur" : "usd",
-                          });
-                        }}
-                        data={currencies[0]}
-                        getItemLabel={(currency) =>
-                          `${currency.symbol} (${currency.code}) - ${currency.name}`
+                            autoApply: value === "true",
+                          })
                         }
-                        searchFields={["name", "symbol", "code"]}
-                        getItemDisplay={(currency) =>
-                          `${currency.symbol} (${currency.code})`
-                        }
-                        getItemValue={(currency) => currency.code}
-                      />
-                    </div> */}
-                    {isArtist && activeSub && (
-                      <div className="flex flex-col items-start justify-start gap-2 md:flex-row md:items-center md:justify-between">
-                        <div className="space-y-0.5">
-                          <Label className={fontSize}>Auto-Apply</Label>
-
-                          <p className="text-sm text-muted-foreground">
-                            Automatically mark open calls as &quot;Applied&quot;
-                            after clicking Apply
-                          </p>
-                        </div>
-                        <Select
-                          value={String(userPref?.autoApply ?? true)}
-                          onValueChange={(value) =>
-                            handleUpdateUserPrefs({
-                              autoApply: value === "true",
-                            })
-                          }
+                      >
+                        <SelectTrigger
+                          className={cn(
+                            "w-full border-1.5 border-foreground/20 sm:h-10 sm:w-50",
+                            fontSize === "text-base"
+                              ? "sm:text-base"
+                              : fontSize,
+                          )}
                         >
-                          <SelectTrigger
-                            className={cn(
-                              "w-full border-1.5 border-foreground/20 sm:h-10 sm:w-[220px]",
-                              fontSize === "text-base"
-                                ? "sm:text-base"
-                                : fontSize,
-                            )}
-                          >
-                            <SelectValue placeholder="Select One" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="true" center>
-                              On (Default)
-                            </SelectItem>
-                            <SelectItem value="false" center>
-                              Off
-                            </SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    )}
+                          <SelectValue placeholder="Select One" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="true" center>
+                            On (Default)
+                          </SelectItem>
+                          <SelectItem value="false" center>
+                            Off
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </CardContent>
                 </Card>
               )}
@@ -1303,12 +1269,15 @@ export default function SettingsPage() {
                       onOpenChange={() => {
                         reset();
                         setPwOpen((prev) => !prev);
+                        setError("");
+                        setSuccess("");
                       }}
                       open={pwOpen}
+                      // key={Math.random()}
                     >
                       <DialogTrigger asChild>
                         <Button
-                          variant="outline"
+                          variant="salWithShadowHiddenYlw"
                           className="w-full min-w-[150px] sm:w-auto"
                         >
                           Update
@@ -1453,7 +1422,7 @@ export default function SettingsPage() {
                     </div>
                     <Button
                       type="button"
-                      variant="outline"
+                      variant="salWithShadowHiddenYlw"
                       className="w-full min-w-[150px] font-bold text-red-600 sm:w-auto"
                       onClick={signOut}
                     >
@@ -1476,7 +1445,7 @@ export default function SettingsPage() {
                           <AlertDialogTrigger asChild>
                             <Button
                               type="button"
-                              variant="outline"
+                              variant="salWithShadowHiddenYlw"
                               className="w-full min-w-[150px] font-bold text-red-600 sm:w-auto"
                             >
                               Sign Out All

@@ -379,6 +379,7 @@ export const ApplyButton = ({
       {!finalButton && (
         <Button
           onClick={() => {
+            setPending(true);
             if (!isAdmin && !isUserOrg) {
               updateEventAnalytics({
                 eventId: id,
@@ -391,7 +392,9 @@ export const ApplyButton = ({
             }
             window.history.pushState({}, "", currentUrl);
             router.push(href);
+            setTimeout(() => setPending(false), 2000);
           }}
+          disabled={pending}
           variant="salWithShadowHiddenLeft"
           size="lg"
           className={cn(
@@ -421,7 +424,8 @@ export const ApplyButton = ({
             <Button
               disabled={
                 (openCall !== "active" && !isAdmin && !orgPreview) ||
-                (noSub && !isAdmin && !orgPreview)
+                (noSub && !isAdmin && !orgPreview) ||
+                pending
               }
               variant={
                 nonArtistAdmin
@@ -533,7 +537,8 @@ export const ApplyButton = ({
         <Button
           disabled={
             (openCall !== "active" && !isAdmin && !orgPreview) ||
-            (noSub && !isAdmin && !orgPreview)
+            (noSub && !isAdmin && !orgPreview) ||
+            pending
           }
           variant={
             nonArtistAdmin ? "salWithShadowHidden" : "salWithShadowHiddenLeft"
