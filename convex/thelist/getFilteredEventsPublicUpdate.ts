@@ -121,6 +121,16 @@ export const getFilteredEventsPublic = query({
       subscription?.status === "trialing" ||
       isAdmin;
 
+    const userPrefs =
+      hasActiveSubscription && userId
+        ? await ctx.db
+            .query("userPreferences")
+            .withIndex("by_userId", (q) => q.eq("userId", userId))
+            .first()
+        : null;
+
+    const hideAppFees = userPrefs?.hideAppFees ?? false;
+
     if (!isAdmin) {
       console.log({
         event: "getFilteredEventsPublic",
@@ -618,6 +628,8 @@ export const getFilteredEventsPublic = query({
     //TODO: Add back the other filters before the rest of this runs. Can also limit the queries here for the thisweek and public open call page?
 
     const eventIds = lookupResults
+      .filter((r) => !(hideAppFees && r.appFee))
+
       .map((r) => r.eventId)
       .filter(Boolean) as Id<"events">[];
 

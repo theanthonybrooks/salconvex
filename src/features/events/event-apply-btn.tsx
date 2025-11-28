@@ -35,7 +35,9 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import { Link } from "@/components/ui/custom-link";
 import { TooltipSimple } from "@/components/ui/tooltip";
+import { AutoApplyToggle } from "@/features/artists/components/auto-apply-toggle";
 import { useArtistApplicationActions } from "@/features/artists/helpers/appActions";
 import { useToggleListAction } from "@/features/artists/helpers/listActions";
 import EventContextMenu from "@/features/events/ui/event-context-menu";
@@ -236,13 +238,15 @@ export const ApplyButton = ({
   // console.log("noSub: ", noSub);
   const { toggleListAction } = useToggleListAction(id as Id<"events">);
   const { toggleAppActions } = useArtistApplicationActions();
-  const [pending, setPending] = useState(false);
+  const [pending, setPending] = useState<"load" | "apply" | "bookmark" | false>(
+    false,
+  );
   const finalAppUrl = appUrl?.trim() ? appUrl : "/thelist";
 
   const onApply = async () => {
     if (typeof openCallId !== "string" || openCallId.length < 10) return;
 
-    setPending(true);
+    setPending("apply");
     const newTab = window.open("about:blank");
 
     if (!newTab) {
@@ -311,7 +315,14 @@ export const ApplyButton = ({
   const onBookmark = async () => {
     if (orgPreview) return;
     if (setIsBookmarked) setIsBookmarked(!isBookmarked);
-    toggleListAction({ bookmarked: !isBookmarked });
+    try {
+      setPending("bookmark");
+      await toggleListAction({ bookmarked: !isBookmarked });
+    } catch (error) {
+      console.error("Error updating bookmark:", error);
+    } finally {
+      setTimeout(() => setPending(false), 1000);
+    }
 
     try {
       await updateUserLastActive({ email: user?.email ?? "" });
@@ -379,7 +390,7 @@ export const ApplyButton = ({
       {!finalButton && (
         <Button
           onClick={() => {
-            setPending(true);
+            setPending("load");
             if (!isAdmin && !isUserOrg) {
               updateEventAnalytics({
                 eventId: id,
@@ -394,7 +405,7 @@ export const ApplyButton = ({
             router.push(href);
             setTimeout(() => setPending(false), 2000);
           }}
-          disabled={pending}
+          // disabled={pending}
           variant="salWithShadowHiddenLeft"
           size="lg"
           className={cn(
@@ -403,10 +414,15 @@ export const ApplyButton = ({
               hasValidSub &&
               !publicView &&
               "border-foreground/50 bg-background text-foreground/50 hover:shadow-llga",
+            pending && "pointer-events-none",
           )}
         >
           <span className={cn("flex items-center gap-x-1", fontSize)}>
-            {buttonText}
+            {pending === "load" ? (
+              <LoaderCircle className="size-4 animate-spin" />
+            ) : (
+              buttonText
+            )}
             {appFee > 0 && !publicView && (
               <CircleDollarSignIcon
                 className={cn(
@@ -425,7 +441,7 @@ export const ApplyButton = ({
               disabled={
                 (openCall !== "active" && !isAdmin && !orgPreview) ||
                 (noSub && !isAdmin && !orgPreview) ||
-                pending
+                pending === "apply"
               }
               variant={
                 nonArtistAdmin
@@ -460,7 +476,7 @@ export const ApplyButton = ({
             >
               <X size={30} />
             </AlertDialogCancel>
-            <AlertDialogHeader>
+            <AlertDialogHeader className="text-left">
               <AlertDialogTitle className="text-2xl">
                 Notice: External Redirect
               </AlertDialogTitle>
@@ -469,18 +485,24 @@ export const ApplyButton = ({
                   {!orgPreview && !appStatus && openCall === "active" && (
                     <>
                       {autoApply && (
-                        <>
-                          <span>
-                            This application is located on another website. By
-                            clicking apply, a new tab will open, you will be
+                        <span>
+                          <p>This application is located on another website.</p>
+                          <br />
+                          <p>
+                            By clicking apply, a new tab will open, you will be
                             redirected and the application will be marked as
-                            &quot;applied&quot; in your dashboard here.
-                          </span>
-                          <span className="text-xs italic">
-                            You can disable this in your account settings if you
-                            don&apos;t want this to happen
-                          </span>
-                        </>
+                            &quot;applied&quot; in your{" "}
+                            <Link
+                              href="/dashboard/artist/apps"
+                              target="_blank"
+                              variant="underline"
+                              className="text-sm"
+                            >
+                              artist dashboard
+                            </Link>
+                          </p>
+                          {/* <p>You can change this in your account settings</p> */}
+                        </span>
                       )}
                       {!autoApply && (
                         <span>
@@ -516,19 +538,26 @@ export const ApplyButton = ({
                 </span>
               </AlertDialogDescription>
             </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogFooter
+              className={cn("items-center sm:justify-between")}
+            >
+              <AutoApplyToggle />
+              <div className="flex w-full flex-col-reverse gap-2 sm:w-auto sm:flex-row sm:justify-end">
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
 
-              <AlertDialogPrimaryAction
-                variant="salWithShadow"
-                onClick={onApply}
-                className="flex items-center gap-x-1 sm:w-40"
-              >
-                {!orgPreview && !appStatus && openCall === "active"
-                  ? "Apply"
-                  : "Continue"}{" "}
-                {pending && <LoaderCircle className="size-4 animate-spin" />}
-              </AlertDialogPrimaryAction>
+                <AlertDialogPrimaryAction
+                  variant="salWithShadow"
+                  onClick={onApply}
+                  className="flex items-center gap-x-1 sm:w-40"
+                >
+                  {!orgPreview && !appStatus && openCall === "active"
+                    ? "Apply"
+                    : "Continue"}{" "}
+                  {pending === "apply" && (
+                    <LoaderCircle className="size-4 animate-spin" />
+                  )}
+                </AlertDialogPrimaryAction>
+              </div>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
@@ -538,7 +567,7 @@ export const ApplyButton = ({
           disabled={
             (openCall !== "active" && !isAdmin && !orgPreview) ||
             (noSub && !isAdmin && !orgPreview) ||
-            pending
+            pending === "apply"
           }
           variant={
             nonArtistAdmin ? "salWithShadowHidden" : "salWithShadowHiddenLeft"
@@ -582,6 +611,7 @@ export const ApplyButton = ({
                 !publicView &&
                 hasValidSub &&
                 "border-foreground/50 bg-background text-foreground/50 hover:shadow-vlga",
+              pending ? "pointer-events-none" : "",
             )}
             onClick={onBookmark}
           >

@@ -214,6 +214,9 @@ interface SelectSimpleProps {
   hasReset?: boolean;
   center?: boolean;
   iconOnly?: boolean;
+  debug?: {
+    open: boolean;
+  };
 }
 
 export const SelectSimple = ({
@@ -232,7 +235,9 @@ export const SelectSimple = ({
   hasReset,
   center,
   iconOnly,
+  debug,
 }: SelectSimpleProps) => {
+  const { open } = debug ?? {};
   const selectOptions = [
     ...options,
     ...(hasReset && value !== "-" && value
@@ -249,6 +254,7 @@ export const SelectSimple = ({
   }, {});
   return (
     <Select
+      open={open ? true : undefined}
       value={value}
       onValueChange={(val) => {
         if (val === "-") {

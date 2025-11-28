@@ -54,6 +54,7 @@ export type FontSizeType = Infer<typeof fontSizeValidator> | undefined;
 
 const userPrefsBaseValues = {
   autoApply: v.optional(v.boolean()),
+  hideAppFees: v.optional(v.boolean()),
   currency: v.optional(v.string()),
   timezone: v.optional(v.string()),
 
@@ -658,6 +659,7 @@ const eventLookupSchema = {
   eligibilityType: v.optional(eligibilityTypeValidator),
   ocStart: v.optional(v.string()),
   ocEnd: v.optional(v.string()),
+  appFee: v.optional(v.number()),
   eventApprovedAt: v.optional(v.number()),
   ocApprovedAt: v.optional(v.number()),
   lastEditedAt: v.optional(v.number()),

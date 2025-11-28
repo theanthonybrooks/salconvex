@@ -17,18 +17,12 @@ import {
   timezones,
 } from "@/app/data/timezones";
 import { useManageSubscription } from "@/hooks/use-manage-subscription";
-import {
-  UpdatePasswordSchema,
-  UpdatePasswordSchemaValues,
-  UpdateUserSchema,
-  UpdateUserSchemaValues,
-} from "@/schemas/auth";
+import { UpdateUserSchema, UpdateUserSchemaValues } from "@/schemas/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AlertDialogTitle } from "@radix-ui/react-alert-dialog";
 import { FontSizeIcon } from "@radix-ui/react-icons";
 import { useTheme } from "next-themes";
 import { useForm } from "react-hook-form";
-import { toast } from "react-toastify";
 import { z } from "zod";
 
 import {
@@ -44,8 +38,6 @@ import {
   Shield,
 } from "lucide-react";
 
-import { FormError } from "@/components/form-error";
-import { FormSuccess } from "@/components/form-success";
 import { MultiSelect } from "@/components/multi-select";
 import {
   AlertDialog,
@@ -67,29 +59,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Link } from "@/components/ui/custom-link";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import LogoUploader from "@/components/ui/logo-uploader";
 import { SearchMappedSelect } from "@/components/ui/mapped-select";
-import { PasswordChecklist } from "@/components/ui/password-checklist";
-import { PasswordInput } from "@/components/ui/password-input";
 import {
   Select,
   SelectContent,
@@ -101,14 +74,16 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ResetPasswordDialog } from "@/features/auth/components/reset-password-dialog";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { getUserFontSizePref } from "@/helpers/stylingFns";
 import { cn } from "@/helpers/utilsFns";
+import { showToast } from "@/lib/toast";
 import { useDevice } from "@/providers/device-provider";
+import { getUserThemeOptionsFull } from "@/providers/themed-provider";
 
 import { useAuthActions } from "@convex-dev/auth/react";
 import { api } from "~/convex/_generated/api";
-import { Id } from "~/convex/_generated/dataModel";
 import { FontSizeType, UserPrefsType } from "~/convex/schema";
 import {
   useAction,
@@ -117,6 +92,19 @@ import {
   useQuery,
 } from "convex/react";
 import { ConvexError } from "convex/values";
+
+const formatKey = (key: keyof UserPrefsType): string => {
+  // example: convert "notificationEmail" → "Notification email"
+  return key.replace(/([A-Z])/g, " $1").replace(/^./, (c) => c.toUpperCase());
+};
+
+const getToastMessage = (keys: Array<keyof UserPrefsType>): string => {
+  if (keys.length === 1) {
+    const key = keys[0];
+    return `${formatKey(key)} updated`;
+  }
+  return "Preferences updated";
+};
 
 export default function SettingsPage() {
   const pathname = usePathname();
@@ -137,7 +125,7 @@ export default function SettingsPage() {
   const isAdmin = user?.role?.includes("admin");
   const isArtist = userType?.includes("artist");
   const { isMobile } = useDevice();
-
+  const userThemeOptions = getUserThemeOptionsFull(user);
   const userPref = userData?.userPref;
   const fontSizePref = getUserFontSizePref(userPref?.fontSize);
   const fontSize = fontSizePref?.body;
@@ -170,7 +158,6 @@ export default function SettingsPage() {
   const unsubscribeFromNewsletter = useAction(
     api.actions.resend.sendNewsletterUpdateConfirmation,
   );
-  const updatePassword = useMutation(api.users.updatePassword);
   const updateUserPrefs = useMutation(api.users.updateUserPrefs);
   const updateUserNotifications = useMutation(
     api.users.updateUserNotifications,
@@ -184,14 +171,12 @@ export default function SettingsPage() {
   const removeProfileImage = useMutation(api.uploads.user.removeProfileImage);
   const generateUploadUrl = useMutation(api.uploads.files.generateUploadUrl);
 
-  const [pwOpen, setPwOpen] = useState(false);
   const { setTheme, theme } = useTheme();
 
   // const [selectedLanguage, setLanguage] = useState("en")
 
   const [pending, setPending] = useState(false);
-  const [error, setError] = useState<string>("");
-  const [success, setSuccess] = useState<string>("");
+
   const [uploading, setUploading] = useState(false);
 
   const [isSaving, setIsSaving] = useState(false);
@@ -200,7 +185,7 @@ export default function SettingsPage() {
   const DeleteAccount = useMutation(api.users.deleteAccount);
   const onDeleteAccount = async () => {
     setPending(true);
-    setError("");
+
     localStorage.clear();
 
     try {
@@ -208,32 +193,12 @@ export default function SettingsPage() {
       sessionStorage.clear();
       await signOut();
     } catch (err) {
-      setError("Failed to delete account. Please try again.");
+      showToast("error", "Failed to delete account. Please contact support.");
       console.error(err);
     } finally {
       setPending(false);
     }
   };
-  const passwordForm = useForm<UpdatePasswordSchemaValues>({
-    resolver: zodResolver(UpdatePasswordSchema),
-    defaultValues: {
-      oldPassword: "",
-      newPassword: "",
-      repeatNewPassword: "",
-    },
-    mode: "onChange",
-    delayError: 300,
-  });
-
-  const { getFieldState, watch, reset } = passwordForm;
-  const newPassword = watch("newPassword");
-  const newRepeatedPassword = watch("repeatNewPassword");
-  const currentPasswordState = getFieldState("oldPassword");
-  const newPasswordState = getFieldState("newPassword");
-  const currentPasswordValid =
-    !currentPasswordState?.invalid && currentPasswordState?.isDirty;
-  const newPasswordValid =
-    !newPasswordState?.invalid && newPasswordState?.isDirty;
 
   const {
     register: updateRegister,
@@ -277,18 +242,10 @@ export default function SettingsPage() {
       setUploading(true);
       await removeProfileImage({ storageId: user.imageStorageId });
       setUploading(false);
-      // toast.success("Profile image removed successfully!", {
-      //   autoClose: 2000,
-      //   pauseOnHover: false,
-      //   hideProgressBar: true,
-      // });
+      showToast("success", "Profile image removed successfully!");
     } catch (err) {
       console.error(err);
-      toast.error("Failed to remove profile image", {
-        autoClose: 2000,
-        pauseOnHover: false,
-        hideProgressBar: true,
-      });
+      showToast("error", "Failed to remove profile image");
     }
   };
 
@@ -310,11 +267,7 @@ export default function SettingsPage() {
     });
 
     if (!response.ok) {
-      toast.error("Failed to upload profile image", {
-        autoClose: 2000,
-        pauseOnHover: false,
-        hideProgressBar: true,
-      });
+      showToast("error", "Failed to upload profile image");
       setUploading(false);
       return;
     }
@@ -324,18 +277,12 @@ export default function SettingsPage() {
     await uploadProfileImage({ storageId });
 
     setUploading(false);
-    // toast.success("Profile image updated successfully!", {
-    //   autoClose: 2000,
-    //   pauseOnHover: false,
-    //   hideProgressBar: true,
-    //   closeButton: false,
-    // });
+    showToast("success", "Profile image updated successfully!");
   };
 
   const handleUpdateUserSubmit = async (data: UpdateUserSchemaValues) => {
     setPending(true);
     setIsSaving(true);
-    setError("");
 
     if (!user || !user.email) {
       throw new Error("No user found");
@@ -351,34 +298,20 @@ export default function SettingsPage() {
       // console.log("formData", formData)
       setPending(false);
       setIsSaving(false);
-      toast.success("User updated!", {
-        autoClose: 2000,
-        pauseOnHover: false,
-        hideProgressBar: true,
-      });
+      showToast("success", "User updated!");
       updateReset();
     } catch (err: unknown) {
       if (err instanceof ConvexError) {
-        toast.error(err.data || "An unexpected error occurred.", {
-          autoClose: 2000,
-          pauseOnHover: false,
-          hideProgressBar: true,
-        });
+        showToast("error", err.data || "An unexpected error occurred.");
       }
     } finally {
       setPending(false);
       setIsSaving(false);
-
-      setTimeout(() => {
-        setSuccess("");
-        setError("");
-      }, 5000);
     }
   };
 
   const handleUpdateUserPrefs = async (update: Partial<UserPrefsType>) => {
     setPending(true);
-    setError("");
 
     if (!user) {
       throw new Error("No user found");
@@ -386,21 +319,20 @@ export default function SettingsPage() {
 
     try {
       await updateUserPrefs(update);
-      setSuccess("User updated!");
+      const changed = Object.keys(update) as Array<keyof UserPrefsType>;
+      const message = getToastMessage(changed);
+
+      showToast("success", message);
     } catch (err: unknown) {
+      let message: string = "An unknown error occurred.";
       if (err instanceof ConvexError) {
-        setError(err.data || "An unexpected error occurred.");
+        message = err.data || "An unexpected error occurred.";
       } else if (err instanceof Error) {
-        setError(err.message || "An unexpected error occurred.");
-      } else {
-        setError("An unknown error occurred.");
+        message = err.message || "An unexpected error occurred.";
       }
+      showToast("error", message);
     } finally {
       setPending(false);
-      setTimeout(() => {
-        setSuccess("");
-        setError("");
-      }, 5000);
     }
   };
 
@@ -409,7 +341,6 @@ export default function SettingsPage() {
     value: boolean,
   ) => {
     setPending(true);
-    setError("");
 
     if (!user || !user.email) {
       throw new Error("No user found");
@@ -435,18 +366,15 @@ export default function SettingsPage() {
         }
       }
 
-      setPending(false);
-      setSuccess("Successfully updated user preferences!");
+      showToast("success", "Successfully updated notification preferences!");
     } catch (error) {
+      let message: string = "An unknown error occurred.";
       if (error instanceof ConvexError) {
-        console.log(error.data);
-        setError(error.data?.message ?? "Unexpected error.");
+        message = error.data?.message ?? "Unexpected error.";
       } else if (error instanceof Error) {
-        setError(error.message);
-      } else {
-        setError("An unknown error occurred.");
-        console.error(error);
+        message = error.message;
       }
+      showToast("error", message);
     } finally {
       setPending(false);
     }
@@ -469,54 +397,15 @@ export default function SettingsPage() {
       };
 
       await updateNewsletterSubscription(values);
-      setSuccess("Successfully updated newsletter preferences");
+      showToast("success", "Successfully updated newsletter preferences");
     } catch (err) {
+      let message: string =
+        "An unknown error occurred. Please contact support.";
       if (err instanceof ConvexError) {
         if (err.data.includes("Log in to update")) {
-          setError("Please log in to update your newsletter preferences");
-        } else {
-          setError("An unknown error occurred. Please contact support.");
+          message = "Please log in to update your newsletter preferences";
         }
-      }
-    } finally {
-      setPending(false);
-    }
-  };
-
-  const handleUpdatePasswordSubmit = async (
-    data: UpdatePasswordSchemaValues,
-  ) => {
-    setPending(true);
-    setError("");
-
-    if (!user || !user.email) {
-      throw new Error("No user found");
-    }
-    try {
-      await updatePassword({
-        email: user.email,
-        password: data.newPassword,
-        currentPassword: data.oldPassword,
-        userId: user.userId as Id<"users">,
-        method: "userUpdate",
-      });
-
-      setPending(false);
-      setSuccess("Password updated!");
-      passwordForm?.reset();
-
-      setTimeout(() => {
-        setSuccess("");
-        setError("");
-        setPwOpen(false);
-      }, 2000);
-    } catch (err: unknown) {
-      if (err instanceof ConvexError) {
-        setError(err.data || "An unexpected error occurred.");
-      } else if (err instanceof Error) {
-        setError(err.message || "An unexpected error occurred.");
-      } else {
-        setError("An unknown error occurred.");
+        showToast("error", message);
       }
     } finally {
       setPending(false);
@@ -530,17 +419,17 @@ export default function SettingsPage() {
       }
       await deleteSessions({ userId: user?.userId });
       // await invalidateSessions({ userId: user?.userId })
-      setSuccess("Sessions deleted!");
+      showToast("success", "Sessions deleted!");
       sessionStorage.clear();
       signOut();
     } catch (err: unknown) {
+      let message: string = "An unknown error occurred.";
       if (err instanceof ConvexError) {
-        setError(err.data || "An unexpected error occurred.");
+        message = err.data || "An unexpected error occurred.";
       } else if (err instanceof Error) {
-        setError(err.message || "An unexpected error occurred.");
-      } else {
-        setError("An unknown error occurred.");
+        message = err.message || "An unexpected error occurred.";
       }
+      showToast("error", message);
     } finally {
       setPending(false);
     }
@@ -768,9 +657,9 @@ export default function SettingsPage() {
               {((isArtist && activeSub) || isAdmin) && (
                 <Card className={cn(isArtist && activeSub && "self-start")}>
                   <CardHeader>
-                    <CardTitle>Preferences</CardTitle>
+                    <CardTitle>Open Call Preferences</CardTitle>
                     <CardDescription>
-                      Manage your account preferences
+                      Manage your open call preferences
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-6">
@@ -875,37 +764,57 @@ export default function SettingsPage() {
                         <Label className={fontSize}>Auto-Apply</Label>
 
                         <p className="text-sm text-muted-foreground">
-                          Automatically mark open calls as &quot;Applied&quot;
-                          after clicking Apply
+                          Mark open calls as &quot;Applied&quot; after clicking
+                          Apply
                         </p>
                       </div>
-                      <Select
+                      <SelectSimple
+                        options={[
+                          { value: "true", label: "On (Default)" },
+                          { value: "false", label: "Off" },
+                        ]}
                         value={String(userPref?.autoApply ?? true)}
-                        onValueChange={(value) =>
+                        onChangeAction={(value) =>
+                          handleUpdateUserPrefs({ autoApply: value === "true" })
+                        }
+                        placeholder="Select one"
+                        fontSize={fontSize}
+                        center
+                        className={cn(
+                          "w-full border-1.5 border-foreground/20 sm:h-10 sm:w-40",
+                        )}
+                      />
+                    </div>
+                    <Separator />
+
+                    <div className="flex flex-col items-start justify-start gap-2 md:flex-row md:items-center md:justify-between">
+                      <div className="space-y-0.5">
+                        <Label className={fontSize}>
+                          Hide Application Fees
+                        </Label>
+
+                        <p className="text-sm text-muted-foreground">
+                          Hide open calls with application fees from The List
+                        </p>
+                      </div>
+                      <SelectSimple
+                        options={[
+                          { value: "false", label: "Off (Default)" },
+                          { value: "true", label: "On " },
+                        ]}
+                        value={String(userPref?.hideAppFees ?? false)}
+                        onChangeAction={(value) =>
                           handleUpdateUserPrefs({
-                            autoApply: value === "true",
+                            hideAppFees: value === "true",
                           })
                         }
-                      >
-                        <SelectTrigger
-                          className={cn(
-                            "w-full border-1.5 border-foreground/20 sm:h-10 sm:w-50",
-                            fontSize === "text-base"
-                              ? "sm:text-base"
-                              : fontSize,
-                          )}
-                        >
-                          <SelectValue placeholder="Select One" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="true" center>
-                            On (Default)
-                          </SelectItem>
-                          <SelectItem value="false" center>
-                            Off
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
+                        placeholder="Select one"
+                        fontSize={fontSize}
+                        center
+                        className={cn(
+                          "w-full border-1.5 border-foreground/20 sm:h-10 sm:w-40",
+                        )}
+                      />
                     </div>
                   </CardContent>
                 </Card>
@@ -1074,7 +983,7 @@ export default function SettingsPage() {
                       }
                       placeholder="Select frequency"
                       className="w-full max-w-60 border-1.5 border-foreground/20 bg-card placeholder:text-foreground sm:h-11 sm:max-w-40"
-                      itemClassName="justify-center"
+                      center
                     />
                   </div>
                 </div>
@@ -1087,7 +996,9 @@ export default function SettingsPage() {
           <Card>
             <CardHeader>
               <CardTitle>Appearance </CardTitle>
-              <CardDescription>Customize the look and feel</CardDescription>
+              <CardDescription>
+                Customize your display preferences
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-4">
@@ -1102,44 +1013,18 @@ export default function SettingsPage() {
                       </p>
                     </div>
                   </div>
-
-                  <Select
-                    value={userPref?.theme ?? theme}
-                    onValueChange={(value) => {
-                      setTheme(value);
-                      handleUpdateUserPrefs({ theme: value });
+                  <SelectSimple
+                    options={userThemeOptions}
+                    value={(userPref?.theme ?? theme) || "default"}
+                    onChangeAction={(val) => {
+                      setTheme(val);
+                      handleUpdateUserPrefs({ theme: val });
                     }}
-                  >
-                    <SelectTrigger
-                      className={cn(
-                        "w-full border-1.5 border-foreground/20 sm:h-10 sm:w-[220px]",
-                        fontSize === "text-base" ? "sm:text-base" : fontSize,
-                      )}
-                    >
-                      <SelectValue placeholder="Select color" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="default" center>
-                        SAL Yellow (Default)
-                      </SelectItem>
-                      <SelectItem value="light" center>
-                        Light
-                      </SelectItem>
-                      {isAdmin && (
-                        <SelectItem value="dark" center>
-                          Dark
-                        </SelectItem>
-                      )}{" "}
-                      <SelectItem value="white" center>
-                        White
-                      </SelectItem>
-                      {isAdmin && (
-                        <SelectItem value="orange" center>
-                          Orange
-                        </SelectItem>
-                      )}
-                    </SelectContent>
-                  </Select>
+                    placeholder="Select theme"
+                    fontSize={fontSize}
+                    center
+                    className="border-1.5 border-foreground/20 sm:h-10 sm:w-[220px]"
+                  />
                 </div>
                 <div className="flex flex-col items-start justify-start gap-y-2 md:flex-row md:items-center md:justify-between md:gap-y-0">
                   <div className="flex items-center gap-4">
@@ -1151,14 +1036,32 @@ export default function SettingsPage() {
                       </p>
                     </div>
                   </div>
-
-                  <Select
+                  <SelectSimple
+                    options={[
+                      { value: "normal", label: "Normal (Default)" },
+                      {
+                        value: "large",
+                        label: "Large",
+                        className: "!text-base ",
+                      },
+                    ]}
                     value={userPref?.fontSize ?? "normal"}
-                    onValueChange={(value) => {
+                    onChangeAction={(value) => {
                       handleUpdateUserPrefs({
                         fontSize: value as FontSizeType,
                       });
                     }}
+                    placeholder="Select theme"
+                    fontSize={fontSize}
+                    center
+                    className={cn(
+                      "w-full border-1.5 border-foreground/20 sm:h-10 sm:w-[220px]",
+                    )}
+                  />
+
+                  {/* <Select
+                    value={userPref?.fontSize ?? "normal"}
+                    onValueChange={}
                   >
                     <SelectTrigger
                       className={cn(
@@ -1176,7 +1079,7 @@ export default function SettingsPage() {
                         Large
                       </SelectItem>
                     </SelectContent>
-                  </Select>
+                  </Select> */}
                 </div>
               </div>
             </CardContent>
@@ -1265,142 +1168,8 @@ export default function SettingsPage() {
                         </p>
                       </div>
                     </div>
-                    <Dialog
-                      onOpenChange={() => {
-                        reset();
-                        setPwOpen((prev) => !prev);
-                        setError("");
-                        setSuccess("");
-                      }}
-                      open={pwOpen}
-                      // key={Math.random()}
-                    >
-                      <DialogTrigger asChild>
-                        <Button
-                          variant="salWithShadowHiddenYlw"
-                          className="w-full min-w-[150px] sm:w-auto"
-                        >
-                          Update
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="sm:max-w-[425px]">
-                        <DialogHeader>
-                          <DialogTitle>Edit password</DialogTitle>
-                          <DialogDescription className="sr-only">
-                            New password must be at least 8 characters long and
-                            must include at least one number, one uppercase
-                            letter, and one lowercase letter.
-                          </DialogDescription>
-                        </DialogHeader>
 
-                        <Form {...passwordForm}>
-                          <form
-                            onSubmit={passwordForm?.handleSubmit(
-                              handleUpdatePasswordSubmit,
-                            )}
-                            className="space-y-2"
-                          >
-                            {success && success === "Password updated!" && (
-                              <FormSuccess message={success} />
-                            )}
-                            {error && <FormError message={error} />}
-                            <FormField
-                              control={passwordForm.control}
-                              name="oldPassword"
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormLabel
-                                    className={cn("text-right", fontSize)}
-                                  >
-                                    Current Password
-                                  </FormLabel>
-
-                                  <FormControl>
-                                    <PasswordInput
-                                      isPending={pending}
-                                      tabIndex={1}
-                                      field={field}
-                                    />
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-                            <FormField
-                              control={passwordForm.control}
-                              name="newPassword"
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormLabel
-                                    className={cn("text-right", fontSize)}
-                                  >
-                                    New Password
-                                  </FormLabel>
-
-                                  <FormControl>
-                                    <PasswordInput
-                                      disabled={!currentPasswordValid}
-                                      isPending={pending}
-                                      tabIndex={2}
-                                      field={field}
-                                    />
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-                            <FormField
-                              control={passwordForm.control}
-                              name="repeatNewPassword"
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormLabel
-                                    className={cn("text-right", fontSize)}
-                                  >
-                                    Repeat New Password
-                                  </FormLabel>
-
-                                  <FormControl>
-                                    <PasswordInput
-                                      disabled={
-                                        !newPasswordValid ||
-                                        !currentPasswordValid
-                                      }
-                                      isPending={pending}
-                                      tabIndex={3}
-                                      field={field}
-                                    />
-                                  </FormControl>
-                                </FormItem>
-                              )}
-                            />
-
-                            {currentPasswordValid && (
-                              <PasswordChecklist
-                                password={newPassword ?? ""}
-                                checkPassword={newRepeatedPassword ?? ""}
-                                type="update"
-                              />
-                            )}
-
-                            <DialogFooter>
-                              <Button
-                                className="mt-3 w-full"
-                                variant={
-                                  passwordForm.formState?.isValid
-                                    ? "salWithShadow"
-                                    : "salWithShadowHidden"
-                                }
-                                type="submit"
-                                disabled={!passwordForm.formState?.isValid}
-                              >
-                                Update Password
-                              </Button>
-                            </DialogFooter>
-                          </form>
-                        </Form>
-                      </DialogContent>
-                    </Dialog>
+                    <ResetPasswordDialog />
                   </div>
                 </div>
               </CardContent>

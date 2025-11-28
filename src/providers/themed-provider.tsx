@@ -1,6 +1,15 @@
 // app/components/ThemedProvider.tsx
 "use client";
 
+import { roleThemeMap, ThemeOptions } from "@/constants/themeConsts";
+
+import type {
+  ThemeType,
+  ThemeTypeOptions,
+  UserRoles,
+} from "@/types/themeTypes";
+import type { User } from "@/types/user";
+
 import { createContext, ReactNode, useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { ThemeProvider } from "next-themes";
@@ -16,6 +25,38 @@ interface ThemedProviderProps {
   userPref?: UserPrefsType;
 }
 
+export const getThemeOptionsForRole = (role: UserRoles): ThemeTypeOptions[] => {
+  const allowed = roleThemeMap[role];
+  return ThemeOptions.filter((opt) => allowed.includes(opt.value));
+};
+
+export const getUserThemeOptions = (user: User | undefined): ThemeType[] => {
+  let userRoleType = "guest";
+  if (user) {
+    if (user.role.includes("admin")) {
+      userRoleType = "admin";
+    } else {
+      userRoleType = "user";
+    }
+  }
+  return getThemeOptionsForRole(userRoleType as UserRoles).map(
+    (opt) => opt.value,
+  );
+};
+export const getUserThemeOptionsFull = (
+  user: User | undefined,
+): ThemeTypeOptions[] => {
+  let userRoleType = "guest";
+  if (user) {
+    if (user.role.includes("admin")) {
+      userRoleType = "admin";
+    } else {
+      userRoleType = "user";
+    }
+  }
+  return getThemeOptionsForRole(userRoleType as UserRoles);
+};
+
 export const PendingThemeContext = createContext<{
   pendingTheme: string | null;
   setPendingTheme: (t: string | null) => void;
@@ -23,11 +64,10 @@ export const PendingThemeContext = createContext<{
 
 export function ThemedProvider({ children }: ThemedProviderProps) {
   const { preloadedUserData } = useConvexPreload();
-  // const [pendingTheme, setPendingTheme] = useState<string | null>(null);
   const userData = usePreloadedQuery(preloadedUserData);
   const user = userData?.user;
-  // const userTheme = userData?.userPref?.theme;
-  const isAdmin = userData?.user?.role?.includes("admin");
+  const userThemeOptions = getUserThemeOptions(user);
+
   const pathname = usePathname();
   const whiteRoutes = ["/render/post", "/call/social"];
   const isWhiteRoute = whiteRoutes.some((route) => pathname.includes(route));
@@ -43,17 +83,10 @@ export function ThemedProvider({ children }: ThemedProviderProps) {
 
   return (
     <ThemeProvider
-      themes={
-        isAdmin
-          ? ["light", "dark", "default", "white", "system"]
-          : user
-            ? ["light", "default", "white"]
-            : ["default"]
-      }
+      themes={userThemeOptions}
       attribute="class"
       storageKey="theme"
       forcedTheme={forcedTheme}
-      //? themes={["light", "dark", "default", "white", "system"]} //todo: Re-enable dark and system modes once it's actually set up
       defaultTheme="default"
       enableSystem={false} //? todo: Re-enable dark and system modes once it's actually set up
       // disableTransitionOnChange

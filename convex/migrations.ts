@@ -119,6 +119,23 @@ export const populateUserRoles = migrations.define({
   },
 });
 
+export const populateAppFees = migrations.define({
+  table: "eventLookup",
+  migrateOne: async (ctx, lookup) => {
+    if (lookup.openCallId) {
+      if (lookup.appFee) return;
+      const openCall = await ctx.db.get(lookup.openCallId);
+      if (openCall) {
+        await ctx.db.patch(lookup._id, {
+          appFee: openCall.basicInfo.appFee,
+        });
+      }
+    }
+  },
+});
+
+export const runPAF = migrations.runner(internal.migrations.populateAppFees);
+
 export const populateUserAccountTypes = migrations.define({
   table: "users",
   migrateOne: async (ctx, user) => {

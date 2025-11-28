@@ -1,6 +1,7 @@
 "use client";
 
 import type { VariantProps } from "class-variance-authority";
+
 import { type ComponentPropsWithRef } from "react";
 import Link from "next/link";
 import { cva } from "class-variance-authority";
@@ -13,6 +14,7 @@ const linkVariants = cva(
     variants: {
       variant: {
         default: "underline-offset-2 hover:underline",
+        underline: "underline underline-offset-2 hover:underline-offset-1",
         subtle: "text-muted-foreground hover:text-foreground",
         subtleUnderline:
           "text-muted-foreground decoration-foreground underline-offset-2 hover:text-foreground hover:underline",

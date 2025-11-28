@@ -1,8 +1,9 @@
 import { approvedStates } from "@/constants/eventConsts";
 import { validOCVals } from "@/constants/openCallConsts";
-import { ConvexError, v } from "convex/values";
+
 import { internal } from "~/convex/_generated/api";
 import { internalMutation, mutation } from "~/convex/_generated/server";
+import { ConvexError, v } from "convex/values";
 
 export const eventLookupUpdateHelper = mutation({
   args: {
@@ -85,6 +86,7 @@ export const addUpdateEventLookup = internalMutation({
       ocEnd: validOpenCall
         ? (openCall?.basicInfo?.dates?.ocEnd ?? undefined)
         : undefined,
+      appFee: validOpenCall ? openCall?.basicInfo?.appFee : undefined,
       ocApprovedAt: validOpenCall ? openCall?.approvedAt : undefined,
     };
 
@@ -132,6 +134,7 @@ export const deleteEventLookup = internalMutation({
         ocStart: undefined,
         ocEnd: undefined,
         ocApprovedAt: undefined,
+        appFee: undefined,
         lastEditedAt: Date.now(),
       };
 
