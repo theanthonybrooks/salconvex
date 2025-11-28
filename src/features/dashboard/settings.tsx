@@ -98,10 +98,13 @@ const formatKey = (key: keyof UserPrefsType): string => {
   return key.replace(/([A-Z])/g, " $1").replace(/^./, (c) => c.toUpperCase());
 };
 
-const getToastMessage = (keys: Array<keyof UserPrefsType>): string => {
+const getToastMessage = (
+  keys: Array<keyof UserPrefsType>,
+  title?: string,
+): string => {
   if (keys.length === 1) {
     const key = keys[0];
-    return `${formatKey(key)} updated`;
+    return `${title ? title : formatKey(key)} updated`;
   }
   return "Preferences updated";
 };
@@ -310,7 +313,11 @@ export default function SettingsPage() {
     }
   };
 
-  const handleUpdateUserPrefs = async (update: Partial<UserPrefsType>) => {
+  const handleUpdateUserPrefs = async (
+    update: Partial<UserPrefsType>,
+    options?: { title?: string },
+  ) => {
+    const { title } = options ?? {};
     setPending(true);
 
     if (!user) {
@@ -320,7 +327,7 @@ export default function SettingsPage() {
     try {
       await updateUserPrefs(update);
       const changed = Object.keys(update) as Array<keyof UserPrefsType>;
-      const message = getToastMessage(changed);
+      const message = getToastMessage(changed, title);
 
       showToast("success", message);
     } catch (err: unknown) {
@@ -713,7 +720,10 @@ export default function SettingsPage() {
                         ]}
                         value={userPref?.timezone ?? ""}
                         onChange={(value) =>
-                          handleUpdateUserPrefs({ timezone: value })
+                          handleUpdateUserPrefs(
+                            { timezone: value },
+                            { title: "Preferred Timezone" },
+                          )
                         }
                         className={cn(
                           fontSize === "text-base" ? "sm:text-base" : fontSize,
@@ -775,7 +785,10 @@ export default function SettingsPage() {
                         ]}
                         value={String(userPref?.autoApply ?? true)}
                         onChangeAction={(value) =>
-                          handleUpdateUserPrefs({ autoApply: value === "true" })
+                          handleUpdateUserPrefs(
+                            { autoApply: value === "true" },
+                            { title: "Open Call Preferences" },
+                          )
                         }
                         placeholder="Select one"
                         fontSize={fontSize}
@@ -804,9 +817,12 @@ export default function SettingsPage() {
                         ]}
                         value={String(userPref?.hideAppFees ?? false)}
                         onChangeAction={(value) =>
-                          handleUpdateUserPrefs({
-                            hideAppFees: value === "true",
-                          })
+                          handleUpdateUserPrefs(
+                            {
+                              hideAppFees: value === "true",
+                            },
+                            { title: "Open Call Preferences" },
+                          )
                         }
                         placeholder="Select one"
                         fontSize={fontSize}
@@ -1018,7 +1034,10 @@ export default function SettingsPage() {
                     value={(userPref?.theme ?? theme) || "default"}
                     onChangeAction={(val) => {
                       setTheme(val);
-                      handleUpdateUserPrefs({ theme: val });
+                      handleUpdateUserPrefs(
+                        { theme: val },
+                        { title: "Theme preferences" },
+                      );
                     }}
                     placeholder="Select theme"
                     fontSize={fontSize}
@@ -1038,7 +1057,11 @@ export default function SettingsPage() {
                   </div>
                   <SelectSimple
                     options={[
-                      { value: "normal", label: "Normal (Default)" },
+                      {
+                        value: "normal",
+                        label: "Normal (Default)",
+                        className: "!text-sm",
+                      },
                       {
                         value: "large",
                         label: "Large",
@@ -1047,9 +1070,12 @@ export default function SettingsPage() {
                     ]}
                     value={userPref?.fontSize ?? "normal"}
                     onChangeAction={(value) => {
-                      handleUpdateUserPrefs({
-                        fontSize: value as FontSizeType,
-                      });
+                      handleUpdateUserPrefs(
+                        {
+                          fontSize: value as FontSizeType,
+                        },
+                        { title: "Font Size preference" },
+                      );
                     }}
                     placeholder="Select theme"
                     fontSize={fontSize}
@@ -1109,9 +1135,12 @@ export default function SettingsPage() {
                     <Select
                       value={userPref?.cookiePrefs}
                       onValueChange={(value) =>
-                        handleUpdateUserPrefs({
-                          cookiePrefs: value as CookiePref,
-                        })
+                        handleUpdateUserPrefs(
+                          {
+                            cookiePrefs: value as CookiePref,
+                          },
+                          { title: "Cookie Preferences" },
+                        )
                       }
                     >
                       <SelectTrigger
