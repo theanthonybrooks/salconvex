@@ -1,5 +1,6 @@
 "use client";
 
+// #region ------------- Imports --------------
 import type { SearchType } from "@/constants/filterConsts";
 import type { EventCategory, EventType } from "@/types/eventTypes";
 import type {
@@ -25,7 +26,19 @@ import {
 import { useSearchParams } from "next/navigation";
 import { debounce } from "lodash";
 
-import { setParamIfNotDefault } from "@/helpers/utilsFns"; // same helper you were using
+import { setParamIfNotDefault } from "@/helpers/utilsFns";
+
+// #endregion
+
+const getDefaultSortForView = (view: ViewOptions): SortOptions => {
+  if (view === "event" || view === "archive") {
+    return { sortBy: "eventStart", sortDirection: "asc" };
+  }
+  if (view === "organizer" || view === "orgView") {
+    return { sortBy: "organizer", sortDirection: "asc" };
+  }
+  return { sortBy: "openCall", sortDirection: "asc" };
+};
 
 export const viewOptionValues = [
   { value: "openCall", label: "Open Calls" },
@@ -52,7 +65,7 @@ interface EventListContextValue {
   defaultSort: SortOptions;
   defaultSearch: SearchParams;
   getDefaultSortForView: (view: ViewOptions) => SortOptions;
-  getDefaultSearchForView: (view: ViewOptions) => SearchParams;
+  // getDefaultSearchForView: (view: ViewOptions) => SearchParams;
   handleResetFilters: () => void;
 }
 
@@ -65,9 +78,6 @@ export const EventListProvider = ({
 }) => {
   const searchParams = useSearchParams();
 
-  // -----------------------------
-  // Default values
-  // -----------------------------
   const defaultFilters: Filters = useMemo(
     () => ({
       showHidden: false,
@@ -92,40 +102,16 @@ export const EventListProvider = ({
     return "openCall";
   });
 
-  const getDefaultSortForView = useCallback(
-    (view: ViewOptions): SortOptions => {
-      if (view === "event" || view === "archive") {
-        return { sortBy: "eventStart", sortDirection: "asc" };
-      }
-      if (view === "organizer" || view === "orgView") {
-        return { sortBy: "organizer", sortDirection: "asc" };
-      }
-      return { sortBy: "openCall", sortDirection: "asc" };
-    },
-    [],
-  );
-
-  const defaultSort = useMemo(
-    () => getDefaultSortForView(view),
-    [view, getDefaultSortForView],
-  );
+  const defaultSort = useMemo(() => getDefaultSortForView(view), [view]);
 
   const defaultSearch = useMemo<SearchParams>(
     () => ({
       searchTerm: "",
-      searchType:
-        view === "event" || view === "archive"
-          ? "events"
-          : view === "organizer"
-            ? "orgs"
-            : "all",
+      searchType: "all",
     }),
-    [view],
+    [],
   );
 
-  // -----------------------------
-  // State
-  // -----------------------------
   const currentFilters: Filters = {
     showHidden: searchParams.get("h") === "true",
     bookmarkedOnly: searchParams.get("b") === "true",
@@ -168,28 +154,6 @@ export const EventListProvider = ({
   const [search, setSearch] = useState<SearchParams>(currentSearch);
   const [page, setPage] = useState(Number(searchParams.get("page")) || 1);
 
-  const getDefaultSearchForView = useCallback(
-    (view: ViewOptions): SearchParams => {
-      if (view === "event" || view === "archive") {
-        return {
-          searchTerm: search?.searchTerm ?? "",
-          searchType: "events",
-        };
-      }
-      if (view === "organizer") {
-        return {
-          searchTerm: search?.searchTerm ?? "",
-          searchType: "orgs",
-        };
-      }
-      return {
-        searchTerm: search?.searchTerm ?? "",
-        searchType: "all",
-      };
-    },
-    [search],
-  );
-
   const handleResetFilters = useCallback(() => {
     setFilters(defaultFilters);
     setSortOptions(defaultSort);
@@ -205,9 +169,6 @@ export const EventListProvider = ({
     setPage,
   ]);
 
-  // -----------------------------
-  // Debounced updates
-  // -----------------------------
   const updateURL = useMemo(
     () =>
       debounce(
@@ -254,9 +215,9 @@ export const EventListProvider = ({
           sessionStorage.setItem("previousSalPage", fullUrl);
           window.history.replaceState(null, "", fullUrl);
         },
-        400,
+        0,
       ),
-    [defaultSort],
+    [defaultSort.sortBy],
   );
 
   useEffect(() => {
@@ -267,16 +228,10 @@ export const EventListProvider = ({
     return () => updateURL.cancel();
   }, [updateURL]);
 
-  // -----------------------------
-  // Persist view across reloads
-  // -----------------------------
   useEffect(() => {
     sessionStorage.setItem("salView", view);
   }, [view]);
 
-  // -----------------------------
-  // Context value
-  // -----------------------------
   const value = useMemo(
     () => ({
       filters,
@@ -293,7 +248,6 @@ export const EventListProvider = ({
       defaultSort,
       defaultSearch,
       getDefaultSortForView,
-      getDefaultSearchForView,
       handleResetFilters,
     }),
     [
@@ -305,8 +259,6 @@ export const EventListProvider = ({
       defaultFilters,
       defaultSort,
       defaultSearch,
-      getDefaultSortForView,
-      getDefaultSearchForView,
       handleResetFilters,
     ],
   );

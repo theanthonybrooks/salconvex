@@ -47,13 +47,12 @@ const ClientEventList = () => {
     sortOptions,
     setSortOptions,
     search,
-    setSearch,
+    // setSearch,
     view,
     setView,
     page,
     setPage,
     getDefaultSortForView,
-    getDefaultSearchForView,
     handleResetFilters,
   } = useEventListContext();
 
@@ -98,7 +97,7 @@ const ClientEventList = () => {
           setDebouncedFilters(filters);
           setDebouncedSort(sort);
         },
-        400, // milliseconds
+        0, // milliseconds
       ),
     [],
   );
@@ -171,20 +170,19 @@ const ClientEventList = () => {
   useEffect(() => {
     return () => updateDebouncedValues.cancel();
   }, [updateDebouncedValues]);
-
-  const total = queryResult?.total ?? 0;
+  const rawTotal = queryResult?.total;
+  const total = rawTotal ?? 0;
   const totalOpen = queryResult?.totalOpenCalls;
   const totalActive = queryResult?.totalActive;
   const totalArchived = queryResult?.totalArchived;
   // const isLoading = !queryResult;
   // const isLoading = !queryResult?.finishedLoading;
-
   const isLoading =
     !queryResult?.finishedLoading || (!artistData && hasActiveSubscription);
   const handleViewChange = (newView: ViewOptions) => {
     setView(newView);
     setSortOptions(getDefaultSortForView(newView));
-    setSearch(getDefaultSearchForView(newView));
+    // setSearch(getDefaultSearchForView(newView));
     if (newView === "archive") {
       handleResetFilters();
     }

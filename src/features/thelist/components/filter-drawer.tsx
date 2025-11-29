@@ -4,7 +4,6 @@ import { searchDialogVariants } from "@/constants/dialogConsts";
 import {
   FilterDrawerProps,
   SearchType,
-  searchTypeOptions,
   TheListFilterCommandItem,
 } from "@/constants/filterConsts";
 
@@ -29,6 +28,7 @@ import { FlairBadge } from "@/components/ui/flair-badge";
 import { Input } from "@/components/ui/input";
 import { SelectSimple } from "@/components/ui/select";
 import { FilterBase } from "@/features/thelist/components/filters/filter-base";
+import { getSearchTypeOptions } from "@/features/thelist/components/filters/the-list-filters";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { formatEventLink, getOpenCallStatusLabel } from "@/helpers/eventFns";
 import { getSearchLocationString } from "@/helpers/locationFns";
@@ -70,8 +70,8 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
   const subData = usePreloadedQuery(preloadedSubStatus);
   const { hasActiveSubscription } = subData ?? {};
   const userData = usePreloadedQuery(preloadedUserData);
-  const { userPref } = userData ?? {};
-  // const isAdmin = user?.role?.includes("admin");
+  const { userPref, user } = userData ?? {};
+  const isAdmin = user?.role?.includes("admin") ?? false;
   const baseFontSize = userPref?.fontSize === "large" ? "text-base" : "text-sm";
   // const smFontSize = userPref?.fontSize === "large" ? "text-sm" : "text-xs";
   const subFontColor = "text-stone-500";
@@ -82,24 +82,6 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
   // console.log(subStatus);
   const shortcutRef = useRef(shortcut);
   const inputRef = useRef<HTMLInputElement>(null);
-
-  function getSearchTypeOptions(view: string) {
-    switch (view) {
-      case "organizer":
-        // Remove "events"
-        return searchTypeOptions.filter((opt) =>
-          ["events", "orgs", "loc"].includes(opt.value),
-        );
-      case "archive":
-        // if (isAdmin) return searchTypeOptions;
-        return searchTypeOptions.filter((opt) => !["all"].includes(opt.value));
-      case "event":
-        return searchTypeOptions.filter((opt) => !["all"].includes(opt.value));
-
-      default:
-        return searchTypeOptions;
-    }
-  }
 
   useEffect(() => {
     shortcutRef.current = shortcut;
@@ -497,7 +479,7 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
               )}
 
               <SelectSimple
-                options={[...getSearchTypeOptions(view)]}
+                options={[...getSearchTypeOptions(view, isAdmin)]}
                 value={searchType}
                 onChangeAction={(value) => setSearchType(value as SearchType)}
                 placeholder="Search Type"

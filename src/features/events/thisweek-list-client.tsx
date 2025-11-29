@@ -171,7 +171,6 @@ const ClientThisWeekList = (
   const skeletonGroups = useMemo(() => generateSkeletonGroups(1), []);
   const hasResults = totalResults > 0;
   let flatIndex = 0;
-
   return (
     <>
       {isLoading ? (

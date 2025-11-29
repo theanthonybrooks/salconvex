@@ -1,12 +1,16 @@
 "use client";
 
-import { SearchType, TheListFilterCommandItem } from "@/constants/filterConsts";
+import {
+  SearchType,
+  searchTypeOptions,
+  TheListFilterCommandItem,
+} from "@/constants/filterConsts";
 
 import { MergedEventPreviewData } from "@/types/eventTypes";
 import { Filters, SearchParams, SortOptions } from "@/types/thelist";
 import { User } from "@/types/user";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { debounce } from "lodash";
 
 import { useEventListContext } from "@/features/the-list/client-provider";
@@ -27,6 +31,28 @@ interface ListFilterProps<T extends TheListFilterCommandItem> {
   results: MergedEventPreviewData[];
   isLoading: boolean;
   // userPref: UserPrefsType | null;
+}
+
+export function getSearchTypeOptions(view: string, isAdmin: boolean) {
+  switch (view) {
+    case "organizer":
+      // Remove "events"
+      return searchTypeOptions.filter((opt) =>
+        ["events", "orgs", "loc"].includes(opt.value),
+      );
+    case "openCall":
+      return isAdmin
+        ? searchTypeOptions
+        : searchTypeOptions.filter((opt) => !["all"].includes(opt.value));
+    case "archive":
+      // if (isAdmin) return searchTypeOptions;
+      return searchTypeOptions.filter((opt) => !["all"].includes(opt.value));
+    case "event":
+      return searchTypeOptions.filter((opt) => !["all"].includes(opt.value));
+
+    default:
+      return searchTypeOptions;
+  }
 }
 
 export const TheListFilters = <T extends TheListFilterCommandItem>({
@@ -88,7 +114,7 @@ export const TheListFilters = <T extends TheListFilterCommandItem>({
   // const { preloadedSubStatus } = useConvexPreload();
   // const subData = usePreloadedQuery(preloadedSubStatus);
   // const { hasActiveSubscription } = subData ?? {};
-
+  const searchTypeRef = useRef(search?.searchType ?? "all");
   const [open, setOpen] = useState(false);
   const [localValue, setLocalValue] = useState(search?.searchTerm ?? "");
 
@@ -97,6 +123,7 @@ export const TheListFilters = <T extends TheListFilterCommandItem>({
   );
   const userType = user?.accountType;
   const userRole = user?.role;
+  const isAdmin = userRole?.includes("admin") ?? false;
 
   const debouncedSearch = useMemo(
     () =>
@@ -104,7 +131,7 @@ export const TheListFilters = <T extends TheListFilterCommandItem>({
         const cleaned = value.replace(/[^a-zA-Z0-9\s]/g, "");
         if (cleaned.length >= 2 || value.length === 0)
           handleSearchChange({ searchTerm: value, searchType });
-      }, 600),
+      }, 1000),
     [handleSearchChange],
   );
 
@@ -114,6 +141,7 @@ export const TheListFilters = <T extends TheListFilterCommandItem>({
       (localValue.length > 0 && searchType !== search.searchType)
     ) {
       debouncedSearch(localValue, searchType);
+      searchTypeRef.current = searchType;
     }
     return () => {
       debouncedSearch.cancel();
@@ -121,6 +149,12 @@ export const TheListFilters = <T extends TheListFilterCommandItem>({
   }, [localValue, debouncedSearch, search, searchType]);
 
   useEffect(() => {
+    const searchOptions = getSearchTypeOptions(view, isAdmin).map(
+      (type) => type.value,
+    );
+    // console.log(searchOptions, searchTypeRef.current);
+    if (searchOptions.includes(searchTypeRef.current)) return;
+    setLocalValue("");
     if (view === "organizer") {
       setSearchType("orgs");
     } else if (view === "event" || view === "archive") {
@@ -128,8 +162,9 @@ export const TheListFilters = <T extends TheListFilterCommandItem>({
     } else {
       setSearchType("all");
     }
+    // console.log("setting search type");
     return;
-  }, [view]);
+  }, [view, isAdmin]);
 
   return (
     <div className={cn("flex items-center justify-center gap-2", className)}>
