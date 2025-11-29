@@ -364,6 +364,7 @@ export const FilterBase = ({
                   )}
                   <SelectItem value="eventStart">Event Start</SelectItem>
                   <SelectItem value="name">Name</SelectItem>
+                  <SelectItem value="country">Country</SelectItem>
                   <SelectItem value="organizer">Organizer</SelectItem>
                 </SelectContent>
               </Select>

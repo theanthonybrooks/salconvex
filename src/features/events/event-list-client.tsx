@@ -181,11 +181,14 @@ const ClientEventList = () => {
     !queryResult?.finishedLoading || (!artistData && hasActiveSubscription);
   const handleViewChange = (newView: ViewOptions) => {
     setView(newView);
-    setSortOptions(getDefaultSortForView(newView));
     // setSearch(getDefaultSearchForView(newView));
-    if (newView === "archive") {
+    if (
+      newView === "archive" ||
+      (newView === "openCall" && !hasActiveSubscription)
+    ) {
       handleResetFilters();
     }
+    setSortOptions(getDefaultSortForView(newView));
     setPage(1);
   };
 
@@ -664,6 +667,7 @@ const PublicHeader = ({
   setViewAction,
 }: publicHeaderProps) => {
   const router = useRouter();
+
   return (
     <div className="mx-auto max-w-[90dvw] pb-8 pt-4 sm:max-w-[1200px] sm:py-8">
       <div className="flex flex-col gap-3 text-center font-bold tracking-wide text-foreground sm:flex-row sm:items-center sm:gap-2 lg:text-xl">
