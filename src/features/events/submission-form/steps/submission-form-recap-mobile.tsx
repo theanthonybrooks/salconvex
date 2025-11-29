@@ -4,9 +4,9 @@
 
 import { EligibilityType } from "@/types/openCallTypes";
 
-import { useEffect, useState } from "react";
-import Image from "next/image";
 import { motion } from "framer-motion";
+import Image from "next/image";
+import { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 
 import { Checkbox } from "@/components/ui/checkbox";
@@ -37,6 +37,7 @@ import {
   getEventCategoryLabel,
   getEventTypeLabel,
 } from "@/helpers/eventFns";
+import { buildMailtoLink } from "@/helpers/linkFns";
 import { RichTextDisplay } from "@/helpers/richTextFns";
 import { cn } from "@/helpers/utilsFns";
 import { getCallFormatLabel } from "@/lib/openCallFns";
@@ -96,9 +97,15 @@ export const SubmissionFormRecapMobile = ({
   const appLinkFormat = ocData?.requirements?.applicationLinkFormat;
   const mailLink = appLinkFormat === "mailto:";
   const mailSubject = ocData?.requirements?.applicationLinkSubject;
-  const outputAppLink = mailLink
-    ? `mailto:${appLink}${mailSubject ? `?subject=${mailSubject}` : ""}`
-    : appLink;
+  const mailCC = ocData?.requirements?.applicationLinkCC;
+  const outputAppLink =
+    mailLink && appLink
+      ? buildMailtoLink({
+          email: appLink,
+          subject: mailSubject,
+          cc: mailCC,
+        })
+      : appLink;
 
   useEffect(() => {
     const timeout = setTimeout(() => setHasMounted(true), 50);
@@ -444,6 +451,7 @@ export const SubmissionFormRecapMobile = ({
                     {mailLink && mailSubject && (
                       <p className="text-sm">Subject: {mailSubject}</p>
                     )}
+                    {mailCC && <p className="text-sm">CC: {mailCC.replace(/;/g, ", ")}</p>}
                   </div>
                   <Accordion type="multiple" defaultValue={[]}>
                     <AccordionItem value="compensation">

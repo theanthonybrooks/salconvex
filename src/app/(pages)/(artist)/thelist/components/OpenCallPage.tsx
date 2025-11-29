@@ -72,7 +72,7 @@ const OpenCallDetail = () => {
     user?._id === data?.organizer?.ownerId ||
     Boolean(user && data?.organizer?.allowedEditors.includes(user._id));
 
-  console.log("isOwner: ", isOwner, data);
+  // console.log("isOwner: ", isOwner, data);
 
   return (
     // <OpenCallDetailWrapper>

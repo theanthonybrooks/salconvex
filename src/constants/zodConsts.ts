@@ -25,3 +25,24 @@ export const optionalUrl = z
 export const unicodeEmail = z.email("Must be a valid email address");
 
 export const optionalEmail = z.union([z.literal(""), unicodeEmail]).optional();
+
+export const semicolonSeparatedEmails = z.string().refine(
+  (value) => {
+    if (value.trim().length === 0) return true;
+    const parts = value.split(";");
+
+    // No empty entries (e.g., trailing semicolon)
+    if (parts.some((p) => p.trim().length === 0)) return false;
+
+    // Validate each email using your existing schema
+    for (const part of parts) {
+      const parsed = unicodeEmail.safeParse(part.trim());
+      if (!parsed.success) return false;
+    }
+
+    return true;
+  },
+  {
+    message: "Must be a semicolon-separated list of valid email addresses",
+  },
+);

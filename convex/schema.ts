@@ -718,6 +718,7 @@ export const openCallSchema = {
     applicationLinkFormat: linkFormatValidator,
 
     applicationLinkSubject: v.optional(v.string()),
+    applicationLinkCC: v.optional(v.string()),
     otherInfo: v.optional(v.string()), //todo: make not optional later
   }),
   documents: v.optional(
@@ -1322,6 +1323,19 @@ export default defineSchema({
 
     // // Relationships
     .index("by_countryAbbr", ["countryAbbr"])
+    .index("by_countryAbbr_ocState", ["countryAbbr", "ocState"])
+    .index("by_countryAbbr_eventState_category", [
+      "countryAbbr",
+      "eventState",
+      "eventCategory",
+    ])
+    .index("by_orgCountryAbbr_ocState", ["orgLocation.countryAbbr", "ocState"])
+    .index("by_orgCountryAbbr_eventState_category", [
+      "orgLocation.countryAbbr",
+      "eventState",
+      "eventCategory",
+    ])
+    .index("by_orgCountryAbbr", ["orgLocation.countryAbbr"])
     .index("by_mainOrgId", ["mainOrgId"])
     .index("by_orgName", ["orgName"])
     .index("by_ownerId", ["ownerId"])
@@ -1393,7 +1407,7 @@ export default defineSchema({
         "eligibility.whom",
       ],
     })
-
+    .index("by_lastUpdatedAt", ["lastUpdatedAt"])
     .index("by_eventId", ["eventId"])
     .index("by_eventId_and_state", ["eventId", "state"])
     .index("by_eventId_approvedAt", ["eventId", "approvedAt"])

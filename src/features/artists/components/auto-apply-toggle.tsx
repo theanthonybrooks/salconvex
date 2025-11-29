@@ -9,7 +9,11 @@ import { api } from "~/convex/_generated/api";
 import { useMutation, usePreloadedQuery } from "convex/react";
 import { ConvexError } from "convex/values";
 
-export const AutoApplyToggle = () => {
+type AutoApplyToggleProps = {
+  toast?: boolean;
+};
+
+export const AutoApplyToggle = ({ toast = false }: AutoApplyToggleProps) => {
   const updateUserPrefs = useMutation(api.users.updateUserPrefs);
   const { preloadedUserData, preloadedSubStatus } = useConvexPreload();
   const subData = usePreloadedQuery(preloadedSubStatus);
@@ -32,8 +36,9 @@ export const AutoApplyToggle = () => {
 
     try {
       await updateUserPrefs(update);
-
-      showToast("success", "Successfully updated application preferences!");
+      if (toast) {
+        showToast("success", "Successfully updated application preferences!");
+      }
     } catch (err: unknown) {
       let message: string = "An unknown error occurred.";
       if (err instanceof ConvexError) {
@@ -58,7 +63,7 @@ export const AutoApplyToggle = () => {
             }
           />
           <p className="text-xs">
-            Auto-apply: {userPref?.autoApply ? "On" : "Off"}
+            Auto-apply: <strong>{userPref?.autoApply ? "On" : "Off"}</strong>
           </p>
         </div>
       )}

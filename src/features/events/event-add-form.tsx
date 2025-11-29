@@ -1359,6 +1359,7 @@ export const EventOCForm = ({
                   openCallData.requirements.applicationLinkFormat,
                 applicationLinkSubject:
                   openCallData.requirements.applicationLinkSubject,
+                applicationLinkCC: openCallData.requirements.applicationLinkCC,
                 otherInfo: openCallData.requirements.otherInfo,
               },
               documents: mergedDocs,
@@ -1460,6 +1461,7 @@ export const EventOCForm = ({
                   openCallData.requirements.applicationLinkFormat,
                 applicationLinkSubject:
                   openCallData.requirements.applicationLinkSubject,
+                applicationLinkCC: openCallData.requirements.applicationLinkCC,
                 otherInfo: openCallData.requirements.otherInfo,
               },
               documents: normalizedCurrentDocs,
@@ -1614,6 +1616,8 @@ export const EventOCForm = ({
                     openCallData.requirements.applicationLinkFormat,
                   applicationLinkSubject:
                     openCallData.requirements.applicationLinkSubject,
+                  applicationLinkCC:
+                    openCallData.requirements.applicationLinkCC,
                   otherInfo: openCallData.requirements.otherInfo,
                 },
                 documents: normalizedCurrentDocs,

@@ -78,7 +78,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   const router = useRouter();
   const [activeStep, setActiveStep] = useState(0);
   const [formType, setFormType] = useState<number>(0);
-  console.log(formType);
+  // console.log(formType);
   const [editedSections, setEditedSections] = useState<
     ("event" | "openCall")[]
   >([]);
@@ -1282,6 +1282,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
                   openCallData.requirements.applicationLinkFormat,
                 applicationLinkSubject:
                   openCallData.requirements.applicationLinkSubject,
+                applicationLinkCC: openCallData.requirements.applicationLinkCC,
                 otherInfo: openCallData.requirements.otherInfo,
               },
               documents: mergedDocs,
@@ -1382,6 +1383,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
                   openCallData.requirements.applicationLinkFormat,
                 applicationLinkSubject:
                   openCallData.requirements.applicationLinkSubject,
+                applicationLinkCC: openCallData.requirements.applicationLinkCC,
                 otherInfo: openCallData.requirements.otherInfo,
               },
               documents: normalizedCurrentDocs,
@@ -1532,6 +1534,8 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
                     openCallData.requirements.applicationLinkFormat,
                   applicationLinkSubject:
                     openCallData.requirements.applicationLinkSubject,
+                  applicationLinkCC:
+                    openCallData.requirements.applicationLinkCC,
                   otherInfo: openCallData.requirements.otherInfo,
                 },
                 documents: normalizedCurrentDocs,

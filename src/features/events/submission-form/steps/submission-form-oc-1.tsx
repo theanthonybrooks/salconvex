@@ -854,26 +854,48 @@ const SubmissionFormOC1 = ({
                       />
                     </div>
                     {appLinkFormat === "mailto:" && (
-                      <Controller
-                        name="openCall.requirements.applicationLinkSubject"
-                        control={control}
-                        render={({ field }) => (
-                          <DebouncedControllerInput
-                            disabled={pastEvent}
-                            field={field}
-                            placeholder="Email Subject (optional)"
-                            className={cn("w-full rounded border-foreground")}
-                            debounceMs={50}
-                            // onBlur={() => {
-                            //   field.onBlur?.();
-                            //   handleCheckSchema?.();
-                            //   field.onChange(field.value);
-                            //   // console.log("Blur me", field + type)
-                            // }}
-                            onSchemaCheck={handleCheckSchema}
-                          />
-                        )}
-                      />
+                      <>
+                        <Controller
+                          name="openCall.requirements.applicationLinkSubject"
+                          control={control}
+                          render={({ field }) => (
+                            <DebouncedControllerInput
+                              disabled={pastEvent}
+                              field={field}
+                              placeholder="Email Subject (optional)"
+                              className={cn("w-full rounded border-foreground")}
+                              debounceMs={50}
+                              // onBlur={() => {
+                              //   field.onBlur?.();
+                              //   handleCheckSchema?.();
+                              //   field.onChange(field.value);
+                              //   // console.log("Blur me", field + type)
+                              // }}
+                              onSchemaCheck={handleCheckSchema}
+                            />
+                          )}
+                        />
+                        <Controller
+                          name="openCall.requirements.applicationLinkCC"
+                          control={control}
+                          render={({ field }) => (
+                            <DebouncedControllerInput
+                              disabled={pastEvent}
+                              field={field}
+                              placeholder="Email CC's (optional - separate with ';')"
+                              className={cn("w-full rounded border-foreground")}
+                              debounceMs={50}
+                              // onBlur={() => {
+                              //   field.onBlur?.();
+                              //   handleCheckSchema?.();
+                              //   field.onChange(field.value);
+                              //   // console.log("Blur me", field + type)
+                              // }}
+                              onSchemaCheck={handleCheckSchema}
+                            />
+                          )}
+                        />
+                      </>
                     )}
                   </div>
                 </>

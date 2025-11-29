@@ -187,3 +187,27 @@ export function normalizeToHandle(value: string, domain: string): string {
 
 export const isValidEmail = (email: string) =>
   /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+type MailLinkParams = {
+  email: string;
+  subject?: string;
+  cc?: string;
+};
+
+export function buildMailtoLink({
+  email,
+  subject,
+  cc,
+}: MailLinkParams): string {
+  const parts: string[] = [];
+
+  if (cc) {
+    parts.push(`cc=${encodeURIComponent(cc)}`);
+  }
+  if (subject) {
+    parts.push(`subject=${encodeURIComponent(subject)}`);
+  }
+
+  const query = parts.length ? `?${parts.join("&")}` : "";
+  return `mailto:${email}${query}`;
+}

@@ -745,3 +745,14 @@ export const getOpenCallDocuments = query({
     return { files: openCallFiles, documents: openCall.documents };
   },
 });
+
+export const getOpenCallAppLink = query({
+  args: {
+    openCallId: v.id("openCalls"),
+  },
+  handler: async (ctx, args) => {
+    const openCall = await ctx.db.get(args.openCallId);
+    if (!openCall) return null;
+    return openCall.requirements?.applicationLink;
+  },
+});

@@ -9,36 +9,17 @@ import type { User } from "@/types/user";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  getExternalErrorHtml,
-  getExternalRedirectHtml,
-} from "@/utils/loading-page-html";
-import { toast } from "react-toastify";
 
 import { FaBookmark, FaRegBookmark } from "react-icons/fa6";
 import {
   CheckCircleIcon,
   CircleDollarSignIcon,
   LoaderCircle,
-  X,
 } from "lucide-react";
 
-import {
-  AlertDialog,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogPrimaryAction,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+import { ApplyRedirectDialog } from "@/components/ui/apply-redirect-dialog";
 import { Button } from "@/components/ui/button";
-import { Link } from "@/components/ui/custom-link";
 import { TooltipSimple } from "@/components/ui/tooltip";
-import { AutoApplyToggle } from "@/features/artists/components/auto-apply-toggle";
-import { useArtistApplicationActions } from "@/features/artists/helpers/appActions";
 import { useToggleListAction } from "@/features/artists/helpers/listActions";
 import EventContextMenu from "@/features/events/ui/event-context-menu";
 import { getEventCategoryLabel } from "@/helpers/eventFns";
@@ -101,7 +82,18 @@ export const ApplyButtonShort = ({
       : appStatus && !publicView && hasValidSub
         ? "Applied"
         : "Read More";
+  function runAnalytics(action: "bookmark" | "view" | "apply") {
+    if (isAdmin || isUserOrg) return;
 
+    updateEventAnalytics({
+      eventId,
+      plan: user?.plan ?? 0,
+      action,
+      src,
+      userType: user?.accountType,
+      hasSub: activeSub,
+    });
+  }
   return (
     <>
       {/* //removing the target attribute for now as it's not really necessary, I think. The params are all in the url when you view something, so you should go back to that exact same page/filter combo */}
@@ -109,16 +101,7 @@ export const ApplyButtonShort = ({
       <Button
         asChild
         onClick={() => {
-          if (!isAdmin && !isUserOrg) {
-            updateEventAnalytics({
-              eventId,
-              plan: user?.plan ?? 0,
-              action: "view",
-              src,
-              userType: user?.accountType,
-              hasSub: activeSub,
-            });
-          }
+          runAnalytics("view");
           window.history.pushState({}, "", currentUrl);
           // sessionStorage.setItem("previousSalPage", window.location.pathname);
           router.push(href);
@@ -237,80 +220,26 @@ export const ApplyButton = ({
   const nonArtistAdmin = isAdmin && !isArtist;
   // console.log("noSub: ", noSub);
   const { toggleListAction } = useToggleListAction(id as Id<"events">);
-  const { toggleAppActions } = useArtistApplicationActions();
   const [pending, setPending] = useState<"load" | "apply" | "bookmark" | false>(
     false,
   );
   const finalAppUrl = appUrl?.trim() ? appUrl : "/thelist";
 
-  const onApply = async () => {
-    if (typeof openCallId !== "string" || openCallId.length < 10) return;
+  function runAnalytics(
+    action: "bookmark" | "view" | "apply",
+    src: AnalyticsSrcType,
+  ) {
+    if (isAdmin || isUserOrg) return;
 
-    setPending("apply");
-    const newTab = window.open("about:blank");
-
-    if (!newTab) {
-      toast.error(
-        "Application redirect blocked. Please enable popups for this site.",
-      );
-      console.error("Popup was blocked");
-      return;
-    }
-    newTab.document.write(getExternalRedirectHtml(finalAppUrl));
-    newTab.document.close();
-
-    // if (isEmail) {
-    //   console.log("isEmail: ", isEmail);
-    //   return;
-    // }
-
-    // const newTab = window.open("about:blank");
-
-    // if (!newTab) {
-    //   toast.error(
-    //     "Application redirect blocked. Please enable popups for this site.",
-    //   );
-    //   console.error("Popup was blocked");
-    //   return;
-    // }
-
-    // newTab.document.write(getExternalRedirectHtml(finalAppUrl));
-    // newTab.document.close();
-
-    try {
-      if (!appStatus && openCall === "active" && autoApply && !orgPreview) {
-        await toggleAppActions({
-          openCallId: openCallId as Id<"openCalls">,
-          manualApplied: true,
-        });
-      }
-      await updateUserLastActive({ email: user?.email ?? "" });
-
-      if (isEmail && appUrl) {
-        window.location.href = appUrl;
-        return;
-      }
-
-      newTab.location.href = finalAppUrl;
-    } catch (error) {
-      console.error("Application update failed:", error);
-      if (newTab && !newTab.closed) {
-        newTab.document.write(getExternalErrorHtml(finalAppUrl));
-        newTab.document.close();
-      }
-    } finally {
-      setPending(false);
-      if (isAdmin || isUserOrg) return;
-      updateEventAnalytics({
-        eventId: id,
-        plan: user?.plan ?? 0,
-        action: appStatus ? "view" : "apply",
-        src: "ocPage",
-        userType: user?.accountType,
-        hasSub: activeSub,
-      });
-    }
-  };
+    updateEventAnalytics({
+      eventId: id,
+      plan: user?.plan ?? 0,
+      action,
+      src,
+      userType: user?.accountType,
+      hasSub: activeSub,
+    });
+  }
 
   const onBookmark = async () => {
     if (orgPreview) return;
@@ -329,15 +258,8 @@ export const ApplyButton = ({
     } catch (error) {
       console.error("Error updating last active:", error);
     } finally {
-      if (isAdmin || isBookmarked || isUserOrg) return;
-      updateEventAnalytics({
-        eventId: id,
-        plan: user?.plan ?? 0,
-        action: "bookmark",
-        src: finalButton ? "ocPage" : "theList",
-        userType: user?.accountType,
-        hasSub: activeSub,
-      });
+      if (isBookmarked) return;
+      runAnalytics("bookmark", finalButton ? "ocPage" : "theList");
     }
   };
   const router = useRouter();
@@ -391,16 +313,7 @@ export const ApplyButton = ({
         <Button
           onClick={() => {
             setPending("load");
-            if (!isAdmin && !isUserOrg) {
-              updateEventAnalytics({
-                eventId: id,
-                plan: user?.plan ?? 0,
-                action: "view",
-                src: src ?? "theList",
-                userType: user?.accountType,
-                hasSub: activeSub,
-              });
-            }
+            runAnalytics("view", src ?? "theList");
             window.history.pushState({}, "", currentUrl);
             router.push(href);
             setTimeout(() => setPending(false), 2000);
@@ -434,166 +347,32 @@ export const ApplyButton = ({
           </span>
         </Button>
       )}
-      {finalButton && !isEmail && (
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <Button
-              disabled={
-                (openCall !== "active" && !isAdmin && !orgPreview) ||
-                (noSub && !isAdmin && !orgPreview) ||
-                pending === "apply"
-              }
-              variant={
-                nonArtistAdmin
-                  ? "salWithShadowHidden"
-                  : "salWithShadowHiddenLeft"
-              }
-              size="lg"
-              className={cn(
-                "relative z-[1] h-14 w-full cursor-pointer sm:h-11 xl:min-w-[150px]",
-                appStatus !== null &&
-                  !publicView &&
-                  "border-foreground/50 bg-background text-foreground/80 hover:shadow-llga",
-              )}
-            >
-              <span className="flex items-center gap-x-1 text-base">
-                {buttonText}
-                {appFee > 0 && !publicView && (
-                  <CircleDollarSignIcon
-                    className={cn(
-                      "size-6 text-red-600",
-                      appStatus !== null && "text-foreground/50",
-                    )}
-                  />
-                )}
-              </span>
-            </Button>
-          </AlertDialogTrigger>
-          <AlertDialogContent className="w-[80dvw] bg-salYellow text-foreground">
-            <AlertDialogCancel
-              iconOnly
-              className="absolute right-2 top-2 hidden hover:text-red-600 sm:block"
-            >
-              <X size={30} />
-            </AlertDialogCancel>
-            <AlertDialogHeader className="text-left">
-              <AlertDialogTitle className="text-2xl">
-                Notice: External Redirect
-              </AlertDialogTitle>
-              <AlertDialogDescription className="text-foreground">
-                <span className="flex flex-col gap-y-2">
-                  {!orgPreview && !appStatus && openCall === "active" && (
-                    <>
-                      {autoApply && (
-                        <span>
-                          <p>This application is located on another website.</p>
-                          <br />
-                          <p>
-                            By clicking apply, a new tab will open, you will be
-                            redirected and the application will be marked as
-                            &quot;applied&quot; in your{" "}
-                            <Link
-                              href="/dashboard/artist/apps"
-                              target="_blank"
-                              variant="underline"
-                              className="text-sm"
-                            >
-                              artist dashboard
-                            </Link>
-                          </p>
-                          {/* <p>You can change this in your account settings</p> */}
-                        </span>
-                      )}
-                      {!autoApply && (
-                        <span>
-                          This application is located on another website. By
-                          clicking apply, a new tab will open and you will be
-                          redirected
-                        </span>
-                      )}
-                    </>
-                  )}
-                  {!orgPreview && appStatus && (
-                    <>
-                      <span>
-                        You&apos;ve already applied for this open call. Do you
-                        still want to proceed to the external application?
-                      </span>
-                    </>
-                  )}
-                  {!orgPreview && !appStatus && openCall === "ended" && (
-                    <>
-                      <span>
-                        This application is closed. You can&apos;t apply for
-                        this open call, though you can still view it.
-                      </span>
-                    </>
-                  )}
-                  {orgPreview && (
-                    <span>
-                      This is a preview of your application link. You will be
-                      redirected.
-                    </span>
-                  )}
-                </span>
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter
-              className={cn("items-center sm:justify-between")}
-            >
-              <AutoApplyToggle />
-              <div className="flex w-full flex-col-reverse gap-2 sm:w-auto sm:flex-row sm:justify-end">
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-
-                <AlertDialogPrimaryAction
-                  variant="salWithShadow"
-                  onClick={onApply}
-                  className="flex items-center gap-x-1 sm:w-40"
-                >
-                  {!orgPreview && !appStatus && openCall === "active"
-                    ? "Apply"
-                    : "Continue"}{" "}
-                  {pending === "apply" && (
-                    <LoaderCircle className="size-4 animate-spin" />
-                  )}
-                </AlertDialogPrimaryAction>
-              </div>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      )}
-      {finalButton && isEmail && (
-        <Button
-          disabled={
-            (openCall !== "active" && !isAdmin && !orgPreview) ||
-            (noSub && !isAdmin && !orgPreview) ||
-            pending === "apply"
-          }
-          variant={
-            nonArtistAdmin ? "salWithShadowHidden" : "salWithShadowHiddenLeft"
-          }
-          size="lg"
-          className={cn(
-            "relative z-[1] h-14 w-full cursor-pointer sm:h-11 xl:min-w-[150px]",
-            appStatus !== null &&
-              !publicView &&
-              hasValidSub &&
-              "border-foreground/50 bg-background text-foreground/80 hover:shadow-llga",
-          )}
-          onClick={onApply}
-        >
-          <span className="flex items-center gap-x-1 text-base">
-            {buttonText}
-            {appFee > 0 && !publicView && (
-              <CircleDollarSignIcon
-                className={cn(
-                  "size-6 text-red-600",
-                  appStatus !== null && "text-foreground/50",
-                )}
-              />
-            )}
-          </span>
-        </Button>
+      {finalButton && (
+        <ApplyRedirectDialog
+          userProps={{
+            user,
+            appStatus,
+            autoApply,
+            isUserOrg,
+          }}
+          buttonProps={{
+            publicView,
+            orgPreview,
+            disabled: Boolean(
+              (openCall !== "active" && !isAdmin && !orgPreview) ||
+                (noSub && !isAdmin && !orgPreview),
+            ),
+            buttonText,
+          }}
+          openCallProps={{
+            eventId: id,
+            openCallId,
+            appFee,
+            openCallStatus: openCall,
+            format: isEmail ? "mailto" : "https",
+            finalAppUrl,
+          }}
+        />
       )}
 
       {!orgPreview && !hasApplied && !nonArtistAdmin && (

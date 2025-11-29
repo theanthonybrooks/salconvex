@@ -13,6 +13,7 @@ import {
 import {
   optionalEmail,
   optionalUrl,
+  semicolonSeparatedEmails,
   unicodeEmail,
 } from "@/constants/zodConsts";
 
@@ -510,6 +511,7 @@ export const openCallBaseSchema = z.object({
       z.literal("mailto:"),
     ]),
     applicationLinkSubject: z.optional(z.string()),
+    applicationLinkCC: semicolonSeparatedEmails.optional(),
 
     // .refine((val) => !val || isValidUrl(val), {
     //   message: "Must be a valid URL (https://...)",
@@ -867,6 +869,7 @@ export const getOpenCallStep1Schema = (isAdmin: boolean = false) => {
         });
       }
     }
+
     if (!isAdmin && appRequirements.length < 50 && appRequirements) {
       ctx.addIssue({
         code: "custom",

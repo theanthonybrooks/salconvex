@@ -1,5 +1,7 @@
 import { OpenCallLinkFormat } from "@/types/openCallTypes";
 
+import { buildMailtoLink } from "@/helpers/linkFns";
+
 type TimeRange = "day" | "week" | "month" | "year";
 
 type Application = {
@@ -30,6 +32,7 @@ type appLinkParams = {
   applicationLink?: string;
   applicationLinkFormat?: OpenCallLinkFormat;
   applicationLinkSubject?: string;
+  applicationLinkCC?: string;
 };
 
 export function formatApplicationLink(
@@ -37,14 +40,22 @@ export function formatApplicationLink(
 ): string | null {
   if (!requirements?.applicationLink) return null;
 
-  const { applicationLink, applicationLinkFormat, applicationLinkSubject } =
-    requirements;
+  const {
+    applicationLink,
+    applicationLinkFormat,
+    applicationLinkSubject,
+    applicationLinkCC,
+  } = requirements;
 
   if (applicationLinkFormat === "mailto:") {
-    const subject = applicationLinkSubject
-      ? `?subject=${encodeURIComponent(applicationLinkSubject)}`
-      : "";
-    return `mailto:${applicationLink}${subject}`;
+
+    const mailToLink = buildMailtoLink({
+      email: applicationLink,
+      subject: applicationLinkSubject,
+      cc: applicationLinkCC,
+    });
+
+    return mailToLink;
   }
 
   return applicationLink;
