@@ -150,9 +150,9 @@ export default function Footer({ className }: { className?: string }) {
       )}
     >
       <div className="mx-auto w-full px-4 py-6 sm:px-6 lg:px-8 lg:pt-16 xl:max-w-full xl:px-6">
-        <div className="mx-auto xl:grid xl:grid-cols-2 xl:gap-8 3xl:max-w-[max(80vw,1500px)]">
+        <div className="mx-auto xl:grid xl:gap-8 3xl:max-w-[max(60vw,1500px)]">
           {/* Links */}
-          <div className="mt-5 grid gap-8 px-6 xl:col-span-2 xl:mt-0 xl:grid-cols-[1fr_5px_auto]">
+          <div className="mt-5 grid gap-8 px-6 md:grid-cols-[63%_5px_auto] xl:mt-0 xl:grid-cols-[1fr_5px_auto]">
             <div
               className={cn(
                 "hidden text-start md:grid md:justify-items-center lg:gap-8",
@@ -190,24 +190,16 @@ export default function Footer({ className }: { className?: string }) {
             <Separator
               thickness={1}
               orientation="vertical"
-              className="my-4 hidden border-foreground xl:block"
+              className="my-4 hidden border-foreground md:block"
             />
             <div
               data-type="newsletter"
-              className="mx-auto flex w-full flex-col justify-center sm:px-10 lg:hidden xl:flex"
+              className="mx-auto flex w-full flex-col justify-center sm:px-10"
             >
-              {/* <div>
-                <p className="text-sm font-semibold text-foreground">
-                  Stay Updated
-                </p>
-                <p className="mb-4 mt-4 text-sm text-foreground md:mb-8">
-                  Subscribe to the newsletter for regular updates
-                </p>
-              </div> */}
               <Form {...form}>
                 <form
                   onSubmit={handleSubmit(handleSubscribe)}
-                  className="mt-4 sm:flex md:w-full md:max-w-md"
+                  className="mt-4 flex flex-col gap-4 md:w-full md:max-w-md xl:flex-row"
                 >
                   <div className="flex flex-1 flex-col gap-3">
                     <FormField
@@ -247,7 +239,7 @@ export default function Footer({ className }: { className?: string }) {
                       />
                     )}
                   </div>
-                  <div className="mt-3 sm:ml-3 sm:mt-0">
+                  <div className="">
                     <Button
                       type="submit"
                       variant={
@@ -255,7 +247,7 @@ export default function Footer({ className }: { className?: string }) {
                           ? "salWithShadowHidden"
                           : "salWithShadowHiddenBg"
                       }
-                      className="flex w-full items-center justify-center gap-2 font-bold md:w-[150px]"
+                      className="flex w-full items-center justify-center gap-2 font-bold xl:w-[150px]"
                       disabled={subAction === "subbing" || !isValid}
                     >
                       {subAction === "cta"
@@ -284,6 +276,7 @@ export default function Footer({ className }: { className?: string }) {
             </div>
           </div>
         </div>
+        {/* Under footer bar */}
         <div className="mt-12 border-t border-border pt-4 dark:border-gray-800">
           <div className="flex flex-col items-center justify-between gap-y-2 px-12 md:flex-row">
             <div className="mb-2 flex space-x-6 md:mb-0 md:space-x-3">

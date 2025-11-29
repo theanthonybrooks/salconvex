@@ -89,7 +89,6 @@ export const SubDialog = ({
 
   const reason = watch("reason");
   const hasReason = reason.length > 0;
-  console.log(reason);
 
   const handleCancelSubscription = async (
     data: CancelSubDialogSchemaValues,

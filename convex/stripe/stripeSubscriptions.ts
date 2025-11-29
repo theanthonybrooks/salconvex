@@ -574,6 +574,8 @@ export const subscriptionStoreWebhook = mutation({
         const discountAmount = baseObject?.discount?.coupon?.amount_off;
         const discountDuration = baseObject?.discount?.coupon?.duration;
         const planData = baseObject?.plan;
+        const stripePriceId = baseObject?.plan?.id;
+        console.log(stripePriceId);
         const prevPlanData = base.previous_attributes?.plan;
         // const couponCode = baseObject?.discount?.coupon?.name;
         const currentAmount = planData?.amount;
@@ -594,6 +596,7 @@ export const subscriptionStoreWebhook = mutation({
         const updatedMetadata = {
           ...existingMetadata,
           interval: currentInterval,
+
           plan: planKey ?? "Unknown",
         };
 
@@ -602,26 +605,26 @@ export const subscriptionStoreWebhook = mutation({
         //todo: Update this in the future. Make it a bit more readable and sure that it's working as intended.
 
         let amount: number | undefined;
-        let nextAmount: number | undefined;
+        let amountNext: number | undefined;
         let interval: string | undefined;
-        let nextInterval: string | undefined;
+        let intervalNext: string | undefined;
 
         if (currentAmount < prevAmount) {
           amount = prevAmount;
-          nextAmount = currentAmount;
+          amountNext = currentAmount;
           if (currentInterval === "month") {
             interval = prevInterval === "year" ? "year" : currentInterval;
-            nextInterval =
+            intervalNext =
               currentInterval === "month" && prevInterval === "year"
                 ? currentInterval
                 : undefined;
           } else {
             interval = currentInterval;
-            nextInterval = undefined;
+            intervalNext = undefined;
           }
         } else {
           amount = currentAmount;
-          nextAmount = undefined;
+          amountNext = undefined;
           interval = currentInterval;
         }
 
@@ -637,18 +640,19 @@ export const subscriptionStoreWebhook = mutation({
             endedAt: baseObject.ended_at
               ? new Date(baseObject.ended_at * 1000).getTime()
               : undefined,
-            interval: interval,
-            intervalNext: nextInterval,
-            amount: amount,
+            interval,
+            intervalNext,
+            amount,
             discountAmount: discountAmount ?? undefined,
             discountPercent: discountPercent ?? undefined,
             discountDuration: discountDuration ?? undefined,
-            amountNext: nextAmount,
+            amountNext,
             currentPeriodEnd: baseObject.current_period_end
               ? new Date(baseObject.current_period_end * 1000).getTime()
               : undefined,
             cancelAtPeriodEnd: baseObject.cancel_at_period_end ?? false,
             stripeId: baseObject.id,
+            stripePriceId,
             metadata: updatedMetadata,
             plan: planNumber ?? 0,
             //test if actually needed - the stripeId changes when the subscription is updated, but I don't know if it's able to reference/find the new one in reference to the old one or not. Wait and see.

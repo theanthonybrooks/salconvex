@@ -181,7 +181,7 @@ export default function Home() {
       </p>
 
       <section className="home-page relative w-full">
-        <div className="sticky top-0 z-0 h-[60dvh] sm:h-dvh">
+        <div className="sticky top-0 z-0 h-[60dvh] overflow-hidden sm:h-dvh">
           <motion.div
             initial={{ y: 0, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
@@ -274,7 +274,7 @@ export default function Home() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.5, ease: "easeInOut" }}
-                  className="absolute bottom-5 right-1/2 z-0 flex w-max translate-x-1/2 flex-col gap-1 rounded-3xl bg-card px-6 py-2 text-foreground shadow-xl transition-all ease-in-out hover:cursor-pointer hover:bg-salYellowLt sm:right-10 sm:w-auto sm:translate-x-0 sm:px-6"
+                  className="absolute bottom-5 right-1/2 flex w-max translate-x-1/2 flex-col gap-1 rounded-3xl bg-card px-6 py-2 text-foreground shadow-xl transition-all ease-in-out hover:cursor-pointer hover:bg-salYellowLt sm:right-10 sm:w-auto sm:translate-x-0 sm:px-6"
                 >
                   <div className="group flex cursor-pointer flex-col items-center gap-2 sm:flex-row">
                     <span className={cn("flex items-center gap-2")}>
@@ -408,11 +408,11 @@ export default function Home() {
 
         <div className="relative z-10 bg-background pt-4 sm:pt-10">
           <h1 className="hidden px-4 pb-8 text-center font-tanker text-4xl lg:block">
-            Global database of everything street art, graffiti, and
-            mural-related
+            artist and organizer resource for everything street art, graffiti,
+            and mural-related
           </h1>
           <div className="flex w-screen items-center justify-center gap-3 bg-foreground/90 p-6 font-tanker lowercase text-background">
-            <div className="flex w-[clamp(300px,70vw,1000px)] flex-col items-center justify-around gap-3 sm:flex-row">
+            <div className="flex w-[clamp(300px,75vw,1500px)] flex-col items-center justify-around gap-3 sm:flex-row">
               <span className="flex flex-col items-center gap-2">
                 <p className="text-[3.25em] leading-[3rem]">Currently,</p>
                 <p className="text-2xl">on The Street Art List:</p>

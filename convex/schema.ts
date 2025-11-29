@@ -1503,6 +1503,7 @@ export default defineSchema({
     .index("stripeProductId", ["stripeProductId"]),
 
   userSubscriptions: defineTable(userSubscriptionSchema)
+    .index("by_lastEditedAt", ["lastEditedAt"])
     .index("by_status", ["status"])
     .index("userId", ["userId"])
     .index("stripeId", ["stripeId"])

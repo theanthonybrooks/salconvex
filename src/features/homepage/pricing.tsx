@@ -71,6 +71,7 @@ type PricingCardProps = {
   hadTrial?: boolean;
   subscription?: Doc<"userSubscriptions"> | null;
   activeSub?: boolean;
+  className?: string;
 };
 
 // const pricingRange = [
@@ -343,6 +344,7 @@ const PricingCard = ({
   image,
   stripePriceId,
   subscription,
+  className,
 }: PricingCardProps) => {
   const [pending, setPending] = useState(false);
   const [comingSoon, setComingSoon] = useState(false);
@@ -380,15 +382,16 @@ const PricingCard = ({
   const isEligibleForFree = (isOrganizer && hadFreeCall === false) || !user;
   const hadTrial = subscription?.hadTrial;
   const userSubPriceId = subscription?.stripePriceId;
-  const userInterval = subscription?.interval;
-  const sameInterval =
-    (isYearly && userInterval === "year") ||
-    (!isYearly && userInterval === "month");
+  // const userInterval = subscription?.interval;
+  // const sameInterval =
+  //   (isYearly && userInterval === "year") ||
+  //   (!isYearly && userInterval === "month");
   const isCurrentUserPlan =
     typeof stripePriceId === "string" &&
     typeof userSubPriceId === "string" &&
     stripePriceId === userSubPriceId &&
     activeSub;
+
   const handleCheckout = async (
     interval: "month" | "year",
     hadTrial: boolean,
@@ -422,12 +425,15 @@ const PricingCard = ({
         {
           relative: popular || isFree || isCurrentUserPlan,
         },
-        activeSub &&
-          !isCurrentUserPlan &&
-          sameInterval &&
-          "scale-90 transition-transform duration-500 ease-in-out hover:scale-100",
+        activeSub && isCurrentUserPlan && "ring-8 ring-salPink",
+        // activeSub &&
+        //   !isCurrentUserPlan &&
+        //   sameInterval &&
+        // "ring-2 ring-salPink ring-offset-1",
+        //   `scale-90 transition-transform duration-500 ease-in-out hover:translate-x-0 hover:scale-100 ${cardIndex === 0 ? "sm:translate-x-5" : cardIndex === numberOfCards - 1 ? "sm:-translate-x-5" : ""}`,
         isOrganizer && "self-start",
         isCurrentUserPlan && "border-3",
+        className,
         // isFree && "self-start",
       )}
     >
@@ -437,7 +443,7 @@ const PricingCard = ({
         </div>
       )}
       {isCurrentUserPlan && (
-        <div className="absolute -top-4 left-0 right-0 mx-auto w-fit rounded-full border-2 bg-salPinkLt px-3 py-1">
+        <div className="absolute -top-5 left-0 right-0 mx-auto w-fit rounded-full border-2 bg-salPinkLt px-4 py-2">
           <p className="text-sm font-medium text-foreground">Current Plan</p>
         </div>
       )}
@@ -761,18 +767,10 @@ export default function Pricing() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
             viewport={{ once: true }}
-            className="mt-10 flex flex-col justify-center gap-y-6 lg:flex-row lg:gap-5 3xl:mt-16"
+            className="mt-10 flex flex-col justify-center gap-y-6 lg:flex-row lg:gap-10 3xl:mt-16"
           >
             {[...plans]
-              // .sort((a, b) => {
-              //   const priceA = isYearly
-              //     ? (a.prices.year?.usd?.amount ?? Infinity)
-              //     : (a.prices.month?.usd?.amount ?? Infinity);
-              //   const priceB = isYearly
-              //     ? (b.prices.year?.usd?.amount ?? Infinity)
-              //     : (b.prices.month?.usd?.amount ?? Infinity);
-              //   return priceA - priceB;
-              // })
+
               .sort((a, b) => {
                 const priceA = isYearly
                   ? (getPrice(a.prices.year, currency)?.amount ?? Infinity)
@@ -785,24 +783,7 @@ export default function Pricing() {
                 return priceA - priceB;
               })
 
-              // .filter((plan) => {
-              //   if (!hasSub) return true; // show all if user doesn’t have a subscription
-
-              //   const stripePriceId = isYearly
-              //     ? plan.prices?.year?.usd?.stripeId
-              //     : plan.prices?.month?.usd?.stripeId;
-
-              //   const isCurrentUserPlan =
-              //     typeof stripePriceId === "string" &&
-              //     typeof userSubPriceId === "string" &&
-              //     stripePriceId === userSubPriceId;
-
-              //   return isCurrentUserPlan;
-              // })
               .map((plan) => {
-                // const stripePriceId = isYearly
-                //   ? plan.prices?.year?.usd?.stripeId
-                //   : plan.prices?.month?.usd?.stripeId;
                 const stripePriceId = isYearly
                   ? getPrice(plan.prices.year, currency)?.stripeId
                   : getPrice(plan.prices.month, currency)?.stripeId;
@@ -833,7 +814,7 @@ export default function Pricing() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
             viewport={{ once: true }}
-            className="mt-10 flex flex-col justify-center gap-y-6 md:flex-row md:gap-8 3xl:mt-16"
+            className="mt-10 flex flex-col justify-center gap-y-6 md:flex-row md:gap-10 3xl:mt-16"
           >
             {orgPlans &&
               orgPlans
@@ -865,7 +846,7 @@ export default function Pricing() {
           </motion.div>
         )}
         {isArtist && hasSub && (
-          <p className="mx-auto w-full max-w-[90vw] pb-3 pt-6 sm:text-center">
+          <p className="mx-auto w-full max-w-[90vw] pb-3 pt-9 sm:text-center">
             If you would like to change your plan, you can do so by clicking the
             desired plan above and updating your membership via Stripe.
           </p>
@@ -893,7 +874,6 @@ export default function Pricing() {
             </p>
           </div>
         )} */}
-        {/* //TODO:Add functionality that will allow artists/organizers to add other account type (prompt them) */}
       </div>
     </section>
   );
