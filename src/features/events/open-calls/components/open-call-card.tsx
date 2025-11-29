@@ -52,9 +52,15 @@ const OpenCallCard = ({
   publicPreview,
   fontSize,
 }: OpenCallCardProps) => {
-  const { category: eventCategory, _id: id, location, dates } = event;
+  const {
+    category: eventCategory,
+    _id: id,
+    location,
+    dates,
+    slug: eventSlug,
+  } = event;
 
-  const { eventDates } = dates;
+  const { eventDates, edition } = dates;
   const {
     selectionCriteria,
     compensation,
@@ -62,7 +68,7 @@ const OpenCallCard = ({
     eligibility,
     documents,
     requirements,
-    _id: openCallId,
+    // _id: openCallId,
   } = openCall;
 
   const {
@@ -137,11 +143,11 @@ const OpenCallCard = ({
   const eventStart = eventDates[0].start;
   const eventEnd = eventDates[0].end;
 
-  const hasEventDates =
-    eventStart &&
-    isValidIsoDate(eventStart) &&
-    eventEnd &&
-    isValidIsoDate(eventEnd);
+  // const hasEventDates =
+  //   eventStart &&
+  //   isValidIsoDate(eventStart) &&
+  //   eventEnd &&
+  //   isValidIsoDate(eventEnd);
 
   const eventTimeline = event.timeLine;
 
@@ -149,18 +155,29 @@ const OpenCallCard = ({
 
   const icsLink =
     callType === "Fixed" && isValidIsoDate(ocStart) && isValidIsoDate(ocEnd)
-      ? generateICSFile(
-          event.name,
-          ocStart,
-          ocEnd,
-          locationString,
-          event.about ?? "",
-          eventCategory,
-          true,
-          hasEventDates ? eventStart! : "",
-          hasEventDates ? eventEnd! : "",
-          `${openCallId}`,
-        )
+      ? generateICSFile({
+          openCallInfo: {
+            dates: {
+              endDate: ocEnd,
+            },
+          },
+          eventInfo: {
+            title: event.name,
+            // description: event.blurb ?? event.about.slice(0, 250),
+            description: event.blurb ?? "",
+            eventCategory,
+            location: locationString,
+            dates: {
+              startDate: eventStart,
+              endDate: eventEnd,
+              edition,
+            },
+          },
+          calendarProps: {
+            slug: eventSlug,
+            type: "openCall",
+          },
+        })
       : null;
 
   const isMobile = format === "mobile";

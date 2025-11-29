@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 
 import { FaBookmark, FaRegBookmark } from "react-icons/fa6";
-import { CalendarClockIcon, EyeOff, MapPin } from "lucide-react";
+import { EyeOff, MapPin } from "lucide-react";
 
 import { Card } from "@/components/ui/card";
 import { DraftPendingBanner } from "@/components/ui/draft-pending-banner";
@@ -18,8 +18,6 @@ import EventDates from "@/features/events/components/event-dates";
 import { EventCard } from "@/features/events/components/events-card";
 import { OrganizerCard } from "@/features/organizers/components/organizer-card";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
-import { generateICSFile } from "@/helpers/addToCalendar";
-import { isValidIsoDate } from "@/helpers/dateFns";
 import { getEventCategoryLabel, getEventTypeLabel } from "@/helpers/eventFns";
 import { getFormattedLocationString } from "@/helpers/locationFns";
 import { getUserFontSizePref } from "@/helpers/stylingFns";
@@ -64,7 +62,8 @@ export const EventCardDetailMobile = (props: EventCardProps) => {
     // hasActiveOpenCall: hasOpenCall,
     // adminNote,
     state: eventState,
-    dates,
+    // dates,
+    // slug: eventSlug,
   } = event;
   const isOwner = user?._id === organizer?.ownerId;
   // const { bookmarked, hidden } = artist?.listActions?.find(
@@ -79,9 +78,9 @@ export const EventCardDetailMobile = (props: EventCardProps) => {
     (la) => la.eventId === event._id,
   ) ?? { bookmarked: false, hidden: false };
 
-  const { eventDates } = dates;
-  const eventStart = eventDates[0].start;
-  const eventEnd = eventDates[0].end;
+  // const { eventDates, edition } = dates;
+  // const eventStart = eventDates[0].start;
+  // const eventEnd = eventDates[eventDates.length - 1].end;
 
   const [activeTab, setActiveTab] = useState("event");
   const [hasMounted, setHasMounted] = useState(false);
@@ -90,25 +89,31 @@ export const EventCardDetailMobile = (props: EventCardProps) => {
     abbreviated: true,
   });
 
-  const hasEventDates = eventStart && eventEnd;
-  const eventAbout = event?.about ?? "";
-  const eventId = event?._id ?? "";
+  // const hasEventDates = eventStart && eventEnd;
+  // const eventAbout = event?.about ?? "";
+  // const eventId = event?._id ?? "";
 
-  const icsLink =
-    hasEventDates && isValidIsoDate(eventStart) && isValidIsoDate(eventEnd)
-      ? generateICSFile(
-          event.name,
-          eventStart,
-          eventEnd,
-          locationString,
-          eventAbout,
-          eventCategory,
-          false,
-          isValidIsoDate(eventStart) ? eventStart! : "",
-          isValidIsoDate(eventEnd) ? eventEnd! : "",
-          `${eventId}`,
-        )
-      : null;
+  // const icsLink =
+  //   isValidIsoDate(eventStart) && isValidIsoDate(eventEnd)
+  //     ? generateICSFile({
+  //         eventInfo: {
+  //           title: event.name,
+  //           // description: event.blurb ?? event.about.slice(0, 250),
+  //           description: event.blurb ?? eventAbout.slice(0, 250) + "...",
+  //           eventCategory,
+  //           location: locationString,
+  //           dates: {
+  //             startDate: eventStart,
+  //             endDate: eventEnd,
+  //             edition,
+  //           },
+  //         },
+  //         calendarProps: {
+  //           slug: eventSlug,
+  //           type: "openCall",
+  //         },
+  //       })
+  //     : null;
 
   useEffect(() => {
     const timeout = setTimeout(() => setHasMounted(true), 50);
@@ -213,14 +218,14 @@ export const EventCardDetailMobile = (props: EventCardProps) => {
                 )}
               >
                 <EventDates event={event} format="mobile" type="event" />
-                {icsLink && (
+                {/* {icsLink && (
                   <a
                     href={icsLink}
                     download={`${event.name.replace(/\s+/g, "_")}.ics`}
                   >
                     <CalendarClockIcon className="size-5 md:size-4" />
                   </a>
-                )}
+                )} */}
               </span>
             </div>
             <p className={cn("flex items-center gap-x-1", fontSize)}>
