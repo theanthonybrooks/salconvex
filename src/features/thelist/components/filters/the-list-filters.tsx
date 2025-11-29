@@ -134,6 +134,7 @@ export const TheListFilters = <T extends TheListFilterCommandItem>({
       }, 1000),
     [handleSearchChange],
   );
+  
 
   useEffect(() => {
     if (
@@ -162,7 +163,6 @@ export const TheListFilters = <T extends TheListFilterCommandItem>({
     } else {
       setSearchType("all");
     }
-    // console.log("setting search type");
     return;
   }, [view, isAdmin]);
 

@@ -221,6 +221,21 @@ export const EventListProvider = ({
   );
 
   useEffect(() => {
+    if (view !== "event") return;
+
+    setFilters((prev) => {
+      if (
+        Array.isArray(prev.eventCategories) &&
+        prev.eventCategories.length === 1 &&
+        prev.eventCategories[0] === "event"
+      ) {
+        return prev; // no change
+      }
+      return { ...prev, eventCategories: [] };
+    });
+  }, [view]);
+
+  useEffect(() => {
     updateURL(filters, sortOptions, search, page);
   }, [filters, sortOptions, search, page, updateURL]);
 
