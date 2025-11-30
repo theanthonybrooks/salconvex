@@ -1,4 +1,16 @@
-export const hashtags = ["#publicart", "#callforartist", "#artistopencall"];
+export const baseHashtags = `#thestreetartlist #streetartcall #streetartcalls #streetartopencall #opencall #muralopencall #thelist #publicartopencall #streetartcalls #publicart #publicartist #callforentry #rfq #rfp #eoi #urbanart #arteurbana #artistopportunities #artistopportunity #mural #murals #streetart #streetartist #streetartopportunity`;
+
+export const graffitiEventHashtags = `#graffitijam #graffiti`;
+
+export const muralProjectHashtags = `#publicartproject #muralproject`;
+
+export const pasteUpHashtags = `#pasteup #wheatpaste #sticker`;
+
+export const streetArtFestivalHashtags = `#streetartfest #muralfestival #muralfest`;
+
+export const hashtags = `#publicart #callforartist #artistopencall `;
+
+export const recapCommentHashtags = `${baseHashtags} ${streetArtFestivalHashtags} ${muralProjectHashtags}`;
 
 export const recapCaptionIntro = `A quick rundown of what I've found that's ending in the next 7 days. The links for everything are on The Street Art List website (link in bio).
 
@@ -7,9 +19,10 @@ DM or email at hey@thestreetartlist.com with any feedback or things that you thi
 P.S. - Questions related to the events/open calls should be asked to the organizers directly.`;
 
 export const promoBlock = `The Street Art List is a platform dedicated to 2D Public Art - Sharing mural, graffiti, and street art calls (RFP, RFQ, EOI, etc). 
+
 Originally created as a personal artist resource and living snapshot of the industry, we now offer a global map of street art, graffiti jams, and mural festivals and projects (over 1,200 and counting), an annual event calendar, and resources for artists and organizers.
 
 Find out more at thestreetartlist.com.
 
-${hashtags.join(" ")}
+${hashtags}
 `;

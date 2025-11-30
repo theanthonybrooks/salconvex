@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/dialog";
 import { formatCurrency } from "@/helpers/currencyFns";
 import { formatEventDates, formatOpenCallDeadline } from "@/helpers/dateFns";
-import { formatBudgetCurrency } from "@/helpers/eventFns";
+import { formatBudgetCurrency, getEventTags } from "@/helpers/eventFns";
 import { getDemonym, getFormattedLocationString } from "@/helpers/locationFns";
 import { cn } from "@/helpers/utilsFns";
 import { getCallFormatLabel } from "@/lib/openCallFns";
@@ -38,14 +38,19 @@ export const PostCaptionDialog = ({
   open,
   setOpenAction,
 }: PostCaptionDialogProps) => {
-  const [copied, setCopied] = useState<"alt" | "caption" | null>(null);
+  const copiedStyling = "ring-2 ring-green-300";
+  const [copied, setCopied] = useState<"alt" | "caption" | "comment" | null>(
+    null,
+  );
   const [captionText, setCaptionText] = useState("");
   const [altText, setAltText] = useState("");
+  const [commentText, setCommentText] = useState("");
 
   useEffect(() => {
     if (!data) return;
     const { event, openCall, organizer } = data;
     if (!openCall || !organizer || !event) return;
+
     const hasEvent = event.dates.eventFormat !== "noEvent";
     const eventStart = hasEvent
       ? event.dates.eventDates[0].start
@@ -70,7 +75,9 @@ export const PostCaptionDialog = ({
     content += `\n\nProject Info:`;
     content += `\n—————————\n`;
     if (organizer.links?.instagram) {
-      content += `Organizer: ${organizer.links.instagram}`;
+      content += `Organizer: ${organizer.links.instagram}${event?.links?.instagram ? ` & ${event.links.instagram}` : ""}`;
+    } else if (event?.links?.instagram) {
+      content += `Organizer: ${event.links.instagram}`;
     } else {
       content += `Organizer: ${organizer.name}`;
     }
@@ -118,14 +125,27 @@ export const PostCaptionDialog = ({
     setCaptionText(content);
 
     let altContent = "";
-    altContent += `${event.name} - ${organizer.links.instagram ?? organizer.name}`;
+    altContent += `${event.name} - ${event?.links?.instagram ?? organizer.links.instagram ?? organizer.name}`;
     altContent += `\nAll open calls are listed on The Street Art List (www.thestreetartlist.com - link in bio)`;
     setAltText(altContent);
+
+    const commentContent = getEventTags({
+      type: event.type,
+      category: event.category,
+    });
+
+    setCommentText(commentContent);
   }, [data]);
 
-  const handleCopyText = (object: "caption" | "alt") => {
+  const handleCopyText = (object: "caption" | "alt" | "comment") => {
     navigator.clipboard
-      .writeText(object === "caption" ? captionText : altText)
+      .writeText(
+        object === "caption"
+          ? captionText
+          : object === "alt"
+            ? altText
+            : commentText,
+      )
       .then(() => {
         setCopied(object);
         setTimeout(() => setCopied(null), 2000);
@@ -147,7 +167,10 @@ export const PostCaptionDialog = ({
           <Button
             variant="salWithShadowHiddenBg"
             size="lg"
-            className="flex w-40 items-center gap-1"
+            className={cn(
+              "flex w-40 items-center gap-1",
+              copied === "caption" && "border-green-800 bg-green-100",
+            )}
             onClick={() => handleCopyText("caption")}
             disabled={captionText.trim().length === 0}
           >
@@ -166,7 +189,10 @@ export const PostCaptionDialog = ({
           <Button
             variant="salWithShadowHiddenBg"
             size="lg"
-            className="flex w-40 items-center gap-1"
+            className={cn(
+              "flex w-40 items-center gap-1",
+              copied === "alt" && "border-green-800 bg-green-100",
+            )}
             onClick={() => handleCopyText("alt")}
             disabled={altText.trim().length === 0}
           >
@@ -182,6 +208,28 @@ export const PostCaptionDialog = ({
               </>
             )}
           </Button>
+          <Button
+            variant="salWithShadowHiddenBg"
+            size="lg"
+            className={cn(
+              "flex w-40 items-center gap-1",
+              copied === "comment" && "border-green-800 bg-green-100",
+            )}
+            onClick={() => handleCopyText("comment")}
+            disabled={altText.trim().length === 0}
+          >
+            {copied === "comment" ? (
+              <>
+                <Check className="size-4" />
+                Copied!
+              </>
+            ) : (
+              <>
+                <Clipboard className="size-4" />
+                Copy Comment
+              </>
+            )}
+          </Button>
         </div>
         <div
           className={cn(
@@ -192,14 +240,32 @@ export const PostCaptionDialog = ({
             value={captionText}
             setValue={setCaptionText}
             maxLength={2200}
-            className="max-h-[60dvh]"
+            className={cn(
+              "max-h-[60dvh] font-mono",
+              copied === "caption" && copiedStyling,
+            )}
           />
-          <DebouncedTextarea
-            value={altText}
-            setValue={setAltText}
-            maxLength={140}
-            className="max-h-25"
-          />
+          <div className="flex flex-col gap-4">
+            <DebouncedTextarea
+              value={altText}
+              setValue={setAltText}
+              maxLength={140}
+              className={cn(
+                "max-h-25 font-mono",
+                copied === "alt" && copiedStyling,
+              )}
+            />
+            <DebouncedTextarea
+              value={commentText}
+              setValue={setCommentText}
+              maxLength={30}
+              className={cn(
+                "max-h-50 font-mono",
+                copied === "comment" && copiedStyling,
+              )}
+              countMode="word"
+            />
+          </div>
         </div>
       </DialogContent>
     </Dialog>

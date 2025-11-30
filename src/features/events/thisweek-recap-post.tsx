@@ -1,4 +1,8 @@
-import { promoBlock, recapCaptionIntro } from "@/constants/socialConsts";
+import {
+  promoBlock,
+  recapCaptionIntro,
+  recapCommentHashtags,
+} from "@/constants/socialConsts";
 
 import { SortOptions } from "@/types/thelist";
 
@@ -20,7 +24,7 @@ import {
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
+import { DebouncedTextarea } from "@/components/ui/debounced-textarea2";
 import {
   RecapCallCount,
   RecapCover,
@@ -29,29 +33,32 @@ import {
 } from "@/features/events/ui/thisweek-recap/recap-cover";
 import RecapPost from "@/features/events/ui/thisweek-recap/recap-post";
 import { formatCondensedDateRange } from "@/helpers/dateFns";
+import { sanitizeIGHandle } from "@/helpers/linkFns";
 import { cn } from "@/helpers/utilsFns";
 
 import { api } from "~/convex/_generated/api";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { useQueries } from "convex-helpers/react/cache";
+import { useConvex } from "convex/react";
 
 interface ThisweekRecapPostProps {
   source: "thisweek" | "nextweek";
 }
 
 const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
+  const convex = useConvex();
   const router = useRouter();
   const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
   const refs = useRef<(HTMLDivElement | null)[]>([]);
-  const [copiedText, setCopiedText] = useState(false);
-  const [copiedAlt, setCopiedAlt] = useState(false);
+  const [copied, setCopied] = useState<"caption" | "alt" | "comment" | null>(
+    null,
+  );
 
   const [captionText, setCaptionText] = useState("");
+  const [altText, setAltText] = useState("");
+  const [commentText, setCommentText] = useState("");
   const [excludedIds, setExcludedIds] = useState<string[]>([]);
 
-  const [altText, setAltText] = useState("");
-  const [charCount, setCharCount] = useState(0);
-  const [altCharCount, setAltCharCount] = useState(0);
   const [dateFontSize, setDateFontSize] = useState<number | null>(null);
 
   const sortOptions = useMemo<SortOptions>(
@@ -169,71 +176,83 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
   //   }
   // };
 
-  const handleCopyText = () => {
-    navigator.clipboard.writeText(captionText).then(() => {
-      setCopiedText(true);
-      setTimeout(() => setCopiedText(false), 2000);
-    });
-  };
-
-  const handleCopyAlt = () => {
-    navigator.clipboard.writeText(altText).then(() => {
-      setCopiedAlt(true);
-      setTimeout(() => setCopiedAlt(false), 2000);
-    });
+  const handleCopy = (object: "caption" | "alt" | "comment") => {
+    navigator.clipboard
+      .writeText(
+        object === "caption"
+          ? captionText
+          : object === "alt"
+            ? altText
+            : commentText,
+      )
+      .then(() => {
+        setCopied(object);
+        setTimeout(() => setCopied(null), 2000);
+      });
   };
 
   useEffect(() => {
     // if (!filteredResults?.length) return;
 
-    const grouped: Record<string, { events: string[]; timeZone: string }> = {};
+    const run = async () => {
+      const grouped: Record<string, { events: string[]; timeZone: string }> =
+        {};
 
-    for (const event of filteredResults) {
-      const name = event.name;
-      const dueDate = event.tabs?.openCall?.basicInfo.dates?.ocEnd ?? "";
-      const timeZone =
-        event?.tabs?.openCall?.basicInfo?.dates?.timezone ?? "Europe/Berlin";
-      const dateKey = formatInTimeZone(dueDate, timeZone, "yyyy-MM-dd");
+      for (const event of filteredResults) {
+        const { name, orgData } = event;
+        const orgLinks = orgData
+          ? await convex.query(api.organizer.organizations.getOrgLinks, {
+              orgId: orgData.mainOrgId,
+            })
+          : null;
+        const dueDate = event.tabs?.openCall?.basicInfo.dates?.ocEnd ?? "";
+        const timeZone =
+          event?.tabs?.openCall?.basicInfo?.dates?.timezone ?? "Europe/Berlin";
+        const dateKey = formatInTimeZone(dueDate, timeZone, "yyyy-MM-dd");
 
-      const instagram = event.links?.instagram;
-      const igHandle = instagram
-        ? instagram
-            .replace(/^https?:\/\/(www\.)?instagram\.com\//, "")
-            .replace(/\/$/, "")
-        : "";
-      const organization = igHandle ? `| ${igHandle}` : "";
+        const eventIG = sanitizeIGHandle(event.links?.instagram);
+        const orgIG = sanitizeIGHandle(orgLinks?.instagram);
+        const organization = eventIG
+          ? `| ${eventIG}`
+          : orgIG
+            ? `| ${orgIG}`
+            : "";
 
-      if (!grouped[dateKey]) {
-        grouped[dateKey] = { events: [], timeZone };
+        if (!grouped[dateKey]) {
+          grouped[dateKey] = { events: [], timeZone };
+        }
+        grouped[dateKey].events.push(`${name} ${organization}`.trim());
       }
-      grouped[dateKey].events.push(`${name} ${organization}`.trim());
-    }
 
-    const sortedDates = Object.keys(grouped).sort();
+      const sortedDates = Object.keys(grouped).sort();
 
-    let content = recapCaptionIntro + "\n\n";
+      let content = recapCaptionIntro + "\n\n";
 
-    let counter = 1;
-    for (const date of sortedDates) {
-      const { events, timeZone } = grouped[date];
+      let counter = 1;
+      for (const date of sortedDates) {
+        const { events, timeZone } = grouped[date];
 
-      const formattedDate = formatInTimeZone(date, timeZone, "MMMM d");
+        const formattedDate = formatInTimeZone(date, timeZone, "MMMM d");
 
-      content += `${formattedDate}:\n`;
-      for (const item of events) {
-        content += `${counter}. ${item}\n`;
-        counter++;
+        content += `${formattedDate}:\n`;
+        for (const item of events) {
+          content += `${counter}. ${item}\n`;
+          counter++;
+        }
+        content += "\n";
       }
-      content += "\n";
-    }
 
-    content += `Access to all of the open calls, the ability to bookmark, hide, and track applications starts at $3/month. The coding of the site, searching, reading through, addition of open calls, and these IG posts are all done by me, @anthonybrooksart.\n\n`;
+      content += `Access to all of the open calls, the ability to bookmark, hide, and track applications starts at $3/month. The coding of the site, searching, reading through, addition of open calls, and these IG posts are all done by me, @anthonybrooksart.\n\n`;
 
-    content += promoBlock;
+      content += promoBlock;
 
-    setCaptionText(content);
-    setCharCount(content.length);
-  }, [filteredResults]);
+      setCaptionText(content);
+      setCommentText(recapCommentHashtags);
+
+      // setCommentText(commentContent);
+    };
+    run();
+  }, [filteredResults, convex]);
 
   useEffect(() => {
     // if (!filteredResults?.length) return;
@@ -241,7 +260,6 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
     const altText = `Weekly post for ${displayRange}. The links are on The Street Art List website (thestreetartlist.com)`;
 
     setAltText(altText);
-    setAltCharCount(altText.length);
   }, [filteredResults, displayRange]);
 
   const mobileScalingClasses =
@@ -412,46 +430,62 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
             </Button>
             <Button
               variant="salWithShadowHiddenBg"
-              onClick={handleCopyText}
-              className="flex w-full flex-1 items-center gap-1"
+              onClick={() => handleCopy("caption")}
+              className={cn(
+                "flex w-full flex-1 items-center gap-1",
+                copied === "caption" && "border-green-800 bg-green-100",
+              )}
             >
-              {copiedText ? "Copied!" : "Copy Text"}{" "}
+              {copied === "caption" ? "Copied!" : "Copy Text"}{" "}
               <Clipboard className="size-4" />
             </Button>
             <Button
               variant="salWithShadowHiddenBg"
-              onClick={handleCopyAlt}
-              className="flex w-full flex-1 items-center gap-1"
+              onClick={() => handleCopy("alt")}
+              className={cn(
+                "flex w-full flex-1 items-center gap-1",
+                copied === "alt" && "border-green-800 bg-green-100",
+              )}
             >
-              {copiedAlt ? "Copied!" : "Copy Alt"}
+              {copied === "alt" ? "Copied!" : "Copy Alt"}
+              <Clipboard className="size-4" />
+            </Button>
+            <Button
+              variant="salWithShadowHiddenBg"
+              onClick={() => handleCopy("comment")}
+              className={cn(
+                "flex w-full flex-1 items-center gap-1",
+                copied === "comment" && "border-green-800 bg-green-100",
+              )}
+            >
+              {copied === "comment" ? "Copied!" : "Copy Comment"}
               <Clipboard className="size-4" />
             </Button>
           </div>
-          <Textarea
+          <DebouncedTextarea
             value={captionText}
-            onChange={(e) => {
-              setCaptionText(e.target.value);
-              setCharCount(e.target.value.length);
-            }}
-            rows={28}
-            className="mx-auto max-w-[90vw] whitespace-pre-wrap bg-card font-mono"
+            setValue={setCaptionText}
+            maxLength={2200}
+            className={cn(
+              "mx-auto max-w-[90vw] font-mono",
+              copied === "caption" && "ring-2 ring-green-300",
+            )}
           />
-          <p className="text-right text-sm text-foreground/60">
-            {charCount}/3000 characters
-          </p>
 
-          <Textarea
+          <DebouncedTextarea
             value={altText}
-            onChange={(e) => {
-              setAltText(e.target.value);
-              setAltCharCount(e.target.value.length);
-            }}
-            rows={5}
-            className="mx-auto max-w-[90vw] whitespace-pre-wrap bg-card font-mono"
+            setValue={setAltText}
+            maxLength={100}
+            className={cn("mx-auto max-w-[90vw] font-mono")}
           />
-          <p className="text-right text-sm text-foreground/60">
-            {altCharCount}/100 characters
-          </p>
+
+          <DebouncedTextarea
+            value={commentText}
+            setValue={setCommentText}
+            maxLength={30}
+            className={cn("mx-auto max-w-[90vw] font-mono")}
+            countMode="word"
+          />
         </div>
       </div>
     </>

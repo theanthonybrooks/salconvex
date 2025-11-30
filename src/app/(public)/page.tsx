@@ -460,7 +460,7 @@ export default function Home() {
           </div>
 
           <div
-            className="mx-auto mt-10 flex w-full max-w-[clamp(300px,80vw,1000px)] flex-col items-start justify-center gap-2 py-4"
+            className="mx-auto mt-10 flex w-full max-w-[clamp(300px,80vw,1500px)] flex-col items-start justify-center gap-2 py-4"
             data-nosnippet
           >
             <span className="inline items-center">

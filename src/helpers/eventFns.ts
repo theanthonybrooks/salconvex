@@ -5,7 +5,15 @@ import {
   paidEvents,
 } from "@/constants/eventConsts";
 import { CALL_TYPE_LABELS } from "@/constants/openCallConsts";
+import {
+  baseHashtags,
+  graffitiEventHashtags,
+  muralProjectHashtags,
+  pasteUpHashtags,
+  streetArtFestivalHashtags,
+} from "@/constants/socialConsts";
 
+import type { EventData } from "@/types/eventTypes";
 import {
   EventCategory,
   EventType,
@@ -277,4 +285,44 @@ export const getOpenCallStatusLabel = ({
   } else {
     return 0;
   }
+};
+
+type EventTypeCategory = Pick<EventData, "type" | "category">;
+
+export const getEventTags = (event: EventTypeCategory) => {
+  const { type, category } = event;
+  const parts: string[] = [baseHashtags];
+
+  switch (category) {
+    case "project":
+      parts.push(muralProjectHashtags);
+      break;
+    case "residency":
+      parts.push("artistresidency resartis");
+      break;
+    case "gfund":
+      parts.push("artgrant artsfunding");
+      break;
+    case "roster":
+      parts.push("artistroster");
+      break;
+  }
+
+  // if (postType === "socialPost") {
+  //   parts.push(postCommentHashtags);
+  // } else {
+  //   parts.push(recapCommentHashtags);
+  // }
+
+  if (type.includes("gjm")) {
+    parts.push(graffitiEventHashtags);
+  } else if (type.includes("saf")) {
+    parts.push(streetArtFestivalHashtags);
+  } else if (type.includes("pup")) {
+    parts.push(pasteUpHashtags);
+  } else if (type.includes("mur")) {
+    parts.push(muralProjectHashtags);
+  }
+
+  return parts.join(" ");
 };

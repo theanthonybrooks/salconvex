@@ -220,6 +220,17 @@ export const getOrgContactInfo = query({
   },
 });
 
+export const getOrgLinks = query({
+  args: {
+    orgId: v.id("organizations"),
+  },
+  handler: async (ctx, args) => {
+    const org = await ctx.db.get(args.orgId);
+    if (!org) return null;
+    return org.links;
+  },
+});
+
 export const isNewOrg = query({
   args: {
     organizationName: v.string(),

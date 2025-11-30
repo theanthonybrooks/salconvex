@@ -23,6 +23,15 @@ export const platformDomains: Record<PlatformType, string[]> = {
 
 const allowedCharacters = /^[a-zA-Z0-9._]+$/;
 
+export function sanitizeIGHandle(
+  handle: string | undefined,
+): string | undefined {
+  if (!handle) return;
+  return handle
+    .replace(/^https?:\/\/(www\.)?instagram\.com\//, "")
+    .replace(/\/$/, "");
+}
+
 export function formatHandleInput(
   value: string | undefined,
   platform: PlatformType,
