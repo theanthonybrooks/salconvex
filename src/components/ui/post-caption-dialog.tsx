@@ -125,8 +125,8 @@ export const PostCaptionDialog = ({
     setCaptionText(content);
 
     let altContent = "";
-    altContent += `${event.name} - ${event?.links?.instagram ?? organizer.links.instagram ?? organizer.name}`;
-    altContent += `\nAll open calls are listed on The Street Art List (www.thestreetartlist.com - link in bio)`;
+    altContent += `All open calls are listed on The Street Art List (www.thestreetartlist.com - link in bio)`;
+    altContent += `Tagged: \n${event?.links?.instagram ?? organizer.links.instagram ?? organizer.name}`;
     setAltText(altContent);
 
     const commentContent = getEventTags({
