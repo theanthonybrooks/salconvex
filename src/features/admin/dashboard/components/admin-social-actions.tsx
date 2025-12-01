@@ -1,3 +1,5 @@
+import { subDays } from "date-fns";
+
 import { CheckCircle, Clock, X } from "lucide-react";
 
 import type { Id } from "~/convex/_generated/dataModel";
@@ -80,7 +82,7 @@ export const AdminSocialTimePicker = ({
   const updatePlannedDate = useMutation(
     api.events.socials.updateSocialPostPlannedDate,
   );
-  const now = new Date().getTime();
+  const yesterday = subDays(new Date(), 1).getTime();
 
   const handleDateSelect = (d: number | undefined) => {
     try {
@@ -100,7 +102,7 @@ export const AdminSocialTimePicker = ({
         handleDateSelect(date);
       }}
       label="Select Date"
-      minDate={now}
+      minDate={yesterday}
       withTime={false}
       inputClassName="border-transparent hover:border-foreground/40 text-sm"
     />
