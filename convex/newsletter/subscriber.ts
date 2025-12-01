@@ -2,8 +2,8 @@ import {
   NewsletterFrequency,
   NewsletterType,
 } from "@/constants/newsletterConsts";
+
 import { getAuthUserId } from "@convex-dev/auth/server";
-import { ConvexError, v } from "convex/values";
 import { Id } from "~/convex/_generated/dataModel";
 import {
   mutation,
@@ -11,6 +11,7 @@ import {
   query,
   QueryCtx,
 } from "~/convex/_generated/server";
+import { ConvexError, v } from "convex/values";
 
 export async function updateUserNewsletter(
   ctx: MutationCtx,
@@ -21,7 +22,6 @@ export async function updateUserNewsletter(
     userPlan?: number;
   },
 ): Promise<void> {
-  console.log("args in updateUserNewsletter", args);
   const { userId, userPlan, email } = args;
 
   const sub = await ctx.db
@@ -48,18 +48,14 @@ export async function updateUserNewsletter(
       ...(basePlan && { type: ["general"] }),
     });
     console.log("patching newsletter sub by userId");
-  } else if (email && !sub) {
-    if (emailSub) {
-      console.log("patching newsletter sub by email");
-      await ctx.db.patch(emailSub._id, {
-        userId,
-        ...(typeof userPlan === "number" && { userPlan }),
-        ...(basePlan && { frequency: "monthly" }),
-        ...(basePlan && { type: ["general"] }),
-      });
-    }
-  } else {
-    console.log("no newsletter patching");
+  } else if (emailSub) {
+    console.log("patching newsletter sub by email");
+    await ctx.db.patch(emailSub._id, {
+      userId,
+      ...(typeof userPlan === "number" && { userPlan }),
+      ...(basePlan && { frequency: "monthly" }),
+      ...(basePlan && { type: ["general"] }),
+    });
   }
 }
 
@@ -92,6 +88,7 @@ export async function updateNewsletterUser(
 ) {
   await ctx.db.patch(newsletterId, {
     userId,
+    userPlan: 0,
   });
 }
 
@@ -268,6 +265,7 @@ export const getNewsletterSubscribers = query({
           name: subscriber.firstName,
           email: subscriber.email,
           userPlan: subscriber.userPlan,
+          userType: subscriber.userId ? "user" : "guest",
           active: subscriber.newsletter,
           type: subscriber.type,
           frequency: subscriber.frequency,

@@ -128,6 +128,7 @@ export const FilterBase = ({
   const isAdmin = userData?.user?.role?.includes("admin");
   const paidUser = (isArtist && hasActiveSubscription) || isAdmin;
   const limitOpenCalls = view === "event" || view === "orgView";
+  // const organizerView = view === "organizer";
   const orgView = view === "orgView";
   const archiveView = view === "archive";
   const notEvent =
@@ -300,8 +301,13 @@ export const FilterBase = ({
                     {!orgView && (
                       <SelectItem value="events">Event Name</SelectItem>
                     )}
-                    <SelectItem value="orgs">Organizers</SelectItem>
                     <SelectItem value="loc">Location</SelectItem>
+                    <SelectItem value="orgs">Organizers</SelectItem>
+                    {/* {!organizerView && (
+                      <SelectItem value="orgLocation">
+                        Organizer Location
+                      </SelectItem>
+                    )} */}
                     {!orgView && <SelectItem value="all">All</SelectItem>}
                   </SelectContent>
                 </Select>

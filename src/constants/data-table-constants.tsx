@@ -18,6 +18,7 @@ import {
   CircleCheck,
   Clock,
   DollarSign,
+  Ghost,
   House,
   List,
   LucideBaby,
@@ -34,6 +35,7 @@ import {
   PaintBucket,
   Pencil,
   Scroll,
+  User,
   User2,
   Users,
   X,
@@ -371,6 +373,24 @@ export const TABLE_FILTERS: TableFilterConfig = {
       options: [
         { value: true, label: "Active" },
         { value: false, label: "Inactive" },
+      ],
+    },
+    {
+      columnId: "userPlan",
+      title: "Plan",
+      options: [
+        { value: "0", label: "None" },
+        { value: "1", label: "Original" },
+        { value: "2", label: "Banana" },
+        { value: "3", label: "Fat Cap" },
+      ],
+    },
+    {
+      columnId: "userType",
+      title: "User Type",
+      options: [
+        { icon: User, value: "user", label: "User" },
+        { icon: Ghost, value: "guest", label: "Guest" },
       ],
     },
   ],

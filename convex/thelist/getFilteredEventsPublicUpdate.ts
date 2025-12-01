@@ -198,14 +198,7 @@ export const getFilteredEventsPublic = query({
           .take(10);
       } else {
         if (searchType === "all" && searchTerm) {
-          const [
-            events,
-            eventLocs,
-            orgLocs,
-            orgs,
-            countryAbbrs,
-            orgCountryAbbrs,
-          ] = await Promise.all([
+          const [events, eventLocs, orgs, countryAbbrs] = await Promise.all([
             ctx.db
               .query("eventLookup")
               .withSearchIndex("search_by_name", (q) =>
@@ -218,14 +211,7 @@ export const getFilteredEventsPublic = query({
                 q.search("locationFull", searchTerm).eq("ocState", "published"),
               )
               .take(100),
-            ctx.db
-              .query("eventLookup")
-              .withSearchIndex("search_by_org_location", (q) =>
-                q
-                  .search("orgLocation.full", searchTerm)
-                  .eq("ocState", "published"),
-              )
-              .take(100),
+
             ctx.db
               .query("eventLookup")
               .withSearchIndex("search_by_orgName", (q) =>
@@ -240,14 +226,7 @@ export const getFilteredEventsPublic = query({
                   .eq("ocState", "published"),
               )
               .take(100),
-            ctx.db
-              .query("eventLookup")
-              .withIndex("by_orgCountryAbbr_ocState", (q) =>
-                q
-                  .eq("orgLocation.countryAbbr", formattedCountryAbbr)
-                  .eq("ocState", "published"),
-              )
-              .take(100),
+            ctx.db,
           ]);
           //! Remove the dups. Avoiding any duplicate key issues that I was having
 
@@ -262,19 +241,12 @@ export const getFilteredEventsPublic = query({
               ?.toLowerCase()
               .includes(searchTerm?.toLowerCase()),
           );
-          const filteredOrgLocations = orgLocs.filter((org) =>
-            org?.orgLocation?.full
-              ?.toLowerCase()
-              .includes(searchTerm?.toLowerCase()),
-          );
 
           lookupResults = [
             ...filteredEvents,
             ...filteredLocations,
-            ...filteredOrgLocations,
             ...filteredOrgs,
             ...countryAbbrs,
-            ...orgCountryAbbrs,
           ].filter(
             (item, index, self) =>
               index === self.findIndex((t) => t._id === item._id),
@@ -301,48 +273,24 @@ export const getFilteredEventsPublic = query({
             org?.orgName?.toLowerCase().includes(searchTerm?.toLowerCase()),
           );
         } else if (searchType === "loc" && searchTerm) {
-          const [locs, countryAbbrs, orgLocs, orgCountryAbbrs] =
-            await Promise.all([
-              ctx.db
-                .query("eventLookup")
-                .withSearchIndex("search_by_location", (q) =>
-                  q
-                    .search("locationFull", searchTerm)
-                    .eq("ocState", "published"),
-                )
-                .take(100),
+          const [locs, countryAbbrs] = await Promise.all([
+            ctx.db
+              .query("eventLookup")
+              .withSearchIndex("search_by_location", (q) =>
+                q.search("locationFull", searchTerm).eq("ocState", "published"),
+              )
+              .take(100),
 
-              ctx.db
-                .query("eventLookup")
-                .withIndex("by_countryAbbr_ocState", (q) =>
-                  q
-                    .eq("countryAbbr", formattedCountryAbbr)
-                    .eq("ocState", "published"),
-                )
-                .collect(),
-              ctx.db
-                .query("eventLookup")
-                .withSearchIndex("search_by_org_location", (q) =>
-                  q
-                    .search("orgLocation.full", searchTerm)
-                    .eq("ocState", "published"),
-                )
-                .take(100),
-              ctx.db
-                .query("eventLookup")
-                .withIndex("by_orgCountryAbbr_ocState", (q) =>
-                  q
-                    .eq("orgLocation.countryAbbr", formattedCountryAbbr)
-                    .eq("ocState", "published"),
-                )
-                .collect(),
-            ]);
-          lookupResults = [
-            ...locs,
-            ...countryAbbrs,
-            ...orgLocs,
-            ...orgCountryAbbrs,
-          ].filter(
+            ctx.db
+              .query("eventLookup")
+              .withIndex("by_countryAbbr_ocState", (q) =>
+                q
+                  .eq("countryAbbr", formattedCountryAbbr)
+                  .eq("ocState", "published"),
+              )
+              .collect(),
+          ]);
+          lookupResults = [...locs, ...countryAbbrs].filter(
             (item, index, self) =>
               index === self.findIndex((t) => t._id === item._id),
           );
@@ -408,53 +356,29 @@ export const getFilteredEventsPublic = query({
           org?.orgName?.toLowerCase().includes(searchTerm?.toLowerCase()),
         );
       } else if (searchType === "loc" && searchTerm) {
-        const [locs, countryAbbrs, orgLocs, orgCountryAbbrs] =
-          await Promise.all([
-            ctx.db
-              .query("eventLookup")
-              .withSearchIndex("search_by_location", (q) =>
-                q
-                  .search("locationFull", searchTerm)
-                  .eq("eventState", "published")
-                  .eq("eventCategory", "event"),
-              )
-              .take(100),
+        const [locs, countryAbbrs] = await Promise.all([
+          ctx.db
+            .query("eventLookup")
+            .withSearchIndex("search_by_location", (q) =>
+              q
+                .search("locationFull", searchTerm)
+                .eq("eventState", "published")
+                .eq("eventCategory", "event"),
+            )
+            .take(100),
 
-            ctx.db
-              .query("eventLookup")
-              .withIndex("by_countryAbbr_eventState_category", (q) =>
-                q
-                  .eq("countryAbbr", formattedCountryAbbr)
-                  .eq("eventState", "published")
-                  .eq("eventCategory", "event"),
-              )
+          ctx.db
+            .query("eventLookup")
+            .withIndex("by_countryAbbr_eventState_category", (q) =>
+              q
+                .eq("countryAbbr", formattedCountryAbbr)
+                .eq("eventState", "published")
+                .eq("eventCategory", "event"),
+            )
 
-              .collect(),
-            ctx.db
-              .query("eventLookup")
-              .withSearchIndex("search_by_org_location", (q) =>
-                q
-                  .search("orgLocation.full", searchTerm)
-                  .eq("eventState", "published")
-                  .eq("eventCategory", "event"),
-              )
-              .take(100),
-            ctx.db
-              .query("eventLookup")
-              .withIndex("by_orgCountryAbbr_eventState_category", (q) =>
-                q
-                  .eq("orgLocation.countryAbbr", formattedCountryAbbr)
-                  .eq("eventState", "published")
-                  .eq("eventCategory", "event"),
-              )
-              .collect(),
-          ]);
-        lookupResults = [
-          ...locs,
-          ...countryAbbrs,
-          ...orgLocs,
-          ...orgCountryAbbrs,
-        ].filter(
+            .collect(),
+        ]);
+        lookupResults = [...locs, ...countryAbbrs].filter(
           (item, index, self) =>
             index === self.findIndex((t) => t._id === item._id),
         );

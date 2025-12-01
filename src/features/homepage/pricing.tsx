@@ -421,7 +421,7 @@ const PricingCard = ({
     <Card
       id={`pricing-card-${title}`}
       className={cn(
-        "pricing-card mx-auto flex w-full min-w-[20vw] max-w-sm flex-col justify-between border-2 px-2 py-1 transition-opacity duration-200 ease-in-out lg:mx-0",
+        "pricing-card mx-auto flex w-full max-w-sm flex-col justify-between border-2 px-2 py-1 transition-opacity duration-200 ease-in-out lg:mx-0",
         {
           relative: popular || isFree || isCurrentUserPlan,
         },

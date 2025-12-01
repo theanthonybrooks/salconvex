@@ -24,7 +24,7 @@ const formatDate = (dateStr: string) =>
 const formatDates = (start: string, end: string) => {
   const validStart = isValidIsoDate(start);
   const validEnd = isValidIsoDate(end);
-  if (!validStart || !validEnd) return "No Event Dates";
+  if (!validStart || !validEnd) return "(No Event Dates) ";
   const startDate = new Date(start);
   const endDate = new Date(end);
   const startMonth = getFourCharMonth(startDate);

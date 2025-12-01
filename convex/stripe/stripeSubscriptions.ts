@@ -728,6 +728,7 @@ export const subscriptionStoreWebhook = mutation({
             subscription: undefined,
           });
         }
+  
         break;
 
       case "customer.discount.created":

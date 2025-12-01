@@ -8,7 +8,7 @@ import { Id } from "~/convex/_generated/dataModel";
 import { useMutation } from "convex/react";
 
 export interface UserActionProps {
-  userId: string;
+  userId: Id<"users">;
 }
 
 export const DeleteUser = ({ userId }: UserActionProps) => {
@@ -37,7 +37,13 @@ export const DeleteUser = ({ userId }: UserActionProps) => {
   );
 };
 
-export const DeleteNewsletterSubscription = ({ userId }: UserActionProps) => {
+type NewsletterActionProps = {
+  subscriberId: Id<"newsletter">;
+};
+
+export const DeleteNewsletterSubscription = ({
+  subscriberId,
+}: NewsletterActionProps) => {
   const confirm = useConfirmAction().confirm;
   const deleteSubscription = useMutation(
     api.newsletter.subscriber.deleteSubscription,
@@ -51,7 +57,7 @@ export const DeleteNewsletterSubscription = ({ userId }: UserActionProps) => {
             "Are you sure you want to remove this user's newsletter subscription?",
           onConfirm: () => {
             deleteSubscription({
-              subscriberId: userId as Id<"newsletter">,
+              subscriberId,
             });
           },
         });

@@ -39,6 +39,23 @@ export const run = migrations.runner();
 
 // export const runPFM = migrations.runner(internal.migrations.populateFeatureMap);
 
+export const backfillNewsletterUserId = migrations.define({
+  table: "newsletter",
+  migrateOne: async (ctx, newsletter) => {
+    const user = await ctx.db
+      .query("users")
+      .withIndex("email", (q) => q.eq("email", newsletter.email))
+      .first();
+    if (!user) return;
+
+    await ctx.db.patch(newsletter._id, { userId: user._id });
+  },
+});
+
+export const runBNUI = migrations.runner(
+  internal.migrations.backfillNewsletterUserId,
+);
+
 export const removeCurrencyFromUserPrefsWithoutSubs = migrations.define({
   table: "userPreferences",
   migrateOne: async (ctx, userPref) => {

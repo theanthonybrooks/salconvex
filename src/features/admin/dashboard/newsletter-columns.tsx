@@ -19,6 +19,7 @@ import { DeleteNewsletterSubscription } from "@/components/data-table/actions/Da
 import { DataTableColumnHeader } from "@/components/data-table/DataTableColumnHeader";
 import { Button } from "@/components/ui/button";
 import { ConfirmingDropdown } from "@/components/ui/confirmation-dialog-context";
+import { CopyableItem } from "@/components/ui/copyable-item";
 import { Link } from "@/components/ui/custom-link";
 import {
   DropdownMenu,
@@ -39,6 +40,7 @@ export const newsletterColumnLabels: Record<string, string> = {
   type: "Type",
   frequency: "Frequency",
   userPlan: "Plan",
+  userType: "User Type",
   timesAttempted: "Attempts",
   lastAttempt: "Last Attempt",
   createdAt: "Created",
@@ -48,10 +50,11 @@ interface NewsletterColumnsProps {
   _id: Id<"newsletter">;
   name: string;
   email: string;
+  userPlan?: number;
+  userType?: string;
   active: boolean;
   type?: NewsletterType[];
   frequency?: NewsletterFrequency;
-  userPlan?: number;
   timesAttempted: number;
   lastAttempt: number;
   createdAt: number;
@@ -169,9 +172,9 @@ export const newsletterColumns: ColumnDef<NewsletterColumnsProps>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Plan" />
     ),
+    accessorFn: (row) => String(row.userPlan),
     cell: ({ row }) => {
       const plan = row.getValue("userPlan") as number | undefined;
-      // console.log(plan);
       return (
         <div
           className={cn(
@@ -186,9 +189,26 @@ export const newsletterColumns: ColumnDef<NewsletterColumnsProps>[] = [
         </div>
       );
     },
-    filterFn: (row, columnId, filterValue) => {
-      if (!Array.isArray(filterValue)) return true;
-      return filterValue.includes(row.getValue(columnId));
+    filterFn: (row, id, value) => {
+      return value.includes(String(row.getValue(id)));
+    },
+  },
+  {
+    accessorKey: "userType",
+    id: "userType",
+    minSize: 120,
+    maxSize: 120,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="User Type" />
+    ),
+    cell: ({ row }) => {
+      const { userType } = row.original;
+
+      return (
+        <div className="truncate text-center text-sm capitalize text-muted-foreground">
+          {userType}
+        </div>
+      );
     },
   },
 
@@ -224,11 +244,10 @@ export const newsletterColumns: ColumnDef<NewsletterColumnsProps>[] = [
     minSize: 40,
     enableResizing: false,
     cell: ({ row }) => {
-      const user = row.original;
+      const { _id: id, email } = row.original;
 
       // const openCallState = event.openCallState;
       // const openCallId = event.openCallId;
-      // console.log(table.options)
 
       return (
         <div className={cn("flex justify-center")}>
@@ -251,21 +270,23 @@ export const newsletterColumns: ColumnDef<NewsletterColumnsProps>[] = [
                 <DropdownMenuLabel>Actions</DropdownMenuLabel>{" "}
                 <DropdownMenuSeparator />
                 {/* <DuplicateEvent eventId={event._id} /> */}
-                <DeleteNewsletterSubscription userId={user._id} />
+                <DeleteNewsletterSubscription subscriberId={id} />
                 <DropdownMenuItem>
                   <Link
-                    href={`mailto:${user.email}`}
+                    href={`mailto:${email}`}
                     target="_blank"
                     className="flex items-center gap-x-2"
                   >
                     <FaEnvelope className="size-4" /> Contact
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => navigator.clipboard.writeText(user._id)}
-                  className="flex items-center gap-x-2"
-                >
-                  <LucideClipboardCopy className="size-4" /> User ID
+                <DropdownMenuItem>
+                  <CopyableItem
+                    copyContent={id}
+                    defaultIcon={<LucideClipboardCopy className="size-4" />}
+                  >
+                    Subscription ID
+                  </CopyableItem>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

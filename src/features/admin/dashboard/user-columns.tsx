@@ -617,8 +617,7 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
     minSize: 40,
     enableResizing: false,
     cell: ({ row }) => {
-      const user = row.original;
-      const { artistId } = user;
+      const { _id: userId, artistId, email, customerId } = row.original;
 
       // const openCallState = event.openCallState;
       // const openCallId = event.openCallId;
@@ -646,8 +645,8 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
               >
                 <DropdownMenuLabel>Actions</DropdownMenuLabel>{" "}
                 <DropdownMenuSeparator />
-                <DeleteUser userId={user._id} />
-                <Link href={`mailto:${user.email}`} target="_blank">
+                <DeleteUser userId={userId} />
+                <Link href={`mailto:${email}`} target="_blank">
                   <DropdownMenuItem>
                     <FaEnvelope className="size-4" /> Contact
                   </DropdownMenuItem>
@@ -655,7 +654,7 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
                 <DropdownMenuItem>
                   <CopyableItem
                     defaultIcon={<LucideClipboardCopy className="size-4" />}
-                    copyContent={user.email}
+                    copyContent={email}
                   >
                     Copy Email
                   </CopyableItem>
@@ -663,7 +662,7 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
                 <DropdownMenuItem>
                   <CopyableItem
                     defaultIcon={<LucideClipboardCopy className="size-4" />}
-                    copyContent={user._id}
+                    copyContent={userId}
                   >
                     User ID
                   </CopyableItem>
@@ -678,11 +677,11 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
                     </CopyableItem>
                   </DropdownMenuItem>
                 )}
-                {user.customerId && (
+                {customerId && (
                   <DropdownMenuItem>
                     <CopyableItem
                       defaultIcon={<LucideClipboardCopy className="size-4" />}
-                      copyContent={user.customerId}
+                      copyContent={customerId}
                     >
                       Stripe ID
                     </CopyableItem>
