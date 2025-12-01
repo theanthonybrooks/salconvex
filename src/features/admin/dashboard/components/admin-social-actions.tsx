@@ -1,4 +1,4 @@
-import { subDays } from "date-fns";
+import { startOfDay } from "date-fns";
 
 import { CheckCircle, Clock, X } from "lucide-react";
 
@@ -82,7 +82,7 @@ export const AdminSocialTimePicker = ({
   const updatePlannedDate = useMutation(
     api.events.socials.updateSocialPostPlannedDate,
   );
-  const yesterday = subDays(new Date(), 1).getTime();
+  const today = startOfDay(new Date()).getTime();
 
   const handleDateSelect = (d: number | undefined) => {
     try {
@@ -102,7 +102,7 @@ export const AdminSocialTimePicker = ({
         handleDateSelect(date);
       }}
       label="Select Date"
-      minDate={yesterday}
+      minDate={today}
       withTime={false}
       inputClassName="border-transparent hover:border-foreground/40 text-sm"
     />
