@@ -133,7 +133,7 @@ export const FilterBase = ({
   const archiveView = view === "archive";
   const notEvent =
     filters.eventCategories?.length !== 0 &&
-    !filters.eventCategories?.includes("event");
+    filters.eventCategories?.[0] !== "event";
   const alphaSort = sortOptions.sortBy === "name";
   const unknownOption = isAdmin ? [{ value: "Unknown", label: "Unknown" }] : [];
   const callTypeOptions = [...callType_option_values, ...unknownOption];
@@ -447,7 +447,7 @@ export const FilterBase = ({
               />
             </section>
           )}
-          {(filters.eventCategories?.includes("event") ||
+          {(filters.eventCategories?.[0] === "event" ||
             filters.eventCategories?.length === 0) && (
             <section className="flex flex-col gap-2">
               <Label htmlFor="eventTypes" className="flex items-center gap-2">

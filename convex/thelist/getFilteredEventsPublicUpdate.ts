@@ -612,7 +612,11 @@ export const getFilteredEventsPublic = query({
     if (filters.postStatus && filters.postStatus !== "all" && isAdmin) {
       events = events.filter((e) => e.posted === filters.postStatus);
     }
-    if (filters.eventTypes?.length) {
+    if (
+      filters.eventTypes?.length &&
+      (filters.eventCategories?.length === 0 ||
+        filters.eventCategories?.[0] === "event")
+    ) {
       events = events.filter((e) =>
         Array.isArray(e.type)
           ? e.type.some((t) => filters.eventTypes!.includes(t))

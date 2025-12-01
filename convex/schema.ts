@@ -791,6 +791,7 @@ const newsletterSchema = {
   userPlan: v.optional(v.number()),
   timesAttempted: v.number(),
   lastAttempt: v.number(),
+  temporary: v.optional(v.boolean()),
 };
 
 const supportSchema = {

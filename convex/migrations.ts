@@ -19,42 +19,56 @@ import { DataModel } from "./_generated/dataModel.js";
 export const migrations = new Migrations<DataModel>(components.migrations);
 export const run = migrations.runner();
 
-// export const populateFeatureMap = migrations.define({
-//   table: "userPlans",
-//   migrateOne: async (ctx, plan) => {
-//     if (plan.featureMap) return;
-//     const features = plan.features;
-//     const featureMap: { base: string[]; monthly: string[]; yearly: string[] } =
-//       {
-//         base: [],
-//         monthly: [],
-//         yearly: [],
-//       };
-//     for (const feature of features) {
-//       featureMap.base.push(feature);
-//     }
-//     await ctx.db.patch(plan._id, { featureMap });
-//   },
-// });
-
-// export const runPFM = migrations.runner(internal.migrations.populateFeatureMap);
-
-export const backfillNewsletterUserId = migrations.define({
-  table: "newsletter",
-  migrateOne: async (ctx, newsletter) => {
+export const transferFromMailchimpContacts = migrations.define({
+  table: "mailchimpContacts",
+  migrateOne: async (ctx, mailchimpContact) => {
+    const newsletterSubscriber = await ctx.db
+      .query("newsletter")
+      .withIndex("by_email", (q) =>
+        q.eq("email", mailchimpContact.EMAIL_ADDRESS),
+      )
+      .first();
+    if (newsletterSubscriber) return;
     const user = await ctx.db
       .query("users")
-      .withIndex("email", (q) => q.eq("email", newsletter.email))
+      .withIndex("email", (q) => q.eq("email", mailchimpContact.EMAIL_ADDRESS))
       .first();
-    if (!user) return;
-
-    await ctx.db.patch(newsletter._id, { userId: user._id });
+    const userData = {
+      userId: user?._id ?? null,
+      firstName: user?.firstName ?? mailchimpContact.FIRST_NAME,
+      email: user?.email ?? mailchimpContact.EMAIL_ADDRESS,
+      newsletter: true,
+      type: ["general"] as "general"[],
+      frequency: "monthly" as "monthly",
+      userPlan: user?.plan ?? 0,
+      timesAttempted: 0,
+      lastAttempt: 0,
+      temporary: true,
+    };
+    await ctx.db.insert("newsletter", userData);
   },
 });
 
-export const runBNUI = migrations.runner(
-  internal.migrations.backfillNewsletterUserId,
+export const runTFMC = migrations.runner(
+  internal.migrations.transferFromMailchimpContacts,
 );
+
+// export const backfillNewsletterUserId = migrations.define({
+//   table: "newsletter",
+//   migrateOne: async (ctx, newsletter) => {
+//     const user = await ctx.db
+//       .query("users")
+//       .withIndex("email", (q) => q.eq("email", newsletter.email))
+//       .first();
+//     if (!user) return;
+
+//     await ctx.db.patch(newsletter._id, { userId: user._id });
+//   },
+// });
+
+// export const runBNUI = migrations.runner(
+//   internal.migrations.backfillNewsletterUserId,
+// );
 
 export const removeCurrencyFromUserPrefsWithoutSubs = migrations.define({
   table: "userPreferences",
