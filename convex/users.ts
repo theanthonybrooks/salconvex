@@ -142,7 +142,7 @@ export const usersWithSubscriptions = query({
               ? [artistProfile.artistResidency.country]
               : []),
           ]),
-        );
+        ).sort((a, b) => a.localeCompare(b));
 
         const planName = subscription?.metadata?.plan?.toLowerCase();
         const cancelAt = subscription?.cancelAt;
@@ -232,8 +232,8 @@ export const usersWithSubscriptions = query({
           website: artistWebsite,
           canFeature: artistCanFeature ?? false,
           email: user.email,
-          subscription: label ?? "4. none",
-          subStatus: currentStatus ?? "-",
+          subscription: label ?? undefined,
+          subStatus: currentStatus,
           accountType: user.accountType ?? [],
           cancelFeedback,
           cancelComment,
@@ -244,7 +244,7 @@ export const usersWithSubscriptions = query({
           organizationNames: orgNames ?? [],
           createdAt: user.createdAt,
           lastUpdated,
-          source: user.source,
+          source: user.source || undefined,
         };
       }),
     );

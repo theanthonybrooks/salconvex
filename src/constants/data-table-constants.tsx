@@ -6,6 +6,7 @@ import { onlineEventCategories } from "@/constants/resourcesConsts";
 import type { DataTableFacetedFilterOption } from "@/components/data-table/DataTableFacetedFilter";
 import type { PageTypes, TableTypes } from "@/types/tanstack-table";
 
+import { BsRobot } from "react-icons/bs";
 import { FaMoneyBill } from "react-icons/fa6";
 import {
   ArrowDown,
@@ -306,7 +307,7 @@ export const subscriptionOptions = [
     icon: LucideCircleDollarSign,
   },
   {
-    value: "4. none",
+    value: "-",
     label: "No Subscription",
     icon: LucideCircleDashed,
   },
@@ -328,6 +329,7 @@ export const subscriptionStatusOptions = [
     label: "Past Due",
     icon: LucideBadgeAlert,
   },
+  { value: "payment_failed", label: "Payment Failed", icon: BsRobot },
   {
     value: "canceled",
     label: "Canceled",

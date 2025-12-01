@@ -64,8 +64,8 @@ interface UserColumnsProps {
   instagram?: string;
   website?: string;
   canFeature: boolean;
-  subscription: string;
-  subStatus: string;
+  subscription?: string;
+  subStatus?: string;
   cancelComment?: string;
   cancelFeedback?: string;
   cancelReason?: string;
@@ -141,6 +141,11 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
   },
   {
     accessorKey: "subscription",
+    accessorFn: (row) => {
+      const subscription = row.subscription;
+      if (!subscription) return "-";
+      return subscription;
+    },
     id: "subscription",
     minSize: 160,
     maxSize: 200,
@@ -178,9 +183,18 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
       return filterValue.includes(row.getValue(columnId));
     },
     enableMultiSort: true,
+    sortUndefined: "last",
   },
   {
     accessorKey: "subStatus",
+    accessorFn: (row) => {
+      const substatus = row.subStatus;
+      const cancelReason = row.cancelReason;
+      if (cancelReason === "Payment Failed") return "payment_failed";
+      if (!substatus) return "-";
+      return substatus;
+    },
+
     id: "subStatus",
     minSize: 100,
     maxSize: 120,
@@ -201,6 +215,8 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
               "border border-yellow-400 bg-yellow-100 text-yellow-800",
             subStatus === "canceled" &&
               "border border-red-400 bg-red-100 text-red-800",
+            subStatus === "past_due" &&
+              "border border-blue-400 bg-blue-100 text-blue-800",
             !subStatus && "italic text-muted-foreground",
           )}
         >
@@ -210,7 +226,7 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
               !subStatus && "text-muted-foreground",
             )}
           >
-            {subStatus || "none"}
+            {subStatus || "-"}
             {cancelReason ? (
               systemCancel ? (
                 <BsRobot className="size-3" />
@@ -227,6 +243,7 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
       return filterValue.includes(row.getValue(columnId));
     },
     enableMultiSort: true,
+    sortUndefined: "last",
   },
 
   {
@@ -252,6 +269,7 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
         </TooltipSimple>
       );
     },
+    sortUndefined: "last",
   },
   {
     accessorKey: "cancelFeedback",
@@ -276,6 +294,7 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
         </TooltipSimple>
       );
     },
+    sortUndefined: "last",
   },
   {
     accessorKey: "cancelComment",
@@ -300,6 +319,7 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
         </TooltipSimple>
       );
     },
+    sortUndefined: "last",
   },
   {
     accessorKey: "canceledAt",
@@ -330,6 +350,7 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
         </div>
       );
     },
+    sortUndefined: "last",
   },
   {
     accessorKey: "lastActive",
@@ -361,6 +382,7 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
       );
     },
     enableMultiSort: true,
+    sortUndefined: "last",
   },
   {
     accessorKey: "lastUpdated",
@@ -387,15 +409,24 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
       );
     },
     enableMultiSort: true,
+    sortUndefined: "last",
   },
   {
     accessorKey: "location",
+    accessorFn: (row) => {
+      const list = row.location;
+      if (Array.isArray(list) && list.length > 0) {
+        return list.join(", ");
+      }
+      return undefined;
+    },
     id: "location",
     minSize: 120,
     maxSize: 260,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Location" />
     ),
+
     cell: ({ row }) => {
       const { location } = row.original;
       return (
@@ -410,6 +441,7 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
         </div>
       );
     },
+    sortUndefined: "last",
   },
   {
     accessorKey: "instagram",
@@ -595,7 +627,7 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
       <DataTableColumnHeader column={column} title="Source" />
     ),
     cell: ({ row }) => {
-      const value = row.getValue("source") as string | undefined;
+      const { source: value } = row.original;
       return (
         <TooltipSimple content={value}>
           <p
@@ -604,11 +636,14 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
               !value && "text-center",
             )}
           >
-            {value ? value : "-"}
+            {value ? value : "No Source"}
           </p>
         </TooltipSimple>
       );
     },
+    sortUndefined: "last",
+
+    enableMultiSort: true,
   },
   {
     id: "actions",
@@ -618,10 +653,6 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
     enableResizing: false,
     cell: ({ row }) => {
       const { _id: userId, artistId, email, customerId } = row.original;
-
-      // const openCallState = event.openCallState;
-      // const openCallId = event.openCallId;
-      // console.log(table.options)
 
       return (
         <div
