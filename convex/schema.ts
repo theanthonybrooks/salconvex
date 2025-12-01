@@ -1052,6 +1052,27 @@ export const eventVoucherSchema = v.object({
 // #region ------------- Table Schemas & Indexes --------------
 export default defineSchema({
   ...authTables, // This includes other auth tables
+
+  mailchimpContacts: defineTable({
+    CC: v.string(),
+    CONFIRM_IP: v.string(),
+    CONFIRM_TIME: v.string(),
+    DSTOFF: v.union(v.float64(), v.string()),
+    EMAIL_ADDRESS: v.string(),
+    EUID: v.union(v.null(), v.float64(), v.string()),
+    FIRST_NAME: v.string(),
+    GMTOFF: v.union(v.float64(), v.string()),
+    LAST_CHANGED: v.string(),
+    LEID: v.float64(),
+    MEMBER_RATING: v.float64(),
+    NOTES: v.string(),
+    OPTIN_IP: v.string(),
+    OPTIN_TIME: v.string(),
+    REGION: v.union(v.float64(), v.string()),
+    TAGS: v.string(),
+    TIMEZONE: v.string(),
+  }),
+
   eventAnalytics: defineTable(eventAnalyticsSchema)
     .index("by_userId", ["userId"])
     .index("by_userId_action", ["userId", "action"])
