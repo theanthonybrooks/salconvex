@@ -636,7 +636,7 @@ export const userColumns: ColumnDef<UserColumnsProps>[] = [
               !value && "text-center",
             )}
           >
-            {value ? value : "No Source"}
+            {value ? value : "-"}
           </p>
         </TooltipSimple>
       );

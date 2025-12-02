@@ -30,7 +30,7 @@ export function DataTableColumnHeader<TData, TValue>({
   title,
   className,
 }: DataTableColumnHeaderProps<TData, TValue>) {
-  const baseClassName = "h-full px-3 ";
+  const baseClassName = " px-3 ";
 
   if (!column.getCanSort()) {
     return <div className={cn(baseClassName, className)}>{title}</div>;
@@ -42,6 +42,7 @@ export function DataTableColumnHeader<TData, TValue>({
     <div
       className={cn(
         baseClassName,
+        sortingActive && "h-full",
         "flex items-center space-x-2 hover:bg-white/50",
         className,
       )}

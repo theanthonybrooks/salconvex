@@ -366,19 +366,17 @@ export const getEventColumns = <T extends Event>(
       cell: ({ row }) => {
         const { lastEditedAt: value } = row.original;
         return (
-          <div className="flex justify-center space-x-2">
-            <span className="max-w-[175px] truncate font-medium capitalize">
-              {value
-                ? new Date(value).toLocaleString(undefined, {
-                    month: "numeric",
-                    day: "numeric",
-                    year: "2-digit",
-                    hour: "numeric",
-                    minute: "2-digit",
-                  })
-                : "-"}
-            </span>
-          </div>
+          <p className="max-w-[175px] truncate pr-2 text-end font-medium capitalize">
+            {value
+              ? new Date(value).toLocaleString(undefined, {
+                  month: "numeric",
+                  day: "numeric",
+                  year: "2-digit",
+                  hour: "numeric",
+                  minute: "2-digit",
+                })
+              : "-"}
+          </p>
         );
       },
       enableMultiSort: true,

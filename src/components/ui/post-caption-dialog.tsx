@@ -51,6 +51,9 @@ export const PostCaptionDialog = ({
     const { event, openCall, organizer } = data;
     if (!openCall || !organizer || !event) return;
 
+    const orgIG = organizer.links?.instagram;
+    const eventIG = event?.links?.instagram;
+
     const hasEvent = event.dates.eventFormat !== "noEvent";
     const eventStart = hasEvent
       ? event.dates.eventDates[0].start
@@ -74,10 +77,10 @@ export const PostCaptionDialog = ({
 
     content += `\n\nProject Info:`;
     content += `\n—————————\n`;
-    if (organizer.links?.instagram) {
-      content += `Organizer: ${organizer.links.instagram}${event?.links?.instagram ? ` & ${event.links.instagram}` : ""}`;
-    } else if (event?.links?.instagram) {
-      content += `Organizer: ${event.links.instagram}`;
+    if (orgIG) {
+      content += `Organizer: ${orgIG}${eventIG && orgIG !== eventIG ? ` & ${eventIG}` : ""}`;
+    } else if (eventIG) {
+      content += `Organizer: ${eventIG}`;
     } else {
       content += `Organizer: ${organizer.name}`;
     }
