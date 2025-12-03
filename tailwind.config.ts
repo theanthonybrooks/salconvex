@@ -5,7 +5,7 @@ import { fontFamily } from "tailwindcss/defaultTheme";
 import { PluginAPI } from "tailwindcss/types/config";
 
 export default {
-  darkMode: ["class"],
+  darkMode: `selector`,
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
