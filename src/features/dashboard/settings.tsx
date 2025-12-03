@@ -33,6 +33,7 @@ import {
   LoaderCircle,
   Mail,
   Mailbox,
+  MailPlus,
   MailSearch,
   Palette,
   Shield,
@@ -74,6 +75,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ChangeEmailDialog } from "@/features/auth/components/change-email-dialog";
 import { ResetPasswordDialog } from "@/features/auth/components/reset-password-dialog";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { getUserFontSizePref } from "@/helpers/stylingFns";
@@ -562,15 +564,12 @@ export default function SettingsPage() {
                       <Label htmlFor="email" className={fontSize}>
                         Email{" "}
                         <i className="text-xs font-light">
-                          (Updating will require re-verifying*)
+                          (Update in <strong>Security</strong> settings*)
                         </i>
-                        {/* TODO: Add some logic that checks if the email was changed and if so, toasts a message to the user that a new verification email will be sent */}
                       </Label>
                       <Input
                         {...updateRegister("email")}
-                        // disabled={pending}
-                        //TODO: Add this back in when I implement the email verification system
-                        disabled={true || pending}
+                        disabled
                         id="email"
                         type="email"
                         placeholder="Your email"
@@ -600,7 +599,7 @@ export default function SettingsPage() {
                     }
                     onMouseEnter={handleOnHoverSave}
                     onMouseLeave={handleOnHoverSaveEnd}
-                    className="mt-4 w-full dark:text-primary-foreground sm:w-auto"
+                    className="mt-4 w-full sm:w-auto dark:text-primary-foreground"
                   >
                     {isSaving ? (
                       <span className="flex items-center gap-2">
@@ -1187,6 +1186,20 @@ export default function SettingsPage() {
                     </Button>
                   </div>
                   <Separator />*/}
+                  <div className="flex flex-col items-start justify-start gap-y-2 px-4 md:flex-row md:items-center md:justify-between md:gap-y-0">
+                    <div className="flex items-center gap-4">
+                      <MailPlus className="size-5 text-muted-foreground" />
+                      <div>
+                        <Label className={fontSize}>Email</Label>
+                        <p className="text-sm text-muted-foreground">
+                          Change your email address
+                        </p>
+                      </div>
+                    </div>
+
+                    <ChangeEmailDialog />
+                  </div>
+                  <Separator />
                   <div className="flex flex-col items-start justify-start gap-y-2 px-4 md:flex-row md:items-center md:justify-between md:gap-y-0">
                     <div className="flex items-center gap-4">
                       <Shield className="size-5 text-muted-foreground" />

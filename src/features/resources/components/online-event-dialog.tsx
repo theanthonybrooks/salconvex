@@ -577,7 +577,7 @@ export const OnlineEventDialog = ({
                       /> */}
                       <SelectSimple
                         options={[...onlineEventLocationOptions]}
-                        value={field.value}
+                        value={field.value ?? ""}
                         onChangeAction={(value) => field.onChange(value)}
                         placeholder="Select location"
                         className="w-full border-gray-300 bg-card sm:h-11"

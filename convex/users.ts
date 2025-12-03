@@ -1,3 +1,4 @@
+import { generateNumericToken } from "@/helpers/otpFns";
 import {
   formatSubscriptionLabel,
   getCancelReasonLabel,
@@ -398,10 +399,7 @@ export const updateUser = mutation({
       ? await getAuthUserId(ctx)
       : (otherUserId ?? null);
     if (!userId) return null;
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_userId", (q) => q.eq("userId", userId))
-      .unique();
+    const user = await ctx.db.get(userId);
 
     if (!user) {
       throw new ConvexError("User not found");
@@ -439,6 +437,107 @@ export const updateUser = mutation({
         });
       }
     }
+  },
+});
+
+export const deletePendingEmail = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return { success: false, message: "No user found" };
+    const pendingEmail = await ctx.db
+      .query("userEmail")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .first();
+    if (!pendingEmail)
+      return { success: false, message: "No pending email found" };
+    await ctx.db.delete(pendingEmail._id);
+    return { success: true, message: "Email verification code deleted!" };
+  },
+});
+
+export const setPendingEmail = mutation({
+  args: {
+    email: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    const user = userId ? await ctx.db.get(userId) : null;
+    if (!user) return { success: false, message: "User not found" };
+    if (user.email === args.email)
+      return { success: false, message: "Email already set" };
+    const otpCode = generateNumericToken(6);
+    await ctx.db.insert("userEmail", {
+      userId: user._id,
+      currentEmail: user.email,
+      pendingEmail: args.email,
+
+      otpCode,
+    });
+    return {
+      success: true,
+      message: "Email verification code sent!",
+      code: otpCode,
+    };
+  },
+});
+
+export const verifyEmail = mutation({
+  args: {
+    code: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    const user = userId ? await ctx.db.get(userId) : null;
+    if (!user) return { success: false, message: "User not found" };
+    const pendingEmail = await ctx.db
+      .query("userEmail")
+      .withIndex("by_userId", (q) => q.eq("userId", user._id))
+      .first();
+    if (!pendingEmail)
+      return { success: false, message: "No pending email found" };
+    const authAccount = await ctx.db
+      .query("authAccounts")
+      .withIndex("userIdAndProvider", (q) =>
+        q.eq("userId", user._id).eq("provider", "password"),
+      )
+      .first();
+    const newsletterSub = await ctx.db
+      .query("newsletter")
+      .withIndex("by_userId", (q) => q.eq("userId", user._id))
+      .first();
+    if (!authAccount)
+      return { success: false, message: "No auth account found" };
+    if (args.code === pendingEmail.otpCode) {
+      await ctx.db.patch(user._id, {
+        email: pendingEmail.pendingEmail,
+        emailVerificationTime: Date.now(),
+        emailVerified: true,
+      });
+      await ctx.db.patch(authAccount._id, {
+        emailVerified: pendingEmail.pendingEmail,
+        providerAccountId: pendingEmail.pendingEmail,
+      });
+      if (newsletterSub) {
+        await ctx.db.patch(newsletterSub._id, {
+          email: pendingEmail.pendingEmail,
+        });
+      }
+    } else {
+      const otpCode = generateNumericToken(6);
+      await ctx.db.insert("userEmail", {
+        userId: user._id,
+        currentEmail: user.email,
+        pendingEmail: pendingEmail.pendingEmail,
+        otpCode,
+      });
+      return {
+        success: false,
+        message: "Incorrect code - check your email for a new code",
+      };
+    }
+    await ctx.db.delete(pendingEmail._id);
+    return { success: true, message: "Email verified" };
   },
 });
 

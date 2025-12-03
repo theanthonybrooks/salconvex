@@ -6,6 +6,7 @@ import { html } from "common-tags";
 import { capitalize } from "lodash";
 import { Resend } from "resend";
 
+import { getEmailVerificationBase } from "@/helpers/emailFns";
 import { cleanInput } from "@/helpers/utilsFns";
 
 import { api } from "~/convex/_generated/api";
@@ -440,6 +441,46 @@ export const sendEventRegistrationEmail = internalAction({
     } catch (error) {
       console.error("Failed to send message:", error);
       throw new ConvexError("Could not send message. Please try again.");
+    }
+  },
+});
+
+export const sendEmailVerificationCode = action({
+  args: {
+    email: v.string(),
+  },
+  handler: async (ctx, { email }) => {
+    try {
+      const result = await ctx.runMutation(api.users.setPendingEmail, {
+        email,
+      });
+      if (!result.success || !result.code) {
+        throw new ConvexError("Failed to send email verification code");
+      }
+      const expirationTime = Date.now() + 15 * 60 * 1000;
+      const validMin = Math.floor((expirationTime - Date.now()) / (60 * 1000));
+      const htmlContent = getEmailVerificationBase({
+        token: result.code,
+        validMin,
+        purpose: "update",
+      });
+      await resend.emails.send({
+        from: "The Street Art List <account@support.thestreetartlist.com>",
+        to: email,
+        subject: "Email Verification",
+        html: htmlContent,
+      });
+
+      return { success: true };
+    } catch (error) {
+      if (error instanceof ConvexError) {
+        return {
+          success: false,
+          message: error.data?.message ?? "An unexpected error occurred.",
+        };
+      }
+      console.error("Failed to send message:", error);
+      return { success: false, message: "An unexpected error occurred." };
     }
   },
 });

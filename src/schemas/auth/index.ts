@@ -167,3 +167,24 @@ export const UpdatePasswordSchema = z
   });
 
 export type UpdatePasswordSchemaValues = z.infer<typeof UpdatePasswordSchema>;
+
+export const ChangeEmailSchema = z.object({
+  email: unicodeEmail.transform((val) => val.toLowerCase()),
+  code: z.string().optional(),
+});
+
+export const VerifyEmailSchema = ChangeEmailSchema.extend({
+  code: z.string().min(6, { message: "The code must be 6 digits" })
+})
+
+export const getChangeEmailSchema = (step: 1 | 2) => {
+  if (step === 1) {
+    return ChangeEmailSchema;
+  }
+  return VerifyEmailSchema;
+};
+
+export type EmailChangeValues = z.infer<
+  ReturnType<typeof getChangeEmailSchema>
+>;
+

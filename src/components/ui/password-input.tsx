@@ -89,7 +89,7 @@ export function PasswordInput<
         </button>
       </div>
       {showChecklist && isFocused && (
-        <PasswordChecklist password={field.value} type={type} />
+        <PasswordChecklist password={field.value ?? ""} type={type} />
       )}
     </div>
   );

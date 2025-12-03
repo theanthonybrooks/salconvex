@@ -428,6 +428,14 @@ const userPWSchema = v.object({
   changedBy: v.optional(v.string()),
 });
 
+const userEmailSchema = v.object({
+  currentEmail: v.string(),
+  pendingEmail: v.string(),
+  userId: v.id("users"),
+  otpCode: v.string(),
+  
+});
+
 const userLogSchema = {
   userId: v.string(),
   firstName: v.string(),
@@ -1117,6 +1125,11 @@ export default defineSchema({
   userPW: defineTable(userPWSchema)
     .index("by_userId", ["userId"])
     .index("by_email", ["email"]),
+
+  userEmail: defineTable(userEmailSchema)
+    .index("by_userId", ["userId"])
+    .index("by_currentEmail", ["currentEmail"])
+    .index("by_pendingEmail", ["pendingEmail"]),
 
   passwordResetLog: defineTable({
     email: v.string(),

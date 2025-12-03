@@ -733,7 +733,7 @@ const Card = ({
           id={id as Id<"todoKanban">}
         />
         {(isHovered || isEditing) && (
-          <div className="absolute right-0.5 top-0.5 flex items-center justify-center gap-x-3 rounded-lg border border-primary bg-card/90 p-2.5 dark:bg-foreground sm:gap-x-2">
+          <div className="absolute right-0.5 top-0.5 flex items-center justify-center gap-x-3 rounded-lg border border-primary bg-card/90 p-2.5 sm:gap-x-2 dark:bg-foreground">
             <TaskDialog
               id={id}
               mode="edit"
@@ -1013,7 +1013,7 @@ export const TaskDialog = ({
                         <SelectSimple
                           disabled={isSubmitting}
                           options={[...ColumnTypeOptions]}
-                          value={field.value}
+                          value={field.value ?? ""}
                           onChangeAction={(value) => field.onChange(value)}
                           placeholder="Select column"
                           className="w-full min-w-30 max-w-sm sm:max-w-40"
@@ -1034,7 +1034,7 @@ export const TaskDialog = ({
                         <SelectSimple
                           disabled={isSubmitting}
                           options={[...priorityOptions]}
-                          value={field.value}
+                          value={field.value ?? ""}
                           onChangeAction={(value) => field.onChange(value)}
                           placeholder="Select priority"
                           className="w-full min-w-30 max-w-sm sm:max-w-30"
@@ -1056,7 +1056,7 @@ export const TaskDialog = ({
                         <SelectSimple
                           disabled={isSubmitting}
                           options={[...supportCategoryOptions]}
-                          value={field.value}
+                          value={field.value ?? ""}
                           onChangeAction={(value) => field.onChange(value)}
                           placeholder="Select category"
                           className="w-full min-w-40 max-w-sm sm:max-w-50"
@@ -1080,7 +1080,7 @@ export const TaskDialog = ({
                               { label: "Start", value: "start" },
                               { label: "End", value: "end" },
                             ]}
-                            value={field.value}
+                            value={field.value ?? ""}
                             onChangeAction={(value) => field.onChange(value)}
                             placeholder="Select order"
                             className="w-auto"
@@ -1106,7 +1106,7 @@ export const TaskDialog = ({
                     <FormControl>
                       <PublicToggle
                         name="public-toggle"
-                        checked={field.value}
+                        checked={field.value ?? false}
                         onChange={(value) => field.onChange(value)}
                       />
                     </FormControl>

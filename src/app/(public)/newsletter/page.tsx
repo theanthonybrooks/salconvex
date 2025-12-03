@@ -440,16 +440,12 @@ const NewsletterPage = () => {
                                   id="newsletter-openCall"
                                   checked={field.value?.includes("openCall")}
                                   onCheckedChange={(checked) => {
+                                    const current = field.value ?? [];
                                     if (checked) {
-                                      field.onChange([
-                                        ...field.value,
-                                        "openCall",
-                                      ]);
+                                      field.onChange([...current, "openCall"]);
                                     } else {
                                       field.onChange(
-                                        field.value.filter(
-                                          (t) => t !== "openCall",
-                                        ),
+                                        current.filter((t) => t !== "openCall"),
                                       );
                                     }
                                   }}
@@ -464,16 +460,12 @@ const NewsletterPage = () => {
                                   id="newsletter-general"
                                   checked={field.value?.includes("general")}
                                   onCheckedChange={(checked) => {
+                                    const current = field.value ?? [];
                                     if (checked) {
-                                      field.onChange([
-                                        ...field.value,
-                                        "general",
-                                      ]);
+                                      field.onChange([...current, "general"]);
                                     } else {
                                       field.onChange(
-                                        field.value.filter(
-                                          (t) => t !== "general",
-                                        ),
+                                        current.filter((t) => t !== "general"),
                                       );
                                     }
                                   }}
@@ -500,7 +492,7 @@ const NewsletterPage = () => {
                               <SelectSimple
                                 disabled={!currentType?.length}
                                 options={[...newsletterFrequencyOptions]}
-                                value={field.value}
+                                value={field.value ?? ""}
                                 onChangeAction={field.onChange}
                                 placeholder="Select frequency"
                                 className="w-full bg-card placeholder:text-foreground sm:h-11"

@@ -197,7 +197,7 @@ export const SubDialog = ({
                         <SelectSimple
                           hasReset
                           options={[...BaseFeedbackOptions]}
-                          value={field.value}
+                          value={field.value ?? ""}
                           onChangeAction={(value) =>
                             field.onChange(value as Feedback)
                           }
