@@ -435,13 +435,13 @@ export function DataTable<TData, TValue>({
                         className={cn(
                           "px-3",
                           cell.column.getIndex() > 1
-                            ? "border-l border-foreground/30 sm:border-l-0"
+                            ? "border-l border-foreground/30 sm:border-dashed"
                             : undefined,
                           tableType &&
                             !selectableTableTypes.includes(tableType) &&
                             !numberedTableTypes.includes(tableType) &&
                             cell.column.getIndex() >= 1 &&
-                            "border-l border-foreground/30 sm:border-l-0",
+                            "border-l border-foreground/30 sm:border-dashed",
                         )}
                       >
                         {flexRender(

@@ -1528,6 +1528,7 @@ export default defineSchema({
     .index("by_lastEditedAt", ["lastEditedAt"])
     .index("by_status", ["status"])
     .index("userId", ["userId"])
+    .index("by_userId_paidStatus", ["userId", "paidStatus"])
     .index("stripeId", ["stripeId"])
     .index("by_chargeId", ["chargeId"])
     .index("customerId", ["customerId"]),

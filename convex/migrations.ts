@@ -19,6 +19,46 @@ import { DataModel } from "./_generated/dataModel.js";
 export const migrations = new Migrations<DataModel>(components.migrations);
 export const run = migrations.runner();
 
+function needsLowercase(value: string): boolean {
+  return value !== value.toLowerCase();
+}
+
+export const convertAllEmailsToLowerCase = migrations.define({
+  table: "users",
+  migrateOne: async (ctx, user) => {
+    const userEmail = user.email;
+    const lowerCased = userEmail.toLowerCase();
+    if (!needsLowercase(userEmail)) return;
+    await ctx.db.patch(user._id, { email: lowerCased });
+    const authAccount = await ctx.db
+      .query("authAccounts")
+      .withIndex("userIdAndProvider", (q) =>
+        q.eq("userId", user._id).eq("provider", "password"),
+      )
+      .first();
+    if (!authAccount) return;
+    await ctx.db.patch(authAccount._id, {
+      emailVerified: lowerCased,
+      providerAccountId: lowerCased,
+    });
+    const userSub = await ctx.db
+      .query("userSubscriptions")
+      .withIndex("by_userId_paidStatus", (q) =>
+        q.eq("userId", user._id).eq("paidStatus", true),
+      )
+      .first();
+    if (!userSub) return;
+    const subMetadata = userSub.metadata ?? {};
+    await ctx.db.patch(userSub._id, {
+      metadata: { ...subMetadata, userEmail: lowerCased },
+    });
+  },
+});
+
+export const runCAETL = migrations.runner(
+  internal.migrations.convertAllEmailsToLowerCase,
+);
+
 export const transferFromMailchimpContacts = migrations.define({
   table: "mailchimpContacts",
   migrateOne: async (ctx, mailchimpContact) => {
