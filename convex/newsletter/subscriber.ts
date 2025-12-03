@@ -11,6 +11,10 @@ import {
   query,
   QueryCtx,
 } from "~/convex/_generated/server";
+import {
+  newsletterFrequencyValidator,
+  newsletterTypeValidator,
+} from "~/convex/schema";
 import { ConvexError, v } from "convex/values";
 
 export async function updateUserNewsletter(
@@ -465,5 +469,37 @@ export const getNewsletterStatus = query({
     }
 
     throw new ConvexError("No newsletter subscription found: " + email);
+  },
+});
+
+export const getAudience = query({
+  args: {
+    type: newsletterTypeValidator,
+    frequency: newsletterFrequencyValidator,
+    plan: v.union(v.literal(0), v.literal(1), v.literal(2), v.literal(3)),
+  },
+  handler: async (ctx, args) => {
+    const { type, frequency, plan } = args;
+
+    const subscribers = await ctx.db
+      .query("newsletter")
+      .withIndex("by_active_frequency_plan", (q) =>
+        q
+          .eq("newsletter", true)
+          .eq("frequency", frequency)
+          .gte("userPlan", plan),
+      )
+      .collect();
+
+    const filteredSubscribers = subscribers.filter((subscriber) => {
+      if (type.includes("openCall")) {
+        return subscriber.type.includes("openCall");
+      } else if (type.includes("general")) {
+        return subscriber.type.includes("general");
+      }
+      return false;
+    });
+
+    return filteredSubscribers;
   },
 });

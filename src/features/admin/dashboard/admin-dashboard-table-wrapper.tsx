@@ -4,6 +4,7 @@ import { TableTypes } from "@/types/tanstack-table";
 
 import { useState } from "react";
 import { useDashboard } from "@/app/(pages)/dashboard/_components/DashboardContext";
+import { NewsletterMainPage } from "@/app/(pages)/dashboard/admin/_components/newsletter/newsletterMainPage";
 
 import type { Id } from "~/convex/_generated/dataModel";
 import { DataTable } from "@/components/data-table/DataTable";
@@ -190,18 +191,21 @@ export function AdminDashboardTableWrapper({
         </>
       )}
       {newsletterPage && (
-        <ResponsiveDataTable
-          title="Newsletter Subscriptions"
-          description="View newsletter subscribers & their preferences"
-          data={newsletterData?.subscribers ?? []}
-          defaultFilters={[{ id: `active`, value: ["true"] }]}
-          defaultSort={[{ id: `createdAt`, desc: true }]}
-          columns={newsletterColumns}
-          tableType="newsletter"
-          pageType="dashboard"
-          pageSize={{ desktop: 50, mobile: 10 }}
-          adminActions={adminActions}
-        />
+        <>
+          <NewsletterMainPage />
+          <ResponsiveDataTable
+            title="Newsletter Subscriptions"
+            description="View newsletter subscribers & their preferences"
+            data={newsletterData?.subscribers ?? []}
+            defaultFilters={[{ id: `active`, value: ["true"] }]}
+            defaultSort={[{ id: `createdAt`, desc: true }]}
+            columns={newsletterColumns}
+            tableType="newsletter"
+            pageType="dashboard"
+            pageSize={{ desktop: 50, mobile: 10 }}
+            adminActions={adminActions}
+          />
+        </>
       )}
       {usersPage && (
         <ResponsiveDataTable

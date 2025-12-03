@@ -156,10 +156,10 @@ export default function SettingsPage() {
     userId ? { userId } : "skip",
   );
   const subscribeToNewsletter = useAction(
-    api.actions.resend.sendNewsletterConfirmation,
+    api.actions.newsletter.sendNewsletterConfirmation,
   );
   const unsubscribeFromNewsletter = useAction(
-    api.actions.resend.sendNewsletterUpdateConfirmation,
+    api.actions.newsletter.sendNewsletterUpdateConfirmation,
   );
   const updateUserPrefs = useMutation(api.users.updateUserPrefs);
   const updateUserNotifications = useMutation(

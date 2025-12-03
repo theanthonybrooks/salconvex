@@ -415,7 +415,8 @@ export function DataTable<TData, TValue>({
                     onClick={row.getToggleSelectedHandler()}
                     data-state={row.getIsSelected() && "selected"}
                     className={cn(
-                      "bg-white/50 data-[state=selected]:bg-salPink/30",
+                      "data-[state=selected]:bg-salPink/30",
+                      "bg-white/50",
                       tableType &&
                         selectableTableTypes.includes(tableType) &&
                         "hover:cursor-pointer hover:bg-salYellow/10",

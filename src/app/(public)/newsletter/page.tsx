@@ -75,7 +75,7 @@ const NewsletterPage = () => {
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
   const unsubscribe = useAction(
-    api.actions.resend.sendNewsletterUpdateConfirmation,
+    api.actions.newsletter.sendNewsletterUpdateConfirmation,
   );
   const updateNewsletterSubscription = useMutation(
     api.newsletter.subscriber.updateNewsletterStatus,

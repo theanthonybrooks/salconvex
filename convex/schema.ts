@@ -778,16 +778,22 @@ const applicationsSchema = {
   responseTime: v.optional(v.number()),
   notes: v.optional(v.string()),
 };
-
+export const newsletterTypeValidator = v.union(
+  v.literal("general"),
+  v.literal("openCall"),
+);
+export const newsletterFrequencyValidator = v.union(
+  v.literal("monthly"),
+  v.literal("weekly"),
+);
 const newsletterSchema = {
   userId: v.union(v.id("users"), v.null()),
   firstName: v.string(),
   email: v.string(),
   newsletter: v.boolean(),
-  type: v.optional(
-    v.array(v.union(v.literal("openCall"), v.literal("general"))),
-  ),
-  frequency: v.optional(v.union(v.literal("monthly"), v.literal("weekly"))),
+  type: v.array(newsletterTypeValidator),
+
+  frequency: newsletterFrequencyValidator,
   userPlan: v.optional(v.number()),
   timesAttempted: v.number(),
   lastAttempt: v.number(),
@@ -1585,6 +1591,7 @@ export default defineSchema({
     .index("by_userId", ["userId"]),
 
   newsletter: defineTable(newsletterSchema)
+    .index("by_active_frequency_plan", ["newsletter", "frequency", "userPlan"])
     .index("by_userId", ["userId"])
     .index("by_email", ["email"]),
 

@@ -4,7 +4,7 @@ import { IBAN_COUNTRIES } from "@/constants/locationConsts";
 
 import type { ReactNode } from "react";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 
@@ -19,6 +19,8 @@ type SymbolOptions = "$" | "€";
 type UserInfoContextValue = {
   currency: CurrencyOptions;
   symbol: SymbolOptions;
+  ip: string;
+  location: string;
 };
 
 const UserInfoContext = createContext<UserInfoContextValue | undefined>(
@@ -82,8 +84,16 @@ async function decrypt(token: string): Promise<string | null> {
 // ---------------------------------------------
 // Currency detection
 // ---------------------------------------------
-async function getClientCurrency(): Promise<CurrencyOptions> {
+
+type UserInfoType = {
+  currency: CurrencyOptions;
+  location: string;
+  ip: string;
+};
+async function getClientInfo(): Promise<UserInfoType> {
   let currency: CurrencyOptions = "usd";
+  let location: string = "";
+  let ip: string = "0.0.0.0";
   try {
     const res = await fetch("https://ipapi.co/json/");
     if (!res.ok) throw new Error("Failed to fetch location");
@@ -92,11 +102,17 @@ async function getClientCurrency(): Promise<CurrencyOptions> {
     if (country && IBAN_COUNTRIES.has(country)) {
       currency = "eur";
     }
+    location = `${data.city}, ${data.region_code ? data.region_code + ", " : ""} ${data.country}`;
+    ip = data.ip;
     // console.log("data", data);
   } catch (error) {
     console.error("Error fetching client location:", error);
   } finally {
-    return currency;
+    return {
+      currency,
+      location,
+      ip,
+    };
   }
 }
 
@@ -110,43 +126,58 @@ export const UserInfoProvider = ({ children }: Props) => {
   const { preloadedUserData } = useConvexPreload();
   const userData = usePreloadedQuery(preloadedUserData);
   const { user, userPref } = userData ?? {};
-
-  const [currency, setCurrency] = useState<CurrencyOptions>("usd");
+  const [userInfo, setUserInfo] = useState<UserInfoType>({
+    currency: "usd",
+    location: "",
+    ip: "0.0.0.0",
+  });
+  const ipRef = useRef<string>("0.0.0.0");
 
   useEffect(() => {
-    const loadCurrency = async () => {
+    if (ipRef.current !== "0.0.0.0") return;
+    const loadUserInfo = async () => {
+      const userData = await getClientInfo();
+      const { currency, ip } = userData;
+      ipRef.current = ip;
+      const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
       if (user) {
         if (userPref?.currency) {
-          setCurrency(userPref.currency.toLowerCase() as CurrencyOptions);
+          setUserInfo({
+            ...userData,
+            currency: userPref.currency.toLowerCase() as CurrencyOptions,
+          });
         } else {
-          const detected = await getClientCurrency();
-          await updateUserPrefs({ currency: detected });
+          await updateUserPrefs({ currency });
         }
         return;
       }
-
       // Guest: try stored, else detect
-      const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
       if (stored) {
         const decoded = await decrypt(stored);
         if (decoded) {
-          setCurrency(decoded as CurrencyOptions);
+          setUserInfo({ ...userData, currency: decoded as CurrencyOptions });
           return;
         }
       }
 
-      const detected = await getClientCurrency();
-      setCurrency(detected);
-      const encrypted = await encrypt(detected);
+      setUserInfo(userData);
+      const encrypted = await encrypt(currency);
       localStorage.setItem(LOCAL_STORAGE_KEY, encrypted);
     };
 
-    loadCurrency();
+    loadUserInfo();
   }, [user, userPref, updateUserPrefs]);
-  const symbol = currency === "usd" ? "$" : "€";
+  const symbol = userInfo.currency === "usd" ? "$" : "€";
 
   return (
-    <UserInfoContext.Provider value={{ currency, symbol }}>
+    <UserInfoContext.Provider
+      value={{
+        currency: userInfo.currency,
+        symbol,
+        ip: userInfo.ip,
+        location: userInfo.location,
+      }}
+    >
       {children}
     </UserInfoContext.Provider>
   );

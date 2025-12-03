@@ -82,7 +82,7 @@ export default function Footer({ className }: { className?: string }) {
   //   api.newsletter.subscriber.subscribeToNewsletter,
   // );
   const subscribeToNewsletter = useAction(
-    api.actions.resend.sendNewsletterConfirmation,
+    api.actions.newsletter.sendNewsletterConfirmation,
   );
 
   const subStatus = subscription?.status || "none";
@@ -104,14 +104,14 @@ export default function Footer({ className }: { className?: string }) {
       });
       if (result?.status === "too_many_attempts") {
         toast.error(
-          "You've already subscribed to the newsletter with this email. Please check your spam folder or contact support.",
+          "You've already subscribed to the newsletter with this email. Please update your notification preferences in the dashboard and check your junk mail folder.",
         );
       } else if (result?.status === "already_subscribed") {
         toast.success("You're already subscribed to the newsletter.");
         setSubAction("subscribed");
       } else if (result?.status === "already_subscribed diff email") {
         toast.info(
-          "You're already subscribed with a different email. Please check your spam folder.",
+          "You're already subscribed with a different email. Please update your notification preferences in the dashboard and check your junk mail folder.",
         );
         setSubAction("cta");
       } else if (result?.status === "diff user has email") {

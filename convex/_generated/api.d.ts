@@ -10,8 +10,8 @@
 
 import type * as actions_getTimezone from "../actions/getTimezone.js";
 import type * as actions_getUserInfo from "../actions/getUserInfo.js";
+import type * as actions_newsletter from "../actions/newsletter.js";
 import type * as actions_resend from "../actions/resend.js";
-import type * as actions_sendOtpEmail from "../actions/sendOtpEmail.js";
 import type * as admin from "../admin.js";
 import type * as aggregates_eventAggregates from "../aggregates/eventAggregates.js";
 import type * as analytics_eventAnalytics from "../analytics/eventAnalytics.js";
@@ -35,6 +35,7 @@ import type * as kanban_cards from "../kanban/cards.js";
 import type * as kanban_display from "../kanban/display.js";
 import type * as map_worldMap from "../map/worldMap.js";
 import type * as migrations from "../migrations.js";
+import type * as newsletter_emails from "../newsletter/emails.js";
 import type * as newsletter_subscriber from "../newsletter/subscriber.js";
 import type * as openCalls_openCall from "../openCalls/openCall.js";
 import type * as organizer_applications from "../organizer/applications.js";
@@ -42,7 +43,6 @@ import type * as organizer_organizations from "../organizer/organizations.js";
 import type * as organizer_staff from "../organizer/staff.js";
 import type * as otp_resendOtp from "../otp/resendOtp.js";
 import type * as otp_resetOtp from "../otp/resetOtp.js";
-import type * as otp_verificationCodeEmail from "../otp/verificationCodeEmail.js";
 import type * as plans from "../plans.js";
 import type * as stripe_stripeAddOns from "../stripe/stripeAddOns.js";
 import type * as stripe_stripeBase from "../stripe/stripeBase.js";
@@ -64,8 +64,8 @@ import type {
 declare const fullApi: ApiFromModules<{
   "actions/getTimezone": typeof actions_getTimezone;
   "actions/getUserInfo": typeof actions_getUserInfo;
+  "actions/newsletter": typeof actions_newsletter;
   "actions/resend": typeof actions_resend;
-  "actions/sendOtpEmail": typeof actions_sendOtpEmail;
   admin: typeof admin;
   "aggregates/eventAggregates": typeof aggregates_eventAggregates;
   "analytics/eventAnalytics": typeof analytics_eventAnalytics;
@@ -89,6 +89,7 @@ declare const fullApi: ApiFromModules<{
   "kanban/display": typeof kanban_display;
   "map/worldMap": typeof map_worldMap;
   migrations: typeof migrations;
+  "newsletter/emails": typeof newsletter_emails;
   "newsletter/subscriber": typeof newsletter_subscriber;
   "openCalls/openCall": typeof openCalls_openCall;
   "organizer/applications": typeof organizer_applications;
@@ -96,7 +97,6 @@ declare const fullApi: ApiFromModules<{
   "organizer/staff": typeof organizer_staff;
   "otp/resendOtp": typeof otp_resendOtp;
   "otp/resetOtp": typeof otp_resetOtp;
-  "otp/verificationCodeEmail": typeof otp_verificationCodeEmail;
   plans: typeof plans;
   "stripe/stripeAddOns": typeof stripe_stripeAddOns;
   "stripe/stripeBase": typeof stripe_stripeBase;
@@ -159,6 +159,135 @@ export declare const components: {
         any
       >;
       reset: FunctionReference<"mutation", "internal", { name: string }, any>;
+    };
+  };
+  resend: {
+    lib: {
+      cancelEmail: FunctionReference<
+        "mutation",
+        "internal",
+        { emailId: string },
+        null
+      >;
+      cleanupAbandonedEmails: FunctionReference<
+        "mutation",
+        "internal",
+        { olderThan?: number },
+        null
+      >;
+      cleanupOldEmails: FunctionReference<
+        "mutation",
+        "internal",
+        { olderThan?: number },
+        null
+      >;
+      createManualEmail: FunctionReference<
+        "mutation",
+        "internal",
+        {
+          from: string;
+          headers?: Array<{ name: string; value: string }>;
+          replyTo?: Array<string>;
+          subject: string;
+          to: string;
+        },
+        string
+      >;
+      get: FunctionReference<
+        "query",
+        "internal",
+        { emailId: string },
+        {
+          complained: boolean;
+          createdAt: number;
+          errorMessage?: string;
+          finalizedAt: number;
+          from: string;
+          headers?: Array<{ name: string; value: string }>;
+          html?: string;
+          opened: boolean;
+          replyTo: Array<string>;
+          resendId?: string;
+          segment: number;
+          status:
+            | "waiting"
+            | "queued"
+            | "cancelled"
+            | "sent"
+            | "delivered"
+            | "delivery_delayed"
+            | "bounced"
+            | "failed";
+          subject: string;
+          text?: string;
+          to: string;
+        } | null
+      >;
+      getStatus: FunctionReference<
+        "query",
+        "internal",
+        { emailId: string },
+        {
+          complained: boolean;
+          errorMessage: string | null;
+          opened: boolean;
+          status:
+            | "waiting"
+            | "queued"
+            | "cancelled"
+            | "sent"
+            | "delivered"
+            | "delivery_delayed"
+            | "bounced"
+            | "failed";
+        } | null
+      >;
+      handleEmailEvent: FunctionReference<
+        "mutation",
+        "internal",
+        { event: any },
+        null
+      >;
+      sendEmail: FunctionReference<
+        "mutation",
+        "internal",
+        {
+          from: string;
+          headers?: Array<{ name: string; value: string }>;
+          html?: string;
+          options: {
+            apiKey: string;
+            initialBackoffMs: number;
+            onEmailEvent?: { fnHandle: string };
+            retryAttempts: number;
+            testMode: boolean;
+          };
+          replyTo?: Array<string>;
+          subject: string;
+          text?: string;
+          to: string;
+        },
+        string
+      >;
+      updateManualEmail: FunctionReference<
+        "mutation",
+        "internal",
+        {
+          emailId: string;
+          errorMessage?: string;
+          resendId?: string;
+          status:
+            | "waiting"
+            | "queued"
+            | "cancelled"
+            | "sent"
+            | "delivered"
+            | "delivery_delayed"
+            | "bounced"
+            | "failed";
+        },
+        null
+      >;
     };
   };
   ticketCounterPool: {
