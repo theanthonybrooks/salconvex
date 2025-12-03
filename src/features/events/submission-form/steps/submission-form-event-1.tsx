@@ -236,7 +236,7 @@ const SubmissionFormEventStep1 = ({
                   return (
                     <SelectSimple
                       options={[...eventCategoryOptions]}
-                      value={field.value}
+                      value={field.value ?? ""}
                       onChangeAction={(value) => {
                         field.onChange(value as EventCategory);
                         handleCategoryChange(value as EventCategory);
@@ -319,7 +319,7 @@ const SubmissionFormEventStep1 = ({
                   control={control}
                   render={({ field }) => (
                     <EventNameSearch
-                      value={field.value}
+                      value={field.value ?? ""}
                       isExisting={eventNameExists}
                       onChange={field.onChange}
                       className={cn(
@@ -384,7 +384,7 @@ const SubmissionFormEventStep1 = ({
                       <MapboxInputFull
                         id="event.location"
                         isEvent
-                        value={field.value}
+                        value={field.value ?? null}
                         onChange={field.onChange}
                         onBlur={field.onBlur}
                         reset={eventNameExists}

@@ -15,7 +15,8 @@ import {
   Tailwind,
   Text,
 } from "@react-email/components";
-import tailwindConfig from "~/tailwind.config";
+
+import { emailTailwindConfig } from "@/components/email/tailwind-email-config";
 
 export type RecentLoginEmailProps = {
   userFirstName?: string;
@@ -54,7 +55,7 @@ export const RecentLoginEmail = ({
 
   return (
     <Html>
-      <Tailwind config={tailwindConfig}>
+      <Tailwind config={emailTailwindConfig}>
         <Head />
         <Body className="font-yelp bg-white">
           <Preview>Sally recent login</Preview>
@@ -156,7 +157,7 @@ export const TestNewsletterEmail = (props: TestNewsletterEmailProps) => {
 
   return (
     <Html>
-      <Tailwind config={tailwindConfig}>
+      <Tailwind config={emailTailwindConfig}>
         <Head />
         <Body className="font-yelp bg-white">
           <Preview>Sally email test</Preview>

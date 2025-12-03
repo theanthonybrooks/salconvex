@@ -195,7 +195,7 @@ const SubmissionFormOrgStep = ({
               render={({ field }) => (
                 <OrgSearch
                   id="organization.name"
-                  value={field.value}
+                  value={field.value ?? ""}
                   onChange={field.onChange}
                   isValid={validOrgWZod}
                   validationError={invalidOrgWZod}
@@ -256,7 +256,7 @@ const SubmissionFormOrgStep = ({
                   render={({ field }) => (
                     <MapboxInputFull
                       id="organization.location"
-                      value={field.value}
+                      value={field.value ?? null}
                       onChange={field.onChange}
                       onBlur={field.onBlur}
                       reset={reset}

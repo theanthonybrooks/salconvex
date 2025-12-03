@@ -50,6 +50,7 @@
     "@radix-ui/react-tooltip": "^1.2.8",
     "@react-email/components": "^1.0.1",
     "@react-email/render": "^2.0.0",
+    "@react-email/tailwind": "^2.0.1",
     "@sentry/nextjs": "^10.5.0",
     "@sparticuz/chromium": "^138.0.2",
     "@tanstack/react-table": "^8.21.3",

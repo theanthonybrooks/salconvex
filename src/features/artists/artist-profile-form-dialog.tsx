@@ -410,7 +410,7 @@ export const ArtistProfileForm = ({
                 render={({ field, fieldState }) => (
                   <>
                     <SearchMappedMultiSelect<Country>
-                      values={field.value}
+                      values={field.value ?? []}
                       onChange={field.onChange}
                       data={sortedGroupedCountries}
                       selectLimit={3}

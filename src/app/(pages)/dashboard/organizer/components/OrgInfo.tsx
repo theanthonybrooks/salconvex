@@ -242,7 +242,7 @@ export const OrgInfo = ({ orgData, user }: OrgInfoProps) => {
                   <FormControl>
                     <MapboxInputFull
                       id="organization.location"
-                      value={field.value}
+                      value={field.value || null}
                       onChange={field.onChange}
                       onBlur={field.onBlur}
                       reset={false}
