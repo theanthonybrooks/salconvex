@@ -1,0 +1,11 @@
+### Test Googlebot on /
+GET http://localhost:3000/
+User-Agent: Googlebot/2.1 (+http://www.google.com/bot.html)
+
+### The List
+GET http://localhost:3000/thelist
+User-Agent: Googlebot
+
+### Pricing
+GET http://localhost:3000/pricing
+User-Agent: Googlebot

@@ -23,7 +23,7 @@ const INDEXABLE_ROUTES = new Set([
   "/about",
   "/pricing",
   "/about",
-  "/map",
+  // "/map",
   "/calendar",
   "/faq",
 ]);

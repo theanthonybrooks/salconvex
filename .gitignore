@@ -48,3 +48,6 @@ next-env.d.ts
 
 # Authentication tokens
 .npmrc
+
+# Trash
+/src/trash/
