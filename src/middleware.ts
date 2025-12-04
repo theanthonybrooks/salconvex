@@ -8,6 +8,9 @@ import {
 
 // const isPublicPage = createRouteMatcher(["/", "/archive", "/pricing"])
 
+const BOT_UA_REGEX =
+  /bot|crawler|spider|crawling|googlebot|bingbot|duckduckbot|slurp|yandex|baiduspider|semrush|facebookexternalhit|twitterbot|linkedinbot/i;
+
 const isAuthPage = createRouteMatcher(["/auth/:path*"]);
 const isDashboardPage = createRouteMatcher(["/dashboard/:path*"]);
 const isSubmitPage = createRouteMatcher(["/submit"]);
@@ -36,6 +39,8 @@ export default convexAuthNextjsMiddleware(
     }
 
     const userAgent = request.headers.get("user-agent") || "";
+    const isBot = BOT_UA_REGEX.test(userAgent);
+
     const ua = new UAParser(userAgent).getResult();
 
     // const isAuthenticated = await isAuthenticatedNextjs()
@@ -85,6 +90,13 @@ export default convexAuthNextjsMiddleware(
     response.headers.set("x-os-version", ua.os.version || "");
     response.headers.set("x-browser-name", ua.browser.name || "");
     response.headers.set("x-browser-version", ua.browser.version || "");
+    if (isBot) {
+      // Pretend the bot already accepted cookies so the banner won't render
+      response.cookies.set("cookie_preferences", "all", {
+        path: "/",
+        httpOnly: false,
+      });
+    }
     return response;
   },
   { cookieConfig: { maxAge: 60 * 60 * 24 * 30 } },
