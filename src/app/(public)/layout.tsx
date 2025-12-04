@@ -18,9 +18,21 @@ import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
 import { api } from "~/convex/_generated/api";
 import { fetchQuery } from "convex/nextjs";
 
+const INDEXABLE_ROUTES = new Set([
+  "/",
+  "/about",
+  "/pricing",
+  "/about",
+  "/map",
+  "/calendar",
+  "/faq",
+]);
+
 export async function generateMetadata(): Promise<Metadata> {
   const headersList = await headers();
   const pathname = headersList.get("x-pathname");
+  const isIndexable = INDEXABLE_ROUTES.has(pathname ?? "");
+
   const meta = getPageMeta(pathname);
 
   let title = meta.title || "The Street Art List";
@@ -36,6 +48,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title,
     description,
+    robots: isIndexable ? "index, follow" : "noindex, follow",
     openGraph: {
       title: meta.externalTitle || meta.title || "The Street Art List",
       description: meta.description || DEFAULT_DESCRIPTION,

@@ -684,7 +684,7 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
                                   }
                                   {...field}
                                   placeholder="ex. Bob Bobson"
-                                  className="w-full border-foreground bg-card text-base focus:outline-none focus:ring-1 focus:ring-ring focus:ring-offset-1 focus:ring-offset-ring"
+                                  className="w-full border-foreground bg-card text-base focus:outline-none focus:ring-1 focus:ring-ring"
                                 />
                               </FormControl>
                               <FormMessage />
@@ -706,7 +706,7 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
                                   }
                                   {...field}
                                   placeholder="ex. email@example.com"
-                                  className="w-full border-foreground bg-card text-base focus:outline-none focus:ring-1 focus:ring-ring focus:ring-offset-1 focus:ring-offset-ring"
+                                  className="w-full border-foreground bg-card text-base focus:outline-none focus:ring-1 focus:ring-ring"
                                 />
                               </FormControl>
                               <FormMessage />
@@ -732,7 +732,7 @@ export const CheckoutPage = ({ preloaded }: CheckoutPageProps) => {
                                 transform={autoHttps}
                                 field={field}
                                 placeholder="ex. example.com"
-                                className="w-full border-foreground bg-card text-base focus:outline-none focus:ring-1 focus:ring-ring focus:ring-offset-1 focus:ring-offset-ring"
+                                className="w-full border-foreground bg-card text-base focus:outline-none focus:ring-1 focus:ring-ring"
                                 debounceMs={50}
                                 tabIndex={1}
                               />

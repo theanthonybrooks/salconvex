@@ -16,7 +16,6 @@ import {
   DollarSign,
   WandSparkles,
   X,
-  XCircle,
   XIcon,
 } from "lucide-react";
 
@@ -59,7 +58,7 @@ interface BaseOption<T extends string = string> {
 const multiSelectVariants = cva("mx-[2px]", {
   variants: {
     variant: {
-      basic: "border-[1.5px] bg-white text-foreground hover:bg-white",
+      basic: "border-1.5 bg-white text-foreground hover:bg-white",
       default: "border-foreground/10 bg-card text-foreground hover:bg-card",
       secondary:
         "border-foreground/10 bg-secondary text-secondary-foreground hover:bg-secondary/80",
@@ -79,7 +78,8 @@ const multiSelectVariants = cva("mx-[2px]", {
  * Props for MultiSelect component
  */
 interface MultiSelectProps<T extends string>
-  extends ButtonHTMLAttributes<HTMLButtonElement>,
+  extends
+    ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof multiSelectVariants> {
   /**
    * An array of option objects to be displayed in the multi-select component.
@@ -344,10 +344,6 @@ export const MultiSelect = forwardRef(
       }
     }, [isPopoverOpen, hasSearch]);
 
-    const disabledClass = disabled
-      ? "pointer-events-none opacity-50 border-foreground/50"
-      : "";
-
     return (
       <Popover
         open={isPopoverOpen}
@@ -376,7 +372,12 @@ export const MultiSelect = forwardRef(
             )}
           >
             {displayValues.length > 0 ? (
-              <div className="flex w-full items-center justify-between border-stone-300">
+              <div
+                className={cn(
+                  "flex w-full items-center justify-between border-stone-300",
+                  disabled && "pointer-events-none",
+                )}
+              >
                 <div className="jack flex flex-wrap items-center">
                   {!shortResults &&
                     displayValues.slice(0, maxCount).map((value) => {
@@ -384,13 +385,13 @@ export const MultiSelect = forwardRef(
                       const IconComponent = option?.icon;
                       return (
                         <Badge
+                          disabled={disabled}
                           key={value}
                           className={cn(
                             "m-0 first:ml-0",
                             isAnimating ? "animate-bounce" : "",
                             multiSelectVariants({ variant }),
                             badgeClassName,
-                            disabledClass,
                           )}
                           style={{
                             animationDuration: `${animation}s`,
@@ -405,27 +406,32 @@ export const MultiSelect = forwardRef(
                           >
                             {abbreviated ? option?.abbr : option?.label}
                           </p>
-                          {!lockedValue?.includes(value) && !condensed && (
-                            <X
-                              className="ml-2 h-3 w-3 cursor-pointer"
-                              onClick={(event) => {
-                                event.stopPropagation();
-                                toggleOption(value);
-                              }}
-                            />
-                          )}
+                          {!lockedValue?.includes(value) &&
+                            !condensed &&
+                            !disabled && (
+                              <X
+                                className={cn("ml-2 size-3 cursor-pointer")}
+                                onClick={(event) => {
+                                  event.stopPropagation();
+                                  toggleOption(value);
+                                }}
+                              />
+                            )}
                         </Badge>
                       );
                     })}
                   {!shortResults && displayValues.length > maxCount && (
                     <Badge
+                      disabled={disabled}
                       className={cn(
                         "border-foreground/1 bg-transparent text-foreground hover:bg-salPink/40",
                         isAnimating ? "animate-bounce" : "",
                         badgeClassName,
-                        disabledClass,
                       )}
-                      style={{ animationDuration: `${animation}s` }}
+                      style={{
+                        animationDuration: `${animation}s`,
+                        height: `${height * 4 - 8}px`,
+                      }}
                     >
                       {condensed || compact ? (
                         <> {displayValues.length - maxCount}</>
@@ -433,28 +439,31 @@ export const MultiSelect = forwardRef(
                         <>
                           {`+ ${displayValues.length - maxCount} more`}
 
-                          <XCircle
-                            className={cn(
-                              "ml-2 size-4 cursor-pointer",
-                              disabledClass,
-                            )}
-                            onClick={(event) => {
-                              event.stopPropagation();
-                              clearExtraOptions();
-                            }}
-                          />
+                          {!disabled && (
+                            <X
+                              className={cn(
+                                "ml-2 size-3 cursor-pointer",
+                                disabled &&
+                                  "pointer-events-none border-foreground/50 opacity-50",
+                              )}
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                clearExtraOptions();
+                              }}
+                            />
+                          )}
                         </>
                       )}
                     </Badge>
                   )}
                   {shortResults && (
                     <Badge
+                      disabled={disabled}
                       variant="basic"
                       className={cn(
                         "border-foreground/1 bg-transparent text-foreground hover:bg-salPink/50",
                         isAnimating ? "animate-bounce" : "",
                         badgeClassName,
-                        disabledClass,
                       )}
                       style={{ animationDuration: `${animation}s` }}
                     >
@@ -465,7 +474,11 @@ export const MultiSelect = forwardRef(
                 <div className="flex items-center justify-between">
                   {!compact && (
                     <XIcon
-                      className="mx-2 h-4 cursor-pointer text-foreground/50 hover:scale-110 hover:text-red-600"
+                      className={cn(
+                        "mx-2 h-4 cursor-pointer text-foreground/50 hover:scale-110 hover:text-red-600",
+                        disabled &&
+                          "pointer-events-none border-foreground/50 opacity-50",
+                      )}
                       onClick={(event) => {
                         event.stopPropagation();
                         forceClear();
@@ -488,7 +501,12 @@ export const MultiSelect = forwardRef(
                 </div>
               </div>
             ) : (
-              <div className="mx-auto flex w-full items-center justify-between">
+              <div
+                className={cn(
+                  "mx-auto flex w-full items-center justify-between",
+                  disabled && "pointer-events-none",
+                )}
+              >
                 <span
                   className={cn(
                     "mx-3 text-sm font-normal text-foreground/50",

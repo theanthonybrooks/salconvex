@@ -28,6 +28,9 @@ export const DEFAULT_ICON = {
 export const DEFAULT_DESCRIPTION =
   "  The Street Art List is a global list of street art, graffiti, & mural projects. Open calls, event calendar, and global map, with organizer and artist dashboards. Created, regularly updated, and run by visual artist, Anthony Brooks (@anthonybrooksart), a Serbian-American artist based in Berlin, Germany.";
 
+
+
+
 interface PageTitles {
   path: string;
   title: string;

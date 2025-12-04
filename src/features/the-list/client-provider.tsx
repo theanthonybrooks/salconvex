@@ -26,7 +26,10 @@ import {
 import { useSearchParams } from "next/navigation";
 import { debounce } from "lodash";
 
+import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { setParamIfNotDefault } from "@/helpers/utilsFns";
+
+import { usePreloadedQuery } from "convex/react";
 
 // #endregion
 
@@ -77,6 +80,9 @@ export const EventListProvider = ({
   children: React.ReactNode;
 }) => {
   const searchParams = useSearchParams();
+  const { preloadedSubStatus } = useConvexPreload();
+  const subData = usePreloadedQuery(preloadedSubStatus);
+  const { hasActiveSubscription } = subData ?? {};
 
   const defaultFilters: Filters = useMemo(
     () => ({
@@ -93,12 +99,25 @@ export const EventListProvider = ({
   );
 
   const [view, setView] = useState<ViewOptions>(() => {
+    // 1. Search param
+    const paramView = searchParams.get("view") as ViewOptions | null;
+    if (
+      paramView &&
+      viewOptionValues.some((opt) => opt.value === paramView) &&
+      hasActiveSubscription
+    ) {
+      return paramView;
+    }
+
+    // 2. Session storage
     if (typeof window !== "undefined") {
       const saved = sessionStorage.getItem("salView") as ViewOptions | null;
       if (saved && viewOptionValues.some((opt) => opt.value === saved)) {
         return saved;
       }
     }
+
+    // 3. Fallback
     return "openCall";
   });
 

@@ -49,6 +49,7 @@ import { PopoverSimple } from "@/components/ui/popover";
 import SmileySvg from "@/features/auth/components/smiley-svg";
 import SpeechBubble from "@/features/auth/components/speech-bubble";
 import { onEmailChange } from "@/helpers/privacyFns";
+import { cn } from "@/helpers/utilsFns";
 
 import { useAuthActions } from "@convex-dev/auth/react";
 import { api } from "~/convex/_generated/api";
@@ -556,6 +557,7 @@ const RegisterForm = ({ switchFlow }: RegisterFormProps) => {
                           hasSearch={false}
                           selectAll={false}
                           tabIndex={step === "signUp" ? 5 : -1}
+                          className={cn("disabled:border-foreground/50")}
                         />
                       </FormControl>
                       <FormMessage />

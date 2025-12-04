@@ -549,17 +549,17 @@ a {
   display: none; /* Chrome, Safari, Opera */
 }
 
-:focus-visible {
+/* :focus-visible {
   outline: 2px solid var(--sal-pink-hex);
   outline-offset: 2px;
-}
+} */
 
 :focus,
 :focus-within,
 :active {
-  &:not(button) {
-    box-shadow: none;
-  }
+  /*  &:not(button) {
+    /~ box-shadow: none; ~/
+  }*/
   outline: none;
   /* border: 2px solid black ; */
 }

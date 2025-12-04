@@ -5,6 +5,7 @@ import ClientThisWeekList from "@/features/events/thisweek-list-client";
 
 export const metadata: Metadata = {
   title: "This Week",
+  robots: "index, follow",
   description:
     "See the latest mural open calls and public art opportunities ending this week.",
   openGraph: {
