@@ -438,6 +438,7 @@ export const TABLE_FILTERS: TableFilterConfig = {
       options: [
         { value: true, label: "Can Feature" },
         { value: false, label: "Can't Feature" },
+        { value: "-", label: "Unchecked" },
       ],
     },
     {

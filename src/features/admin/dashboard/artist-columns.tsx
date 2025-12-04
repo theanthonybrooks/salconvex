@@ -46,7 +46,7 @@ export interface ArtistColumnProps {
   nationality: string[];
   instagram: string;
   website: string;
-  canFeature: boolean;
+  canFeature: boolean | undefined;
   feature: boolean | string;
   notes: string;
   createdAt: number;
@@ -190,6 +190,11 @@ export const artistColumns: ColumnDef<ArtistColumnProps>[] = [
   },
   {
     accessorKey: "canFeature",
+    accessorFn: (row) => {
+      const value = row.canFeature;
+      if (typeof value === "boolean") return value;
+      return "-";
+    },
     id: "canFeature",
     minSize: 60,
     maxSize: 60,

@@ -42,7 +42,7 @@ export const getActiveArtists = query({
             nationality: artist.artistNationality ?? [],
             instagram: artist.contact?.instagram ?? "",
             website: artist.contact?.website ?? "",
-            canFeature: artist.canFeature ?? false,
+            canFeature: artist.canFeature,
             feature: artist.feature ?? "none",
             notes: artist.adminNote ?? "",
             createdAt: artist._creationTime,

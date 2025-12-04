@@ -50,4 +50,4 @@ next-env.d.ts
 .npmrc
 
 # Trash
-/src/trash/
+trash/
