@@ -692,7 +692,11 @@ export const getUserOrganizations = query({
         new Map(filteredResults.map((org) => [org._id, org])).values(),
       );
 
-      return { data: uniqueResults, success: true, error: null };
+      const sortedResults = uniqueResults.sort((a, b) =>
+        a.name.localeCompare(b.name),
+      );
+
+      return { data: sortedResults, success: true, error: null };
     } else {
       const orgs =
         trimmedQuery === ""

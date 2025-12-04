@@ -391,6 +391,10 @@ export const MapboxInputFull = ({
         value={inputValue}
         onChange={(e) => setInputValue(e.target.value)}
         onClick={() => setIsFocused(true)}
+        onFocus={() => {
+          if (isFocused) return;
+          setIsFocused(true);
+        }}
         onBlur={handleBlur}
         onKeyDown={handleKeyDown}
         placeholder={placeholder}

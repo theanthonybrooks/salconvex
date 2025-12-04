@@ -1,5 +1,7 @@
 "use client";
 
+import { DOC_TYPES } from "@/constants/fileConsts";
+
 import { useState } from "react";
 
 import { Book, BookDashed, Download, X } from "lucide-react";
@@ -60,9 +62,8 @@ export function OpenCallFilesTable({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [tempTitle, setTempTitle] = useState("");
   const isDocument = type === "docs";
-  const documentPattern = /\.(pdf|docx?|pptx?)$/i;
   const visibleFiles = isDocument
-    ? files.filter((doc) => documentPattern.test(doc.title))
+    ? files.filter((doc) => DOC_TYPES.includes(getMimeTypeFromHref(doc.title)))
     : files;
 
   const startEditing = (id: string, currentTitle: string) => {
