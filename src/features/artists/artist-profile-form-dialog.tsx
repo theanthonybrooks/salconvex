@@ -1,5 +1,3 @@
-import { User } from "@/types/user";
-
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { UpdateArtistSchema, UpdateArtistSchemaValues } from "@/schemas/artist";
@@ -31,19 +29,24 @@ import { MapboxInputFull } from "@/components/ui/mapbox-search";
 import { SearchMappedMultiSelect } from "@/components/ui/mapped-select-multi";
 import { Separator } from "@/components/ui/separator";
 import { TooltipSimple } from "@/components/ui/tooltip";
+import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { autoHttps, formatHandleInput } from "@/helpers/linkFns";
 import { sortedGroupedCountries } from "@/helpers/locationFns";
+import { getUserFontSizePref } from "@/helpers/stylingFns";
 import { cn } from "@/helpers/utilsFns";
 
 import { api } from "~/convex/_generated/api";
 import { Id } from "~/convex/_generated/dataModel";
-import { useAction, useMutation, useQuery } from "convex/react";
+import {
+  useAction,
+  useMutation,
+  usePreloadedQuery,
+  useQuery,
+} from "convex/react";
 import { FunctionReturnType } from "convex/server";
 
 interface ArtistProfileFormProps {
   className?: string;
-
-  user: User | undefined;
   subData: FunctionReturnType<
     typeof api.subscriptions.getUserSubscriptionStatus
   >;
@@ -55,12 +58,17 @@ interface ArtistProfileFormProps {
 export const ArtistProfileForm = ({
   className,
   onClick,
-  user,
+
   subData,
   hasUnsavedChanges,
   setHasUnsavedChanges,
 }: ArtistProfileFormProps) => {
   const artistData = useQuery(api.artists.artistActions.getArtist, {});
+  const { preloadedUserData } = useConvexPreload();
+  const userData = usePreloadedQuery(preloadedUserData);
+  const { user, userPref } = userData ?? {};
+  const fontSizePref = getUserFontSizePref(userPref?.fontSize);
+  const fontSize = fontSizePref?.body;
   const [pending, setPending] = useState(false);
 
   const userFullName = user ? user?.firstName + " " + user?.lastName : "";
@@ -315,7 +323,10 @@ export const ArtistProfileForm = ({
                       id="artistName"
                       {...field}
                       placeholder="(if different from your profile name)"
-                      className="w-full rounded border border-foreground/30 p-3 text-base focus:outline-none focus:ring-1 focus:ring-foreground"
+                      className={cn(
+                        "w-full rounded border border-foreground/30 p-3 text-base focus:outline-none focus:ring-1 focus:ring-foreground",
+                      )}
+                      fontSize={fontSize}
                     />
                   </FormControl>
                 </FormItem>
@@ -358,6 +369,7 @@ export const ArtistProfileForm = ({
                     field={field}
                     placeholder="@username"
                     transform={(val) => formatHandleInput(val, "instagram")}
+                    fontSize={fontSize}
                   />
                 </FormControl>
                 <FormMessage />
@@ -377,6 +389,7 @@ export const ArtistProfileForm = ({
                     field={field}
                     placeholder="yoursite.com"
                     transform={autoHttps}
+                    fontSize={fontSize}
                   />
                 </FormControl>
                 <FormMessage />
@@ -425,6 +438,7 @@ export const ArtistProfileForm = ({
                       ]}
                       tabIndex={5}
                       className="h-12 bg-card text-base hover:bg-card"
+                      fontSize={fontSize}
                     />
                     {fieldState.error && (
                       <p className="mt-1 text-sm text-red-600">
@@ -453,7 +467,10 @@ export const ArtistProfileForm = ({
                     tabIndex={6}
                     placeholder="Place of residence (city, state, country, etc).."
                     className="mb-3 w-full lg:mb-0"
-                    inputClassName="rounded-lg border-foreground "
+                    inputClassName={cn(
+                      "rounded-lg border-foreground",
+                      fontSize,
+                    )}
                     isArtist={true}
                   />
                 )}
@@ -527,6 +544,7 @@ export const ArtistProfileForm = ({
                   variant="salWithShadowHiddenYlw"
                   tabIndex={9}
                   className="focus:scale-95"
+                  fontSize={fontSize}
                 >
                   Cancel
                 </Button>
@@ -539,6 +557,7 @@ export const ArtistProfileForm = ({
                   disabled={!isValid || pending}
                   tabIndex={8}
                   className="focus:scale-95"
+                  fontSize={fontSize}
                 >
                   {!hadTrial ? (
                     "Start Trial"

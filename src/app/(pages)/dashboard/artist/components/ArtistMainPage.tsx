@@ -1,7 +1,5 @@
 "use client";
 
-import { usePreloadedQuery } from "convex/react";
-
 import {
   Card,
   CardContent,
@@ -13,6 +11,8 @@ import { Separator } from "@/components/ui/separator";
 import { ArtistProfileForm } from "@/features/artists/components/artist-profile-form";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { cn } from "@/helpers/utilsFns";
+
+import { usePreloadedQuery } from "convex/react";
 
 export const ArtistMainPage = () => {
   const { preloadedUserData, preloadedSubStatus } = useConvexPreload();
@@ -36,7 +36,7 @@ export const ArtistMainPage = () => {
           </CardHeader>
           <CardContent className="space-y-6">
             <Separator />
-            <ArtistProfileForm user={user} subData={subData} type="dashboard" />
+            <ArtistProfileForm type="dashboard" />
           </CardContent>
         </Card>
       ) : null}

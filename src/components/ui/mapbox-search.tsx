@@ -401,7 +401,7 @@ export const MapboxInputFull = ({
         tabIndex={tabIndex}
         disabled={disabled}
         className={cn(
-          "w-full rounded border border-foreground/30 p-3 text-base placeholder-foreground/50 placeholder-shown:bg-card focus:outline-none focus:ring-1 focus:ring-foreground",
+          "w-full rounded border border-foreground/30 p-3 text-base placeholder-foreground/50 placeholder-shown:bg-card focus:outline-none focus:ring-1 focus:ring-foreground sm:text-sm",
           inputClassName,
         )}
       />

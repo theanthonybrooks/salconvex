@@ -17,6 +17,7 @@ interface DebouncedControllerInputProps<
   debounceMs?: number;
   transform?: (value: string) => string | undefined;
   onSchemaCheck?: () => void;
+  fontSize?: string;
 }
 
 export function DebouncedControllerInput<
@@ -28,6 +29,7 @@ export function DebouncedControllerInput<
   transform,
   onSchemaCheck,
   className,
+  fontSize,
   ...inputProps
 }: DebouncedControllerInputProps<TFieldValues, TName>) {
   // const { setValue } = useFormContext();
@@ -76,6 +78,7 @@ export function DebouncedControllerInput<
       className={cn(
         "bg-card text-base placeholder:text-sm placeholder:text-foreground/50 sm:text-sm",
         className,
+        fontSize,
       )}
       value={localValue ?? ""}
       onChange={(e) => {

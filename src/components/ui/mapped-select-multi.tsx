@@ -38,6 +38,7 @@ interface SearchMappedMultiSelectProps<T> {
   displayLimit?: number;
   tabIndex?: number;
   required?: boolean;
+  fontSize?: string;
 }
 
 export function SearchMappedMultiSelect<T>({
@@ -57,6 +58,7 @@ export function SearchMappedMultiSelect<T>({
   displayLimit = 1,
   tabIndex,
   required,
+  fontSize,
 }: SearchMappedMultiSelectProps<T>) {
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -164,7 +166,10 @@ export function SearchMappedMultiSelect<T>({
                   {values?.slice(0, displayLimit).map((val) => (
                     <span
                       key={val}
-                      className="max-w-[18ch] truncate rounded border border-foreground/50 px-2 py-0.5 text-sm"
+                      className={cn(
+                        "max-w-[18ch] truncate rounded border border-foreground/50 px-2 py-0.5 text-sm",
+                        fontSize,
+                      )}
                     >
                       {getItemLabel(
                         Object.values(data)
@@ -174,7 +179,12 @@ export function SearchMappedMultiSelect<T>({
                     </span>
                   ))}
                   {values?.length > displayLimit && (
-                    <span className="flex items-center text-sm text-muted-foreground">
+                    <span
+                      className={cn(
+                        "flex items-center text-sm text-muted-foreground",
+                        fontSize,
+                      )}
+                    >
                       +{values?.length - displayLimit} more
                     </span>
                   )}
@@ -319,7 +329,7 @@ export function SearchMappedMultiSelect<T>({
                           onChange(newValues);
                         }}
                         className={cn(
-                          "flex items-center justify-start gap-x-2 hover:cursor-pointer hover:bg-salPink/30 data-[selected='true']:ring-2 data-[selected='true']:ring-salPink",
+                          "flex items-center justify-start gap-x-2 hover:cursor-pointer hover:bg-salPink/30",
                           isSelected && "bg-salYellow",
                           isLimit && "hover:cursor-default",
                           isLimit && !isSelected && "text-foreground/50",

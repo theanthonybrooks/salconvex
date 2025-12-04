@@ -193,7 +193,6 @@ export const AccountSubscribeForm = ({
         <></>
         {isArtist ? (
           <ArtistProfileForm
-            user={user}
             subData={subData}
             onClick={onClick}
             hasUnsavedChanges={hasUnsavedChanges}

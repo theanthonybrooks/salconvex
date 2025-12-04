@@ -622,13 +622,15 @@ export default function Pricing() {
   const subData = usePreloadedQuery(preloadedSubStatus);
   const userData = usePreloadedQuery(preloadedUserData);
   const { user, userPref } = userData ?? {};
+  const {
+    hasActiveSubscription: hasSub,
+    subscription,
+    hadTrial,
+  } = subData ?? {};
   const { fontSize } = userPref ?? {};
   const fontSizePref = getUserFontSizePref(fontSize);
   const baseFontSize = fontSizePref?.body;
   const currency = (userCurrency?.toLowerCase() ?? "usd") as UserCurrenciesType;
-  const hasSub = subData?.hasActiveSubscription;
-  const hadTrial = subData?.hadTrial;
-  const subscription = subData?.subscription;
   const bannedSub = subscription?.banned;
   const subInterval = subscription?.intervalNext ?? subscription?.interval;
 

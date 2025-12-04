@@ -1,7 +1,5 @@
 "use client";
 
-import { User } from "@/types/user";
-
 import { useEffect, useState } from "react";
 import { UpdateArtistSchema, UpdateArtistSchemaValues } from "@/schemas/artist";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -28,27 +26,34 @@ import { Label } from "@/components/ui/label";
 import LogoUploader from "@/components/ui/logo-uploader";
 import { MapboxInputFull } from "@/components/ui/mapbox-search";
 import { SearchMappedMultiSelect } from "@/components/ui/mapped-select-multi";
+import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { autoHttps, formatHandleInput } from "@/helpers/linkFns";
 import { sortedGroupedCountries } from "@/helpers/locationFns";
+import { getUserFontSizePref } from "@/helpers/stylingFns";
 import { cn } from "@/helpers/utilsFns";
 
 import { api } from "~/convex/_generated/api";
-import { useAction, useMutation, useQuery } from "convex/react";
-import { FunctionReturnType } from "convex/server";
+import {
+  useAction,
+  useMutation,
+  usePreloadedQuery,
+  useQuery,
+} from "convex/react";
 
 interface ArtistProfileFormProps {
-  user: User | undefined;
-  subData: FunctionReturnType<
-    typeof api.subscriptions.getUserSubscriptionStatus
-  >;
   type: "initial" | "dashboard";
 }
 
-export const ArtistProfileForm = ({ user, type }: ArtistProfileFormProps) => {
+export const ArtistProfileForm = ({ type }: ArtistProfileFormProps) => {
   const [pending, setPending] = useState(false);
   const [hoverSave, setHoverSave] = useState(false);
-
   const artistData = useQuery(api.artists.artistActions.getArtist, {});
+  const { preloadedUserData } = useConvexPreload();
+  const userData = usePreloadedQuery(preloadedUserData);
+  const { user, userPref } = userData ?? {};
+  const fontSizePref = getUserFontSizePref(userPref?.fontSize);
+  const fontSize = fontSizePref?.body;
+
   const updateArtist = useMutation(
     api.artists.artistActions.updateOrCreateArtist,
   );
@@ -220,7 +225,10 @@ export const ArtistProfileForm = ({ user, type }: ArtistProfileFormProps) => {
                     id="artistName"
                     {...field}
                     placeholder="(if different from your profile name)"
-                    className="w-full rounded border border-foreground/30 p-3 text-base focus:outline-none focus:ring-1 focus:ring-foreground"
+                    className={cn(
+                      "w-full rounded border border-foreground/30 p-3 text-base focus:outline-none focus:ring-1 focus:ring-foreground",
+                    )}
+                    fontSize={fontSize}
                   />
                 </FormControl>
               </FormItem>
@@ -266,6 +274,7 @@ export const ArtistProfileForm = ({ user, type }: ArtistProfileFormProps) => {
                   field={field}
                   placeholder="@username"
                   transform={(val) => formatHandleInput(val, "instagram")}
+                  fontSize={fontSize}
                 />
               </FormControl>
               <FormMessage />
@@ -285,6 +294,8 @@ export const ArtistProfileForm = ({ user, type }: ArtistProfileFormProps) => {
                   field={field}
                   placeholder="yoursite.com"
                   transform={autoHttps}
+                  fontSize={fontSize}
+
                   // onBlur={() => {
                   //   field.onBlur?.();
 
@@ -363,7 +374,8 @@ export const ArtistProfileForm = ({ user, type }: ArtistProfileFormProps) => {
                       "altSpellings",
                     ]}
                     tabIndex={5}
-                    className="h-12 bg-card text-base hover:bg-card"
+                    className={cn("h-12 bg-card text-base hover:bg-card")}
+                    fontSize={fontSize}
                   />
                   {fieldState.error && (
                     <p className="mt-1 text-sm text-red-600">
@@ -392,7 +404,7 @@ export const ArtistProfileForm = ({ user, type }: ArtistProfileFormProps) => {
                   tabIndex={6}
                   placeholder="Place of residence (city, state, country, etc).."
                   className="mb-3 w-full lg:mb-0"
-                  inputClassName="rounded-lg border-foreground "
+                  inputClassName={cn("rounded-lg border-foreground", fontSize)}
                   isArtist={true}
                 />
               )}
@@ -411,7 +423,8 @@ export const ArtistProfileForm = ({ user, type }: ArtistProfileFormProps) => {
           }
           onMouseEnter={handleOnHoverSave}
           onMouseLeave={handleOnHoverSaveEnd}
-          className="mt-4 w-full dark:text-primary-foreground sm:w-auto"
+          className="mt-4 w-full sm:w-auto dark:text-primary-foreground"
+          fontSize={fontSize}
         >
           {pending ? (
             <span className="flex items-center gap-2">

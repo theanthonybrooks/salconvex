@@ -83,14 +83,24 @@ const radioInnerVariants = cva(
 );
 
 export interface InputProps
-  extends React.InputHTMLAttributes<HTMLInputElement>,
+  extends
+    React.InputHTMLAttributes<HTMLInputElement>,
     VariantProps<typeof inputVariants> {
   labelClassName?: string;
+  fontSize?: string;
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
   (
-    { variant, inputHeight, className, labelClassName, type, ...props },
+    {
+      variant,
+      inputHeight,
+      className,
+      labelClassName,
+      fontSize,
+      type,
+      ...props
+    },
     ref,
   ) => {
     const baseClasses =
@@ -106,7 +116,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           <input
             ref={ref}
             type="radio"
-            className={cn("peer", baseClasses, className)}
+            className={cn("peer", baseClasses, className, fontSize)}
             {...props}
           />
           <span className="pointer-events-none absolute left-0 top-0 flex size-6 items-center justify-center rounded-full sm:size-5 peer-checked:[&>*]:scale-100">
@@ -129,6 +139,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           baseClasses,
           className,
           "disabled:border-foreground/50 disabled:opacity-50",
+          fontSize,
         )}
         ref={ref}
         {...props}
