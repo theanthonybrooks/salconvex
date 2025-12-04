@@ -127,7 +127,9 @@ export const ChangeEmailDialog = ({ className }: ChangeEmailDialogProps) => {
     }
   };
   const handleVerifyEmail = async (data: EmailChangeValues) => {
+    let clear = false;
     setPending(true);
+    setSuccess("");
     setError("");
 
     if (!userId || !user) {
@@ -147,6 +149,7 @@ export const ChangeEmailDialog = ({ className }: ChangeEmailDialogProps) => {
           setOpen(false);
         }, 2000);
       } else {
+        clear = result.clear;
         throw new Error(result.message);
       }
     } catch (err: unknown) {
@@ -158,6 +161,7 @@ export const ChangeEmailDialog = ({ className }: ChangeEmailDialogProps) => {
         setError("An unknown error occurred.");
       }
     } finally {
+      if (clear) handleBackStep();
       setPending(false);
     }
   };
@@ -233,14 +237,14 @@ export const ChangeEmailDialog = ({ className }: ChangeEmailDialogProps) => {
             )}
             {step === 2 && (
               <>
-                {success && <FormSuccess message={success} />}
+                {success && !error && <FormSuccess message={success} />}
                 <FormField
                   control={control}
                   name="code"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className={cn("text-right", fontSize)}>
-                        Code
+                        Verification Code
                       </FormLabel>
 
                       <FormControl>

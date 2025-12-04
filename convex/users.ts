@@ -10,6 +10,7 @@ import {
   getAuthUserId,
   invalidateSessions,
 } from "@convex-dev/auth/server";
+import { internal } from "~/convex/_generated/api";
 import { Id } from "~/convex/_generated/dataModel";
 import { scryptCrypto } from "~/convex/auth";
 import { updateOrgOwnerBeforeDelete } from "~/convex/organizer/organizations";
@@ -489,13 +490,14 @@ export const verifyEmail = mutation({
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
     const user = userId ? await ctx.db.get(userId) : null;
-    if (!user) return { success: false, message: "User not found" };
+    if (!user)
+      return { success: false, message: "User not found", clear: true };
     const pendingEmail = await ctx.db
       .query("userEmail")
       .withIndex("by_userId", (q) => q.eq("userId", user._id))
       .first();
     if (!pendingEmail)
-      return { success: false, message: "No pending email found" };
+      return { success: false, message: "No pending email found", clear: true };
     const authAccount = await ctx.db
       .query("authAccounts")
       .withIndex("userIdAndProvider", (q) =>
@@ -507,7 +509,7 @@ export const verifyEmail = mutation({
       .withIndex("by_userId", (q) => q.eq("userId", user._id))
       .first();
     if (!authAccount)
-      return { success: false, message: "No auth account found" };
+      return { success: false, message: "No auth account found", clear: true };
     if (args.code === pendingEmail.otpCode) {
       await ctx.db.patch(user._id, {
         email: pendingEmail.pendingEmail,
@@ -534,10 +536,11 @@ export const verifyEmail = mutation({
       return {
         success: false,
         message: "Incorrect code - check your email for a new code",
+        clear: false,
       };
     }
     await ctx.db.delete(pendingEmail._id);
-    return { success: true, message: "Email verified" };
+    return { success: true, message: "Email verified", clear: true };
   },
 });
 
@@ -875,6 +878,44 @@ export const deleteUnconfirmedUsers = internalMutation({
             ),
           ),
         ),
+      );
+    }
+  },
+});
+
+export const deleteUnverifiedPendingEmails = internalMutation({
+  args: {
+    cursor: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const fifteenMinutesAgo = Date.now() - 15 * 60 * 1000;
+
+    const batch = await ctx.db
+      .query("userEmail")
+      .withIndex("by_creation_time", (q) =>
+        q.lt("_creationTime", fifteenMinutesAgo),
+      )
+      .paginate({
+        cursor: args.cursor ?? null,
+        numItems: 200,
+      });
+
+    await Promise.all(
+      batch.page.map((pendingEmail) =>
+        ctx.db.delete(pendingEmail._id).catch((error) => {
+          console.error(
+            `Failed to delete unverified email: ${pendingEmail.pendingEmail}:`,
+            error,
+          );
+        }),
+      ),
+    );
+
+    if (!batch.isDone) {
+      await ctx.scheduler.runAfter(
+        0,
+        internal.users.deleteUnverifiedPendingEmails,
+        { cursor: batch.continueCursor },
       );
     }
   },

@@ -433,7 +433,7 @@ const userEmailSchema = v.object({
   pendingEmail: v.string(),
   userId: v.id("users"),
   otpCode: v.string(),
-  
+
 });
 
 const userLogSchema = {
@@ -1127,6 +1127,7 @@ export default defineSchema({
     .index("by_email", ["email"]),
 
   userEmail: defineTable(userEmailSchema)
+    
     .index("by_userId", ["userId"])
     .index("by_currentEmail", ["currentEmail"])
     .index("by_pendingEmail", ["pendingEmail"]),

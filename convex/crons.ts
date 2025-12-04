@@ -10,6 +10,15 @@ crons.cron(
 );
 
 crons.cron(
+  "Delete unverified pending emails every 15 min",
+  "*/15 * * * *", // Every 30 minutes
+  internal.users.deleteUnverifiedPendingEmails,
+  {
+    cursor: undefined,
+  },
+);
+
+crons.cron(
   "delete orphaned user passwords every 15 min",
   "*/15 * * * *", // Every 15 minutes
   internal.users.deleteOrphanedUserPw,
