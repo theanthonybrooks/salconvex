@@ -285,7 +285,7 @@ export function AdminDashboardTableWrapper({
           pageType="dashboard"
           collapsedSidebar={isSidebarCollapsed}
           defaultSort={[
-            { id: "posted", desc: true },
+            // { id: "posted", desc: true },
             { id: "plannedDate", desc: false },
           ]}
           pageSize={50}

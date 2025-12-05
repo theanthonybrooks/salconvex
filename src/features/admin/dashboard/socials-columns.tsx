@@ -152,7 +152,45 @@ export const socialColumns: ColumnDef<SocialColumnProps>[] = [
     ),
     cell: ({ row }) => {
       const { plannedDate: value, id: eventId } = row.original;
-      return <AdminSocialTimePicker eventId={eventId} plannedDate={value} />;
+      return (
+        <AdminSocialTimePicker
+          eventId={eventId}
+          plannedDate={value}
+          key={eventId}
+        />
+      );
+    },
+    sortUndefined: false,
+    sortingFn: (rowA, rowB, columnId) => {
+      const statusA = rowA.getValue("posted") as string;
+      const statusB = rowB.getValue("posted") as string;
+
+      const isToPostA = statusA === "toPost";
+      const isToPostB = statusB === "toPost";
+
+      if (isToPostA !== isToPostB) {
+        return isToPostA ? -1 : 1;
+      }
+
+      if (isToPostA && isToPostB) {
+        const dateA = rowA.getValue(columnId) as number | undefined;
+        const dateB = rowB.getValue(columnId) as number | undefined;
+
+        const aUndef = dateA === undefined;
+        const bUndef = dateB === undefined;
+
+        if (aUndef || bUndef) {
+          if (aUndef && bUndef) return 0;
+          return aUndef ? -1 : 1;
+        }
+
+        return dateA - dateB;
+      }
+
+      const postDateA = rowA.getValue("postDate") as number;
+      const postDateB = rowB.getValue("postDate") as number;
+
+      return postDateB - postDateA;
     },
   },
   {
@@ -191,6 +229,7 @@ export const socialColumns: ColumnDef<SocialColumnProps>[] = [
         </>
       );
     },
+    sortUndefined: "last",
   },
 
   {
