@@ -385,7 +385,7 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        {hasValidSub && (
+        {(hasValidSub || isAdmin) && (
           <Card className="lg:col-span-2 min-[1400px]:col-span-3">
             <CardHeader>
               <CardTitle>Latest Updates</CardTitle>
