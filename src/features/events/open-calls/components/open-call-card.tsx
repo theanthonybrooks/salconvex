@@ -370,7 +370,7 @@ const OpenCallCard = ({
 
             <AccordionItem value="AppReqs">
               <AccordionTrigger
-                title="Application Requirements"
+                title="Application Requirements:"
                 fontSize={fontSize}
               />
               <AccordionContent>
@@ -478,7 +478,10 @@ const OpenCallCard = ({
 
             {openCall?.requirements?.otherInfo && (
               <AccordionItem value="AppOther">
-                <AccordionTrigger title="Other info:" fontSize={fontSize} />
+                <AccordionTrigger
+                  title="Production Details:"
+                  fontSize={fontSize}
+                />
                 <AccordionContent>
                   <div className="flex flex-col space-y-3 p-3">
                     <RichTextDisplay
@@ -703,7 +706,7 @@ const OpenCallCard = ({
             className="rounded-lg border-2 bg-white/30 px-4"
           >
             <AccordionTrigger
-              title="Application Requirements"
+              title="Application Requirements:"
               fontSize={fontSize}
             />
             <AccordionContent>
@@ -739,7 +742,7 @@ const OpenCallCard = ({
               className="rounded-lg border-2 bg-white/30 px-4"
             >
               <AccordionTrigger
-                title="Selection Criteria"
+                title="Selection Criteria:"
                 fontSize={fontSize}
               />
               <AccordionContent>
@@ -829,7 +832,10 @@ const OpenCallCard = ({
               value="ApplicationOther"
               className="rounded-lg border-2 bg-white/30 px-4"
             >
-              <AccordionTrigger title="Other info:" fontSize={fontSize} />
+              <AccordionTrigger
+                title="Production Details:"
+                fontSize={fontSize}
+              />
               <AccordionContent>
                 <div className="flex flex-col space-y-3 p-3">
                   <RichTextDisplay
