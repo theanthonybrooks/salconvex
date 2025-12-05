@@ -388,6 +388,8 @@ export default function SettingsPage() {
             "Successfully updated notification preferences!",
           );
         }
+      } else {
+        showToast("success", "Successfully updated notification preferences!");
       }
     } catch (error) {
       let message: string = "An unknown error occurred.";
