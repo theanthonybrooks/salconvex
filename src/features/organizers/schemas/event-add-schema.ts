@@ -340,7 +340,7 @@ export const eventSchema = eventBase.superRefine((data, ctx) => {
     data.dates?.eventFormat &&
     // data.dates?.eventFormat !== "" &&
     data.dates?.eventFormat !== "ongoing" &&
-    data.dates?.prodFormat === undefined
+    !data.dates?.prodFormat
   ) {
     ctx.addIssue({
       code: "custom",

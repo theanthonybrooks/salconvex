@@ -131,7 +131,7 @@ export default function MapComponent({
       case "continent":
         return 3;
       case "full":
-        return 2;
+        return 3;
       default:
         return mapType === "event" ? 6 : 3;
     }

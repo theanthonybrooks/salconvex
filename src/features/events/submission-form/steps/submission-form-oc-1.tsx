@@ -495,7 +495,7 @@ const SubmissionFormOC1 = ({
                         ? "Enter your selection criteria (optional)"
                         : "Please enter your selection criteria (optional)"
                     }
-                    charLimit={1200}
+                    charLimit={2000}
                     inputPreviewContainerClassName={cn(
                       "rounded-lg",
                       errors?.openCall?.selectionCriteria && "invalid-field",
