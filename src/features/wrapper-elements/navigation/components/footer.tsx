@@ -9,6 +9,7 @@ import { footerCRText } from "@/constants/text";
 
 import { useState } from "react";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { NewsletterFormValues, newsletterSignupSchema } from "@/schemas/public";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -32,16 +33,21 @@ import { Separator } from "@/components/ui/separator";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { getUserFontSizePref } from "@/helpers/stylingFns";
 import { cn } from "@/helpers/utilsFns";
+import { showToast } from "@/lib/toast";
 
 import { api } from "~/convex/_generated/api";
 import { useQuery } from "convex-helpers/react/cache";
-import { useAction, useMutation, usePreloadedQuery } from "convex/react";
+import { useMutation, usePreloadedQuery } from "convex/react";
 
 export default function Footer({ className }: { className?: string }) {
+  const pathname = usePathname();
+  const isNewsletterPage = pathname === "/newsletter";
   const { preloadedUserData } = useConvexPreload();
   const userData = usePreloadedQuery(preloadedUserData);
-  const userPref = userData?.userPref;
-  const fontSizePref = getUserFontSizePref(userPref?.fontSize);
+  const { userPref } = userData || {};
+  const { fontSize: userFontSize, notifications } = userPref || {};
+  const newsletterSub = notifications?.newsletter ?? false;
+  const fontSizePref = getUserFontSizePref(userFontSize);
   const fontSize = fontSizePref?.body;
   const form = useForm<NewsletterFormValues>({
     resolver: zodResolver(newsletterSignupSchema),
@@ -77,12 +83,15 @@ export default function Footer({ className }: { className?: string }) {
   const numColumns = Object.keys(links).length;
   const [subAction, setSubAction] = useState("cta");
   const subscription = useQuery(api.subscriptions.getUserSubscription);
-  const updateNotifications = useMutation(api.users.updateUserNotifications);
+  // const updateNotifications = useMutation(api.users.updateUserNotifications);
+  //   await updateNotifications({
+  //       newsletter: true,
+  //     });
   // const subscribeToNewsletter = useMutation(
   //   api.newsletter.subscriber.subscribeToNewsletter,
   // );
-  const subscribeToNewsletter = useAction(
-    api.actions.newsletter.sendNewsletterConfirmation,
+  const subscribeToNewsletter = useMutation(
+    api.newsletter.subscriber.subscribeToNewsletter,
   );
 
   const subStatus = subscription?.status || "none";
@@ -102,33 +111,48 @@ export default function Footer({ className }: { className?: string }) {
         email: data.email,
         firstName: data.firstName,
       });
-      if (result?.status === "too_many_attempts") {
-        toast.error(
-          "You've already subscribed to the newsletter with this email. Please update your notification preferences in the dashboard and check your junk mail folder.",
+      if (result?.status.includes("too_many_attempts")) {
+        showToast(
+          "error",
+          result.status.includes("is_verified")
+            ? "You've already subscribed. Please update your notification preferences in the dashboard."
+            : "You still need to verify your email address. Please check your junk mail folder.",
+          {
+            autoClose: 4000,
+          },
         );
       } else if (result?.status === "already_subscribed") {
-        toast.success("You're already subscribed to the newsletter.");
+        showToast("success", "You're already subscribed to the newsletter.", {
+          autoClose: 4000,
+        });
         setSubAction("subscribed");
       } else if (result?.status === "already_subscribed diff email") {
-        toast.info(
+        showToast(
+          "info",
           "You're already subscribed with a different email. Please update your notification preferences in the dashboard and check your junk mail folder.",
         );
         setSubAction("cta");
       } else if (result?.status === "diff user has email") {
-        toast.error(
+        showToast(
+          "error",
           "This email is already in use. Please use a different email or contact support.",
         );
         setSubAction("cta");
       } else if (result?.status === "unknown_error") {
-        toast.error("An unknown error occurred. Please try again later.");
+        showToast(
+          "error",
+          "An unknown error occurred. Please try again later.",
+        );
         setSubAction("cta");
       } else {
-        toast.success("You're now subscribed to the newsletter!");
+        showToast(
+          "success",
+          "We just sent you a verification email! (Please check your junk mail)",
+          { autoClose: 4000 },
+        );
+
         setSubAction("subscribed");
       }
-      await updateNotifications({
-        newsletter: true,
-      });
     } catch (err: unknown) {
       console.error(err);
       toast.error(
@@ -196,40 +220,37 @@ export default function Footer({ className }: { className?: string }) {
               data-type="newsletter"
               className="mx-auto flex w-full flex-col justify-center sm:px-10"
             >
-              <Form {...form}>
-                <form
-                  onSubmit={handleSubmit(handleSubscribe)}
-                  className="mt-4 flex flex-col gap-4 md:w-full md:max-w-md xl:flex-row"
+              {newsletterSub ? (
+                <Link
+                  href="/newsletter"
+                  className={cn(isNewsletterPage && "pointer-events-none")}
                 >
-                  <div className="flex flex-1 flex-col gap-3">
-                    <FormField
-                      control={form.control}
-                      name="email"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormControl>
-                            <Input
-                              {...field}
-                              type="email"
-                              placeholder="Enter your email"
-                              className="h-11 w-full min-w-64 rounded-lg border-foreground bg-background text-foreground placeholder:text-foreground focus:bg-card"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    {emailValid && emailDirty && (
+                  <Button
+                    variant="salWithShadowHiddenBg"
+                    disabled={isNewsletterPage}
+                  >
+                    {isNewsletterPage
+                      ? "You're already subscribed!"
+                      : "View Newsletter Preferences"}
+                  </Button>
+                </Link>
+              ) : (
+                <Form {...form}>
+                  <form
+                    onSubmit={handleSubmit(handleSubscribe)}
+                    className="mt-4 flex flex-col gap-4 md:w-full md:max-w-md xl:flex-row"
+                  >
+                    <div className="flex flex-1 flex-col gap-3">
                       <FormField
                         control={form.control}
-                        name="firstName"
+                        name="email"
                         render={({ field }) => (
                           <FormItem>
                             <FormControl>
                               <Input
                                 {...field}
-                                type="text"
-                                placeholder="Enter your first name"
+                                type="email"
+                                placeholder="Enter your email"
                                 className="h-11 w-full min-w-64 rounded-lg border-foreground bg-background text-foreground placeholder:text-foreground focus:bg-card"
                               />
                             </FormControl>
@@ -237,35 +258,54 @@ export default function Footer({ className }: { className?: string }) {
                           </FormItem>
                         )}
                       />
-                    )}
-                  </div>
-                  <div className="">
-                    <Button
-                      type="submit"
-                      variant={
-                        isValid
-                          ? "salWithShadowHidden"
-                          : "salWithShadowHiddenBg"
-                      }
-                      className="flex w-full items-center justify-center gap-2 font-bold xl:w-[150px]"
-                      disabled={subAction === "subbing" || !isValid}
-                    >
-                      {subAction === "cta"
-                        ? "Subscribe"
-                        : subAction === "subbing"
-                          ? "Subscribing..."
-                          : "Subscribed"}
-                      {subAction === "cta" ? (
-                        <ArrowRight className="ml-2 size-4" />
-                      ) : subAction === "subbing" ? (
-                        <LoaderCircle className="size-4 animate-spin" />
-                      ) : (
-                        <CheckCircle className="size-4" />
+                      {emailValid && emailDirty && (
+                        <FormField
+                          control={form.control}
+                          name="firstName"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormControl>
+                                <Input
+                                  {...field}
+                                  type="text"
+                                  placeholder="Enter your first name"
+                                  className="h-11 w-full min-w-64 rounded-lg border-foreground bg-background text-foreground placeholder:text-foreground focus:bg-card"
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
                       )}
-                    </Button>
-                  </div>
-                </form>
-              </Form>
+                    </div>
+                    <div className="">
+                      <Button
+                        type="submit"
+                        variant={
+                          isValid
+                            ? "salWithShadowHidden"
+                            : "salWithShadowHiddenBg"
+                        }
+                        className="flex w-full items-center justify-center gap-2 font-bold xl:w-[150px]"
+                        disabled={subAction === "subbing" || !isValid}
+                      >
+                        {subAction === "cta"
+                          ? "Subscribe"
+                          : subAction === "subbing"
+                            ? "Subscribing..."
+                            : "Subscribed"}
+                        {subAction === "cta" ? (
+                          <ArrowRight className="ml-2 size-4" />
+                        ) : subAction === "subbing" ? (
+                          <LoaderCircle className="size-4 animate-spin" />
+                        ) : (
+                          <CheckCircle className="size-4" />
+                        )}
+                      </Button>
+                    </div>
+                  </form>
+                </Form>
+              )}
               <Image
                 src="/newsletter_bubble.png"
                 alt="Newsletter sign up. Sign up to receive updates and news about the Street Art List."

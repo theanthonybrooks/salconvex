@@ -160,22 +160,22 @@ export const compareEnrichedEvents = (
 
       if (hasOpenCall && (!isPast || isRolling)) {
         if (callType === "Fixed") priority = 0;
-        else if (callType === "Unknown") priority = 0;
-        else if (callType === "Rolling") priority = 1;
-        else if (callType === "Email") priority = 2;
-        else priority = 3;
+        else if (callType === "Unknown") priority = 1;
+        else if (callType === "Rolling") priority = 2;
+        else if (callType === "Email") priority = 3;
+        else priority = 4;
       } else if (ocStatus === "coming-soon") {
-        priority = 4;
+        priority = 5;
       } else if (!hasOpenCall && !!callType && isApproved) {
-        priority = 5;
-      } else if (thisWeekPg && isPast) {
-        priority = 5;
-      } else if (eventFormat === "ongoing") {
         priority = 6;
+      } else if (thisWeekPg && isPast) {
+        priority = 6;
+      } else if (eventFormat === "ongoing") {
+        priority = 7;
       } else if (eventFormat === "noEvent") {
-        priority = 8;
+        priority = 9;
       } else {
-        priority = eventFormat ? 7 : Infinity;
+        priority = eventFormat ? 8 : Infinity;
       }
 
       // if (item.name === "asdfasfd ") {

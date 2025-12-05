@@ -23,6 +23,33 @@ function needsLowercase(value: string): boolean {
   return value !== value.toLowerCase();
 }
 
+export const backfillUserPrefNewsletter = migrations.define({
+  table: "newsletter",
+  migrateOne: async (ctx, newsletter) => {
+    await ctx.db.patch(newsletter._id, {
+      verified: false,
+    });
+    const userId = newsletter.userId;
+    if (!userId) return;
+    const userPref = await ctx.db
+      .query("userPreferences")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .first();
+    const newsletterSub = userPref?.notifications?.newsletter;
+    if (!userPref || newsletterSub === true) return;
+    await ctx.db.patch(userPref._id, {
+      notifications: {
+        ...userPref.notifications,
+        newsletter: true,
+      },
+    });
+  },
+});
+
+export const runBNPN = migrations.runner(
+  internal.migrations.backfillUserPrefNewsletter,
+);
+
 export const removeTestNewsletterContacts = migrations.define({
   table: "newsletter",
   migrateOne: async (ctx, newsletter) => {

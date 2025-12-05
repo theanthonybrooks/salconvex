@@ -433,7 +433,6 @@ const userEmailSchema = v.object({
   pendingEmail: v.string(),
   userId: v.id("users"),
   otpCode: v.string(),
-
 });
 
 const userLogSchema = {
@@ -805,6 +804,7 @@ const newsletterSchema = {
   userPlan: v.optional(v.number()),
   timesAttempted: v.number(),
   lastAttempt: v.number(),
+  verified: v.optional(v.boolean()),
   temporary: v.optional(v.boolean()),
 };
 
@@ -1127,7 +1127,6 @@ export default defineSchema({
     .index("by_email", ["email"]),
 
   userEmail: defineTable(userEmailSchema)
-    
     .index("by_userId", ["userId"])
     .index("by_currentEmail", ["currentEmail"])
     .index("by_pendingEmail", ["pendingEmail"]),

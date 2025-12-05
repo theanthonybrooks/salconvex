@@ -142,9 +142,8 @@ export default function SettingsPage() {
   const userPlan = subData?.subPlan ?? 0;
   const minBananaUser = activeSub && userPlan >= 2;
   // const minFatCapUser = activeSub && userPlan >= 3;
-  const signedUpForNewsletter = userPref?.notifications?.newsletter ?? false;
 
-  const newsletterInfo = useQuery(
+  const newsletterData = useQuery(
     api.newsletter.subscriber.getNewsletterStatus,
     userId
       ? {
@@ -152,13 +151,19 @@ export default function SettingsPage() {
         }
       : "skip",
   );
+  const signedUpForNewsletter =
+    (userPref?.notifications?.newsletter && newsletterData?.verified) ?? false;
 
   const sessionCount = useQuery(
     api.users.countSessions,
     userId ? { userId } : "skip",
   );
-  const subscribeToNewsletter = useAction(
-    api.actions.newsletter.sendNewsletterConfirmation,
+
+  const requestVerificationEmail = useMutation(
+    api.newsletter.subscriber.requestVerificationEmail,
+  );
+  const subscribeToNewsletter = useMutation(
+    api.newsletter.subscriber.subscribeToNewsletter,
   );
   const unsubscribeFromNewsletter = useAction(
     api.actions.newsletter.sendNewsletterUpdateConfirmation,
@@ -181,6 +186,8 @@ export default function SettingsPage() {
   // const [selectedLanguage, setLanguage] = useState("en")
 
   const [pending, setPending] = useState(false);
+  const [verificationPending, setVerificationPending] =
+    useState<boolean>(false);
 
   const [uploading, setUploading] = useState(false);
 
@@ -367,15 +374,21 @@ export default function SettingsPage() {
             email: user.email,
             firstName: user.firstName,
           });
+          showToast(
+            "success",
+            "Nearly done! Please check your junk mail folder for the verification email.",
+          );
         } else {
           await unsubscribeFromNewsletter({
             newsletter: false,
             email: user.email,
           });
+          showToast(
+            "success",
+            "Successfully updated notification preferences!",
+          );
         }
       }
-
-      showToast("success", "Successfully updated notification preferences!");
     } catch (error) {
       let message: string = "An unknown error occurred.";
       if (error instanceof ConvexError) {
@@ -396,7 +409,7 @@ export default function SettingsPage() {
     setPending(true);
     try {
       const values = {
-        email: newsletterInfo?.email ?? user?.email ?? "",
+        email: newsletterData?.email ?? user?.email ?? "",
         newsletter: true,
         ...(handlerType === "frequency" && {
           frequency: value as NewsletterFrequency,
@@ -418,6 +431,31 @@ export default function SettingsPage() {
       }
     } finally {
       setPending(false);
+    }
+  };
+
+  const handleRequestVerificationEmail = async () => {
+    if (!newsletterData?.subId) return;
+    try {
+      setVerificationPending(true);
+      const result = await requestVerificationEmail({
+        subId: newsletterData.subId,
+      });
+      if (result.success) {
+        showToast("success", "Verification email sent!");
+      } else {
+        showToast(
+          "error",
+          "An unknown error occurred. Please try again later.",
+        );
+      }
+    } catch (error) {
+      console.error("Failed to request verification email:", error);
+    } finally {
+      setTimeout(() => {
+        setVerificationPending(false);
+      }, 5000);
+      setVerificationPending(false);
     }
   };
 
@@ -886,6 +924,25 @@ export default function SettingsPage() {
                     }
                   />
                 </div>
+                {newsletterData?.verified === false && (
+                  <div
+                    className={cn(
+                      "flex w-full items-center justify-center rounded-lg border-1.5 bg-salYellowLt p-3",
+                    )}
+                  >
+                    {verificationPending ? (
+                      <LoaderCircle className="size-4 animate-spin" />
+                    ) : (
+                      <span
+                        className="active-scale-[0.99] cursor-pointer font-semibold hover:scale-[1.01]"
+                        onClick={handleRequestVerificationEmail}
+                      >
+                        Please verify your email address to receive the
+                        newsletter
+                      </span>
+                    )}
+                  </div>
+                )}
 
                 <Separator />
                 <div className="pointer-events-none flex items-center justify-between gap-4 text-muted-foreground/50">
@@ -955,7 +1012,7 @@ export default function SettingsPage() {
                             : (value as NewsletterType[]),
                         );
                       }}
-                      value={newsletterInfo?.type || ["general"]}
+                      value={newsletterData?.type || ["general"]}
                       placeholder="Select account type(s)"
                       variant="basic"
                       maxCount={2}
@@ -989,7 +1046,7 @@ export default function SettingsPage() {
                           ? { ...opt, disabled: true, premium: true }
                           : opt,
                       )}
-                      value={newsletterInfo?.frequency ?? "monthly"}
+                      value={newsletterData?.frequency ?? "monthly"}
                       onChangeAction={(value) =>
                         handleUpdateNewsletterPrefs(
                           "frequency",

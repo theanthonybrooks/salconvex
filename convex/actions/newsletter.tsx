@@ -22,7 +22,7 @@ import {
   newsletterTypeValidator,
 } from "~/convex/schema";
 import { ConvexError, v } from "convex/values";
-import { action } from "../_generated/server";
+import { action, internalAction } from "../_generated/server";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -77,7 +77,7 @@ export const sendNewsletter = action({
     sender: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const senderName = args.sender ?? "do-not-reply";
+    const senderName = args.sender ?? "no-reply";
     const audienceDocs = await ctx.runQuery(
       api.newsletter.subscriber.getAudience,
       args,
@@ -104,26 +104,141 @@ export const sendNewsletter = action({
   },
 });
 
-export const sendNewsletterConfirmation = action({
+export const sendNewsletterVerificationLink = internalAction({
   args: {
     firstName: v.string(),
     email: v.string(),
+    subId: v.id("newsletter"),
   },
-  async handler(ctx, args) {
-    const { firstName, email } = args;
-    let subId: Id<"newsletter"> | null = null;
-    let status: string = "unknown_error";
+  async handler(_ctx, args) {
+    const { firstName, email, subId } = args;
+    const normalizedFirstName =
+      firstName.slice(0, 1).toUpperCase() + firstName.slice(1);
 
     try {
-      const data = await ctx.runMutation(
-        api.newsletter.subscriber.subscribeToNewsletter,
-        {
-          firstName,
-          email,
-        },
-      );
-      subId = data.subscriptionId ?? null;
-      status = data.status;
+      const htmlContent = html`
+        <!DOCTYPE html>
+        <html lang="en">
+          <head>
+            <meta
+              http-equiv="Content-Type"
+              content="text/html; charset=UTF-8"
+            />
+            <meta
+              name="viewport"
+              content="width=device-width, initial-scale=1.0"
+            />
+            <title>Newsletter Signup Verification</title>
+
+            <link
+              href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&display=swap"
+              rel="stylesheet"
+            />
+            ${newsletterStyling}
+          </head>
+          <body style="margin:0; padding:20px; background-color:#ffe770; ">
+            <table
+              role="presentation"
+              border="0"
+              cellpadding="0"
+              cellspacing="0"
+              width="100%"
+            >
+              <tr>
+                <td align="center">
+                  <table
+                    role="presentation"
+                    border="0"
+                    cellpadding="0"
+                    cellspacing="0"
+                    width="600"
+                    class="container"
+                  >
+                    <tr>
+                      <td
+                        class="content"
+                        style="padding:40px; text-align:center;"
+                      >
+                        <img
+                          src="https://thestreetartlist.com/branding/newsletter/newsletter-logo.png"
+                          alt="The Street Art List"
+                          width="300"
+                          style="display:block; margin:0 auto; padding-bottom:20px;"
+                        />
+                        <p
+                          style="text-transform:uppercase; font-weight:bold; font-size:0.875rem; text-align:start; margin:30px 0"
+                        >
+                          Monthly Newsletter for The Street Art List
+                        </p>
+                        <hr />
+
+                        <p
+                          style="font-size:0.875rem; line-height:2; margin:0 0 20px; text-align:left;  "
+                        >
+                          Hey there, ${normalizedFirstName}. You&apos;re almost
+                          ready to receive the monthly newsletter! Click the
+                          link below to verify your email address.
+                          <br />
+                          <a
+                            href="https://thestreetartlist.com/newsletter/verification?vToken=${subId}"
+                            target="_blank"
+                            style="color:black; text-decoration:none; font-weight:bold;"
+                          >
+                            <h1
+                              style="font-size:1rem; font-weight:bold; margin:36px 0; text-align:center; color:#000000;"
+                            >
+                              Click here to complete verification
+                            </h1></a
+                          >
+                        </p>
+
+                        <hr />
+                        <p style="width:100%; text-align:center;">
+                          Copyright © The Street Art List ${year}. All rights
+                          reserved.
+                        </p>
+                        <p
+                          style="font-size:12px; line-height:1.4; margin:0; text-align:center; font-family:'Space Grotesk', Helvetica, Arial, sans-serif; color:#666666;"
+                        >
+                          You are receiving this email because you or someone
+                          with your email opted in via the newsletter signup
+                          form. If you didn&apos;t sign up, you can safely
+                          ignore this email.
+                        </p>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+          </body>
+        </html>
+      `;
+
+      await resend.emails.send({
+        from: "The Street Art List<no-reply@newsletter.thestreetartlist.com>",
+        to: email,
+        subject: "Newsletter Signup Verification",
+        html: htmlContent,
+      });
+
+      return { success: true };
+    } catch (error) {
+      console.error("Failed to send message:", error);
+      throw new ConvexError("Could not send message. Please try again.");
+    }
+  },
+});
+
+export const sendNewsletterConfirmationEmail = internalAction({
+  args: {
+    email: v.string(),
+    firstName: v.string(),
+    subId: v.id("newsletter"),
+  },
+  async handler(_ctx, args) {
+    try {
+      const { email, firstName, subId } = args;
 
       const htmlContent = html`
         <!DOCTYPE html>
@@ -282,16 +397,14 @@ export const sendNewsletterConfirmation = action({
         </html>
       `;
 
-      if (status === "success") {
-        await resend.emails.send({
-          from: "The Street Art List<do-not-reply@newsletter.thestreetartlist.com>",
-          to: email,
-          subject: "Newsletter Signup Confirmation",
-          html: htmlContent,
-        });
-      }
+      await resend.emails.send({
+        from: "The Street Art List<no-reply@newsletter.thestreetartlist.com>",
+        to: email,
+        subject: "Newsletter Signup Confirmation",
+        html: htmlContent,
+      });
 
-      return { success: true, status };
+      return { success: true };
     } catch (error) {
       console.error("Failed to send message:", error);
       throw new ConvexError("Could not send message. Please try again.");
@@ -447,7 +560,7 @@ export const sendNewsletterUpdateConfirmation = action({
 
       if (canceled) {
         await resend.emails.send({
-          from: "The Street Art List<do-not-reply@newsletter.thestreetartlist.com>",
+          from: "The Street Art List<no-reply@newsletter.thestreetartlist.com>",
           to: email,
           subject: "Newsletter Cancellation Confirmation",
           html: htmlContent,

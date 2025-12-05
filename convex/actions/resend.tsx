@@ -184,11 +184,11 @@ export const sendSupportEmail = action({
       await resend.emails.send({
         from: "The Street Art List <internal@support.thestreetartlist.com>",
         to: "internal@thestreetartlist.com",
-        subject: `${subject} from ${name}`,
+        subject: `Ticket #${ticketNumber} - ${subject} from ${name}`,
         html: adminHtmlContent,
       });
       await resend.emails.send({
-        from: "The Street Art List<do-not-reply@support.thestreetartlist.com>",
+        from: "The Street Art List<no-reply@support.thestreetartlist.com>",
         to: email,
         subject: "Form Submission Copy - Ticket #" + ticketNumber,
         html: userHtmlContent,
