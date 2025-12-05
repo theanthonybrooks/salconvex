@@ -710,8 +710,27 @@ export const RichTextEditor = ({
               </div>
             </BubbleMenu>
             {/* <FloatingElementExample /> */}
-            {/* <FloatingMenu editor={editor}>
-              <div className="flex items-center gap-1 rounded-lg border border-foreground/40 bg-card p-2">
+            {/* <BubbleMenu
+              editor={editor}
+              shouldShow={({ state }) => {
+                const { $from } = state.selection;
+
+                // Case 1 – top-level empty paragraph (default)
+                const isEmptyTopParagraph =
+                  $from.parent.type.name === "paragraph" &&
+                  $from.parent.textContent.length === 0 &&
+                  $from.depth === 1;
+
+                // Case 2 – empty list item paragraph
+                const isInEmptyListItem =
+                  $from.parent.type.name === "paragraph" &&
+                  $from.node($from.depth - 1).type.name === "listItem" &&
+                  $from.parent.textContent.length === 0;
+
+                return isEmptyTopParagraph || isInEmptyListItem;
+              }}
+            >
+              <div className="flex items-center gap-1 rounded-lg border bg-white p-2 shadow">
                 <Button
                   onClick={() => {
                     editor
@@ -733,12 +752,135 @@ export const RichTextEditor = ({
                   Insert Artist Info
                 </Button>
                 <Button
-                  onClick={() => insertLabeledListItem(editor, "Artist Info")}
+                  onClick={() => {
+                    editor
+                      .chain()
+                      .focus()
+                      .insertContent([
+                        {
+                          type: "orderedList",
+                          content: [
+                            {
+                              type: "listItem",
+                              content: [
+                                {
+                                  type: "paragraph",
+                                  content: [
+                                    {
+                                      type: "text",
+                                      text: "Main Item:",
+                                      marks: [{ type: "bold" }],
+                                    },
+                                  ],
+                                },
+                                {
+                                  type: "orderedList",
+                                  content: [
+                                    {
+                                      type: "listItem",
+                                      content: [
+                                        {
+                                          type: "paragraph",
+                                          content: [
+                                            {
+                                              type: "text",
+                                              text: "Sub item 1",
+                                            },
+                                          ],
+                                        },
+                                      ],
+                                    },
+                                    {
+                                      type: "listItem",
+                                      content: [
+                                        {
+                                          type: "paragraph",
+                                          content: [
+                                            {
+                                              type: "text",
+                                              text: "Sub item 2",
+                                            },
+                                          ],
+                                        },
+                                      ],
+                                    },
+                                  ],
+                                },
+                              ],
+                            },
+                          ],
+                        },
+                      ])
+                      .run();
+                  }}
+                >
+                  Insert Artist Info
+                </Button>
+                <Button
+                  onClick={() => {
+                    const isInsideList = editor.isActive("orderedList");
+
+                    const block = {
+                      type: "listItem",
+                      content: [
+                        {
+                          type: "paragraph",
+                          content: [
+                            {
+                              type: "text",
+                              text: "Main Item:",
+                              marks: [{ type: "bold" }],
+                            },
+                          ],
+                        },
+                        {
+                          type: "orderedList",
+                          content: [
+                            {
+                              type: "listItem",
+                              content: [
+                                {
+                                  type: "paragraph",
+                                  content: [
+                                    { type: "text", text: "Sub item 1" },
+                                  ],
+                                },
+                              ],
+                            },
+                            {
+                              type: "listItem",
+                              content: [
+                                {
+                                  type: "paragraph",
+                                  content: [
+                                    { type: "text", text: "Sub item 2" },
+                                  ],
+                                },
+                              ],
+                            },
+                          ],
+                        },
+                      ],
+                    };
+
+                    if (isInsideList) {
+                      editor.chain().focus().insertContent(block).run();
+                    } else {
+                      editor
+                        .chain()
+                        .focus()
+                        .insertContent([
+                          { type: "orderedList", content: [block] },
+                        ])
+                        .run();
+                    }
+                  }}
                 >
                   Insert Artist Info
                 </Button>
               </div>
-            </FloatingMenu> */}
+            </BubbleMenu> */}
+
             {/* <DragContextMenu editor={editor} /> */}
           </>
         )}

@@ -1,5 +1,7 @@
 import { CallType } from "@/types/openCallTypes";
 
+import { html } from "common-tags";
+
 import { CallFormatType } from "~/convex/schema";
 
 export const CALL_TYPE_LABELS: Record<Exclude<CallType, null>, string> = {
@@ -82,3 +84,12 @@ export const openCallLinkFormatOptions = [
 ] as const;
 
 export const openCallStatusValues = ["active", "ended", "coming-soon"] as const;
+
+export const baseProductionDetailsText = html` <ol>
+  <li>Production Overview:</li>
+  <li>Project Goals:</li>
+  <li>Theme:</li>
+  <li>Project Location Description:</li>
+  <li>Wall Specifications/Details - dimensions, surface material, etc:</li>
+  <li>Material Requirements - specifics:</li>
+</ol>`;

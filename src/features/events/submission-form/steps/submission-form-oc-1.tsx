@@ -1,4 +1,5 @@
 import {
+  baseProductionDetailsText,
   eligibilityOptionValues,
   openCallLinkFormatOptions,
 } from "@/constants/openCallConsts";
@@ -739,11 +740,11 @@ const SubmissionFormOC1 = ({
                   {fixedType && !freeCall ? 6 : !fixedType && !freeCall ? 4 : 5}
                   :
                 </p>
-                <p className="lg:text-xs">Other Info</p>
+                <p className="lg:text-xs">Production Details</p>
               </div>
               <div className="mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
                 <Label htmlFor="event.type" className="sr-only">
-                  Other Info
+                  Production Details
                 </Label>
                 <Controller
                   name="openCall.requirements.otherInfo"
@@ -751,7 +752,7 @@ const SubmissionFormOC1 = ({
                   render={({ field }) => (
                     <RichTextEditor
                       readOnly={pastEvent}
-                      value={field.value ?? ""}
+                      value={field.value ?? baseProductionDetailsText}
                       onChange={(val) => {
                         field.onChange(val);
                       }}
@@ -765,7 +766,7 @@ const SubmissionFormOC1 = ({
                       purpose="openCall"
                       asModal={true}
                       title={eventName}
-                      subtitle="Other Info"
+                      subtitle="Production Details"
                       inputPreviewContainerClassName={cn(
                         "rounded-lg",
                         errors?.openCall?.requirements?.otherInfo &&

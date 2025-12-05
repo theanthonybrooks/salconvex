@@ -21,8 +21,7 @@ import { cn } from "@/helpers/utilsFns";
 import { parseShortcutKeys } from "@/lib/tiptap-utils";
 
 export interface MarkButtonProps
-  extends Omit<ButtonProps, "type">,
-    UseMarkConfig {
+  extends Omit<ButtonProps, "type">, UseMarkConfig {
   /**
    * Optional text to display alongside the icon.
    */
@@ -86,8 +85,6 @@ export const MarkButton = forwardRef<HTMLButtonElement, MarkButtonProps>(
       onToggled,
     });
     const IconToRender = icon ?? Icon;
-
-    console.log(isVisible, handleMark, label, canToggle, isActive, Icon);
 
     const handleClick = useCallback(
       (event: React.MouseEvent<HTMLButtonElement>) => {

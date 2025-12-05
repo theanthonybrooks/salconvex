@@ -55,8 +55,8 @@ export async function convertToUSD(
 
 export async function getOcPricing(input: number, currency: string = "USD") {
   const amountInUSD = await convertToUSD(input, currency);
-  console.log(input, currency);
-  console.log(amountInUSD);
+  // console.log(input, currency);
+  // console.log(amountInUSD);
   let tier = {
     name: "base",
     description: "Base Paid Open Call Price",
