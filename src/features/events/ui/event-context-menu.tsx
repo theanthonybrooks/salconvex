@@ -149,8 +149,6 @@ const EventContextMenu = ({
   // const { slug, dates } = event;
   const srcType = src ?? (appLink ? "ocPage" : "theList");
 
-  console.log(appLink, srcType);
-
   const onHide = async () => {
     toggleListAction({ hidden: !isHidden });
     await updateUserLastActive({ email: user?.email ?? "" });
