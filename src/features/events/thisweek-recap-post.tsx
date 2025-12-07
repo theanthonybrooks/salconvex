@@ -4,6 +4,7 @@ import {
   recapCommentHashtags,
 } from "@/constants/socialConsts";
 
+import type { FunctionReturnType } from "convex/server";
 import { SortOptions } from "@/types/thelist";
 
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -23,6 +24,7 @@ import {
   X,
 } from "lucide-react";
 
+import type { Id } from "~/convex/_generated/dataModel";
 import { Button } from "@/components/ui/button";
 import { DebouncedTextarea } from "@/components/ui/debounced-textarea2";
 import {
@@ -45,6 +47,10 @@ interface ThisweekRecapPostProps {
   source: "thisweek" | "nextweek";
 }
 
+type OrgLinks = FunctionReturnType<
+  typeof api.organizer.organizations.getOrgLinks
+>;
+
 const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
   const convex = useConvex();
   const router = useRouter();
@@ -58,6 +64,9 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
   const [altText, setAltText] = useState("");
   const [commentText, setCommentText] = useState("");
   const [excludedIds, setExcludedIds] = useState<string[]>([]);
+  const [orgLinksMap, setOrgLinksMap] = useState<
+    Record<Id<"events">, OrgLinks>
+  >({});
 
   const [dateFontSize, setDateFontSize] = useState<number | null>(null);
 
@@ -190,24 +199,58 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
         setTimeout(() => setCopied(null), 2000);
       });
   };
+  useEffect(() => {
+    const auto = activeResults
+      .filter((e) => (e.tabs?.openCall?.basicInfo?.appFee ?? 0) > 0)
+      .map((e) => e._id);
+
+    setExcludedIds(auto);
+  }, [activeResults]);
 
   useEffect(() => {
-    // if (!filteredResults?.length) return;
+    let cancelled = false;
 
+    const load = async () => {
+      const map: Record<Id<"events">, OrgLinks> = {};
+
+      for (const event of activeResults) {
+        const orgId = event.orgData?.mainOrgId;
+        if (!orgId) continue;
+
+        const links = await convex.query(
+          api.organizer.organizations.getOrgLinks,
+          { orgId },
+        );
+
+        map[event._id] = links;
+      }
+
+      if (!cancelled) {
+        setOrgLinksMap(map);
+      }
+    };
+
+    load();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [activeResults, convex]);
+
+  useEffect(() => {
     const run = async () => {
       const grouped: Record<string, { events: string[]; timeZone: string }> =
         {};
 
       for (const event of filteredResults) {
-        const { name, orgData } = event;
-        const orgLinks = orgData
-          ? await convex.query(api.organizer.organizations.getOrgLinks, {
-              orgId: orgData.mainOrgId,
-            })
-          : null;
-        const dueDate = event.tabs?.openCall?.basicInfo.dates?.ocEnd ?? "";
+        const { name } = event;
+        const { openCall } = event.tabs;
+        const orgLinks = orgLinksMap[event._id];
+
+        const dueDate = openCall?.basicInfo.dates?.ocEnd ?? "";
+
         const timeZone =
-          event?.tabs?.openCall?.basicInfo?.dates?.timezone ?? "Europe/Berlin";
+          openCall?.basicInfo?.dates?.timezone ?? "Europe/Berlin";
         const dateKey = formatInTimeZone(dueDate, timeZone, "yyyy-MM-dd");
 
         const eventIG = sanitizeIGHandle(event.links?.instagram);
@@ -252,7 +295,7 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
       // setCommentText(commentContent);
     };
     run();
-  }, [filteredResults, convex]);
+  }, [filteredResults, orgLinksMap]);
 
   useEffect(() => {
     // if (!filteredResults?.length) return;
