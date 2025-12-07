@@ -10,6 +10,8 @@ interface DebouncedControllerNumInputProps<
   TName extends Path<TFieldValues>,
 > {
   field: ControllerRenderProps<TFieldValues, TName>;
+  value: number | undefined;
+  onChange: (value: number | undefined) => void;
   debounceMs?: number;
   formatNumber?: boolean;
   min?: number;
@@ -26,26 +28,21 @@ export function DebouncedControllerNumInput<
   TName extends Path<TFieldValues>,
 >({
   field,
+  value,
+  onChange,
   debounceMs = 500,
   formatNumber = false,
   min,
   max,
   ...inputProps
 }: DebouncedControllerNumInputProps<TFieldValues, TName>) {
-  // const [localValue, setLocalValue] = useState(() => {
-  //   if (typeof field.value === "number" && formatNumber) {
-  //     return formatWithCommas(field.value);
-  //   }
-  //   return field.value?.toString() ?? "";
-  // });
   const [localValue, setLocalValue] = useState(() => {
-    // console.log(field.value, typeof field.value);
-    if (typeof field.value === "number") {
-      return field.value === 0
+    if (typeof value === "number") {
+      return value === 0
         ? ""
         : formatNumber
-          ? formatWithCommas(field.value)
-          : String(field.value);
+          ? formatWithCommas(value)
+          : String(value);
     }
     return "";
   });
@@ -56,39 +53,32 @@ export function DebouncedControllerNumInput<
         const numeric = parseFloat(val.replace(/,/g, ""));
         if (!isNaN(numeric)) {
           if (typeof min === "number" && numeric < min) {
-            field.onChange(min);
+            onChange(min);
           } else if (typeof max === "number" && numeric > max) {
-            field.onChange(max);
+            onChange(max);
           } else {
-            field.onChange(numeric);
+            onChange(numeric);
           }
         } else {
-          field.onChange(undefined);
+          onChange(undefined);
         }
       }, debounceMs),
-    [debounceMs, min, max, field],
+    [debounceMs, min, max, onChange],
   );
 
   useEffect(() => {
-    // if (typeof field.value === "number") {
-    //   setLocalValue(
-    //     formatNumber ? formatWithCommas(field.value) : String(field.value),
-    //   );
-    // } else {
-    //   setLocalValue("");
-    // }
-    if (typeof field.value === "number") {
+    if (typeof value === "number") {
       setLocalValue(
-        field.value === 0
+        value === 0
           ? ""
           : formatNumber
-            ? formatWithCommas(field.value)
-            : String(field.value),
+            ? formatWithCommas(value)
+            : String(value),
       );
     } else {
       setLocalValue("");
     }
-  }, [field.value, formatNumber]);
+  }, [value, formatNumber]);
 
   useEffect(() => {
     return () => {
@@ -125,7 +115,7 @@ export function DebouncedControllerNumInput<
         if (!isNaN(num)) {
           const display = formatNumber ? formatWithCommas(num) : String(num);
           setLocalValue(display);
-          field.onChange(num);
+          onChange(num);
         }
       }}
       onBlur={(e) => {

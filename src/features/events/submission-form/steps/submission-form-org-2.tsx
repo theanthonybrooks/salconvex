@@ -40,7 +40,7 @@ const SubmissionFormOrgStep2 = ({
         <div
           className={cn(
             "flex w-full grid-cols-[20%_auto] flex-col items-center lg:grid lg:gap-x-4 lg:gap-y-4",
-            "self-start [&_.input-section:not(:first-of-type)]:mt-3 [&_.input-section:not(:first-of-type)]:lg:mt-0 [&_.input-section]:mb-2 [&_.input-section]:flex [&_.input-section]:w-full [&_.input-section]:items-start [&_.input-section]:gap-x-2 [&_.input-section]:lg:mb-0 [&_.input-section]:lg:mt-0 [&_.input-section]:lg:w-28 [&_.input-section]:lg:flex-col",
+            "self-start [&_.input-section:not(:first-of-type)]:mt-8 [&_.input-section:not(:first-of-type)]:lg:mt-0 [&_.input-section]:mb-2 [&_.input-section]:flex [&_.input-section]:w-full [&_.input-section]:items-start [&_.input-section]:gap-x-2 [&_.input-section]:lg:mb-0 [&_.input-section]:lg:mt-0 [&_.input-section]:lg:w-28 [&_.input-section]:lg:flex-col",
             "mx-auto xl:max-w-full xl:py-10 4xl:my-auto",
             "lg:max-w-[60dvw]",
             // "xl:self-center",
@@ -74,7 +74,7 @@ const SubmissionFormOrgStep2 = ({
           <div
             className={cn(
               "flex w-full grid-cols-[20%_auto] flex-col items-center lg:grid lg:gap-x-4 lg:gap-y-4",
-              "self-start lg:items-start [&_.input-section:not(:first-of-type)]:mt-3 [&_.input-section:not(:first-of-type)]:lg:mt-0 [&_.input-section]:mb-2 [&_.input-section]:flex [&_.input-section]:w-full [&_.input-section]:items-start [&_.input-section]:gap-x-2 [&_.input-section]:lg:mb-0 [&_.input-section]:lg:mt-0 [&_.input-section]:lg:w-28 [&_.input-section]:lg:flex-col",
+              "self-start lg:items-start [&_.input-section:not(:first-of-type)]:mt-8 [&_.input-section:not(:first-of-type)]:lg:mt-0 [&_.input-section]:mb-2 [&_.input-section]:flex [&_.input-section]:w-full [&_.input-section]:items-start [&_.input-section]:gap-x-2 [&_.input-section]:lg:mb-0 [&_.input-section]:lg:mt-0 [&_.input-section]:lg:w-28 [&_.input-section]:lg:flex-col",
               "mx-auto xl:max-w-full xl:py-10 4xl:my-auto", // "xl:self-center",
               "lg:max-w-[60dvw]",
             )}
@@ -161,7 +161,7 @@ const SubmissionFormOrgStep2 = ({
                     field={field}
                     maxLength={250}
                     className="max-h-30 min-h-12"
-                    placeholder="Short blurb about your organization... Limit 250 characters"
+                    placeholder="Short blurb about your organization used for previews and social media posts... Limit 250 characters"
                   />
                 )}
               />
@@ -184,7 +184,7 @@ const SubmissionFormOrgStep2 = ({
                     tabIndex={0}
                     value={field.value ?? ""}
                     onChange={field.onChange}
-                    placeholder="Add any info about your organization... "
+                    placeholder="Add full details about your organization... Who you are, what you do, your mission, etc. "
                     charLimit={2000}
                     purpose="organizerAbout"
                     formInputPreview
@@ -195,7 +195,7 @@ const SubmissionFormOrgStep2 = ({
               />
               <span className="w-full text-center text-xs italic text-muted-foreground">
                 (Formatting is for preview and won&apos;t exactly match the
-                public version)
+                public version. Text will be used for organization page.)
               </span>
             </div>
           </div>

@@ -143,7 +143,7 @@ export const AccountSubscribeForm = ({
           className,
           isArtist && "md:max-w-[max(60rem,32vw)]",
           !isArtist &&
-            "h-dvh md:h-full md:max-w-full xl:max-h-[95vh] xl:max-w-[98vw]",
+            "h-dvh md:h-full md:max-w-full xl:max-h-[95vh] xl:max-w-[min(1500px,95vw)]",
         )}
       >
         <DialogTitle className={cn(!isArtist && "sr-only")}>

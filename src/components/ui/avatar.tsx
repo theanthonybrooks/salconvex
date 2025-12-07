@@ -1,8 +1,10 @@
 "use client";
 
-import * as React from "react";
 import { User } from "@/types/user";
+
+import * as React from "react";
 import * as AvatarPrimitive from "@radix-ui/react-avatar";
+
 import { User as UserIcon } from "lucide-react";
 
 import { cn } from "@/helpers/utilsFns";

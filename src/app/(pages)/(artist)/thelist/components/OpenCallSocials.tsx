@@ -225,7 +225,7 @@ const PostMenu = ({ className, items, loading }: PostMenuProps) => {
         return (
           <button
             key={item.key}
-            className="cursor-pointer rounded bg-card-secondary p-1 ring-1.5 ring-foreground/10 hover:scale-105 hover:ring-2 hover:ring-foreground/25 active:scale-95"
+            className="active:scale-975 cursor-pointer rounded bg-card-secondary p-1 ring-1.5 ring-foreground/10 hover:scale-105 hover:ring-2 hover:ring-foreground/25"
             onClick={item.onClick}
           >
             {actionableItem && loading ? (

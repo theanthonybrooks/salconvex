@@ -13,6 +13,8 @@ import { User } from "@/types/user";
 import { useEffect, useRef, useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 
+import { HiArrowTurnLeftDown } from "react-icons/hi2";
+
 import { MultiSelect } from "@/components/multi-select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DebouncedFormTextarea } from "@/components/ui/debounced-form-textarea";
@@ -180,7 +182,7 @@ const SubmissionFormEventStep1 = ({
 
   const handleCategoryChange = (value: EventCategory) => {
     if (value === "event") {
-      setValue("event.dates.eventFormat", "setDates");
+      setValue("event.dates.eventFormat", "");
       setValue("event.dates.eventDates", [{ start: "", end: "" }]);
       setValue("event.dates.prodFormat", "");
       setValue("event.dates.prodDates", [{ start: "", end: "" }]);
@@ -211,7 +213,7 @@ const SubmissionFormEventStep1 = ({
       <div
         className={cn(
           "flex w-full grid-cols-[20%_auto] flex-col items-center lg:grid lg:gap-x-4 lg:gap-y-4",
-          "self-start [&_.input-section:not(:first-of-type)]:mt-3 [&_.input-section:not(:first-of-type)]:lg:mt-0 [&_.input-section]:mb-2 [&_.input-section]:flex [&_.input-section]:w-full [&_.input-section]:items-start [&_.input-section]:gap-x-2 [&_.input-section]:lg:mb-0 [&_.input-section]:lg:mt-0 [&_.input-section]:lg:w-28 [&_.input-section]:lg:flex-col",
+          "self-start [&_.input-section:not(:first-of-type)]:mt-8 [&_.input-section:not(:first-of-type)]:lg:mt-0 [&_.input-section]:mb-2 [&_.input-section]:flex [&_.input-section]:w-full [&_.input-section]:items-start [&_.input-section]:gap-x-2 [&_.input-section]:lg:mb-0 [&_.input-section]:lg:mt-0 [&_.input-section]:lg:w-28 [&_.input-section]:lg:flex-col",
           "mx-auto xl:max-w-full xl:py-10 4xl:my-auto",
           "lg:max-w-[60dvw]",
 
@@ -365,11 +367,24 @@ const SubmissionFormEventStep1 = ({
             </div>
             {nameValidTrigger && (
               <>
+                <span className="col-start-2 ml-2 hidden items-center gap-2 text-sm italic text-muted-foreground lg:flex">
+                  <HiArrowTurnLeftDown className="size-4 shrink-0" />
+                  <p>
+                    {getEventCategoryLabel(category, true)} Location (if
+                    different from organization)
+                  </p>
+                </span>
                 <div className="input-section">
                   <p className="min-w-max font-bold lg:text-xl">
                     Step {categoryEvent && !eventOnly ? 4 : 3}:{" "}
                   </p>
-                  <p className="lg:text-xs">Location</p>
+                  <span className={cn("flex items-center gap-2")}>
+                    <p className="lg:text-xs">Location</p>
+
+                    <p className="text-sm italic text-muted-foreground lg:hidden">
+                      (if different from organization location)
+                    </p>
+                  </span>
                 </div>
 
                 <div className="mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
@@ -465,7 +480,7 @@ const SubmissionFormEventStep1 = ({
                       />
                     </div>
 
-                    <div className="col-start-2 mx-auto flex w-full flex-col gap-2 lg:min-w-[300px] lg:max-w-md">
+                    <div className="col-start-2 mx-auto mt-5 flex w-full flex-col gap-2 lg:mt-0 lg:min-w-[300px] lg:max-w-md">
                       <Label htmlFor="event.name" className="sr-only">
                         {getEventCategoryLabel(category, true)} About
                       </Label>
@@ -503,7 +518,7 @@ const SubmissionFormEventStep1 = ({
           <div
             className={cn(
               "flex w-full grid-cols-[20%_auto] flex-col items-center lg:grid lg:gap-x-4 lg:gap-y-4",
-              "self-start lg:items-start [&_.input-section:not(:first-of-type)]:mt-3 [&_.input-section:not(:first-of-type)]:lg:mt-0 [&_.input-section]:mb-2 [&_.input-section]:flex [&_.input-section]:w-full [&_.input-section]:items-start [&_.input-section]:gap-x-2 [&_.input-section]:lg:mb-0 [&_.input-section]:lg:mt-0 [&_.input-section]:lg:w-28 [&_.input-section]:lg:flex-col",
+              "self-start lg:items-start [&_.input-section:not(:first-of-type)]:mt-8 [&_.input-section:not(:first-of-type)]:lg:mt-0 [&_.input-section]:mb-2 [&_.input-section]:flex [&_.input-section]:w-full [&_.input-section]:items-start [&_.input-section]:gap-x-2 [&_.input-section]:lg:mb-0 [&_.input-section]:lg:mt-0 [&_.input-section]:lg:w-28 [&_.input-section]:lg:flex-col",
               "mx-auto xl:max-w-full xl:py-10 4xl:my-auto",
               "lg:max-w-[60dvw]",
               // "xl:self-center",

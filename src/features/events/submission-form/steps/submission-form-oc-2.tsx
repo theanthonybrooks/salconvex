@@ -4,7 +4,7 @@ import { siteUrl } from "@/constants/siteInfo";
 import { OpenCallCategoryKey } from "@/types/openCallTypes";
 import { User } from "@/types/user";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { currencies, Currency } from "@/app/data/currencies";
 import FilePondPluginFileValidateSize from "filepond-plugin-file-validate-size";
 import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type";
@@ -47,8 +47,6 @@ interface SubmissionFormOC2Props {
   pastEvent: boolean;
 }
 
-type HasBudgetOptions = "true" | "false" | "";
-
 const SubmissionFormOC2 = ({
   // user,
   isAdmin,
@@ -64,15 +62,7 @@ const SubmissionFormOC2 = ({
   const [priceAlert, setPriceAlert] = useState<string | null>(null);
   const pastEvent = pastEventCheck && !isAdmin;
   const paidCall = formType === 3;
-  const {
-    control,
-    watch,
-    setValue,
-
-    // setError,
-    // getValues,
-    // formState: { errors },
-  } = useFormContext<EventOCFormValues>();
+  const { control, watch, setValue } = useFormContext<EventOCFormValues>();
 
   const currentFormType = watch("event.formType") ?? 0;
   const openCall = watch("openCall");
@@ -84,15 +74,13 @@ const SubmissionFormOC2 = ({
 
   const orgCurrency = organizer?.location?.currency;
   const existingHasBudget = openCall?.compensation?.budget?.hasBudget;
-  const [hasBudget, setHasBudget] = useState<HasBudgetOptions>(
+  const [hasBudget, setHasBudget] = useState<boolean | undefined>(
     typeof existingHasBudget === "boolean"
-      ? (String(existingHasBudget) as "true" | "false")
-      : paidCall
-        ? "true"
-        : "",
+      ? existingHasBudget
+      : (paidCall ?? undefined),
   );
 
-  const showBudgetInputs = hasBudget?.trim() === "true";
+  const showBudgetInputs = hasBudget;
 
   const budgetMin = openCall?.compensation?.budget?.min;
   const budgetMax = openCall?.compensation?.budget?.max;
@@ -101,18 +89,17 @@ const SubmissionFormOC2 = ({
   const budgetUnit = openCall?.compensation?.budget?.unit;
   const validBudgetMin =
     typeof budgetMin === "number" && budgetMin > (paidCall ? 1 : 0);
-  const noBudgetMin = typeof budgetMin === "number" && budgetMin === 0;
-  const hasBudgetMin = hasBudget?.trim() === "true" && validBudgetMin;
-  const noBudget = hasBudget?.trim() === "false";
+  // const noBudgetMin = typeof budgetMin === "number" && budgetMin === 0;
+  const hasBudgetMin = showBudgetInputs && validBudgetMin;
+  const noBudget = hasBudget === false;
   const hasRate =
     typeof budgetRate === "number" && budgetRate > 0 && budgetUnit !== "";
   const allInclusive = openCall?.compensation?.budget?.allInclusive;
   const unknownBudget = openCall?.compensation?.budget?.unknownBudget;
-  const prevBudgetMaxRef = useRef<number | undefined>(undefined);
-  const budgetMaxRef = useRef(budgetMax);
+
   const hasBudgetValues = budgetMin !== 0 || budgetMax !== 0 || allInclusive;
 
-  const setValueRef = useRef(setValue);
+  // const setValueRef = useRef(setValue);
 
   const handleResetBudget = useCallback(() => {
     setValue("openCall.compensation.budget.min", 0);
@@ -120,98 +107,47 @@ const SubmissionFormOC2 = ({
     setValue("openCall.compensation.budget.rate", 0);
   }, [setValue]);
 
-  useEffect(() => {
-    if (!paidCall) return;
-    if (paidCall) {
-      setHasBudget("true");
-    }
-  }, [paidCall, setValue]);
+  // useEffect(() => {
+  //   if (!paidCall) return;
+  //   if (paidCall) {
+  //     setHasBudget(true);
+  //   }
+  // }, [paidCall, setValue]);
 
-  useEffect(() => {
-    const formValue = hasBudget?.trim();
-    const shouldBe = validBudgetMin ? "true" : "";
-    if (!formValue && validBudgetMin) {
-      setHasBudget(shouldBe);
-      setValue("openCall.compensation.budget.max", budgetMin);
-    } else if (!formValue && noBudgetMin) {
-      setHasBudget("false");
-    } else if (formValue === "false" && validBudgetMin) {
-      handleResetBudget();
-    }
-  }, [
-    validBudgetMin,
-    noBudgetMin,
-    setValue,
-    hasBudget,
-    budgetMin,
-    handleResetBudget,
-  ]);
-
-  useEffect(() => {
-    const isValidNumber = Number.isFinite(budgetMax);
-
-    if (
-      budgetMax === prevBudgetMaxRef.current ||
-      (!isValidNumber && typeof budgetMax !== "undefined")
-    ) {
-      return;
-    }
-
-    prevBudgetMaxRef.current = budgetMax;
-    budgetMaxRef.current = budgetMax;
-
-    const timeout = setTimeout(() => {
-      handleCheckSchema();
-    }, 300);
-
-    return () => clearTimeout(timeout);
-  }, [budgetMax, handleCheckSchema]);
-
-  useEffect(() => {
-    setValueRef.current = setValue;
-  }, [setValue]);
+  // useEffect(() => {
+  //   const formValue = hasBudget;
+  //   const shouldBe = validBudgetMin ? true : undefined;
+  //   if (!formValue && validBudgetMin) {
+  //     setHasBudget(shouldBe);
+  //     setValue("openCall.compensation.budget.max", budgetMin);
+  //   } else if (!formValue && noBudgetMin) {
+  //     setHasBudget(false);
+  //   } else if (formValue === false && validBudgetMin) {
+  //     handleResetBudget();
+  //   }
+  // }, [
+  //   validBudgetMin,
+  //   noBudgetMin,
+  //   setValue,
+  //   hasBudget,
+  //   budgetMin,
+  //   handleResetBudget,
+  // ]);
 
   useEffect(() => {
     if (!initialFormType) return;
-    if (initialFormType < currentFormType) {
+    if (initialFormType < currentFormType && hasBudget) {
       setPriceAlert(
-        "Note: Budgets over $1,000 will convert this to a paid call",
+        "Note: Budgets over $1,000 (USD) will convert this to a paid call",
       );
     } else {
       setPriceAlert(null);
     }
-  }, [currentFormType, initialFormType, paidCall]);
-
-  // useEffect(() => {
-  //   if (initialFormType === 3) return;
-  //   if (budgetMax && budgetMax > 1000) {
-  //     setPriceAlert(
-  //       "Note: Budgets over $1,000 (USD) will convert this to a paid call",
-  //     );
-  //   } else {
-  //     setPriceAlert(null);
-  //   }
-  // }, [budgetMax, initialFormType]);
+  }, [currentFormType, initialFormType, paidCall, hasBudget]);
 
   useEffect(() => {
-    const min = budgetMin;
-    const max = budgetMax;
-
-    if (typeof min !== "number") return;
-    if (min <= 0) return;
-    if (typeof max === "number" && max >= min) return;
-
-    const timeout = setTimeout(() => {
-      const setVal = setValueRef.current;
-      setVal("openCall.compensation.budget.max", min);
-    }, 400);
-
-    return () => clearTimeout(timeout);
-  }, [budgetMin, budgetMax]);
-
-  useEffect(() => {
-    if (hasBudget === "true" || !hasBudgetValues) return;
-    if (hasBudget === "false" && hasBudgetValues) {
+    if (showBudgetInputs || !hasBudgetValues) return;
+    if (showBudgetInputs === false && hasBudgetValues) {
       setValue("openCall.compensation.budget.min", 0);
       setValue("openCall.compensation.budget.max", 0);
       setValue("openCall.compensation.budget.rate", 0);
@@ -221,7 +157,7 @@ const SubmissionFormOC2 = ({
         orgCurrency?.code ?? "USD",
       );
     }
-  }, [hasBudgetValues, hasBudget, setValue, orgCurrency]);
+  }, [hasBudgetValues, showBudgetInputs, setValue, orgCurrency]);
 
   // #endregion
 
@@ -241,7 +177,7 @@ const SubmissionFormOC2 = ({
       <div
         className={cn(
           "flex w-full grid-cols-[20%_auto] flex-col items-center lg:grid lg:gap-x-4 lg:gap-y-4",
-          "[&_.input-section:not(:first-of-type)]:mt-3 [&_.input-section:not(:first-of-type)]:lg:mt-0 [&_.input-section]:mb-2 [&_.input-section]:flex [&_.input-section]:w-full [&_.input-section]:items-start [&_.input-section]:gap-x-2 [&_.input-section]:lg:mb-0 [&_.input-section]:lg:mt-0 [&_.input-section]:lg:w-28 [&_.input-section]:lg:flex-col",
+          "[&_.input-section:not(:first-of-type)]:mt-8 [&_.input-section:not(:first-of-type)]:lg:mt-0 [&_.input-section]:mb-2 [&_.input-section]:flex [&_.input-section]:w-full [&_.input-section]:items-start [&_.input-section]:gap-x-2 [&_.input-section]:lg:mb-0 [&_.input-section]:lg:mt-0 [&_.input-section]:lg:w-28 [&_.input-section]:lg:flex-col",
           "mx-auto xl:max-w-full xl:py-10 4xl:my-auto",
           !showBudgetInputs && "lg:gap-y-4 lg:pb-5 xl:pb-5",
           "lg:max-w-[60dvw]",
@@ -273,7 +209,7 @@ const SubmissionFormOC2 = ({
                   <Select
                     onValueChange={(value: "true" | "false") => {
                       field.onChange(value === "true");
-                      setHasBudget(value);
+                      setHasBudget(value === "true");
                     }}
                     value={String(field.value) ?? ""}
                     disabled={pastEvent}
@@ -350,6 +286,13 @@ const SubmissionFormOC2 = ({
                   render={({ field }) => (
                     <DebouncedControllerNumInput
                       field={field}
+                      value={field.value ?? 0}
+                      onChange={(val) => {
+                        field.onChange(val);
+                        if (typeof val !== "number") return;
+                        if (!budgetMax || val > budgetMax)
+                          setValue("openCall.compensation.budget.max", val);
+                      }}
                       formatNumber={true}
                       min={0}
                       disabled={!showBudgetInputs || pastEvent || unknownBudget}
@@ -357,11 +300,11 @@ const SubmissionFormOC2 = ({
                       className={cn(
                         "h-fit border-none !bg-card px-0 py-0 focus:border-none focus:outline-none sm:text-base",
                         !budgetMin &&
-                          hasBudget === "true" &&
+                          showBudgetInputs &&
                           !unknownBudget &&
                           "invalid-field",
                         unknownBudget &&
-                          hasBudget === "true" &&
+                          showBudgetInputs &&
                           "!bg-foreground/15 text-foreground/50 opacity-50",
                         "text-center",
                         // "text-end"
@@ -377,8 +320,8 @@ const SubmissionFormOC2 = ({
                   control={control}
                   render={({ field }) => (
                     <DebouncedControllerNumInput
-                      // min={budgetMin}
-                      // type="number"
+                      value={field.value ?? 0}
+                      onChange={field.onChange}
                       disabled={
                         !showBudgetInputs ||
                         pastEvent ||
@@ -386,21 +329,22 @@ const SubmissionFormOC2 = ({
                         unknownBudget
                       }
                       formatNumber={true}
-                      field={{
-                        ...field,
-                        onChange: (val: string) => {
-                          const num = parseFloat(val);
-                          field.onChange(isNaN(num) ? 0 : num);
-                        },
-                      }}
+                      // field={{
+                      //   ...field,
+                      //   onChange: (val: string) => {
+                      //     const num = parseFloat(val);
+                      //     field.onChange(isNaN(num) ? 0 : num);
+                      //   },
+                      // }}
+                      field={field}
                       // min={budgetMin}
                       debounceMs={1500}
                       placeholder="Maximum "
                       className={cn(
                         "arrowless h-fit border-none !bg-card px-0 py-0 focus:border-none focus:outline-none sm:text-base",
                         "text-center",
-                        ((!budgetMin && hasBudget) || unknownBudget) &&
-                          hasBudget === "true" &&
+                        ((!budgetMin && showBudgetInputs) || unknownBudget) &&
+                          showBudgetInputs &&
                           "!bg-foreground/15 text-foreground/50 opacity-50",
                         // "text-start"
                       )}
@@ -413,7 +357,7 @@ const SubmissionFormOC2 = ({
         </div>
 
         <>
-          {isAdmin && hasBudget === "true" && (
+          {isAdmin && showBudgetInputs && (
             <label
               className={cn(
                 "col-start-2 mx-auto flex cursor-pointer items-center gap-2 py-2",
@@ -447,7 +391,7 @@ const SubmissionFormOC2 = ({
               {priceAlert}
             </span>
           )}
-          {hasBudget === "true" && (
+          {showBudgetInputs && (
             <>
               <div className="input-section">
                 <p className="lg:text-xs">Rate:</p>
@@ -501,6 +445,7 @@ const SubmissionFormOC2 = ({
                             field={field}
                             formatNumber={true}
                             value={field.value ?? 0}
+                            onChange={field.onChange}
                             min={0}
                             disabled={!showBudgetInputs || pastEvent}
                             placeholder="Rate (ex: 30)"
@@ -581,7 +526,6 @@ const SubmissionFormOC2 = ({
                           field.onChange(val === "true")
                         }
                         value={String(field.value) ?? ""}
-                        // value={field.value ? String(field.value) : ""}
                       >
                         <SelectTrigger
                           className={cn(
@@ -689,7 +633,7 @@ const SubmissionFormOC2 = ({
           <div
             className={cn(
               "flex w-full grid-cols-[20%_auto] flex-col items-center lg:grid lg:gap-x-4 lg:gap-y-4",
-              "self-start lg:items-start [&_.input-section:not(:first-of-type)]:mt-3 [&_.input-section:not(:first-of-type)]:lg:mt-0 [&_.input-section]:mb-2 [&_.input-section]:flex [&_.input-section]:w-full [&_.input-section]:items-start [&_.input-section]:gap-x-2 [&_.input-section]:lg:mb-0 [&_.input-section]:lg:mt-0 [&_.input-section]:lg:w-28 [&_.input-section]:lg:flex-col",
+              "self-start lg:items-start [&_.input-section:not(:first-of-type)]:mt-8 [&_.input-section:not(:first-of-type)]:lg:mt-0 [&_.input-section]:mb-2 [&_.input-section]:flex [&_.input-section]:w-full [&_.input-section]:items-start [&_.input-section]:gap-x-2 [&_.input-section]:lg:mb-0 [&_.input-section]:lg:mt-0 [&_.input-section]:lg:w-28 [&_.input-section]:lg:flex-col",
               "mx-auto xl:max-w-full xl:py-10 4xl:my-auto",
               "lg:max-w-[60dvw]",
               !showBudgetInputs && "lg:gap-y-0 lg:pt-0 xl:pt-0",
@@ -732,12 +676,14 @@ const SubmissionFormOC2 = ({
                             render={({ field }) => (
                               <DebouncedControllerNumInput
                                 disabled={pastEvent}
-                                field={{
-                                  ...field,
-                                  onChange: (val) => {
-                                    const num = parseFloat(val);
-                                    field.onChange(isNaN(num) ? true : num);
-                                  },
+                                field={field}
+                                value={
+                                  (typeof field.value === "number"
+                                    ? field.value
+                                    : 0) ?? 0
+                                }
+                                onChange={(val) => {
+                                  field.onChange(val ?? true);
                                 }}
                                 min={0}
                                 formatNumber={true}

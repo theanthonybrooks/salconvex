@@ -153,7 +153,7 @@ export default function HorizontalLinearStepper({
     <StepperContext.Provider value={{ scrollRef: scrollContainerRef }}>
       <div
         className={cn(
-          "flex h-full w-full flex-col pt-8 lg:pb-2 lg:pt-4 xl:max-h-[85dvh]",
+          "flex h-full w-full flex-col pt-8 lg:pb-2 lg:pt-4 xl:max-h-[88dvh]",
           dashboardView ? "max-h-[87dvh] xl:max-h-[87dvh]" : "max-h-[90dvh]",
           className,
         )}
@@ -271,7 +271,7 @@ export default function HorizontalLinearStepper({
 
         {/* Scrollable Content */}
         <div
-          className="scrollable justy mini darkbar my-4 h-full flex-1"
+          className="scrollable justy mini darkbar my-4 h-full flex-1 pb-8"
           ref={scrollContainerRef}
         >
           {children}

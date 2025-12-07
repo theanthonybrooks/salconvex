@@ -101,7 +101,10 @@ export function UserProfile({
           <DropdownMenuTrigger asChild>
             <Button
               variant="ghost"
-              className={cn("relative size-12.5 rounded-full", className)}
+              className={cn(
+                "relative size-12.5 rounded-full hover:scale-[1.025]",
+                className,
+              )}
             >
               <Avatar className={cn(className)}>
                 <AvatarImage

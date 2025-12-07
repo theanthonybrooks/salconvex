@@ -954,7 +954,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
                 primaryContact: orgData.contact?.primaryContact || "",
               },
               blurb: orgData.blurb,
-              about: orgData.about,
+              about: orgData.about ?? orgData.blurb,
               links: orgData.links,
               isComplete: true,
             });
@@ -1458,7 +1458,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
                 ...eventData.location,
               },
               blurb: eventData.blurb,
-              about: eventData.about,
+              about: eventData.about ?? eventData.blurb,
               links: eventLinks,
               otherInfo: eventData.otherInfo || undefined,
               timeLine: eventData.timeLine,

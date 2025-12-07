@@ -132,7 +132,7 @@ export default function TheListNavBar(
       {canGoToTop && (
         <div
           onClick={onGoToTop}
-          className="fixed bottom-7 right-7 z-20 rounded-full border-2 bg-background p-1 hover:scale-110 hover:cursor-pointer active:scale-95"
+          className="active:scale-975 fixed bottom-7 right-7 z-20 rounded-full border-2 bg-background p-1 hover:scale-105 hover:cursor-pointer"
         >
           <ArrowUpIcon className="size-8 sm:size-6" />
         </div>
@@ -229,7 +229,7 @@ export default function TheListNavBar(
                 prefetch={true}
                 className="hidden px-8 font-bold lg:flex"
               >
-                <Button className="h-9 border-2 border-transparent bg-background text-base font-bold text-foreground hover:border-foreground/70 hover:bg-card/20 active:scale-95 sm:text-base">
+                <Button variant="hiddenOutline" className="h-9 sm:text-base">
                   View Pricing
                 </Button>
               </Link>
@@ -261,7 +261,7 @@ export default function TheListNavBar(
           {!isMobile && (
             <div className="flex items-center gap-2">
               <Link href="/submit">
-                <Button className="hidden h-9 border-2 border-transparent bg-background font-semibold text-foreground hover:border-foreground/70 hover:bg-card/20 active:scale-95 sm:text-base lg:inline-flex">
+                <Button variant="hiddenOutline" className="h-9 sm:text-base">
                   Submit
                 </Button>
               </Link>

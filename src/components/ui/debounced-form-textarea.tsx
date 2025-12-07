@@ -73,6 +73,7 @@ export function DebouncedFormTextarea<
         "relative w-full rounded-lg border border-foreground bg-card focus-within:ring-1 focus-within:ring-ring",
         isFocused && "pb-5",
         disabled && "cursor-not-allowed opacity-50",
+        emptyRequired && "invalid-field",
         containerClassName,
       )}
     >
@@ -94,7 +95,6 @@ export function DebouncedFormTextarea<
         placeholder={placeholder}
         className={cn(
           "scrollable justy mini w-full resize-none bg-transparent p-3 text-base placeholder:italic focus:outline-none sm:text-sm",
-          emptyRequired && "invalid-field",
           className,
         )}
       />

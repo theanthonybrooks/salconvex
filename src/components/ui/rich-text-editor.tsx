@@ -632,7 +632,7 @@ export const RichTextEditor = ({
           {asModal && (
             <span
               className={cn(
-                "mr-10 hidden flex-col items-end gap-1 border-foreground/30 pr-4 md:flex",
+                "mr-10 hidden flex-col items-end gap-1 border-foreground/30 pr-4 lg:flex",
                 (subtitle || title) && "border-r-2",
               )}
             >
@@ -1028,7 +1028,7 @@ export const RichTextEditor = ({
         <Dialog open={editorOpen} onOpenChange={handleDialogChange}>
           <DialogContent
             className={cn(
-              "h-dvh w-screen max-w-full bg-card p-0 sm:h-[90dvh] sm:w-[95vw] sm:rounded-lg",
+              "h-dvh w-screen max-w-full bg-card p-0 sm:h-[90dvh] sm:w-[95vw] sm:rounded-lg xl:h-[95dvh] xl:w-[min(1500px,95vw)]",
               "top-0 translate-y-0 sm:top-1/2 sm:-translate-y-1/2",
               isFocused && isMobile && "h-[61svh]",
               dialogClassName,

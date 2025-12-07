@@ -1,10 +1,10 @@
-import { useRouter } from "next/navigation";
 import { EventCategory, SubmissionFormState } from "@/types/eventTypes";
 import { OpenCallState } from "@/types/openCallTypes";
-import { api } from "~/convex/_generated/api";
-import { Id } from "~/convex/_generated/dataModel";
-import { useMutation } from "convex/react";
-import { ConvexError } from "convex/values";
+
+import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
+
+import { FaRegCopy, FaRegFloppyDisk } from "react-icons/fa6";
 import {
   CheckCircle2,
   Circle,
@@ -13,13 +13,16 @@ import {
   LucidePencil,
   Pencil,
 } from "lucide-react";
-import { FaRegCopy, FaRegFloppyDisk } from "react-icons/fa6";
-import { toast } from "react-toastify";
 
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { TooltipSimple } from "@/components/ui/tooltip";
 import { getEventCategoryLabel } from "@/helpers/eventFns";
 import { cn } from "@/helpers/utilsFns";
+
+import { api } from "~/convex/_generated/api";
+import { Id } from "~/convex/_generated/dataModel";
+import { useMutation } from "convex/react";
+import { ConvexError } from "convex/values";
 
 interface EventActionProps {
   eventId: string;
@@ -101,7 +104,7 @@ export const DataTableAdminOrgStateActions = ({
           state === "pending" && "bg-red-100",
           state === "submitted" && "bg-blue-200",
           state === "published" && "bg-green-200",
-          state && clickThrough && "hover:scale-105 active:scale-95",
+          state && clickThrough && "active:scale-975 hover:scale-105",
         )}
       >
         {state ? (

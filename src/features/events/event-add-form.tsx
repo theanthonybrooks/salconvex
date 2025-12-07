@@ -1032,7 +1032,7 @@ export const EventOCForm = ({
                 primaryContact: orgData.contact?.primaryContact || "",
               },
               blurb: orgData.blurb,
-              about: orgData.about,
+              about: orgData.about ?? orgData.blurb,
               links: orgData.links,
               isComplete: true,
             });
@@ -1534,7 +1534,7 @@ export const EventOCForm = ({
                 ...eventData.location,
               },
               blurb: eventData.blurb,
-              about: eventData.about,
+              about: eventData.about ?? eventData.blurb,
               links: eventLinks,
               otherInfo: eventData.otherInfo || undefined,
               timeLine: eventData.timeLine,
@@ -2266,7 +2266,7 @@ export const EventOCForm = ({
               // console.log("submitting:", data);
               onSubmit();
             })}
-            className="flex h-full min-h-96 grow flex-col p-4 xl:mx-auto xl:max-w-[1500px] 3xl:max-w-[2000px]"
+            className="flex h-full grow flex-col p-4 xl:mx-auto xl:max-w-[1500px] 3xl:max-w-[2000px]"
           >
             {/* //------ 1st Step: Org & Event Selection ------ */}
             {activeStep === 0 && (

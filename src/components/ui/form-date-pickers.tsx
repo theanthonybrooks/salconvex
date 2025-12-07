@@ -341,7 +341,7 @@ export const FormDatePicker = <T extends EventOCFormValues>({
         formatValue !== "ongoing" &&
         formatValue !== "sameAsEvent" &&
         formatValue !== "noEvent" && (
-          <div className="mx-auto flex max-h-52 w-full max-w-sm flex-col gap-2 overflow-y-auto lg:min-w-[300px] lg:max-w-md">
+          <div className="mx-auto flex max-h-52 w-full flex-col gap-2 overflow-y-auto lg:min-w-[300px] lg:max-w-md">
             <Label htmlFor="event.dates.eventDates" className="sr-only">
               {type.charAt(0).toUpperCase() + type.slice(1)} Dates
             </Label>
@@ -349,7 +349,6 @@ export const FormDatePicker = <T extends EventOCFormValues>({
             {formatValue === "setDates" && (
               <>
                 {fields.map((field, index) => {
-                  console.log(field);
                   const prevEndDate =
                     index > 0
                       ? (watch(
@@ -470,7 +469,7 @@ export const FormDatePicker = <T extends EventOCFormValues>({
                     type="button"
                     onClick={() => append({ start: "", end: "" })}
                     className={cn(
-                      "text-center text-sm font-medium text-foreground hover:underline",
+                      "my-3 text-center text-sm font-medium text-foreground hover:underline lg:my-0",
                     )}
                   >
                     Add More Dates +

@@ -320,6 +320,7 @@ export const eventSchema = eventBase.superRefine((data, ctx) => {
   }
 
   const datesRequired =
+    data.name.trim().length > 3 &&
     data.dates?.eventFormat !== "noEvent" &&
     data.dates?.eventFormat !== "ongoing" &&
     data.dates?.eventFormat !== "" &&
@@ -637,7 +638,7 @@ export const openCallStep2Schema = z
         path: ["openCall", "compensation", "budget", "max"],
       });
     }
-    if (budgetMin && budgetMax && budgetMin > budgetMax) {
+    if (budgetMin && ((budgetMax && budgetMin > budgetMax) || !budgetMax)) {
       ctx.addIssue({
         code: "custom",
         message: "Budget max must be greater than or equal to min",

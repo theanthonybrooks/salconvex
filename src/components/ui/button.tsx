@@ -31,9 +31,10 @@ const buttonVariants = cva(
         default: `border bg-white text-foreground hover:bg-salYellow/30`,
         destructive: `bg-destructive text-destructive-foreground hover:bg-destructive/90`,
         outline: `border-1.5 border-foreground bg-background hover:bg-white/30`,
+        hiddenOutline: `active:scale-975 border-2 border-transparent bg-background text-base font-semibold text-foreground hover:border-foreground/70 hover:bg-card/20 sm:text-base`,
         secondary: `bg-secondary text-secondary-foreground hover:bg-secondary/80`,
-        ghost: `border border-transparent hover:scale-105 active:scale-95`,
-        ghost2: `hover:scale-105 hover:bg-none hover:text-accent-foreground active:scale-95`,
+        ghost: `border border-transparent hover:scale-105 active:scale-[0.975]`,
+        ghost2: `hover:scale-105 hover:bg-none hover:text-accent-foreground active:scale-[0.975]`,
         link: `link-btn text-primary underline-offset-2 hover:underline`,
         expandIcon: `group relative bg-primary text-primary-foreground hover:bg-primary/90`,
         ringHover: `bg-primary text-primary-foreground transition-all duration-300 hover:bg-primary/90 hover:ring-2 hover:ring-primary/90 hover:ring-offset-2`,
@@ -97,7 +98,8 @@ interface IconRefProps {
 }
 
 export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+  extends
+    React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
   asChild?: boolean;
   fontSize?: string;
@@ -125,7 +127,7 @@ const Button = React.forwardRef<
     const Comp = asChild ? Slot : "button";
     return (
       <Comp
-        className={cn(buttonVariants({ variant, size, className }), fontSize)}
+        className={cn(buttonVariants({ size, variant, className }), fontSize)}
         ref={ref}
         {...props}
       >

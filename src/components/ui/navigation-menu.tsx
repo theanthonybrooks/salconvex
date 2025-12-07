@@ -1,13 +1,15 @@
 import * as React from "react";
 import * as NavigationMenuPrimitive from "@radix-ui/react-navigation-menu";
 import { cva } from "class-variance-authority";
+
 import { FaChevronDown } from "react-icons/fa";
 import { TiArrowSortedDown } from "react-icons/ti";
 
 import { cn } from "@/helpers/utilsFns";
 
-interface NavigationMenuProps
-  extends React.ComponentPropsWithoutRef<typeof NavigationMenuPrimitive.Root> {
+interface NavigationMenuProps extends React.ComponentPropsWithoutRef<
+  typeof NavigationMenuPrimitive.Root
+> {
   align?: "left" | "center" | "right";
   vpClassName?: string;
 }
@@ -64,7 +66,7 @@ const NavigationMenuTrigger = React.forwardRef<
     ref={ref}
     className={cn(
       navigationMenuTriggerStyle(),
-      "group active:scale-95",
+      "group active:scale-[0.975]",
       className,
     )}
     {...props}
@@ -85,10 +87,9 @@ const NavigationMenuTrigger = React.forwardRef<
 ));
 NavigationMenuTrigger.displayName = NavigationMenuPrimitive.Trigger.displayName;
 
-interface NavigationMenuContentProps
-  extends React.ComponentPropsWithoutRef<
-    typeof NavigationMenuPrimitive.Content
-  > {
+interface NavigationMenuContentProps extends React.ComponentPropsWithoutRef<
+  typeof NavigationMenuPrimitive.Content
+> {
   align?: "left" | "center" | "right";
 }
 
@@ -111,10 +112,9 @@ NavigationMenuContent.displayName = NavigationMenuPrimitive.Content.displayName;
 
 const NavigationMenuLink = NavigationMenuPrimitive.Link;
 
-interface NavigationMenuViewportProps
-  extends React.ComponentPropsWithoutRef<
-    typeof NavigationMenuPrimitive.Viewport
-  > {
+interface NavigationMenuViewportProps extends React.ComponentPropsWithoutRef<
+  typeof NavigationMenuPrimitive.Viewport
+> {
   align?: "left" | "center" | "right";
   vpClassName?: string;
 }

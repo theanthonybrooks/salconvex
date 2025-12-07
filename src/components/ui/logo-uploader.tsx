@@ -205,7 +205,7 @@ export default function LogoUploader({
           {!showFullImage && (
             <div
               className={cn(
-                "absolute bottom-0 right-3 flex size-5 translate-x-[45%] cursor-pointer items-center justify-center overflow-hidden rounded-full border-1.5 bg-emerald-500 hover:scale-110 hover:bg-emerald-400 active:scale-95",
+                "active:scale-975 absolute bottom-0 right-3 flex size-5 translate-x-[45%] cursor-pointer items-center justify-center overflow-hidden rounded-full border-1.5 bg-emerald-500 hover:scale-105 hover:bg-emerald-400",
                 disabled &&
                   "cursor-default bg-muted-foreground hover:scale-100 hover:bg-muted-foreground",
               )}

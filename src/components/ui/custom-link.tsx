@@ -9,7 +9,7 @@ import { cva } from "class-variance-authority";
 import { cn } from "@/helpers/utilsFns";
 
 const linkVariants = cva(
-  "text-base transition-colors duration-200 ease-in-out lg:text-sm [&_button]:hover:no-underline [&_button]:active:scale-95",
+  "text-base transition-colors duration-200 ease-in-out lg:text-sm [&_button]:hover:no-underline [&_button]:active:scale-[0.975]",
   {
     variants: {
       variant: {

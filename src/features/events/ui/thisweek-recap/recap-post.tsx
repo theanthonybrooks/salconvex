@@ -31,6 +31,8 @@ const RecapPost = forwardRef<HTMLDivElement, RecapPostProps>((props, ref) => {
     typeof compensation?.budget?.min === "number" &&
     compensation?.budget?.min > 0;
 
+  const callFormat = openCall?.basicInfo?.callFormat;
+
   return (
     <div
       id={id}
@@ -136,6 +138,12 @@ const RecapPost = forwardRef<HTMLDivElement, RecapPostProps>((props, ref) => {
                       compensation?.budget?.allInclusive,
                       // userCurrency !== currency ? userCurrency : undefined
                     )}
+              </span>
+            </li>
+            <li>
+              <span className="flex items-center gap-1 text-lg">
+                <TiMinus className="size-4" />
+                <b>Format:</b> {callFormat}
               </span>
             </li>
           </ul>

@@ -1,9 +1,11 @@
+import { supportEmail } from "@/constants/siteInfo";
+
 import { JSX } from "react";
+
 import { Minus, Plus } from "lucide-react";
 
 import { Link } from "@/components/ui/custom-link";
 import { cn } from "@/helpers/utilsFns";
-import { supportEmail } from "@/constants/siteInfo";
 
 // Define the types
 interface AccordionItem {
@@ -215,7 +217,7 @@ export const openCallFaqs: AccordionSection = {
             <p>
               <b>Open calls</b> are free for Graffiti Jams, Pasteup/Sticker
               Projects, Street Art Festivals, and Mural Projects with a budget
-              less than or equal to $1,000.
+              less than or equal to $1,000 (USD).
             </p>
           </span>
 
@@ -348,8 +350,9 @@ export const pricingFaqs: AccordionSection = {
 
           <p>
             Organizers only pay a one-time fee when they want to list an open
-            call with a budget of $1,000+ and listing events is always free. For
-            a full pricing breakdown, see the Submission Costs section below.
+            call with a budget of $1,000+ (USD) and listing events is always
+            free. For a full pricing breakdown, see the Submission Costs section
+            below.
           </p>
         </>
       ),
@@ -399,7 +402,7 @@ export const pricingFaqs: AccordionSection = {
             <p>
               <b>Open calls</b> are free for Graffiti Jams, Pasteup/Sticker
               Projects, Street Art Festivals, and Mural Projects with a budget
-              less than or equal to $1,000.
+              less than or equal to $1,000 (USD).
             </p>
           </span>
 

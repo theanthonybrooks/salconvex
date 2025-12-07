@@ -275,6 +275,9 @@ export default {
         "70": "280px",
         "75": "300px",
       },
+      scale: {
+        "975": "0.975",
+      },
       fontSize: {
         "2xs": "0.6rem",
         "4h": "2.5rem",
