@@ -193,7 +193,7 @@ export const ApplyRedirectDialog = ({
           }
           size="lg"
           className={cn(
-            "relative z-[1] h-14 w-full cursor-pointer sm:h-11 xl:min-w-[150px]",
+            "relative z-[1] h-14 w-full max-w-[150px] cursor-pointer sm:h-11",
             appStatus !== null &&
               !publicView &&
               "border-foreground/50 bg-background text-foreground/80 hover:shadow-llga",

@@ -100,9 +100,6 @@ const SubmissionFormOC1 = ({
   const appLinkFormat = watch("openCall.requirements.applicationLinkFormat");
   const pastEvent = pastEventCheck && !isAdmin;
   const freeCall = formType === 2;
-  const [hasAppFee, setHasAppFee] = useState<"true" | "false" | "">(
-    isAdmin ? "false" : "",
-  );
 
   const openCall = watch("openCall");
   const organizer = watch("organization");
@@ -128,7 +125,7 @@ const SubmissionFormOC1 = ({
   const isUnknown = ocEligiblityType === "Unknown";
   const eligDetails = openCall?.eligibility?.details ?? "";
   const appDetails = openCall?.requirements?.requirements ?? "";
-  const showAppFeeInput = hasAppFee?.trim() === "true";
+
   const hasRequiredEligDetails =
     eligDetails.trim().length > 25 ||
     isInternational ||
@@ -141,8 +138,12 @@ const SubmissionFormOC1 = ({
 
   const hasAppLink = appLink?.trim().length > 10;
   const appFee = openCall?.basicInfo?.appFee;
-  const validAppFeeAmount = typeof appFee === "number" && appFee > 0;
-  const noAppFeeAmount = typeof appFee === "number" && appFee === 0;
+  const [hasAppFee, setHasAppFee] = useState<boolean | undefined>(
+    Boolean(appFee) ?? (isAdmin ? false : undefined),
+  );
+  const showAppFeeInput = hasAppFee;
+  // const validAppFeeAmount = typeof appFee === "number" && appFee > 0;
+  // const noAppFeeAmount = typeof appFee === "number" && appFee === 0;
   const ocStart = openCall?.basicInfo?.dates?.ocStart;
   const ocEnd = openCall?.basicInfo?.dates?.ocEnd;
   const noEndRequired = callType && !fixedType;
@@ -196,37 +197,37 @@ const SubmissionFormOC1 = ({
     }
   }, [fixedType, setValue, callType]);
 
-  useEffect(() => {
-    const formValue = hasAppFee?.trim();
-    const shouldBe = validAppFeeAmount ? "true" : "";
+  // useEffect(() => {
+  //   const formValue = hasAppFee;
+  //   const shouldBe = validAppFeeAmount;
 
-    if (!formValue && validAppFeeAmount) {
-      setHasAppFee(shouldBe);
-    } else if (!formValue && noAppFeeAmount) {
-      setHasAppFee("false");
-    } else if (formValue === "false" && validAppFeeAmount) {
-      setValue("openCall.basicInfo.appFee", 0);
-    }
-  }, [validAppFeeAmount, noAppFeeAmount, setValue, hasAppFee]);
+  //   if (!formValue && validAppFeeAmount) {
+  //     setHasAppFee(shouldBe);
+  //   } else if (!formValue && noAppFeeAmount) {
+  //     setHasAppFee(false);
+  //   } else if (formValue === false && validAppFeeAmount) {
+  //     setValue("openCall.basicInfo.appFee", 0);
+  //   }
+  // }, [validAppFeeAmount, noAppFeeAmount, setValue, hasAppFee]);
 
   useEffect(() => {
     if (!appLinkFormat)
       setValue("openCall.requirements.applicationLinkFormat", "https://");
   }, [appLinkFormat, setValue]);
 
-  useEffect(() => {
-    if (hasAppFee === "false" && appFee === undefined) {
-      setValue("openCall.basicInfo.appFee", 0);
-    }
-  }, [appFee, hasAppFee, setValue]);
+  // useEffect(() => {
+  //   if (hasAppFee === false && appFee === undefined) {
+  //     setValue("openCall.basicInfo.appFee", 0);
+  //   }
+  // }, [appFee, hasAppFee, setValue]);
 
-  useEffect(() => {
-    if (!freeCall) return;
-    if (freeCall) {
-      // setValue("openCall.eligibility.whom", []);
-      setValue("openCall.basicInfo.appFee", 0);
-    }
-  }, [freeCall, setValue]);
+  // useEffect(() => {
+  //   if (!freeCall) return;
+  //   if (freeCall) {
+  //     // setValue("openCall.eligibility.whom", []);
+  //     setValue("openCall.basicInfo.appFee", 0);
+  //   }
+  // }, [freeCall, setValue]);
 
   useEffect(() => {
     if (!isAdmin) return;
@@ -236,6 +237,8 @@ const SubmissionFormOC1 = ({
 
   // #endregion
   // console.log("Open Call", openCall);
+
+  console.log(hasAppFee, appFee);
 
   return (
     <div
@@ -525,9 +528,11 @@ const SubmissionFormOC1 = ({
               <Select
                 disabled={pastEvent}
                 onValueChange={(value: "true" | "false" | "") => {
-                  setHasAppFee(value);
+                  setHasAppFee(value === "true");
+                  if (value === "false")
+                    setValue("openCall.basicInfo.appFee", 0);
                 }}
-                value={hasAppFee}
+                value={String(hasAppFee)}
               >
                 <SelectTrigger
                   className={cn(

@@ -401,6 +401,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
             )}
             {bothValid && ((!isUserOrg && !isAdmin) || isCreator) && (
               <>
+                {isUserOrg && <p>Open Call Actions</p>}
                 <ApplyButton
                   src="ocPage"
                   user={user}
@@ -427,7 +428,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                   detailCard
                   finalButton
                 />
-                {activeArtist && (
+                {activeArtist && !isUserOrg && (
                   <p
                     className={cn(
                       "mt-2 flex w-full items-center justify-center gap-x-1 text-center text-sm italic text-muted-foreground hover:cursor-pointer",

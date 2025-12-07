@@ -225,6 +225,11 @@ export const ApplyButton = ({
   );
   const finalAppUrl = appUrl?.trim() ? appUrl : "/thelist";
 
+  const showContextMenu = !(
+    ((isUserOrg && !isAdmin) || nonArtistAdmin) &&
+    finalButton
+  );
+
   function runAnalytics(
     action: "bookmark" | "view" | "apply",
     src: AnalyticsSrcType,
@@ -303,7 +308,7 @@ export const ApplyButton = ({
   return (
     <div
       className={cn(
-        "col-span-full mt-4 flex h-14 max-w-[80dvw] items-center justify-center sm:h-11 sm:max-w-75 lg:mt-0 lg:px-4",
+        "col-span-full mt-4 flex h-14 max-w-[80dvw] items-center justify-center sm:h-11 sm:max-w-75 lg:mt-0",
         !detailCard && "lg:w-[250px]",
         detailCard && "lg:mt-2 lg:w-full",
         className,
@@ -322,10 +327,8 @@ export const ApplyButton = ({
           variant="salWithShadowHiddenLeft"
           size="lg"
           className={cn(
-            "relative z-[1] w-full cursor-pointer xl:min-w-[150px]",
-            appStatus !== null &&
-              hasValidSub &&
-              !publicView &&
+            "relative z-[1] w-full cursor-pointer xl:max-w-[150px]",
+            hasApplied &&
               "border-foreground/50 bg-background text-foreground/50 hover:shadow-llga",
             pending && "pointer-events-none",
           )}
@@ -334,15 +337,17 @@ export const ApplyButton = ({
             {pending === "load" ? (
               <LoaderCircle className="size-4 animate-spin" />
             ) : (
-              buttonText
-            )}
-            {appFee > 0 && !publicView && (
-              <CircleDollarSignIcon
-                className={cn(
-                  "size-6 text-red-600",
-                  appStatus !== null && "text-foreground/50",
+              <>
+                {buttonText}
+                {appFee > 0 && !publicView && (
+                  <CircleDollarSignIcon
+                    className={cn(
+                      "size-6 text-red-600",
+                      appStatus !== null && "text-foreground/50",
+                    )}
+                  />
                 )}
-              />
+              </>
             )}
           </span>
         </Button>
@@ -360,7 +365,7 @@ export const ApplyButton = ({
             orgPreview,
             disabled: Boolean(
               (openCall !== "active" && !isAdmin && !orgPreview) ||
-                (noSub && !isAdmin && !orgPreview),
+              (noSub && !isAdmin && !orgPreview),
             ),
             buttonText,
           }}
@@ -382,14 +387,13 @@ export const ApplyButton = ({
         >
           <Button
             disabled={!hasValidSub && !isAdmin}
-            variant="salWithShadowHiddenVert"
-            size="lg"
+            variant={
+              showContextMenu
+                ? "salWithShadowHiddenVert"
+                : "salWithShadowHiddenRight"
+            }
             className={cn(
-              "relative z-[2] h-14 w-fit rounded-none border-x px-4 sm:h-11 sm:px-3 [&_svg]:size-6",
-              appStatus !== null &&
-                !publicView &&
-                hasValidSub &&
-                "border-foreground/50 bg-background text-foreground/50 hover:shadow-vlga",
+              "h-14 w-fit px-4 sm:px-3 [&_svg]:size-6",
               pending ? "pointer-events-none" : "",
             )}
             onClick={onBookmark}
@@ -402,7 +406,7 @@ export const ApplyButton = ({
           </Button>
         </TooltipSimple>
       )}
-      {!orgPreview && hasApplied && hasValidSub && !nonArtistAdmin && (
+      {!orgPreview && hasApplied && isArtist && (
         <Button
           variant="salWithoutShadow"
           size="lg"
@@ -414,11 +418,11 @@ export const ApplyButton = ({
         </Button>
       )}
 
-      {!(nonArtistAdmin && finalButton) && (
+      {showContextMenu && (
         <EventContextMenu
           event={event}
           eventId={id}
-          isUserOrg={isUserOrg}
+          isUserOrg={isUserOrg && !finalButton}
           mainOrgId={mainOrgId}
           openCallId={openCallId}
           openCallState={openCallState}

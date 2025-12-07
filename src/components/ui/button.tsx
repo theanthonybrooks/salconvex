@@ -68,7 +68,11 @@ const buttonVariants = cva(
         ),
         salWithShadowHiddenVert: cn(
           salShadowHiddenBase,
-          "hover:translate-x-0 hover:shadow-vlg",
+          "rounded-none border-x hover:translate-x-0 hover:shadow-vlg",
+        ),
+        salWithShadowHiddenRight: cn(
+          salShadowHiddenBase,
+          "rounded-l-none border-l px-3 active:scale-95",
         ),
       },
       size: {

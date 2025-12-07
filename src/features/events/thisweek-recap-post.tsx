@@ -200,7 +200,6 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
       });
   };
   useEffect(() => {
-    console.log("excluded ids render");
     const auto = activeResults
       .filter((e) => (e.tabs?.openCall?.basicInfo?.appFee ?? 0) > 0)
       .map((e) => e._id);
@@ -209,7 +208,6 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
   }, [activeResults]);
 
   useEffect(() => {
-    console.log("org link render");
     let cancelled = false;
 
     const load = async () => {
@@ -240,7 +238,6 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
   }, [activeResults, convex]);
 
   useEffect(() => {
-    console.log("caption render");
     const run = async () => {
       const grouped: Record<string, { events: string[]; timeZone: string }> =
         {};
@@ -301,7 +298,6 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
   }, [filteredResults, orgLinksMap]);
 
   useEffect(() => {
-    console.log("alt text render");
     // if (!filteredResults?.length) return;
 
     const altText = `Weekly post for ${displayRange}. The links are on The Street Art List website (thestreetartlist.com)`;
@@ -311,11 +307,7 @@ const ThisweekRecapPost = ({ source }: ThisweekRecapPostProps) => {
 
   const mobileScalingClasses =
     "origin-top-left scale-[0.6] sm:scale-100 -mb-[78rem] sm:mb-0";
-  console.log(
-    filteredResults.map((e) => e.name),
-    excludedIds,
-    orgLinksMap,
-  );
+
   return (
     <>
       <div className="mt-10 flex items-center gap-2">

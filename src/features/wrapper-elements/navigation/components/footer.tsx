@@ -228,6 +228,7 @@ export default function Footer({ className }: { className?: string }) {
                   <Button
                     variant="salWithShadowHiddenBg"
                     disabled={isNewsletterPage}
+                    className="w-full sm:w-auto"
                   >
                     {isNewsletterPage
                       ? "You're already subscribed!"

@@ -163,6 +163,7 @@ export const EventOCForm = ({
   const [formType, setFormType] = useState<number>(Number(planKey));
   const eventOnly = formType === 1;
   const paidCall = formType === 3 && !isAdmin;
+
   const currentStep = steps[activeStep];
   const schema = currentStep.schema;
   const form = useForm<z.infer<typeof eventWithOCSchema>>({
@@ -1287,7 +1288,7 @@ export const EventOCForm = ({
               eventId: eventData._id as Id<"events">,
               openCallId,
               basicInfo: {
-                appFee: paidCall ? openCallData.basicInfo.appFee : 0,
+                appFee: openCallData.basicInfo.appFee ?? 0,
                 callFormat: openCallData.basicInfo.callFormat ?? "RFQ",
                 callType: eventData.hasOpenCall ?? "False",
                 dates: {
@@ -1406,7 +1407,7 @@ export const EventOCForm = ({
               eventId: eventData._id as Id<"events">,
               openCallId,
               basicInfo: {
-                appFee: paidCall ? openCallData.basicInfo.appFee : 0,
+                appFee: openCallData.basicInfo.appFee ?? 0,
                 callFormat: openCallData.basicInfo.callFormat ?? "RFQ",
                 callType: eventData.hasOpenCall ?? "False",
                 dates: {
@@ -1557,7 +1558,7 @@ export const EventOCForm = ({
                 eventId: eventData._id as Id<"events">,
                 openCallId,
                 basicInfo: {
-                  appFee: paidCall ? openCallData.basicInfo.appFee : 0,
+                  appFee: openCallData.basicInfo.appFee ?? 0,
                   callFormat: openCallData.basicInfo.callFormat,
                   callType: eventData.hasOpenCall ?? "False",
                   dates: {
@@ -1705,7 +1706,6 @@ export const EventOCForm = ({
       steps.length,
       openCallId,
       projectBudget,
-      paidCall,
       finalStep,
       alreadyPaid,
       formType,

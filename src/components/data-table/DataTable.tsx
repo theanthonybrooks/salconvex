@@ -133,7 +133,6 @@ export function DataTable<TData, TValue>({
 
     searchParams.forEach((value, key) => {
       if (!value) return;
-      console.log(key, value);
       if (!validColumnIds.includes(key)) return;
 
       const values = value

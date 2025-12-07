@@ -130,6 +130,7 @@ const EventContextMenu = ({
   const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
   // const userPref = userData?.userPref ?? null;
   // const fontSize = userPref?.fontSize === "large" ? "text-base" : "sm:text-sm";
+  // const isCreator = user?.role?.includes("creator");
   const isAdmin = user?.role?.includes("admin");
   const isArtist = user?.accountType?.includes("artist");
 
@@ -147,6 +148,8 @@ const EventContextMenu = ({
   const hasApplied = appStatus !== null;
   // const { slug, dates } = event;
   const srcType = src ?? (appLink ? "ocPage" : "theList");
+
+  console.log(appLink, srcType);
 
   const onHide = async () => {
     toggleListAction({ hidden: !isHidden });
@@ -215,10 +218,9 @@ const EventContextMenu = ({
         <DropdownMenuTrigger asChild>
           {buttonTrigger ? (
             <Button
-              variant="salWithShadowHidden"
-              size="lg"
+              variant="salWithShadowHiddenRight"
               className={cn(
-                "relative z-[1] h-14 w-fit rounded-l-none border-l px-3 active:scale-95 sm:h-11 sm:px-3 [&_svg]:size-6",
+                "h-14 w-fit px-3",
 
                 appStatus !== null &&
                   !nonAdminPublicView &&
@@ -279,6 +281,7 @@ const EventContextMenu = ({
               >
                 <Ellipsis className="size-4" /> More
               </DropdownMenuSubTrigger>
+
               <DropdownMenuPortal>
                 <DropdownMenuSubContent className={cn("p-2")}>
                   {eventId && (
@@ -309,6 +312,12 @@ const EventContextMenu = ({
         {hasValidSub && (!isUserOrg || (isAdmin && !reviewMode)) && (
           <>
             <DropdownMenuGroup>
+              {hasValidSub && isUserOrg && (
+                <>
+                  <DropdownMenuLabel>Artist</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                </>
+              )}
               {/* Artist section: */}
 
               <DropdownMenuItem onClick={onHide}>
