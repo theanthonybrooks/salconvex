@@ -50,35 +50,6 @@ export const runBNPN = migrations.runner(
   internal.migrations.backfillUserPrefNewsletter,
 );
 
-export const removeTestNewsletterContacts = migrations.define({
-  table: "newsletter",
-  migrateOne: async (ctx, newsletter) => {
-    if (newsletter.temporary) {
-      await ctx.db.delete(newsletter._id);
-    }
-  },
-});
-
-export const runRNNC = migrations.runner(
-  internal.migrations.removeTestNewsletterContacts,
-);
-// export const backfillNewsletterUserId = migrations.define({
-//   table: "newsletter",
-//   migrateOne: async (ctx, newsletter) => {
-//     const user = await ctx.db
-//       .query("users")
-//       .withIndex("email", (q) => q.eq("email", newsletter.email))
-//       .first();
-//     if (!user) return;
-
-//     await ctx.db.patch(newsletter._id, { userId: user._id });
-//   },
-// });
-
-// export const runBNUI = migrations.runner(
-//   internal.migrations.backfillNewsletterUserId,
-// );
-
 export const removeCurrencyFromUserPrefsWithoutSubs = migrations.define({
   table: "userPreferences",
   migrateOne: async (ctx, userPref) => {

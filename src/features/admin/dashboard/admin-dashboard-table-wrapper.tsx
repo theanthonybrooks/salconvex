@@ -47,7 +47,6 @@ export function AdminDashboardTableWrapper({
   const isAdmin = userRole?.includes("admin") ?? false;
 
   const allEventsData = usePreloadedQuery(preloadedEventData);
-  // const subEventsData = usePreloadedQuery(preloadedSubmissionData);
 
   const eventsData = allEventsData ?? [];
   const adminActions = {

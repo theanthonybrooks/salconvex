@@ -1,15 +1,13 @@
 "use client";
 
 import { createContext, ReactNode, useContext } from "react";
+
 import { api } from "~/convex/_generated/api";
 import { Preloaded } from "convex/react";
 
 // Define the shape of the context
 type AdminPreloadContextType = {
   preloadedEventData: Preloaded<typeof api.events.event.getAllEvents>;
-  preloadedSubmissionData: Preloaded<
-    typeof api.events.event.getSubmittedEvents
-  >;
 };
 
 // Create the context with an explicit null default
@@ -24,12 +22,9 @@ type AdminPreloadContextProviderProps = AdminPreloadContextType & {
 export function AdminPreloadContextProvider({
   children,
   preloadedEventData,
-  preloadedSubmissionData,
 }: AdminPreloadContextProviderProps) {
   return (
-    <AdminPreloadContext.Provider
-      value={{ preloadedEventData, preloadedSubmissionData }}
-    >
+    <AdminPreloadContext.Provider value={{ preloadedEventData }}>
       {children}
     </AdminPreloadContext.Provider>
   );

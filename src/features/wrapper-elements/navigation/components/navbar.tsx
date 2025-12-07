@@ -233,7 +233,7 @@ export default function NavBar(
           // (isMobile || !homePage) && "bg-background",
         )}
       >
-        <div className="relative mx-auto flex h-full w-screen items-center justify-between px-8 lg:grid lg:grid-cols-[300px_auto_200px]">
+        <div className="relative mx-auto flex h-full w-screen items-center justify-between px-8 lg:grid lg:grid-cols-[300px_auto_auto]">
           {/* Mobile Logo and Navigation */}
           <motion.div
             initial={{ boxShadow: "none", height: 90, width: 90 }}

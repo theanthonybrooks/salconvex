@@ -1,10 +1,11 @@
 import { ReactNode } from "react";
 import { redirect } from "next/navigation";
+
+import { AdminPreloadContextProvider } from "@/features/admin/admin-preload-context";
+
 import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
 import { api } from "~/convex/_generated/api";
 import { fetchQuery, preloadQuery } from "convex/nextjs";
-
-import { AdminPreloadContextProvider } from "@/features/admin/admin-preload-context";
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -44,29 +45,8 @@ export default async function DashboardLayout({
     { token },
   );
 
-  const preloadedSubmissionData = await preloadQuery(
-    api.events.event.getSubmittedEvents,
-    {},
-    { token },
-  );
-  // const preloadedSubmissionData = isAdmin ? await preloadQuery(
-  //   api.events.event.getSubmittedEvents,
-  //   {},
-  //   { token },
-  // ) : null;
-
-  // const userSub = subStatus?.subStatus;
-  // const userType = user?.user?.accountType;
-
-  // if (subStatus?.subStatus === "canceled") {
-  //   redirect("/pricing#plans")
-  // }
-
   return (
-    <AdminPreloadContextProvider
-      preloadedEventData={preloadedEventData}
-      preloadedSubmissionData={preloadedSubmissionData}
-    >
+    <AdminPreloadContextProvider preloadedEventData={preloadedEventData}>
       {children}
     </AdminPreloadContextProvider>
   );

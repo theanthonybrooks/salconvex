@@ -805,7 +805,6 @@ const newsletterSchema = {
   timesAttempted: v.number(),
   lastAttempt: v.number(),
   verified: v.optional(v.boolean()),
-  temporary: v.optional(v.boolean()),
 };
 
 const supportSchema = {
