@@ -209,7 +209,7 @@ export default function Home() {
                 </CarouselItem> */}
                 <CarouselItem className="relative w-full bg-transparent">
                   <Image
-                    src="/artist-highlight/nov25/oldhues-25.jpg"
+                    src="/artist-highlight/nov25/oldhues-35.jpg"
                     alt="The Street Art List - Megan Oldhues @oldhues"
                     loading="eager"
                     width={1920}
@@ -227,10 +227,9 @@ export default function Home() {
                     className="h-full w-full object-cover object-[50%_66%] [@media(max-height:620px)]:object-[50%_30%]"
                   />
                 </CarouselItem>
-
                 <CarouselItem className="relative w-full bg-transparent">
                   <Image
-                    src="/artist-highlight/nov25/oldhues-35.jpg"
+                    src="/artist-highlight/nov25/oldhues-25.jpg"
                     alt="The Street Art List - Megan Oldhues @oldhues"
                     loading="eager"
                     width={1920}
@@ -281,9 +280,9 @@ export default function Home() {
                       <i className={cn("text-base")}>
                         {currentSlide === 0
                           ? "Fireside (2025)"
-                          : currentSlide === 1 || currentSlide === 2
+                          : currentSlide === 2 || currentSlide === 3
                             ? "In Bloom (2023)"
-                            : currentSlide === 3
+                            : currentSlide === 1
                               ? "Mess Mess Mess (2024)"
                               : "Hua Sheng Supermarket (2023)"}
                       </i>
@@ -382,7 +381,7 @@ export default function Home() {
               "absolute bottom-5 left-5 z-10 hidden origin-bottom-left select-none flex-col items-start gap-1 font-tanker lowercase tracking-wide text-card transition-transform duration-700 ease-in-out [text-shadow:0_0_15px_rgba(0,0,0,1)] sm:left-7 sm:flex",
 
               currentSlide === 1
-                ? "sm:scale-[1.2] lg:scale-[1.45] 2xl:scale-[2]"
+                ? "sm:scale-[1.2] lg:scale-100"
                 : "scale-[.6] lg:scale-100",
             )}
             style={{
