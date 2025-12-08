@@ -650,11 +650,11 @@ export const getUserOrganizations = query({
       // return all.filter(filterFn);
       const allOrgs =
         trimmedQuery === ""
-          ? await ctx.db.query("organizations").order("asc").collect()
+          ? await ctx.db.query("organizations").order("asc").take(50)
           : await ctx.db
               .query("organizations")
               .withSearchIndex("search_by_slug", (q) => q.search("slug", slug))
-              .collect();
+              .take(40);
       const filteredOrgs =
         args.query.trim().length > 0
           ? allOrgs.filter((org) =>
@@ -668,7 +668,7 @@ export const getUserOrganizations = query({
           .withSearchIndex("search_by_name", (q) =>
             q.search("name", args.query),
           )
-          .collect();
+          .take(30);
 
         const filteredEvents = events.filter((event) =>
           event.name.toLowerCase().includes(args.query?.toLowerCase()),
@@ -704,11 +704,11 @@ export const getUserOrganizations = query({
               .query("organizations")
               .withIndex("by_ownerId", (q) => q.eq("ownerId", userId))
               .order("asc")
-              .collect()
+              .take(50)
           : await ctx.db
               .query("organizations")
               .withSearchIndex("search_by_slug", (q) => q.search("slug", slug))
-              .collect();
+              .take(30);
 
       const filteredResults = orgs.filter(
         (org) =>

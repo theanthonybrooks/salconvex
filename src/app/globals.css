@@ -1510,8 +1510,9 @@ div:has(> div.react-datepicker__input-container) {
   .rich-text {
     & ol,
     ul {
-      &:not([data-type="taskList"]) {
-        list-style-position: inside;
+      li > p {
+        /* list-style-position: inside; */
+        display: inline;
       }
     }
   }
@@ -1566,8 +1567,6 @@ div:has(> div.react-datepicker__input-container) {
   padding: 0.25rem 0.5rem;
   border-radius: 0.25rem; */
 }
-
-
 
 .editor-wrapper {
   display: flex;

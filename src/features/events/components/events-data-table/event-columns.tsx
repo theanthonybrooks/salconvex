@@ -21,6 +21,7 @@ import {
 import {
   ApproveEvent,
   ArchiveEvent,
+  ChangeEventOwner,
   CopyEventId,
   DeleteEvent,
   DuplicateEvent,
@@ -481,6 +482,13 @@ export const getEventColumns = <T extends Event>(
                             category={eventCategory}
                           />
                           {isDashboard && <RenameEventDialog event={event} />}
+                          {isAdmin && (
+                            <ChangeEventOwner
+                              eventId={event._id}
+                              orgId={event.mainOrgId}
+                              ocId={event.openCallId ?? undefined}
+                            />
+                          )}
                           {((state === "draft" && neitherApproved) ||
                             isAdmin) && (
                             <DeleteEvent

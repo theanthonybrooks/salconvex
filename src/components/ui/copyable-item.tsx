@@ -42,7 +42,7 @@ export const CopyableItem = ({
     });
   };
   return (
-    <TooltipSimple content="Click to copy" side={side}>
+    <TooltipSimple content="Click to copy" side={side} className="z-top">
       <div
         onClick={() => handleCopy()}
         className={cn(

@@ -116,7 +116,7 @@ export const TooltipSimple = ({
   return (
     <TooltipProvider delayDuration={disabled ? 0 : delayDuration}>
       {/* note-to-self:for testing */}
-      {/* <Tooltip open={true}> */}
+      {/* <Tooltip open> */}
       <Tooltip open={disabled ? false : undefined}>
         <TooltipTrigger asChild>{children}</TooltipTrigger>
 
@@ -126,13 +126,7 @@ export const TooltipSimple = ({
             sideOffset={sideOffsetValue}
             align={align}
             alignOffset={alignOffset}
-            className={cn(
-              "group z-50 overflow-hidden rounded-md border-1.5 bg-white px-3 py-1.5 text-xs text-black",
-              "opacity-0 transition-opacity duration-200",
-              "data-[state=closed]:opacity-0 data-[state=delayed-open]:opacity-100",
-              "pointer-events-none",
-              className,
-            )}
+            className={cn("pointer-events-none", className)}
             withArrow={showArrow}
             {...props}
           >

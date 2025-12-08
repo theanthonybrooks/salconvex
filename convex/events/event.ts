@@ -1730,3 +1730,42 @@ export const deleteMultipleEvents = mutation({
   },
 });
 
+export const changeOrgOwner = mutation({
+  args: {
+    eventId: v.id("events"),
+    newOrgId: v.id("organizations"),
+    openCallId: v.optional(v.id("openCalls")),
+  },
+  handler: async (ctx, args) => {
+    const { eventId, newOrgId, openCallId } = args;
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+
+    const user = await ctx.db.get(userId);
+    const isAdmin = user?.role?.includes("admin");
+    if (!isAdmin) throw new Error("You don't have permission to change org");
+
+    const event = await ctx.db.get(eventId);
+    if (!event) return null;
+
+    const openCall = openCallId ? await ctx.db.get(openCallId) : null;
+
+    await ctx.db.patch(event._id, {
+      mainOrgId: newOrgId,
+      organizerId: [newOrgId],
+      lastEditedAt: Date.now(),
+      lastEditedBy: userId,
+    });
+    if (openCall) {
+      await ctx.db.patch(openCall._id, {
+        mainOrgId: newOrgId,
+        lastUpdatedAt: Date.now(),
+        lastUpdatedBy: userId,
+      });
+    }
+    await ctx.runMutation(internal.events.eventLookup.addUpdateEventLookup, {
+      eventId: event._id,
+      openCallId: openCallId,
+    });
+  },
+});

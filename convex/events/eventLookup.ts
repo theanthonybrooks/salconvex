@@ -50,7 +50,7 @@ export const addUpdateEventLookup = internalMutation({
     if (!validEvent) return null;
 
     const eventData = {
-      eventId: eventId,
+      eventId,
       mainOrgId: event.mainOrgId,
       orgName: org?.name,
       orgSlug: org?.slug,

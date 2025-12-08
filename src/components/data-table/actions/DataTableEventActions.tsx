@@ -1,24 +1,40 @@
 import { EventCategory, SubmissionFormState } from "@/types/eventTypes";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "react-toastify";
 
 import { FaRegCopy, FaRegTrashCan } from "react-icons/fa6";
 import {
   Eye,
+  IdCard,
   Image as ImageIcon,
+  LoaderCircle,
   LucideFolderCheck,
   LucideFolderClock,
   LucideFolderInput,
 } from "lucide-react";
 
+import type { Doc } from "~/convex/_generated/dataModel";
+import { Button } from "@/components/ui/button";
 import { useConfirmAction } from "@/components/ui/confirmation-dialog-context";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import { SearchMappedSelect } from "@/components/ui/mapped-select";
 import { getEventCategoryLabel } from "@/helpers/eventFns";
+import { cn } from "@/helpers/utilsFns";
+import { showToast } from "@/lib/toast";
 
 import { api } from "~/convex/_generated/api";
 import { Id } from "~/convex/_generated/dataModel";
+import { useQuery } from "convex-helpers/react/cache/hooks";
 import { useMutation } from "convex/react";
+import { ConvexError } from "convex/values";
 
 export interface EventActionProps {
   eventId: Id<"events">;
@@ -48,6 +64,11 @@ interface ToEventActionProps extends BaseEventActionProps {
   hasOpenCall: boolean;
   category: EventCategory;
   general?: boolean;
+}
+
+interface ChangeEventOwnerProps extends EventActionProps {
+  ocId?: Id<"openCalls">;
+  orgId: Id<"organizations">;
 }
 
 export const GoToEvent = ({
@@ -233,3 +254,133 @@ export const CopyEventId = ({ eventId, displayText }: CopyActionProps) => {
     </span>
   );
 };
+
+export function ChangeEventOwner({
+  eventId,
+  ocId,
+  orgId,
+}: ChangeEventOwnerProps) {
+  const [open, setOpen] = useState(false);
+  const [pending, setPending] = useState(false);
+  const [mainOrgId, setMainOrgId] = useState<Id<"organizations">>(orgId);
+
+  // const inputRef = useRef<HTMLInputElement>(null);
+  const changeOrgOwner = useMutation(api.events.event.changeOrgOwner);
+  const MainOrgInfo = useQuery(api.organizer.organizations.getOrgById, {
+    orgId,
+  });
+  const userOrgResults = useQuery(
+    api.organizer.organizations.getUserOrganizations,
+    { query: "" },
+  );
+  const { data: userOrgData } = userOrgResults ?? {};
+  const userOrgs = useMemo(() => userOrgData ?? [], [userOrgData]);
+  const orgData = {
+    "": [...userOrgs],
+  };
+  const noOrgs = userOrgs.length === 0;
+
+  const handleSave = async () => {
+    if (mainOrgId === orgId) {
+      setOpen(false);
+      return;
+    }
+    try {
+      setPending(true);
+      await changeOrgOwner({
+        eventId,
+        newOrgId: mainOrgId,
+        openCallId: ocId,
+      });
+      // await updateName({ eventId: event._id, name: trimmed });
+      showToast("success", "Organization updated!");
+      setOpen(false);
+    } catch (error) {
+      if (error instanceof ConvexError) {
+        showToast("error", error.data ?? "Failed to update organization.");
+      } else {
+        showToast("error", "Unexpected error.");
+      }
+    } finally {
+      setPending(false);
+    }
+  };
+
+  return (
+    <>
+      <DropdownMenuItem
+        onSelect={(e) => {
+          e.preventDefault();
+          setOpen(true);
+        }}
+      >
+        <IdCard className="size-4" />
+        Change Org
+      </DropdownMenuItem>
+
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent zIndex="z-top">
+          <DialogHeader>
+            <DialogTitle>Change Owner Organization</DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-3">
+            <p>Current Owner: {MainOrgInfo?.name}</p>
+            <p>New Owner:{mainOrgId}</p>
+
+            <SearchMappedSelect<Doc<"organizations">>
+              value={mainOrgId ?? ""}
+              disabled={noOrgs}
+              data={orgData}
+              getItemLabel={(org) => <span>{org.name}</span>}
+              getItemValue={(org) => org._id}
+              onChange={(val) => setMainOrgId(val as Id<"organizations">)}
+              searchFields={["name", "slug"]}
+              className={cn("h-12 justify-start bg-card py-2")}
+              popover={{
+                align: "center",
+                contentClassName: "max-w-[90vw] z-top ",
+                listClassName: "max-h-68",
+              }}
+              getItemDisplay={(org) => (
+                <div className="flex items-center gap-2">
+                  {/* <Image
+                              src={org.logo}
+                              alt={org.name}
+                              width={30}
+                              height={30}
+                              className="rounded-full"
+                            /> */}
+                  <span className="truncate">{org.name}</span>
+                </div>
+              )}
+              placeholder="Select an organization"
+            />
+          </div>
+
+          <DialogFooter>
+            <Button
+              disabled={pending}
+              variant="salWithShadowHiddenBg"
+              onClick={() => setOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              disabled={mainOrgId === orgId || pending}
+              variant="salWithShadowHidden"
+              onClick={handleSave}
+              className={cn("w-40")}
+            >
+              {pending ? (
+                <LoaderCircle className="size-4 animate-spin" />
+              ) : (
+                "Save"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}
