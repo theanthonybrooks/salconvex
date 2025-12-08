@@ -233,12 +233,11 @@ const SubmissionFormOC1 = ({
     if (!isAdmin) return;
     if (!openCall?.basicInfo?.dates?.ocStart)
       setValue("openCall.basicInfo.dates.ocStart", new Date().toISOString());
-  });
+    if (!openCall?.basicInfo?.appFee) setValue("openCall.basicInfo.appFee", 0);
+  }, [isAdmin, openCall, setValue]);
 
   // #endregion
   // console.log("Open Call", openCall);
-
-  console.log(hasAppFee, appFee);
 
   return (
     <div
