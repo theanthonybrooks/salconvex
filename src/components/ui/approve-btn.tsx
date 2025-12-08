@@ -51,16 +51,22 @@ export const ApproveBtn = ({
   isUserOrg,
   className,
 }: ApproveBtnProps) => {
+  const editDraftStates = ["editing", "draft"];
   const router = useRouter();
   const eventDraft = eventState === "draft";
   const openCallDraft = openCallState === "draft";
   const bothDraft = eventDraft && openCallDraft;
+  const draftOrEditing = [eventState, openCallState].some(
+    (s) => s && editDraftStates.includes(s),
+  );
+
   const eventSubmitted = eventState === "submitted";
   const openCallSubmitted = openCallState === "submitted";
   const bothSubmitted = eventSubmitted && openCallSubmitted;
   const approveEvent = useMutation(api.events.event.approveEvent);
   const approveOC = useMutation(api.openCalls.openCall.changeOCStatus);
   const isAdmin = user?.role?.includes("admin") || false;
+  const isCreator = user?.role?.includes("creator");
   const isArtist = user?.accountType?.includes("artist");
   // const somethingSubmitted =
   //   eventSubmitted || openCallSubmitted || bothSubmitted;
@@ -111,10 +117,10 @@ export const ApproveBtn = ({
                 });
                 return;
               }
-              if (eventPublished) {
+              if (eventPublished || draftOrEditing) {
                 const dbPath = `/dashboard/admin/event?_id=${eventId}`;
                 handleCopy(eventId);
-                if (isArtist) {
+                if (isCreator) {
                   window.open(
                     `${process.env.NEXT_PUBLIC_CONVEX_DASHBOARD_URL}data?table=events`,
                     "_blank",
