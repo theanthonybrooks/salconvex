@@ -861,7 +861,7 @@ export const EventOCForm = ({
       try {
         if (direct) {
           const isStepValid = handleCheckSchema();
-          if (!isStepValid) {
+          if (!isStepValid && !exit) {
             toast.error("Please fix errors before continuing.", {
               toastId: "form-validation-error",
             });
