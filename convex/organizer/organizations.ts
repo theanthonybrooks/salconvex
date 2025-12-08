@@ -650,11 +650,11 @@ export const getUserOrganizations = query({
       // return all.filter(filterFn);
       const allOrgs =
         trimmedQuery === ""
-          ? await ctx.db.query("organizations").order("asc").take(50)
+          ? await ctx.db.query("organizations").order("asc").collect()
           : await ctx.db
               .query("organizations")
               .withSearchIndex("search_by_slug", (q) => q.search("slug", slug))
-              .take(40);
+              .collect();
       const filteredOrgs =
         args.query.trim().length > 0
           ? allOrgs.filter((org) =>

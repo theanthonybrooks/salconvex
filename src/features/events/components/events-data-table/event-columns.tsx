@@ -415,11 +415,12 @@ export const getEventColumns = <T extends Event>(
           openCallApproved: ocApproved,
           posted: postStatus,
         } = row.original;
+        // const viewableOCState = ["draft", "editing", "submitted", "published", "archived"]
         const event = row.original;
         const eventCategory = event.category as EventCategory;
         const { isAdmin, isEditor } = table.options.meta ?? {};
         const isDashboard = table.options.meta?.pageType === "dashboard";
-        const hasOC = !!openCallId;
+        const hasOC = !!openCallId && !!ocState && ocState !== "initial";
 
         const neitherApproved = !ocApproved && !event.approvedAt;
 

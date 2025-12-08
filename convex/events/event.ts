@@ -1154,7 +1154,9 @@ export const getEventWithOCDetails = query({
     // console.log("user doesn't have permission to view this event");
     // console.log(source, openCall);
     if (source === "ocpage" && !openCall)
-      throw new ConvexError("Open Call not found");
+      throw new ConvexError(
+        `Open Call not found for: slug: ${slug}, edition: ${edition}, eventId: ${event._id}`,
+      );
     if (!openCall) return null;
 
     return {
