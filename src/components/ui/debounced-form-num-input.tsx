@@ -14,13 +14,20 @@ interface DebouncedControllerNumInputProps<
   onChange: (value: number | undefined) => void;
   debounceMs?: number;
   formatNumber?: boolean;
+  withDecimal?: boolean;
   min?: number;
   max?: number;
   [key: string]: unknown;
 }
 
-const formatWithCommas = (val: number): string => {
-  return val.toLocaleString("en-US");
+// const formatWithCommas = (val: number): string => {
+//   return val.toLocaleString("en-US");
+// };
+const formatWithCommas = (val: number, decimals: number): string => {
+  return val.toLocaleString("en-US", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: decimals,
+  });
 };
 
 export function DebouncedControllerNumInput<
@@ -32,6 +39,7 @@ export function DebouncedControllerNumInput<
   onChange,
   debounceMs = 500,
   formatNumber = false,
+  withDecimal = false,
   min,
   max,
   ...inputProps
@@ -41,7 +49,7 @@ export function DebouncedControllerNumInput<
       return value === 0
         ? ""
         : formatNumber
-          ? formatWithCommas(value)
+          ? formatWithCommas(value, withDecimal ? 2 : 0)
           : String(value);
     }
     return "";
@@ -50,7 +58,10 @@ export function DebouncedControllerNumInput<
   const debouncedOnChange = useMemo(
     () =>
       debounce((val: string) => {
-        const numeric = parseFloat(val.replace(/,/g, ""));
+        const numericString = val.replace(/,/g, "");
+        if (numericString.endsWith(".")) return;
+
+        const numeric = parseFloat(numericString);
         if (!isNaN(numeric)) {
           if (typeof min === "number" && numeric < min) {
             onChange(min);
@@ -72,13 +83,13 @@ export function DebouncedControllerNumInput<
         value === 0
           ? ""
           : formatNumber
-            ? formatWithCommas(value)
+            ? formatWithCommas(value, withDecimal ? 2 : 0)
             : String(value),
       );
     } else {
       setLocalValue("");
     }
-  }, [value, formatNumber]);
+  }, [value, formatNumber, withDecimal]);
 
   useEffect(() => {
     return () => {
@@ -91,7 +102,7 @@ export function DebouncedControllerNumInput<
       {...inputProps}
       type="text"
       inputMode="numeric"
-      pattern="[0-9,]*"
+      pattern={withDecimal ? "[0-9.,]*" : "[0-9,]*"}
       className={cn(
         "bg-card text-base placeholder:text-sm placeholder:text-foreground/50 sm:text-sm",
         typeof inputProps.className === "string"
@@ -100,10 +111,21 @@ export function DebouncedControllerNumInput<
       )}
       value={localValue}
       onChange={(e) => {
-        const raw = e.target.value.replace(/[^\d.,]/g, "");
-        const numeric = raw.replace(/,/g, "");
+        let raw = e.target.value
+          .replace(withDecimal ? /[^\d.,]/g : /[^\d,]/g, "")
+          .replace(/(\..*)\./g, "$1");
+
+        // enforce max 2 decimal digits at the RAW level
+        if (withDecimal && raw.includes(".")) {
+          raw = raw.replace(/(\.\d{2}).*/, "$1");
+        }
+
+        const numericString = raw.replace(/,/g, "");
+
         const display =
-          formatNumber && numeric ? formatWithCommas(parseFloat(numeric)) : raw;
+          formatNumber && numericString && !numericString.endsWith(".")
+            ? formatWithCommas(parseFloat(numericString), withDecimal ? 2 : 0)
+            : raw;
 
         setLocalValue(display);
         debouncedOnChange(raw);
@@ -113,7 +135,9 @@ export function DebouncedControllerNumInput<
         const pasted = e.clipboardData.getData("text").replace(/[^\d.]/g, "");
         const num = parseFloat(pasted);
         if (!isNaN(num)) {
-          const display = formatNumber ? formatWithCommas(num) : String(num);
+          const display = formatNumber
+            ? formatWithCommas(num, withDecimal ? 2 : 0)
+            : String(num);
           setLocalValue(display);
           onChange(num);
         }

@@ -27,6 +27,7 @@ export function DataTablePagination<TData>({
   const totalResults = table.getFilteredRowModel().rows.length;
   const tablePageSize = table.getState().pagination.pageSize;
   const tablePageIndex = table.getState().pagination.pageIndex;
+
   const formType = table.options.meta?.pageType === "form";
   const minimalView = table.options.meta?.minimalView;
 
@@ -52,7 +53,7 @@ export function DataTablePagination<TData>({
         <div
           className={cn(
             "flex-1 text-sm text-muted-foreground",
-            minimalView && "invisible",
+            (minimalView || formType) && "invisible",
           )}
         >
           {table.getFilteredSelectedRowModel().rows.length} of{" "}

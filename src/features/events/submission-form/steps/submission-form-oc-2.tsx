@@ -444,6 +444,7 @@ const SubmissionFormOC2 = ({
                           <DebouncedControllerNumInput
                             field={field}
                             formatNumber={true}
+                            withDecimal
                             value={field.value ?? 0}
                             onChange={field.onChange}
                             min={0}

@@ -78,7 +78,6 @@ export const formatBudgetCurrency = (
   if (min === 0 && (!max || max === 0)) return "No Info";
   const currencyInfo = currencies.code(currency);
   if (!currencyInfo) throw new Error(`Invalid currency code: ${currency}`);
-
   const locale = new Intl.NumberFormat(undefined, {
     currency,
   }).resolvedOptions().locale;
@@ -132,11 +131,12 @@ export const formatRate = (
   });
 
   // Extract the currency symbol from formatted output
-  const currencySymbol = formatter.format(0).replace(/\d/g, "").trim();
+  // const currencySymbol = formatter.format(0).replace(/\d/g, "").trim();
+  const outputRate = formatter.format(rate);
 
-  if (!total) return `${currencySymbol}${rate.toLocaleString(locale)}/${unit}+`;
+  if (!total) return `${outputRate}/${unit}+`;
 
-  return `${currencySymbol}${rate.toLocaleString(locale)}/${unit}`;
+  return `${outputRate}/${unit}`;
 };
 
 export const formatCurrencyServer = async (
@@ -173,7 +173,6 @@ export const formatCurrencyServer = async (
     minimumFractionDigits: min % 1 === 0 ? 0 : 2,
     maximumFractionDigits: 2,
   });
-
   // Extract the currency symbol from formatted output
   const currencySymbol = formatter.format(0).replace(/\d/g, "").trim();
 

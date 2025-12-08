@@ -138,12 +138,12 @@ const SubmissionFormOC1 = ({
 
   const hasAppLink = appLink?.trim().length > 10;
   const appFee = openCall?.basicInfo?.appFee;
+  const validAppFeeAmount = typeof appFee === "number";
+
   const [hasAppFee, setHasAppFee] = useState<boolean | undefined>(
-    Boolean(appFee) ?? (isAdmin ? false : undefined),
+    validAppFeeAmount ? Boolean(appFee) : isAdmin ? false : undefined,
   );
   const showAppFeeInput = hasAppFee;
-  // const validAppFeeAmount = typeof appFee === "number" && appFee > 0;
-  // const noAppFeeAmount = typeof appFee === "number" && appFee === 0;
   const ocStart = openCall?.basicInfo?.dates?.ocStart;
   const ocEnd = openCall?.basicInfo?.dates?.ocEnd;
   const noEndRequired = callType && !fixedType;
@@ -197,37 +197,10 @@ const SubmissionFormOC1 = ({
     }
   }, [fixedType, setValue, callType]);
 
-  // useEffect(() => {
-  //   const formValue = hasAppFee;
-  //   const shouldBe = validAppFeeAmount;
-
-  //   if (!formValue && validAppFeeAmount) {
-  //     setHasAppFee(shouldBe);
-  //   } else if (!formValue && noAppFeeAmount) {
-  //     setHasAppFee(false);
-  //   } else if (formValue === false && validAppFeeAmount) {
-  //     setValue("openCall.basicInfo.appFee", 0);
-  //   }
-  // }, [validAppFeeAmount, noAppFeeAmount, setValue, hasAppFee]);
-
   useEffect(() => {
     if (!appLinkFormat)
       setValue("openCall.requirements.applicationLinkFormat", "https://");
   }, [appLinkFormat, setValue]);
-
-  // useEffect(() => {
-  //   if (hasAppFee === false && appFee === undefined) {
-  //     setValue("openCall.basicInfo.appFee", 0);
-  //   }
-  // }, [appFee, hasAppFee, setValue]);
-
-  // useEffect(() => {
-  //   if (!freeCall) return;
-  //   if (freeCall) {
-  //     // setValue("openCall.eligibility.whom", []);
-  //     setValue("openCall.basicInfo.appFee", 0);
-  //   }
-  // }, [freeCall, setValue]);
 
   useEffect(() => {
     if (!isAdmin) return;
@@ -362,24 +335,6 @@ const SubmissionFormOC1 = ({
                               {option.full}
                             </SelectItem>
                           ))}
-
-                        {/* <SelectItem fit value="International">
-                          International Artists (All)
-                        </SelectItem>
-                        <SelectItem fit value="National">
-                          National Artists
-                        </SelectItem>
-                        <SelectItem fit value="Regional/Local">
-                          Regional/Local Artists
-                        </SelectItem>
-                        <SelectItem fit value="Other">
-                          Other (specify below - Required)
-                        </SelectItem>
-                        {isAdmin && (
-                          <SelectItem fit value="Unknown">
-                            Unknown
-                          </SelectItem>
-                        )} */}
                       </SelectContent>
                     </Select>
                   );
@@ -528,10 +483,17 @@ const SubmissionFormOC1 = ({
                 disabled={pastEvent}
                 onValueChange={(value: "true" | "false" | "") => {
                   setHasAppFee(value === "true");
-                  if (value === "false")
+                  if (value === "false") {
                     setValue("openCall.basicInfo.appFee", 0);
+                  } else if (appFee === 0) {
+                    setValue("openCall.basicInfo.appFee", undefined);
+                  }
                 }}
-                value={String(hasAppFee)}
+                value={
+                  typeof hasAppFee === "boolean" || isAdmin
+                    ? String(hasAppFee)
+                    : ""
+                }
               >
                 <SelectTrigger
                   className={cn(
