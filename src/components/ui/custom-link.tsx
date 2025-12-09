@@ -32,18 +32,25 @@ type CustomLinkProps = ComponentPropsWithRef<typeof Link> &
   VariantProps<typeof linkVariants> & {
     className?: string;
     fontSize?: string;
+    disabled?: boolean;
   };
 
 const CustomLink = ({
   className,
   variant,
   fontSize,
+  disabled,
 
   ...props
 }: CustomLinkProps) => {
   return (
     <Link
-      className={cn(linkVariants({ variant }), className, fontSize)}
+      className={cn(
+        linkVariants({ variant }),
+        className,
+        fontSize,
+        disabled && "pointer-events-none",
+      )}
       {...props}
     />
   );

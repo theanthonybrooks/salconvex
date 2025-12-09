@@ -10,6 +10,7 @@ import { Link } from "@/components/ui/custom-link";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { SelectSimple } from "@/components/ui/select";
 import { TooltipSimple } from "@/components/ui/tooltip";
+import { cn } from "@/helpers/utilsFns";
 import { showToast } from "@/lib/toast";
 
 import { api } from "~/convex/_generated/api";
@@ -121,15 +122,21 @@ export const DeleteSupportTicketBtn = ({
 
 export const GoToSupportTicket = ({
   ticketNumber,
+  kanbanId,
 }: {
   ticketNumber: number;
+  kanbanId?: Id<"todoKanban">;
 }) => {
   return (
-    <TooltipSimple content="View in Kanban" side="top">
+    <TooltipSimple content="View in Kanban" side="top" disabled={!kanbanId}>
       <Link
+        disabled={!kanbanId}
         href={`/dashboard/admin/todos?searchTerm=%23${ticketNumber}`}
         target="_blank"
-        className="block text-center text-sm text-muted-foreground"
+        className={cn(
+          "block text-center text-sm text-muted-foreground",
+          kanbanId ? "font-semibold" : "opacity-50",
+        )}
       >
         {ticketNumber}
       </Link>

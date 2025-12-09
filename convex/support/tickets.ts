@@ -175,6 +175,21 @@ export const getSupportTickets = query({
     const isAdmin = user?.role?.includes("admin");
     if (!isAdmin) return null;
     const supportTickets = await ctx.db.query("support").collect();
-    return supportTickets;
+    const enrichedTickets = await Promise.all(
+      supportTickets.map(async (ticket) => {
+        const ticketNumber = ticket._id;
+        const kanbanCard = await ctx.db
+          .query("todoKanban")
+          .withIndex("by_ticketNumber", (q) =>
+            q.eq("ticketNumber", ticketNumber),
+          )
+          .first();
+        return {
+          ...ticket,
+          kanbanId: kanbanCard?._id,
+        };
+      }),
+    );
+    return enrichedTickets;
   },
 });

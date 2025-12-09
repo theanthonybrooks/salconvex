@@ -26,7 +26,7 @@ import {
 } from "@/features/admin/dashboard/components/admin-support-actions";
 import { cn } from "@/helpers/utilsFns";
 
-import { type Doc } from "~/convex/_generated/dataModel";
+import { type Doc, type Id } from "~/convex/_generated/dataModel";
 
 export const supportColumnLabels: Record<string, string> = {
   ticketNumber: "Ticket #",
@@ -52,7 +52,9 @@ export const supportColumnLabels: Record<string, string> = {
 // ticketNumber: number;
 // message: string;
 
-type SupportColumnsProps = Doc<"support">;
+type SupportColumnsProps = Doc<"support"> & {
+  kanbanId?: Id<"todoKanban">;
+};
 
 export const supportColumns: ColumnDef<SupportColumnsProps>[] = [
   {
@@ -63,8 +65,10 @@ export const supportColumns: ColumnDef<SupportColumnsProps>[] = [
     maxSize: 40,
 
     cell: ({ row }) => {
-      const { ticketNumber } = row.original;
-      return <GoToSupportTicket ticketNumber={ticketNumber} />;
+      const { ticketNumber, kanbanId } = row.original;
+      return (
+        <GoToSupportTicket ticketNumber={ticketNumber} kanbanId={kanbanId} />
+      );
     },
     filterFn: (row, columnId, filterValue) => {
       const value = String(row.getValue(columnId));
