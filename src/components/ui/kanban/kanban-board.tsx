@@ -36,7 +36,7 @@ import type { KanbanCardType } from "@/schemas/admin";
 import type { User } from "@/types/user";
 
 import { useEffect, useRef, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { kanbanCardSchema } from "@/schemas/admin";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
@@ -116,8 +116,12 @@ export const getColumnColor = (column: ColumnType) => {
 };
 
 const Board = ({ purpose: basePurpose }: KanbanBoardProps) => {
+  const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
   const initialSearchTerm = searchParams.get("searchTerm") ?? "";
+  const hasSearchParam = searchParams.has("searchTerm");
+
   const initialPurpose = (searchParams.get("purpose") ??
     basePurpose ??
     "todo") as KanbanPurpose;
@@ -266,6 +270,16 @@ const Board = ({ purpose: basePurpose }: KanbanBoardProps) => {
   if (hasNotPlanned) {
     orderedColumns = [...orderedColumns, "notPlanned"];
   }
+  const displayedColumns = hasSearchParam
+    ? orderedColumns.filter((column) =>
+        cards.some((card) => card.column === column),
+      )
+    : orderedColumns;
+
+  const clearSearchParam = () => {
+    router.replace(pathname);
+  };
+
   return (
     <KanbanProvider user={user} purpose={purpose}>
       <div className="flex h-full max-h-full w-full flex-col gap-3 overflow-hidden overflow-x-auto p-6">
@@ -279,14 +293,20 @@ const Board = ({ purpose: basePurpose }: KanbanBoardProps) => {
               <div className="flex items-center gap-3">
                 <Input
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onChange={(e) => {
+                    setSearchTerm(e.target.value);
+                    if (hasSearchParam) clearSearchParam();
+                  }}
                   placeholder="Search"
                   className="w-full min-w-60 max-w-md"
                 />
 
                 <Button
                   variant="salWithShadowHidden"
-                  onClick={() => setSearchTerm("")}
+                  onClick={() => {
+                    setSearchTerm("");
+                    if (hasSearchParam) clearSearchParam();
+                  }}
                   className={"h-11 disabled:border-foreground/40"}
                   disabled={debouncedSearch === ""}
                 >
@@ -381,7 +401,7 @@ const Board = ({ purpose: basePurpose }: KanbanBoardProps) => {
           </div>
         </div>
         <div className="scrollable mini flex h-full max-h-full w-full gap-3 overflow-hidden overflow-x-auto">
-          {orderedColumns.map((column) => (
+          {displayedColumns.map((column) => (
             <Column
               key={column}
               title={columnDisplayNames[column]}
