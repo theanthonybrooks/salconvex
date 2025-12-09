@@ -7,9 +7,10 @@ import {
 
 import type { Priority } from "@/constants/kanbanConsts";
 
-import { Trash } from "lucide-react";
+import { Eye, Trash } from "lucide-react";
 
 import type { Doc, Id } from "~/convex/_generated/dataModel";
+import { Button } from "@/components/ui/button";
 import { useConfirmAction } from "@/components/ui/confirmation-dialog-context";
 import { Link } from "@/components/ui/custom-link";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
@@ -145,7 +146,13 @@ export const GoToSupportTicket = ({
           kanbanId ? "font-semibold" : "opacity-50",
         )}
       >
-        {ticketNumber}
+        {/* {ticketNumber} */}
+        <Button
+          variant="outline"
+          className="ml-auto size-8 max-h-8 min-w-8 border-foreground/30 p-0 hover:cursor-pointer hover:bg-white/70 active:scale-90"
+        >
+          <Eye className="size-4" />
+        </Button>
       </Link>
     </TooltipSimple>
   );
@@ -181,7 +188,7 @@ export const SupportTicketPrioritySelector = ({
   return (
     <SelectSimple
       labelOnly
-      disabled={status === "closed" || status === "resolved"}
+      disabled={status === "closed" || status === "resolved" || !kanbanId}
       className="border-transparent disabled:border-transparent"
       options={getSupportPriorityOptions(status)}
       value={priority ?? ""}

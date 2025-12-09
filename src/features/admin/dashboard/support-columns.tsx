@@ -19,7 +19,6 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { PopoverSimple } from "@/components/ui/popover";
 import {
   DeleteSupportTicketBtn,
   GoToSupportTicket,
@@ -83,9 +82,11 @@ export const supportColumns: ColumnDef<SupportColumnsProps>[] = [
     maxSize: 40,
 
     cell: ({ row }) => {
-      const { ticketNumber, kanbanId } = row.original;
+      const { ticketNumber } = row.original;
       return (
-        <GoToSupportTicket ticketNumber={ticketNumber} kanbanId={kanbanId} />
+        <div className="block truncate text-center font-medium">
+          {ticketNumber}
+        </div>
       );
     },
     filterFn: (row, columnId, filterValue) => {
@@ -238,17 +239,13 @@ export const supportColumns: ColumnDef<SupportColumnsProps>[] = [
   {
     accessorKey: "message",
     minSize: 200,
-    maxSize: 400,
+    maxSize: 1600,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Message" />
     ),
     cell: ({ row }) => {
       const { message } = row.original;
-      return (
-        <PopoverSimple content={message}>
-          <div className="truncate text-sm">{message}</div>
-        </PopoverSimple>
-      );
+      return <div className="truncate text-sm">{message}</div>;
     },
     filterFn: (row, columnId, filterValue) => {
       if (!Array.isArray(filterValue)) return true;
@@ -285,11 +282,11 @@ export const supportColumns: ColumnDef<SupportColumnsProps>[] = [
   {
     id: "actions",
 
-    maxSize: 40,
-    minSize: 40,
+    maxSize: 80,
+    minSize: 80,
     enableResizing: false,
     cell: ({ row }) => {
-      const { _id: ticketId } = row.original;
+      const { _id: ticketId, ticketNumber, kanbanId } = row.original;
 
       // const openCallState = event.openCallState;
       // const openCallId = event.openCallId;
@@ -300,6 +297,8 @@ export const supportColumns: ColumnDef<SupportColumnsProps>[] = [
           className={cn("flex justify-center")}
           onClick={(e) => e.stopPropagation()}
         >
+          <GoToSupportTicket ticketNumber={ticketNumber} kanbanId={kanbanId} />
+
           <ConfirmingDropdown key={ticketId}>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

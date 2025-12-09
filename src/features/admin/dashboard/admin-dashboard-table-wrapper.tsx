@@ -6,9 +6,13 @@ import { useState } from "react";
 import { useDashboard } from "@/app/(pages)/dashboard/_components/DashboardContext";
 import { NewsletterMainPage } from "@/app/(pages)/dashboard/admin/_components/newsletter/newsletterMainPage";
 
+import { X } from "lucide-react";
+
 import type { Id } from "~/convex/_generated/dataModel";
 import { DataTable } from "@/components/data-table/DataTable";
 import { ResponsiveDataTable } from "@/components/data-table/DataTableWrapper";
+import { Card } from "@/components/ui/card";
+import { Link } from "@/components/ui/custom-link";
 import { useAdminPreload } from "@/features/admin/admin-preload-context";
 import { artistColumns } from "@/features/admin/dashboard/artist-columns";
 import { newsletterColumns } from "@/features/admin/dashboard/newsletter-columns";
@@ -97,6 +101,13 @@ export function AdminDashboardTableWrapper({
   const supportTickets = useQuery(
     api.support.tickets.getSupportTickets,
     supportPage ? {} : "skip",
+  );
+
+  const supportTicketData = useQuery(
+    api.support.tickets.getSupportTicketStatus,
+    supportPage && selectedRow
+      ? { ticketId: selectedRow as Id<"support"> }
+      : "skip",
   );
 
   return (
@@ -300,25 +311,53 @@ export function AdminDashboardTableWrapper({
         />
       )}
       {supportPage && (
-        <ResponsiveDataTable
-          title="Support Tickets"
-          description="Current & Archived Support Tickets"
-          columns={supportColumns}
-          data={supportTickets ?? []}
-          adminActions={adminActions}
-          tableType="support"
-          pageType="dashboard"
-          collapsedSidebar={isSidebarCollapsed}
-          defaultSort={[{ id: "status", desc: false }]}
-          pageSize={50}
-          defaultVisibility={{
-            desktop: {
-              name: isSidebarCollapsed,
-              updatedAt: isSidebarCollapsed,
-            },
-          }}
-          defaultFilters={[]}
-        />
+        <>
+          <ResponsiveDataTable
+            title="Support Tickets"
+            description="Current & Archived Support Tickets"
+            columns={supportColumns}
+            data={supportTickets ?? []}
+            adminActions={adminActions}
+            tableType="support"
+            pageType="dashboard"
+            collapsedSidebar={isSidebarCollapsed}
+            defaultSort={[{ id: "status", desc: false }]}
+            onRowSelect={(row) => setSelectedRow(row?._id ?? null)}
+            pageSize={50}
+            defaultVisibility={{
+              desktop: {
+                name: isSidebarCollapsed,
+                updatedAt: isSidebarCollapsed,
+              },
+            }}
+            defaultFilters={[]}
+          />
+          {supportTicketData && (
+            <div className="px-10">
+              <Card className="relative my-10 flex flex-col gap-2 border-1.5 p-4">
+                <X
+                  className="absolute right-4 top-4 cursor-pointer"
+                  onClick={() => setSelectedRow(null)}
+                />
+                <h3>Support Ticket #{supportTicketData.ticketNumber}</h3>
+                <p className="text-sm">
+                  <strong>Name:</strong> {supportTicketData.name}
+                </p>
+                <span className="flex items-center gap-2 text-sm">
+                  <strong>Email: </strong>
+                  <Link
+                    href={`mailto:${supportTicketData.email}?subject=Ticket%20%23${supportTicketData.ticketNumber}`}
+                  >
+                    {supportTicketData.email}
+                  </Link>
+                </span>
+                <p className="text-sm">
+                  <strong>Message:</strong> {supportTicketData.message}
+                </p>
+              </Card>
+            </div>
+          )}
+        </>
       )}
     </>
   );

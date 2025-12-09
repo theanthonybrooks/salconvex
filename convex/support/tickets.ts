@@ -14,15 +14,24 @@ export const counter = new ShardedCounter(components.shardedCounter);
 
 export const getSupportTicketStatus = query({
   args: {
-    ticketNumber: v.number(),
+    ticketNumber: v.optional(v.number()),
+    ticketId: v.optional(v.id("support")),
   },
   handler: async (ctx, args) => {
-    const support = await ctx.db
-      .query("support")
-      .withIndex("by_ticketNumber", (q) =>
-        q.eq("ticketNumber", args.ticketNumber),
-      )
-      .first();
+    const { ticketNumber, ticketId } = args;
+    const support = ticketNumber
+      ? await ctx.db
+          .query("support")
+          .withIndex("by_ticketNumber", (q) =>
+            q.eq("ticketNumber", ticketNumber),
+          )
+          .first()
+      : ticketId
+        ? await ctx.db
+            .query("support")
+            .withIndex("by_id", (q) => q.eq("_id", ticketId))
+            .first()
+        : null;
 
     if (!support) {
       throw new ConvexError("No support ticket found");

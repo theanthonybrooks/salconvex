@@ -60,6 +60,7 @@ export const selectableTableTypes: TableTypes[] = [
   // "applications",
   "openCalls",
   "resources",
+  "support",
 ];
 
 export const numberedTableTypes: TableTypes[] = [

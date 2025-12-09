@@ -283,7 +283,9 @@ export default function Home() {
                           : currentSlide === 2 || currentSlide === 3
                             ? "In Bloom (2023)"
                             : currentSlide === 1
-                              ? "Mess Mess Mess (2024)"
+                              ? isMobile
+                                ? "Nov/Dec 2025"
+                                : "Mess Mess Mess (2024)"
                               : "Hua Sheng Supermarket (2023)"}
                       </i>
                       <span
@@ -294,7 +296,7 @@ export default function Home() {
                       >
                         |
                       </span>{" "}
-                      {currentSlide < 3 && (
+                      {currentSlide < 4 && (
                         <span className="font-bold sm:hidden">
                           {/* @oldhues */}
                           Megan Oldhues
