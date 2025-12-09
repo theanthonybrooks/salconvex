@@ -254,7 +254,7 @@ export const supportColumns: ColumnDef<SupportColumnsProps>[] = [
           className={cn("flex justify-center")}
           onClick={(e) => e.stopPropagation()}
         >
-          <ConfirmingDropdown>
+          <ConfirmingDropdown key={ticketId}>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button

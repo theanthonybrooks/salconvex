@@ -2,6 +2,10 @@
 
 import { eventTypeOptions } from "@/constants/eventConsts";
 import { onlineEventCategories } from "@/constants/resourcesConsts";
+import {
+  supportCategoryOptions,
+  ticketStatusOptions,
+} from "@/constants/supportConsts";
 
 import type { DataTableFacetedFilterOption } from "@/components/data-table/DataTableFacetedFilter";
 import type { PageTypes, TableTypes } from "@/types/tanstack-table";
@@ -396,7 +400,14 @@ export const TABLE_FILTERS: TableFilterConfig = {
       ],
     },
   ],
-  support: [],
+  support: [
+    { columnId: "status", title: "Status", options: [...ticketStatusOptions] },
+    {
+      columnId: "category",
+      title: "Category",
+      options: [...supportCategoryOptions],
+    },
+  ],
   events: [
     { columnId: "state", title: "State", options: eventStates },
     {

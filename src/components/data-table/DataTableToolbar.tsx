@@ -122,7 +122,6 @@ export function DataTableToolbar<TData>({
   const getColumnLabel = (table?: TableTypes) => {
     // note-to-self: use this to adjust the default column for searching. For now, it's just the name column.
     if (table === "artists") return "name";
-    if (table === "support") return "ticketNumber";
     return "name";
   };
 
