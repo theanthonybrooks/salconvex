@@ -123,8 +123,8 @@ export const supportColumns: ColumnDef<SupportColumnsProps>[] = [
   {
     accessorKey: "status",
     id: "status",
-    minSize: 90,
-    maxSize: 90,
+    minSize: 120,
+    maxSize: 120,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Status" />
     ),
