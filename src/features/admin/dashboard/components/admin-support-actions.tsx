@@ -6,8 +6,10 @@ import { Trash } from "lucide-react";
 
 import type { Doc, Id } from "~/convex/_generated/dataModel";
 import { useConfirmAction } from "@/components/ui/confirmation-dialog-context";
+import { Link } from "@/components/ui/custom-link";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { SelectSimple } from "@/components/ui/select";
+import { TooltipSimple } from "@/components/ui/tooltip";
 import { showToast } from "@/lib/toast";
 
 import { api } from "~/convex/_generated/api";
@@ -114,5 +116,23 @@ export const DeleteSupportTicketBtn = ({
       <Trash className="size-4" />
       Delete
     </DropdownMenuItem>
+  );
+};
+
+export const GoToSupportTicket = ({
+  ticketNumber,
+}: {
+  ticketNumber: number;
+}) => {
+  return (
+    <TooltipSimple content="View in Kanban" side="top">
+      <Link
+        href={`/dashboard/admin/todos?searchTerm=%23${ticketNumber}`}
+        target="_blank"
+        className="block text-center text-sm text-muted-foreground"
+      >
+        {ticketNumber}
+      </Link>
+    </TooltipSimple>
   );
 };

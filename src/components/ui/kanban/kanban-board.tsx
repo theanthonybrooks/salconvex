@@ -35,6 +35,7 @@ import type { KanbanCardType } from "@/schemas/admin";
 import type { User } from "@/types/user";
 
 import { useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { kanbanCardSchema } from "@/schemas/admin";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
@@ -113,7 +114,13 @@ export const getColumnColor = (column: ColumnType) => {
   return colors[column] || "bg-neutral-500";
 };
 
-const Board = ({ purpose: initialPurpose }: KanbanBoardProps) => {
+const Board = ({ purpose: basePurpose }: KanbanBoardProps) => {
+  const searchParams = useSearchParams();
+  const initialSearchTerm = searchParams.get("searchTerm") ?? "";
+  const initialPurpose = (searchParams.get("purpose") ??
+    basePurpose ??
+    "todo") as KanbanPurpose;
+
   const { preloadedUserData } = useConvexPreload();
   const { isMobile } = useDevice();
   const userData = usePreloadedQuery(preloadedUserData);
@@ -124,13 +131,14 @@ const Board = ({ purpose: initialPurpose }: KanbanBoardProps) => {
   // const isCreator = userRole?.includes("creator");
   const [showFilters, setShowFilters] = useState(true);
   const [activeColumn, setActiveColumn] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
   const [category, setCategory] = useState<SupportCategory[]>([]);
   const [userFilter, setUserFilter] = useState<User | null>(user);
 
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [purpose, setPurpose] = useState<KanbanPurpose>(
-    initialPurpose ?? "todo",
+    // basePurpose ?? "todo",
+    initialPurpose,
   );
 
   // useEffect(() => {

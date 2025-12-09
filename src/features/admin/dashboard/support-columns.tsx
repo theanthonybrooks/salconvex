@@ -21,6 +21,7 @@ import {
 import { PopoverSimple } from "@/components/ui/popover";
 import {
   DeleteSupportTicketBtn,
+  GoToSupportTicket,
   SupportTicketStatusSelector,
 } from "@/features/admin/dashboard/components/admin-support-actions";
 import { cn } from "@/helpers/utilsFns";
@@ -59,27 +60,17 @@ export const supportColumns: ColumnDef<SupportColumnsProps>[] = [
     id: "ticketNumber",
     header: ({ column }) => <DataTableColumnHeader column={column} title="#" />,
     size: 40,
+    maxSize: 40,
+
     cell: ({ row }) => {
       const { ticketNumber } = row.original;
-      return (
-        <div
-          className="text-center text-sm text-muted-foreground"
-          onClick={() => {
-            row.toggleSelected();
-          }}
-        >
-          {ticketNumber}
-        </div>
-      );
+      return <GoToSupportTicket ticketNumber={ticketNumber} />;
     },
     filterFn: (row, columnId, filterValue) => {
       const value = String(row.getValue(columnId));
       return value.includes(filterValue);
     },
     enableSorting: true,
-    // sortingFn: (rowA, rowB, columnId) => {
-
-    // },
     enableHiding: false,
   },
   {
