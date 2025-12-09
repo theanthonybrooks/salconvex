@@ -138,7 +138,7 @@ export const GoToSupportTicket = ({
     <TooltipSimple content="View in Kanban" side="top" disabled={!kanbanId}>
       <Link
         disabled={!kanbanId}
-        href={`/dashboard/admin/todos?searchTerm=%23${ticketNumber}`}
+        href={`/dashboard/admin/todos?purpose=support&searchTerm=%23${ticketNumber}`}
         target="_blank"
         className={cn(
           "block text-center text-sm text-muted-foreground",

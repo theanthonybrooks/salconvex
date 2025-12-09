@@ -33,7 +33,9 @@ export const searchCards = query({
     const titleQuery = base.withSearchIndex("search_by_title", (q) => {
       let filter = q.search("title", searchTerm);
       if (args.purpose && args.purpose !== "todo") {
-        filter = filter.eq("purpose", args.purpose);
+        if (args.purpose === "design") {
+          filter = filter.eq("purpose", args.purpose);
+        }
       }
       if (args.category.length === 1) {
         filter = filter.eq("category", args.category[0]);
@@ -44,7 +46,8 @@ export const searchCards = query({
     const descriptionQuery = base.withSearchIndex("search_by_desc", (q) => {
       let filter = q.search("description", searchTerm);
       if (args.purpose && args.purpose !== "todo") {
-        filter = filter.eq("purpose", args.purpose);
+        if (args.purpose === "design")
+          filter = filter.eq("purpose", args.purpose);
       }
       if (args.category.length === 1) {
         filter = filter.eq("category", args.category[0]);
