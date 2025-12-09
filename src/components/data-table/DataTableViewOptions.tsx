@@ -17,6 +17,7 @@ import { artistColumnLabels } from "@/features/admin/dashboard/artist-columns";
 import { newsletterColumnLabels } from "@/features/admin/dashboard/newsletter-columns";
 import { resourcesColumnLabels } from "@/features/admin/dashboard/resources-column";
 import { socialsColumnLabels } from "@/features/admin/dashboard/socials-columns";
+import { supportColumnLabels } from "@/features/admin/dashboard/support-columns";
 import { userColumnLabels } from "@/features/admin/dashboard/user-columns";
 import { userAddOnColumnLabels } from "@/features/admin/dashboard/userAddon-columns";
 import { applicationColumnLabels } from "@/features/artists/applications/components/events-data-table/application-columns";
@@ -41,6 +42,7 @@ const labelMaps: Record<string, Record<string, string>> = {
   newsletter: newsletterColumnLabels,
   userAddOns: userAddOnColumnLabels,
   resources: resourcesColumnLabels,
+  support: supportColumnLabels,
 };
 
 export function DataTableViewOptions<TData>({

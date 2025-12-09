@@ -1,184 +1,208 @@
-//TODO: Add ability for me (or other admins) to bookmark users. Also to flag or ban users.
 "use client";
+
+import { getSupportCategoryLabel } from "@/constants/supportConsts";
+
+import type { SupportCategory } from "@/constants/supportConsts";
 
 import { ColumnDef } from "@tanstack/react-table";
 
-import { LucideClipboardCopy, MoreHorizontal } from "lucide-react";
+import { MoreHorizontal } from "lucide-react";
 
-import { ArtistFeatureSelect } from "@/components/data-table/actions/DataTableAdminArtistActions";
 import { DataTableColumnHeader } from "@/components/data-table/DataTableColumnHeader";
 import { Button } from "@/components/ui/button";
 import { ConfirmingDropdown } from "@/components/ui/confirmation-dialog-context";
-import { CopyableItem } from "@/components/ui/copyable-item";
-import { Link } from "@/components/ui/custom-link";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
+  DropdownMenuGroup,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { TooltipSimple } from "@/components/ui/tooltip";
-import { ConvexDashboardLink } from "@/features/events/ui/convex-dashboard-link";
+import {
+  DeleteSupportTicketBtn,
+  SupportTicketStatusSelector,
+} from "@/features/admin/dashboard/components/admin-support-actions";
 import { cn } from "@/helpers/utilsFns";
 
-import { Id } from "~/convex/_generated/dataModel";
+import { type Doc } from "~/convex/_generated/dataModel";
 
 export const supportColumnLabels: Record<string, string> = {
-  name: "Name",
-  nationality: "Nationality",
-  documents: "Documents",
-  instagram: "Instagram",
-  website: "Website",
-  canFeature: "Can Feature",
-  feature: "Feature",
-  notes: "Notes",
-  createdAt: "Created",
+  ticketNumber: "Ticket #",
+  name: "User Name",
+  email: "User Email",
+  category: "Category",
+  status: "Status",
+  _creationTime: "Created At",
+  updatedAt: "Last Updated",
+  message: "Message",
 };
 
-export interface SupportColumnProps {
-  artistId: Id<"artists">;
-  name: string;
-  nationality: string[];
-  instagram: string;
-  website: string;
-  canFeature: boolean;
-  feature: boolean | "none";
-  notes: string;
-  createdAt: number;
-}
+// _id: Id<"support">;
+// _creationTime: number;
+// updatedAt?: number | undefined;
+// updatedBy?: Id<"users"> | undefined;
+// userId: Id<"users"> | null;
+// name: string;
+// email: string;
+// createdAt: number;
+// category: string;
+// status: "pending" | "open" | "resolved" | "closed";
+// ticketNumber: number;
+// message: string;
 
-//TODO: Still need to actually make this column definition.
-export const supportColumns: ColumnDef<SupportColumnProps>[] = [
+type SupportColumnsProps = Doc<"support">;
+
+export const supportColumns: ColumnDef<SupportColumnsProps>[] = [
+  {
+    accessorKey: "ticketNumber",
+    id: "ticketNumber",
+    header: ({ column }) => <DataTableColumnHeader column={column} title="#" />,
+    size: 40,
+    cell: ({ row }) => {
+      const { ticketNumber } = row.original;
+      return (
+        <div
+          className="text-center text-sm text-muted-foreground"
+          onClick={() => {
+            row.toggleSelected();
+          }}
+        >
+          {ticketNumber}
+        </div>
+      );
+    },
+    enableSorting: true,
+    // sortingFn: (rowA, rowB, columnId) => {
+
+    // },
+    enableHiding: false,
+  },
   {
     accessorKey: "name",
-    id: "name",
     minSize: 120,
-    maxSize: 400,
+    maxSize: 200,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Name" />
     ),
     cell: ({ row }) => {
-      const { artistId, name } = row.original;
+      const { name } = row.original;
+      return <div className="truncate font-medium">{name}</div>;
+    },
+  },
+  {
+    accessorKey: "email",
+    minSize: 120,
+    maxSize: 200,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Email" />
+    ),
+    cell: ({ row }) => {
+      const { email } = row.original;
+      return <div className="truncate">{email}</div>;
+    },
+  },
+
+  {
+    accessorKey: "status",
+    id: "status",
+    minSize: 90,
+    maxSize: 90,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Status" />
+    ),
+    cell: ({ row }) => {
+      const { status, _id: ticketId } = row.original;
       return (
-        <ConvexDashboardLink
-          className="font-medium"
-          table="artists"
-          id={artistId}
-        >
-          <p className="truncate">{name}</p>
-        </ConvexDashboardLink>
+        <SupportTicketStatusSelector ticketId={ticketId} status={status} />
+      );
+    },
+    filterFn: (row, columnId, filterValue) => {
+      if (!Array.isArray(filterValue)) return true;
+      return filterValue.includes(row.getValue(columnId));
+    },
+    enableMultiSort: true,
+    sortUndefined: "last",
+  },
+
+  {
+    accessorKey: "category",
+    minSize: 90,
+    maxSize: 120,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Category" />
+    ),
+    cell: ({ row }) => {
+      const { category } = row.original;
+      const categoryLabel = getSupportCategoryLabel(
+        category as SupportCategory,
+      );
+      return (
+        <div className="truncate text-center text-sm">{categoryLabel}</div>
       );
     },
   },
 
   {
-    accessorKey: "nationality",
-    id: "nationality",
+    accessorKey: "_creationTime",
     minSize: 120,
     maxSize: 200,
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Nationality" />
+      <DataTableColumnHeader column={column} title="Created At" />
     ),
     cell: ({ row }) => {
-      const { nationality } = row.original;
+      const { _creationTime: value } = row.original;
       return (
-        <div className="truncate text-center text-sm text-muted-foreground">
-          {nationality?.length > 0 ? (
-            <TooltipSimple content={nationality.join(", ")}>
-              <p>{nationality?.length > 0 ? nationality.join(", ") : "-"}</p>
-            </TooltipSimple>
-          ) : (
-            "-"
-          )}
+        <div className="truncate text-center text-sm capitalize">
+          {new Date(value).toLocaleString("en-US", {
+            month: "numeric",
+            day: "numeric",
+            year: "2-digit",
+            hour: "numeric",
+            minute: "2-digit",
+          })}
         </div>
       );
     },
   },
-
   {
-    accessorKey: "instagram",
-    id: "instagram",
-    minSize: 120,
-    maxSize: 200,
+    accessorKey: "updatedAt",
+    minSize: 80,
+    maxSize: 120,
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Instagram" />
+      <DataTableColumnHeader column={column} title="Updated At" />
     ),
     cell: ({ row }) => {
-      const { instagram, feature } = row.original;
-      const username = instagram?.startsWith("@")
-        ? instagram?.slice(1)
-        : instagram;
-
+      const { updatedAt } = row.original;
+      // console.log(plan);
       return (
-        <div className="truncate text-center text-sm text-muted-foreground">
-          {instagram ? (
-            <Link
-              href={`https://www.instagram.com/${username}`}
-              target="_blank"
-              className={cn(feature === false && "line-through")}
-            >
-              {instagram}
-            </Link>
-          ) : (
-            "-"
-          )}
+        <div>
+          {updatedAt
+            ? new Date(updatedAt).toLocaleString("en-US", {
+                month: "numeric",
+                day: "numeric",
+                year: "2-digit",
+                hour: "numeric",
+                minute: "2-digit",
+              })
+            : "-"}
         </div>
       );
     },
     filterFn: (row, columnId, filterValue) => {
       if (!Array.isArray(filterValue)) return true;
-      const instagram = row.original?.instagram;
-      const hasValue = !!instagram && instagram.trim() !== "";
-      return filterValue.includes(String(hasValue));
+      return filterValue.includes(row.getValue(columnId));
     },
   },
   {
-    accessorKey: "website",
-    id: "website",
-    minSize: 120,
-    maxSize: 200,
+    accessorKey: "message",
+    minSize: 200,
+    maxSize: 400,
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Website" />
+      <DataTableColumnHeader column={column} title="Message" />
     ),
     cell: ({ row }) => {
-      const { website, feature } = row.original;
-      const displayLink = website?.startsWith("http")
-        ? website.slice(website.indexOf("//") + 2)
-        : website;
-      return (
-        <div className="truncate text-center text-sm text-muted-foreground">
-          {website ? (
-            <Link
-              href={website}
-              target="_blank"
-              className={cn(feature === false && "line-through")}
-            >
-              {displayLink}
-            </Link>
-          ) : (
-            "-"
-          )}
-        </div>
-      );
-    },
-  },
-  {
-    accessorKey: "canFeature",
-    id: "canFeature",
-    minSize: 80,
-    maxSize: 80,
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Can Feature" />
-    ),
-    cell: ({ row }) => {
-      const { canFeature } = row.original;
-      return (
-        <div className="truncate text-center text-sm text-muted-foreground">
-          {typeof canFeature === "boolean" ? (canFeature ? "Yes" : "No") : "-"}
-        </div>
-      );
+      const { message } = row.original;
+      return <div className="truncate text-center text-sm">{message}</div>;
     },
     filterFn: (row, columnId, filterValue) => {
       if (!Array.isArray(filterValue)) return true;
@@ -186,61 +210,31 @@ export const supportColumns: ColumnDef<SupportColumnProps>[] = [
       return filterValue.includes(String(value));
     },
   },
-  {
-    accessorKey: "feature",
-    id: "feature",
-    minSize: 80,
-    maxSize: 80,
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Feature" />
-    ),
-    cell: ({ row }) => {
-      const { feature } = row.original;
-      return (
-        <ArtistFeatureSelect
-          artistId={row.original.artistId}
-          feature={feature}
-          key={row.original.artistId}
-        />
-      );
-    },
-    filterFn: (row, columnId, filterValue) => {
-      if (!Array.isArray(filterValue)) return true;
-      const value = row.getValue(columnId);
-      return filterValue.includes(String(value));
-    },
-  },
-
-  {
-    accessorKey: "notes",
-    id: "notes",
-    minSize: 120,
-    maxSize: 180,
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Notes" />
-    ),
-    cell: ({ row }) => {
-      const { notes } = row.original;
-      return <span className="text-sm">{notes ?? "-"}</span>;
-    },
-  },
-  {
-    accessorKey: "createdAt",
-    id: "createdAt",
-    minSize: 120,
-    maxSize: 180,
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Created" />
-    ),
-    cell: ({ row }) => {
-      const { createdAt: value } = row.original;
-      return (
-        <span className="text-sm">
-          {value ? new Date(value).toLocaleString() : "-"}
-        </span>
-      );
-    },
-  },
+  // {
+  //   accessorKey: "updatedBy",
+  //   minSize: 70,
+  //   maxSize: 100,
+  //   header: ({ column }) => (
+  //     <DataTableColumnHeader column={column} title="Updated By" />
+  //   ),
+  //   cell: ({ row }) => {
+  //     const { updatedBy } = row.original;
+  //     return (
+  //       <div
+  //         className={cn(
+  //           "flex items-center justify-center gap-1 truncate text-center text-sm",
+  //         )}
+  //       >
+  //         {updatedBy}
+  //       </div>
+  //     );
+  //   },
+  //   filterFn: (row, columnId, filterValue) => {
+  //     if (!Array.isArray(filterValue)) return true;
+  //     const value = row.getValue(columnId);
+  //     return filterValue.includes(String(value));
+  //   },
+  // },
 
   {
     id: "actions",
@@ -249,15 +243,17 @@ export const supportColumns: ColumnDef<SupportColumnProps>[] = [
     minSize: 40,
     enableResizing: false,
     cell: ({ row }) => {
-      const { artistId } = row.original;
+      const { _id: ticketId } = row.original;
 
       // const openCallState = event.openCallState;
       // const openCallId = event.openCallId;
-
       // console.log(table.options)
 
       return (
-        <div className={cn("flex justify-center")}>
+        <div
+          className={cn("flex justify-center")}
+          onClick={(e) => e.stopPropagation()}
+        >
           <ConfirmingDropdown>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -273,36 +269,10 @@ export const supportColumns: ColumnDef<SupportColumnProps>[] = [
                 align="end"
                 className="scrollable mini darkbar max-h-56"
               >
-                <DropdownMenuLabel>Actions</DropdownMenuLabel>{" "}
-                <DropdownMenuSeparator />
-                {/* 
-                  <Link
-                  href={`mailto:${user.email}`}
-                  target="_blank"
-                  >
-                  <DropdownMenuItem>
-                    <FaEnvelope className="size-4" /> Contact
-                    </DropdownMenuItem> 
-                  </Link>
-                */}
-                <DropdownMenuItem>
-                  <CopyableItem
-                    defaultIcon={<LucideClipboardCopy className="size-4" />}
-                    copyContent={artistId}
-                  >
-                    User ID
-                  </CopyableItem>
-                </DropdownMenuItem>
-                {artistId && (
-                  <DropdownMenuItem>
-                    <CopyableItem
-                      defaultIcon={<LucideClipboardCopy className="size-4" />}
-                      copyContent={artistId}
-                    >
-                      Artist ID
-                    </CopyableItem>
-                  </DropdownMenuItem>
-                )}
+                <DropdownMenuGroup>
+                  <DropdownMenuLabel>Admin</DropdownMenuLabel>
+                  <DeleteSupportTicketBtn ticketId={ticketId} />
+                </DropdownMenuGroup>
               </DropdownMenuContent>
             </DropdownMenu>
           </ConfirmingDropdown>

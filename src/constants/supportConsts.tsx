@@ -3,6 +3,9 @@ import z from "zod";
 import {
   Calendar,
   Circle,
+  CircleCheck,
+  CircleDashed,
+  CircleX,
   Construction,
   CreditCard,
   Megaphone,
@@ -34,6 +37,29 @@ export const supportCategoryOptions = [
   { label: "Other", value: "other", icon: Circle },
 ] as const;
 
+export const ticketStatusOptions = [
+  {
+    value: "pending",
+    label: "Pending",
+    icon: CircleDashed,
+  },
+  {
+    value: "open",
+    label: "Open",
+    icon: Circle,
+  },
+  {
+    value: "resolved",
+    label: "Resolved",
+    icon: CircleCheck,
+  },
+  {
+    value: "closed",
+    label: "Closed",
+    icon: CircleX,
+  },
+] as const;
+
 export type SupportCategory = (typeof supportCategoryOptions)[number]["value"];
 
 export const supportCategoryValidator = z.union(
@@ -42,5 +68,6 @@ export const supportCategoryValidator = z.union(
 
 export function getSupportCategoryLabel(value: SupportCategory): string {
   const option = supportCategoryOptions.find((opt) => opt.value === value);
+
   return option ? option.label : value;
 }

@@ -50,6 +50,7 @@ export default async function AdminPage({
     case "event":
       return <AdminEventForm user={user} />;
 
+    case "support":
     case "users":
     case "socials":
     case "artists":

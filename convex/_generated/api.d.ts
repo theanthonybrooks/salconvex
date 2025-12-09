@@ -49,6 +49,7 @@ import type * as stripe_stripeBase from "../stripe/stripeBase.js";
 import type * as stripe_stripeOrganizations from "../stripe/stripeOrganizations.js";
 import type * as stripe_stripeSubscriptions from "../stripe/stripeSubscriptions.js";
 import type * as subscriptions from "../subscriptions.js";
+import type * as support_tickets from "../support/tickets.js";
 import type * as thelist_getFilteredEventsPublicUpdate from "../thelist/getFilteredEventsPublicUpdate.js";
 import type * as uploads_files from "../uploads/files.js";
 import type * as uploads_user from "../uploads/user.js";
@@ -103,6 +104,7 @@ declare const fullApi: ApiFromModules<{
   "stripe/stripeOrganizations": typeof stripe_stripeOrganizations;
   "stripe/stripeSubscriptions": typeof stripe_stripeSubscriptions;
   subscriptions: typeof subscriptions;
+  "support/tickets": typeof support_tickets;
   "thelist/getFilteredEventsPublicUpdate": typeof thelist_getFilteredEventsPublicUpdate;
   "uploads/files": typeof uploads_files;
   "uploads/user": typeof uploads_user;

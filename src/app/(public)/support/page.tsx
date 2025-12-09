@@ -85,7 +85,7 @@ const SupportPage = () => {
     // isError,
     error: ticketError,
   } = useQueryWithStatus(
-    api.admin.getSupportTicketStatus,
+    api.support.tickets.getSupportTicketStatus,
     existingTicketNumber
       ? { ticketNumber: Number(existingTicketNumber) }
       : "skip",

@@ -1,3 +1,5 @@
+import type { User } from "@/types/user";
+
 import React from "react";
 
 import { Bell } from "lucide-react";
@@ -26,7 +28,8 @@ type NotificationsDropdownProps = {
   setTooltipDisabled: React.Dispatch<React.SetStateAction<boolean>>;
   tooltipDisabled: boolean;
   className?: string;
-  isAdmin?: boolean;
+
+  user: User;
 };
 
 export const NotificationsDropdown = ({
@@ -35,9 +38,18 @@ export const NotificationsDropdown = ({
   setTooltipDisabled,
   tooltipDisabled,
   className,
-  isAdmin,
+
+  user,
 }: NotificationsDropdownProps) => {
+  const isAdmin = user.role.includes("admin");
+  const isCreator = user.role.includes("creator");
+
   const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
+
+  const { data: supportTicketData } = useQueryWithStatus(
+    api.support.tickets.getNewSupportTickets,
+    isCreator ? { userId: user._id } : "skip",
+  );
   const { data: submittedEventsData } = useQueryWithStatus(
     api.events.event.getSubmittedEventCount,
     isAdmin ? {} : "skip",
@@ -50,11 +62,13 @@ export const NotificationsDropdown = ({
     api.events.socials.getNumberOfQueuedEvents,
     isAdmin ? {} : "skip",
   );
-
+  const { newTickets } = supportTicketData ?? {};
+  const newSupportTickets = newTickets ?? 0;
   const queuedEvents = queuedEventsData?.data ?? 0;
   const pendingEvents = submittedEventsData ?? 0;
   const pendingOpenCalls = submittedOpenCallsData ?? 0;
-  const totalPending = pendingOpenCalls + pendingEvents + queuedEvents;
+  const totalPending =
+    pendingOpenCalls + pendingEvents + queuedEvents + newSupportTickets;
   return (
     <DropdownMenu
       onOpenChange={(val) => {
@@ -78,7 +92,7 @@ export const NotificationsDropdown = ({
           >
             <Bell className="size-6" />
             {isAdmin && totalPending > 0 && (
-              <div className="bg-salPinkMed absolute right-0 top-0 flex size-5 items-center justify-center rounded-full border-1.5 border-salPinkDark text-2xs font-semibold text-card hover:scale-105 hover:cursor-pointer">
+              <div className="absolute right-0 top-0 flex size-5 items-center justify-center rounded-full border-1.5 border-salPinkDark bg-salPinkMed text-2xs font-semibold text-card hover:scale-105 hover:cursor-pointer">
                 {totalPending}
               </div>
             )}
@@ -116,6 +130,14 @@ export const NotificationsDropdown = ({
             <Link href="/dashboard/admin/socials" target="_blank">
               <DropdownMenuItem className="w-full">
                 {queuedEvents} - Scheduled Call{queuedEvents > 1 && "s"}
+              </DropdownMenuItem>
+            </Link>
+          )}
+          {newSupportTickets > 0 && (
+            <Link href="/dashboard/admin/todos" target="_blank">
+              <DropdownMenuItem className="w-full">
+                {newSupportTickets} - Support Ticket
+                {newSupportTickets > 1 && "s"}
               </DropdownMenuItem>
             </Link>
           )}

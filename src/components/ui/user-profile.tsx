@@ -57,14 +57,14 @@ export function UserProfile({
   const { preloadedUserData, preloadedSubStatus } = useConvexPreload();
   const userData = usePreloadedQuery(preloadedUserData);
   const subData = usePreloadedQuery(preloadedSubStatus);
-  const user = userData?.user;
+  const { user } = userData ?? {};
 
   const userRole = user?.role;
   const accountType = user?.accountType ?? [];
   const multipleAccountTypes = accountType.length > 1;
   const isArtist = accountType?.includes("artist") ?? false;
   const isOrganizer = accountType?.includes("organizer") ?? false;
-  const isAdmin = userRole?.includes("admin");
+  const isAdmin = !!user && userRole?.includes("admin");
   const hasActiveSub = subData?.hasActiveSubscription;
   const subStatus = subData?.subStatus;
   // console.log("User subscription:", subscription)
@@ -81,7 +81,7 @@ export function UserProfile({
           setTooltipDisabled={setTooltipDisabled}
           tooltipDisabled={tooltipDisabled}
           className={className}
-          isAdmin={isAdmin}
+          user={user}
         />
       )}
       <DropdownMenu

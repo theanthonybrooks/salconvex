@@ -14,6 +14,7 @@ import { artistColumns } from "@/features/admin/dashboard/artist-columns";
 import { newsletterColumns } from "@/features/admin/dashboard/newsletter-columns";
 import { resourceColumns } from "@/features/admin/dashboard/resources-column";
 import { socialColumns } from "@/features/admin/dashboard/socials-columns";
+import { supportColumns } from "@/features/admin/dashboard/support-columns";
 import { AdminToolbar } from "@/features/admin/dashboard/user-admin-toolbar";
 import { userColumns } from "@/features/admin/dashboard/user-columns";
 import { userAddOnColumns } from "@/features/admin/dashboard/userAddon-columns";
@@ -37,6 +38,7 @@ export function AdminDashboardTableWrapper({
   // );
   // const [existingOpenCall, setExistingOpenCall] =
   //   useState<Doc<"openCalls"> | null>(null);
+
   const { isSidebarCollapsed } = useDashboard();
 
   const { preloadedEventData } = useAdminPreload();
@@ -55,6 +57,7 @@ export function AdminDashboardTableWrapper({
   const submissionsPage = page === "events";
   // const appsPage = page === "applications";
   const usersPage = page === "users";
+  const supportPage = page === "support";
   const artistsPage = page === "artists";
   const newsletterPage = page === "newsletter";
   const resourcesPage = page === "resources";
@@ -89,6 +92,11 @@ export function AdminDashboardTableWrapper({
   const socialsEvents = useQuery(
     api.events.socials.getEventsForSocials,
     socialsPage ? {} : "skip",
+  );
+
+  const supportTickets = useQuery(
+    api.support.tickets.getSupportTickets,
+    supportPage ? {} : "skip",
   );
 
   return (
@@ -288,6 +296,32 @@ export function AdminDashboardTableWrapper({
             { id: "plannedDate", desc: false },
           ]}
           pageSize={50}
+          defaultFilters={[]}
+        />
+      )}
+      {supportPage && (
+        <ResponsiveDataTable
+          title="Support Tickets"
+          description="Current & Archived Support Tickets"
+          columns={supportColumns}
+          data={supportTickets ?? []}
+          adminActions={adminActions}
+          tableType="support"
+          pageType="dashboard"
+          collapsedSidebar={isSidebarCollapsed}
+          defaultSort={
+            [
+              // { id: "posted", desc: true },
+              // { id: "plannedDate", desc: false },
+            ]
+          }
+          pageSize={50}
+          defaultVisibility={{
+            desktop: {
+              name: isSidebarCollapsed,
+              updatedAt: isSidebarCollapsed,
+            },
+          }}
           defaultFilters={[]}
         />
       )}

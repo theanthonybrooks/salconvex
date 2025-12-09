@@ -396,6 +396,7 @@ export const TABLE_FILTERS: TableFilterConfig = {
       ],
     },
   ],
+  support: [],
   events: [
     { columnId: "state", title: "State", options: eventStates },
     {

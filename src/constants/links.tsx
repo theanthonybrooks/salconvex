@@ -388,6 +388,17 @@ export const dashboardNavItems: DashNavItem[] = [
     userType: [],
   },
   {
+    label: "Support",
+    href: "/dashboard/admin/support",
+    icon: HelpCircle,
+    subsection: true,
+    sectionCat: "admin",
+    desc: "Support Tickets",
+    userRole: ["admin"],
+    sub: [],
+    userType: [],
+  },
+  {
     label: "Site Analytics",
     href: "/dashboard/admin/analytics",
     icon: PiGraph,

@@ -39,13 +39,16 @@ export const sendSupportEmail = action({
     }
 
     try {
-      const data = await ctx.runMutation(api.admin.createSupportTicket, {
-        userId,
-        name,
-        email,
-        category,
-        message,
-      });
+      const data = await ctx.runMutation(
+        api.support.tickets.createSupportTicket,
+        {
+          userId,
+          name,
+          email,
+          category,
+          message,
+        },
+      );
 
       const ticketNumber = data?.ticketNumber;
       const userHtmlContent = html`

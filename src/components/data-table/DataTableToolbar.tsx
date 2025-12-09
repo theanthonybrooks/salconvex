@@ -4,14 +4,14 @@ import { TABLE_FILTERS } from "@/constants/data-table-constants";
 
 import { TableTypes } from "@/types/tanstack-table";
 
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useIsMobile } from "@/hooks/use-media-query";
 import { Table } from "@tanstack/react-table";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
-import { Filter, FilterX, X } from "lucide-react";
 import { TbFilterX } from "react-icons/tb";
+import { Filter, FilterX, X } from "lucide-react";
 
 import { DataTableViewOptions } from "@/components/data-table/DataTableViewOptions";
 import { AlertDialogSimple } from "@/components/ui/alert-dialog";
@@ -21,9 +21,9 @@ import { TooltipSimple } from "@/components/ui/tooltip";
 import { OnlineEventDialog } from "@/features/resources/components/online-event-dialog";
 import { cn } from "@/helpers/utilsFns";
 
-import { useMutation } from "convex/react";
 import { api } from "~/convex/_generated/api";
 import { Id } from "~/convex/_generated/dataModel";
+import { useMutation } from "convex/react";
 import { DataTableFacetedFilter } from "./DataTableFacetedFilter";
 
 interface DataTableToolbarProps<TData> {
@@ -122,6 +122,7 @@ export function DataTableToolbar<TData>({
   const getColumnLabel = (table?: TableTypes) => {
     // note-to-self: use this to adjust the default column for searching. For now, it's just the name column.
     if (table === "artists") return "name";
+    if (table === "support") return "ticketNumber";
     return "name";
   };
 

@@ -1517,6 +1517,7 @@ export default defineSchema({
 
     .index("by_column_completedAt", ["column", "completedAt"])
     .index("by_column_ticketNumber", ["column", "ticketNumber"])
+    .index("by_ticketNumber", ["ticketNumber"])
     .index("by_purpose", ["purpose"])
     .index("by_category", ["category"])
     .index("by_column_order", ["column", "order"]),
@@ -1616,6 +1617,7 @@ export default defineSchema({
 
   support: defineTable(supportSchema)
     .index("by_ticketNumber", ["ticketNumber"])
+    .index("by_status", ["status"])
     .index("by_userId", ["userId"])
     .index("by_email", ["email"]),
 
