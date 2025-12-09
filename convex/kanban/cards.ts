@@ -98,7 +98,6 @@ export const getCards = query({
     userId: v.optional(v.id("users")),
   },
   handler: async (ctx, args) => {
-    console.log(args);
     // console.log("user id: ", args.userId);
     const userIsCreator = args.userRole.includes("creator");
 
@@ -145,7 +144,9 @@ export const getCards = query({
         let filteredResults = results;
         if (args.userId) {
           const userResults = results.filter(
-            (card) => card.assignedId === args.userId,
+            (card) =>
+              card.assignedId === args.userId ||
+              card.secondaryAssignedId === args.userId,
           );
           const completeCards = userResults.filter(
             (card) => card.column === "done",
@@ -164,7 +165,6 @@ export const getCards = query({
     }
 
     const collectedResults = await indexedQuery.collect();
-    console.log(collectedResults);
     if (
       args.userId &&
       ((userIsCreator && args.purpose === "todo") || !userIsCreator)

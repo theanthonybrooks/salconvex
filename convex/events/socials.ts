@@ -22,11 +22,12 @@ export const updateEventPostStatus = mutation({
     await ctx.db.patch(event._id, {
       posted,
       ...(args.posted === "posted"
-        ? { postedAt: Date.now() }
-        : { postedAt: undefined }),
-      ...(args.posted === "posted"
-        ? { postedBy: userId }
-        : { postedBy: undefined }),
+        ? { postedAt: Date.now(), postedBy: userId }
+        : {
+            postedAt: undefined,
+            postedBy: undefined,
+            postPlannedDate: undefined,
+          }),
     });
 
     await ctx.runMutation(internal.events.eventLookup.updateLookupPostStatus, {

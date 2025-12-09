@@ -1,6 +1,8 @@
 import { SupportCategory } from "@/constants/supportConsts";
 
-import type { Id } from "~/convex/_generated/dataModel";
+import type { StatusValue } from "@/features/admin/dashboard/components/admin-support-actions";
+
+import type { Doc, Id } from "~/convex/_generated/dataModel";
 
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { ShardedCounter } from "@convex-dev/sharded-counter";
@@ -118,6 +120,8 @@ export const updateSupportTicket = mutation({
     ),
   },
   async handler(ctx, args) {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return null;
     const support = await ctx.db.get(args.supportId);
     if (!support) return null;
 
@@ -125,6 +129,30 @@ export const updateSupportTicket = mutation({
       status: args.status,
       updatedAt: Date.now(),
     });
+
+    const kanbanCard = await ctx.db
+      .query("todoKanban")
+      .withIndex("by_ticketNumber", (q) => q.eq("ticketNumber", support._id))
+      .first();
+
+    const kanbanStatus: Record<
+      StatusValue,
+      Pick<Doc<"todoKanban">, "column">["column"]
+    > = {
+      pending: "proposed",
+      open: "todo",
+      resolved: "done",
+      closed: "notPlanned",
+    };
+
+    if (kanbanCard) {
+      await ctx.db.patch(kanbanCard._id, {
+        column: kanbanStatus[args.status],
+        updatedAt: Date.now(),
+        lastUpdatedBy: userId,
+        completedAt: args.status !== "open" ? Date.now() : undefined,
+      });
+    }
 
     return { support };
   },

@@ -181,7 +181,8 @@ export const SupportTicketPrioritySelector = ({
   return (
     <SelectSimple
       labelOnly
-      className="border-transparent"
+      disabled={status === "closed" || status === "resolved"}
+      className="border-transparent disabled:border-transparent"
       options={getSupportPriorityOptions(status)}
       value={priority ?? ""}
       onChangeAction={async (value) => {
