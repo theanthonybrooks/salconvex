@@ -18,6 +18,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { PopoverSimple } from "@/components/ui/popover";
 import {
   DeleteSupportTicketBtn,
   SupportTicketStatusSelector,
@@ -70,6 +71,10 @@ export const supportColumns: ColumnDef<SupportColumnsProps>[] = [
           {ticketNumber}
         </div>
       );
+    },
+    filterFn: (row, columnId, filterValue) => {
+      const value = String(row.getValue(columnId));
+      return value.includes(filterValue);
     },
     enableSorting: true,
     // sortingFn: (rowA, rowB, columnId) => {
@@ -202,7 +207,11 @@ export const supportColumns: ColumnDef<SupportColumnsProps>[] = [
     ),
     cell: ({ row }) => {
       const { message } = row.original;
-      return <div className="truncate text-center text-sm">{message}</div>;
+      return (
+        <PopoverSimple content={message}>
+          <div className="truncate text-sm">{message}</div>
+        </PopoverSimple>
+      );
     },
     filterFn: (row, columnId, filterValue) => {
       if (!Array.isArray(filterValue)) return true;
