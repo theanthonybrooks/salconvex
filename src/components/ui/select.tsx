@@ -3,6 +3,7 @@
 //TODO: Add the userPref check to this component (and others) to ensure that the fontSize is set to the user's preference
 import * as React from "react";
 import * as SelectPrimitive from "@radix-ui/react-select";
+import { capitalize } from "lodash";
 import { IconType } from "react-icons";
 
 import {
@@ -214,6 +215,7 @@ interface SelectSimpleProps {
   hasReset?: boolean;
   center?: boolean;
   iconOnly?: boolean;
+  labelOnly?: boolean;
   debug?: {
     open: boolean;
   };
@@ -235,6 +237,7 @@ export const SelectSimple = ({
   hasReset,
   center,
   iconOnly,
+  labelOnly,
   debug,
 }: SelectSimpleProps) => {
   const { open } = debug ?? {};
@@ -309,10 +312,10 @@ export const SelectSimple = ({
                 fontSize={fontSize}
               >
                 <TooltipSimple
-                  content={option.label}
+                  content={labelOnly ? capitalize(option.value) : option.label}
                   className="z-top"
                   side="left"
-                  disabled={!iconOnly}
+                  disabled={!iconOnly && !labelOnly}
                 >
                   <span className="flex items-center gap-x-1">
                     {option.premium && (
@@ -320,7 +323,7 @@ export const SelectSimple = ({
                         (<DollarSign className="size-3" />)
                       </span>
                     )}
-                    {option.icon && (
+                    {option.icon && !labelOnly && (
                       <option.icon className={cn("size-4", option.iconSize)} />
                     )}
                     <p

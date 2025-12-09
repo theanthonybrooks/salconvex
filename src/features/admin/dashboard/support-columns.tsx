@@ -2,6 +2,7 @@
 
 import { getSupportCategoryLabel } from "@/constants/supportConsts";
 
+import type { Priority } from "@/constants/kanbanConsts";
 import type { SupportCategory } from "@/constants/supportConsts";
 
 import { ColumnDef } from "@tanstack/react-table";
@@ -22,6 +23,7 @@ import { PopoverSimple } from "@/components/ui/popover";
 import {
   DeleteSupportTicketBtn,
   GoToSupportTicket,
+  SupportTicketPrioritySelector,
   SupportTicketStatusSelector,
 } from "@/features/admin/dashboard/components/admin-support-actions";
 import { cn } from "@/helpers/utilsFns";
@@ -39,6 +41,21 @@ export const supportColumnLabels: Record<string, string> = {
   message: "Message",
 };
 
+const getRank = (status: string) => {
+  switch (status) {
+    case "pending":
+      return 1;
+    case "open":
+      return 2;
+    case "resolved":
+      return 3;
+    case "closed":
+      return 4;
+    default:
+      return 5;
+  }
+};
+
 // _id: Id<"support">;
 // _creationTime: number;
 // updatedAt?: number | undefined;
@@ -54,6 +71,7 @@ export const supportColumnLabels: Record<string, string> = {
 
 type SupportColumnsProps = Doc<"support"> & {
   kanbanId?: Id<"todoKanban">;
+  priority?: Priority;
 };
 
 export const supportColumns: ColumnDef<SupportColumnsProps>[] = [
@@ -121,7 +139,31 @@ export const supportColumns: ColumnDef<SupportColumnsProps>[] = [
       return filterValue.includes(row.getValue(columnId));
     },
     enableMultiSort: true,
+    sortingFn: (rowA, rowB) => {
+      const a = getRank(rowA.getValue("status"));
+      const b = getRank(rowB.getValue("status"));
+
+      return a - b;
+    },
     sortUndefined: "last",
+  },
+  {
+    accessorKey: "priority",
+    minSize: 40,
+    maxSize: 40,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Priority" />
+    ),
+    cell: ({ row }) => {
+      const { priority, kanbanId, status } = row.original;
+      return (
+        <SupportTicketPrioritySelector
+          kanbanId={kanbanId}
+          priority={priority}
+          status={status}
+        />
+      );
+    },
   },
 
   {

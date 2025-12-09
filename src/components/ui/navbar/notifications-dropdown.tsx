@@ -134,7 +134,7 @@ export const NotificationsDropdown = ({
             </Link>
           )}
           {newSupportTickets > 0 && (
-            <Link href="/dashboard/admin/todos" target="_blank">
+            <Link href="/dashboard/admin/support" target="_blank">
               <DropdownMenuItem className="w-full">
                 {newSupportTickets} - Support Ticket
                 {newSupportTickets > 1 && "s"}

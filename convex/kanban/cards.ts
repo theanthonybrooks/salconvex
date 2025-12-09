@@ -95,6 +95,7 @@ export const getCards = query({
     userId: v.optional(v.id("users")),
   },
   handler: async (ctx, args) => {
+    console.log(args);
     // console.log("user id: ", args.userId);
     const userIsCreator = args.userRole.includes("creator");
 
@@ -123,9 +124,15 @@ export const getCards = query({
     }
 
     if (args.purpose !== "todo") {
-      indexedQuery = tableQuery.withIndex("by_purpose", (q) =>
-        q.eq("purpose", args.purpose!),
-      );
+      if (args.purpose === "design") {
+        indexedQuery = tableQuery.withIndex("by_purpose", (q) =>
+          q.eq("purpose", args.purpose),
+        );
+      } else if (args.purpose === "support") {
+        indexedQuery = tableQuery.withIndex("by_ticketNumber", (q) =>
+          q.gt("ticketNumber", undefined),
+        );
+      }
     } else {
       if (args.category.length === 0) {
         let orderedQuery: OrderedQuery<DataModel["todoKanban"]> = indexedQuery;
@@ -154,6 +161,7 @@ export const getCards = query({
     }
 
     const collectedResults = await indexedQuery.collect();
+    console.log(collectedResults);
     if (
       args.userId &&
       ((userIsCreator && args.purpose === "todo") || !userIsCreator)
@@ -560,5 +568,39 @@ export const updateAssignedUser = mutation({
       assignedId: args.userId,
       secondaryAssignedId: args.secondaryUserId,
     });
+  },
+});
+
+export const updateCardPriority = mutation({
+  args: {
+    cardId: v.id("todoKanban"),
+    priority: v.optional(
+      v.union(v.literal("high"), v.literal("medium"), v.literal("low")),
+    ),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new ConvexError("Not authenticated");
+    const kanbanCard = await ctx.db.get(args.cardId);
+    if (!kanbanCard) throw new ConvexError("Kanban card not found");
+
+    await ctx.db.patch(kanbanCard._id, {
+      priority: args.priority,
+      updatedAt: Date.now(),
+      lastUpdatedBy: userId,
+    });
+    const ticketId = kanbanCard.ticketNumber;
+    const supportTicket = ticketId
+      ? await ctx.db
+          .query("support")
+          .withIndex("by_id", (q) => q.eq("_id", ticketId))
+          .first()
+      : null;
+    if (supportTicket) {
+      await ctx.db.patch(supportTicket._id, {
+        updatedAt: Date.now(),
+        updatedBy: userId,
+      });
+    }
   },
 });

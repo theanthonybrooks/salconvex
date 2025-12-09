@@ -1,3 +1,6 @@
+import type { Priority } from "@/constants/kanbanConsts";
+import type { StatusValue } from "@/features/admin/dashboard/components/admin-support-actions";
+
 import z from "zod";
 
 import {
@@ -14,6 +17,8 @@ import {
   Scroll,
   Users2,
 } from "lucide-react";
+
+import { cn } from "@/helpers/utilsFns";
 
 export const supportCategoryOptions = [
   { label: "General", value: "general", icon: Construction, group: "General" },
@@ -70,4 +75,61 @@ export function getSupportCategoryLabel(value: SupportCategory): string {
   const option = supportCategoryOptions.find((opt) => opt.value === value);
 
   return option ? option.label : value;
+}
+
+export const getSupportPriorityOptions = (status: StatusValue) => [
+  {
+    label: (
+      <PriorityIndicatorBase
+        priority="high"
+        alternativeLow={status === "closed" || status === "resolved"}
+      />
+    ),
+    value: "high",
+  },
+  {
+    label: (
+      <PriorityIndicatorBase
+        priority="medium"
+        alternativeLow={status === "closed" || status === "resolved"}
+      />
+    ),
+    value: "medium",
+  },
+  {
+    label: (
+      <PriorityIndicatorBase
+        priority="low"
+        alternativeLow={status === "closed" || status === "resolved"}
+      />
+    ),
+    value: "low",
+  },
+];
+
+export function PriorityIndicatorBase({
+  priority,
+  onClickAction,
+  alternativeLow,
+}: {
+  priority: Priority;
+  onClickAction?: (value: Priority) => void;
+  alternativeLow?: boolean;
+}) {
+  return (
+    <span
+      onClick={(e) => {
+        e.stopPropagation();
+        onClickAction?.(priority);
+      }}
+      className={cn(
+        "mt-1 block size-2 rounded-full border border-transparent p-[5px] hover:scale-105 hover:cursor-pointer hover:border-foreground active:scale-95",
+        priority === "low" || alternativeLow
+          ? "bg-green-500"
+          : priority === "high"
+            ? "bg-red-500"
+            : "bg-yellow-500",
+      )}
+    />
+  );
 }

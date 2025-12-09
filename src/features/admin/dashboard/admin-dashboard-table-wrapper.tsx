@@ -309,7 +309,7 @@ export function AdminDashboardTableWrapper({
           tableType="support"
           pageType="dashboard"
           collapsedSidebar={isSidebarCollapsed}
-          defaultSort={[{ id: "status", desc: true }]}
+          defaultSort={[{ id: "status", desc: false }]}
           pageSize={50}
           defaultVisibility={{
             desktop: {

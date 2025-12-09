@@ -1264,6 +1264,7 @@ export default defineSchema({
     .index("by_slug_edition", ["slug", "dates.edition"])
     .index("by_slug_and_organizerId", ["slug", "organizerId"])
     .index("by_posted", ["posted"])
+    .index("by_posted_postPlannedDate", ["posted", "postPlannedDate"])
     .index("by_organizerId", ["organizerId"])
     .index("by_mainOrgId", ["mainOrgId"])
     .index("by_mainOrgId_and_state", ["mainOrgId", "state"])

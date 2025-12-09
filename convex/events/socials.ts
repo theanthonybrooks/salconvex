@@ -143,7 +143,9 @@ export const getNumberOfQueuedEvents = query({
       };
     const socialsEvents = await ctx.db
       .query("events")
-      .withIndex("by_posted", (q) => q.eq("posted", "toPost"))
+      .withIndex("by_posted_postPlannedDate", (q) =>
+        q.eq("posted", "toPost").gt("postPlannedDate", undefined),
+      )
       .order("asc")
       .collect();
 

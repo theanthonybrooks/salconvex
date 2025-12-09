@@ -50,7 +50,7 @@ export const createSupportTicket = mutation({
       email: args.email,
       category: args.category,
       message: args.message,
-      status: "open",
+      status: "pending",
       createdAt: Date.now(),
     });
 
@@ -158,7 +158,7 @@ export const getNewSupportTickets = query({
     if (!user || !isAdmin) return null;
     const newSupportTickets = await ctx.db
       .query("support")
-      .withIndex("by_status", (q) => q.eq("status", "open"))
+      .withIndex("by_status", (q) => q.eq("status", "pending"))
       .collect();
     const numberOfTickets = newSupportTickets.length;
 
@@ -187,6 +187,7 @@ export const getSupportTickets = query({
         return {
           ...ticket,
           kanbanId: kanbanCard?._id,
+          priority: kanbanCard?.priority,
         };
       }),
     );

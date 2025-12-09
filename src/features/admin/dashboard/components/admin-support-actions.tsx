@@ -1,6 +1,11 @@
 "use client";
 
-import { ticketStatusOptions } from "@/constants/supportConsts";
+import {
+  getSupportPriorityOptions,
+  ticketStatusOptions,
+} from "@/constants/supportConsts";
+
+import type { Priority } from "@/constants/kanbanConsts";
 
 import { Trash } from "lucide-react";
 
@@ -21,7 +26,9 @@ type AdminSupportActionBaseProps = {
   ticketId: Id<"support">;
 };
 
-type TicketStatus = Pick<Doc<"support">, "status">;
+export type TicketStatus = Pick<Doc<"support">, "status">;
+
+export type StatusValue = TicketStatus["status"];
 
 type AdminSupportStatusProps = AdminSupportActionBaseProps & {
   status: string;
@@ -58,7 +65,7 @@ export const SupportTicketStatusSelector = ({
   };
 
   const availableStatuses = ticketStatusOptions.filter(
-    (option) => option.value !== "pending",
+    (option) => option.value !== "pending" || option.value === status,
   );
 
   return (
@@ -141,5 +148,54 @@ export const GoToSupportTicket = ({
         {ticketNumber}
       </Link>
     </TooltipSimple>
+  );
+};
+
+export const SupportTicketPrioritySelector = ({
+  kanbanId,
+  status,
+  priority,
+}: {
+  priority?: Priority;
+  kanbanId?: Id<"todoKanban">;
+} & TicketStatus) => {
+  const updateSupportTicketPriority = useMutation(
+    api.kanban.cards.updateCardPriority,
+  );
+  const handleUpdateSupportTicketPriority = async (value: Priority) => {
+    if (!kanbanId) return;
+    try {
+      await updateSupportTicketPriority({
+        cardId: kanbanId,
+        priority: value,
+      });
+    } catch (error) {
+      if (error instanceof ConvexError) {
+        showToast("error", error.data);
+      } else {
+        console.error("Failed to update ticket priority:", error);
+      }
+    }
+  };
+
+  return (
+    <SelectSimple
+      labelOnly
+      className="border-transparent"
+      options={getSupportPriorityOptions(status)}
+      value={priority ?? ""}
+      onChangeAction={async (value) => {
+        try {
+          await handleUpdateSupportTicketPriority(value as Priority);
+        } catch (error) {
+          if (error instanceof ConvexError) {
+            showToast("error", error.data);
+          } else {
+            console.error("Failed to update ticket priority:", error);
+          }
+        }
+      }}
+      placeholder="-"
+    />
   );
 };

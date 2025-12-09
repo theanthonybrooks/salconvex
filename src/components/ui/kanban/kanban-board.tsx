@@ -13,6 +13,7 @@ import {
 } from "@/constants/kanbanConsts";
 import {
   getSupportCategoryLabel,
+  PriorityIndicatorBase,
   supportCategoryOptions,
 } from "@/constants/supportConsts";
 
@@ -710,7 +711,7 @@ const Card = ({
             getColumnColor(column),
           )}
         >
-          <span
+          {/* <span
             onClick={handleTogglePriority}
             className={cn(
               "mt-1 size-2 rounded-full border border-transparent p-[5px] hover:scale-105 hover:cursor-pointer hover:border-foreground active:scale-95",
@@ -720,6 +721,11 @@ const Card = ({
                   ? "bg-red-500"
                   : "bg-yellow-500",
             )}
+          /> */}
+          <PriorityIndicatorBase
+            priority={newPriority}
+            onClickAction={handleTogglePriority}
+            alternativeLow={column === "done"}
           />
 
           <RichTextDisplay
