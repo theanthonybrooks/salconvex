@@ -1,4 +1,3 @@
-import type { ApplicationStatus } from "@/types/applications";
 import type { EventCategory, EventData } from "@/types/eventTypes";
 import type {
   CallType,
@@ -17,6 +16,7 @@ import {
   LoaderCircle,
 } from "lucide-react";
 
+import type { ApplicationStatus } from "~/convex/schema";
 import { ApplyRedirectDialog } from "@/components/ui/apply-redirect-dialog";
 import { Button } from "@/components/ui/button";
 import { TooltipSimple } from "@/components/ui/tooltip";

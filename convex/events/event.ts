@@ -409,10 +409,7 @@ export const getEventByOrgId = query({
     const userId = await getAuthUserId(ctx);
     if (!userId) return null;
 
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_userId", (q) => q.eq("userId", userId))
-      .unique();
+    const user = await ctx.db.get(userId);
     if (!user) return null;
 
     const org = await ctx.db.get(args.orgId);
@@ -454,10 +451,7 @@ export const getSubmittedEvents = query({
     const userId = await getAuthUserId(ctx);
     if (!userId) return null;
 
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_userId", (q) => q.eq("userId", userId))
-      .unique();
+    const user = await ctx.db.get(userId);
     if (!user) throw new ConvexError("User not found");
 
     const isAdmin = user.role.includes("admin");
@@ -536,10 +530,7 @@ export const getAllEvents = query({
     const userId = await getAuthUserId(ctx);
     if (!userId) return null;
 
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_userId", (q) => q.eq("userId", userId))
-      .unique();
+    const user = await ctx.db.get(userId);
     if (!user) throw new ConvexError("User not found");
 
     const isAdmin = user.role.includes("admin");
@@ -613,10 +604,7 @@ export const getUserEvents = query({
     const userId = await getAuthUserId(ctx);
     if (!userId) return null;
 
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_userId", (q) => q.eq("userId", userId))
-      .unique();
+    const user = await ctx.db.get(userId);
     if (!user) return null;
 
     // const isAdmin = user.role.includes("admin");
@@ -1418,10 +1406,7 @@ export const approveEvent = mutation({
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new Error("Not authenticated");
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_userId", (q) => q.eq("userId", userId))
-      .unique();
+    const user = await ctx.db.get(userId);
     if (!user) throw new Error("User not found");
     const isAdmin = user.role.includes("admin");
     if (!isAdmin)
@@ -1458,10 +1443,7 @@ export const reactivateEvent = mutation({
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new Error("Not authenticated");
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_userId", (q) => q.eq("userId", userId))
-      .unique();
+    const user = await ctx.db.get(userId);
     if (!user) throw new Error("User not found");
     const isAdmin = user.role.includes("admin");
 
@@ -1550,10 +1532,7 @@ export const duplicateEvent = mutation({
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new Error("Not authenticated");
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_userId", (q) => q.eq("userId", userId))
-      .unique();
+    const user = await ctx.db.get(userId);
     if (!user) throw new Error("User not found");
     const event = await ctx.db.get(args.eventId);
     if (!event) return null;
@@ -1679,10 +1658,7 @@ export const deleteMultipleEvents = mutation({
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new Error("Not authenticated");
 
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_userId", (q) => q.eq("userId", userId))
-      .unique();
+    const user = await ctx.db.get(userId);
 
     if (!user) throw new ConvexError("User not found");
 

@@ -332,6 +332,7 @@ export const getNewsletterSubscribers = query({
           userPlan: subscriber.userPlan,
           userType: subscriber.userId ? "user" : "guest",
           active: subscriber.newsletter,
+          verified: subscriber.verified,
           type: subscriber.type,
           frequency: subscriber.frequency,
           timesAttempted: subscriber.timesAttempted,

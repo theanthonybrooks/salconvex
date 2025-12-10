@@ -1,6 +1,8 @@
 //TODO: Add ability for me (or other admins) to bookmark users. Also to flag or ban users.
 "use client";
 
+import type { FunctionReturnType } from "convex/server";
+
 import { ColumnDef } from "@tanstack/react-table";
 
 import { BsRobot } from "react-icons/bs";
@@ -29,8 +31,7 @@ import {
 import { ConvexDashboardLink } from "@/features/events/ui/convex-dashboard-link";
 import { cn } from "@/helpers/utilsFns";
 
-import { Id } from "~/convex/_generated/dataModel";
-import { AccountType, UserRole } from "~/convex/schema";
+import { api } from "~/convex/_generated/api";
 
 export const userColumnLabels: Record<string, string> = {
   name: "Name",
@@ -54,32 +55,10 @@ export const userColumnLabels: Record<string, string> = {
   organizationNames: "Organizations",
 };
 
-interface UserColumnsProps {
-  _id: Id<"users">;
-  artistId?: Id<"artists">;
-  customerId?: string;
-  name: string;
-  email: string;
-  location: string[];
-  instagram?: string;
-  website?: string;
-  canFeature: boolean;
-  subscription?: string;
-  subStatus?: string;
-  cancelComment?: string;
-  cancelFeedback?: string;
-  cancelReason?: string;
-  canceledAt?: number;
-  lastActive?: number;
-  lastUpdated?: number;
-  accountType: AccountType;
-  createdAt: number;
-  role: UserRole;
-  source?: string;
-  organizationNames: string[];
-}
+type UserResults = FunctionReturnType<typeof api.users.usersWithSubscriptions>;
+type UserResult = NonNullable<UserResults>["users"][number];
 
-export const userColumns: ColumnDef<UserColumnsProps>[] = [
+export const userColumns: ColumnDef<UserResult>[] = [
   {
     accessorKey: "rowNumber",
     id: "rowNumber",

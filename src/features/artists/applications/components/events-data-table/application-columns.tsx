@@ -1,16 +1,15 @@
 "use client";
 
-import { ApplicationStatus } from "@/types/applications";
+import type { FunctionReturnType } from "convex/server";
 
 import { ColumnDef } from "@tanstack/react-table";
 
+import type { api } from "~/convex/_generated/api";
 import { DataTableColumnHeader } from "@/components/data-table/DataTableColumnHeader";
 import { Link } from "@/components/ui/custom-link";
 import { AppNotesInput } from "@/features/artists/applications/components/events-data-table/app-notes-input";
 import { AppStatusSelector } from "@/features/artists/applications/components/events-data-table/app-status-selector";
 import { cn } from "@/helpers/utilsFns";
-
-import { Id } from "~/convex/_generated/dataModel";
 
 export const applicationColumnLabels: Record<string, string> = {
   name: "Event Name",
@@ -26,24 +25,30 @@ export const applicationColumnLabels: Record<string, string> = {
   // manualApplied: "Manual Entry",
 };
 
-interface ApplicationColumnsProps {
-  _id: Id<"applications">;
-  name: string;
-  edition: number;
-  eventStart: string;
-  eventEnd: string;
-  productionStart: string;
-  productionEnd: string;
-  applicationTime: number;
-  applicationStatus: ApplicationStatus;
-  // manualApplied: boolean;
-  responseTime: number;
-  // response: string;
-  notes?: string;
-  slug: string;
-}
+type ArtistApplications = FunctionReturnType<
+  typeof api.artists.applications.getArtistApplications
+>;
 
-export const applicationColumns: ColumnDef<ApplicationColumnsProps>[] = [
+type ArtistApplication = NonNullable<ArtistApplications>[number];
+
+// interface ApplicationColumnsProps {
+//   _id: Id<"applications">;
+//   name: string;
+//   edition: number;
+//   eventStart: string;
+//   eventEnd: string;
+//   productionStart: string;
+//   productionEnd: string;
+//   applicationTime: number;
+//   applicationStatus: ApplicationStatus;
+//   // manualApplied: boolean;
+//   responseTime: number;
+//   // response: string;
+//   notes?: string;
+//   slug: string;
+// }
+
+export const applicationColumns: ColumnDef<ArtistApplication>[] = [
   {
     accessorKey: "rowNumber",
     id: "rowNumber",

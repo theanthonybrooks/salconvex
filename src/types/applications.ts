@@ -1,3 +1,5 @@
+import type { ApplicationStatus } from "~/convex/schema";
+
 export const artistStatusOptions = [
   { value: "applied", label: "Applied" },
   { value: "accepted", label: "Accepted" },
@@ -20,7 +22,7 @@ export const applicationStatusValues = [
   "pending",
   "roster",
   "shortlisted",
-];
+] as const;
 
 export const positiveApplicationStatuses = [
   "external apply",
@@ -33,13 +35,16 @@ export const positiveApplicationStatuses = [
   "shortlisted",
 ];
 
-export type ApplicationStatus = (typeof applicationStatusValues)[number] | null;
+// export type ApplicationStatus = (typeof applicationStatusValues)[number] | null;
 
 export type NonNullApplicationStatus = Exclude<ApplicationStatus, null>;
 
 export const statusColorMap: Record<NonNullApplicationStatus, string> = {
+  "external apply": "",
+  applied: "",
   accepted: "text-green-700",
   rejected: "text-red-700",
+  pending: "",
   roster: "text-blue-700",
   shortlisted: "text-yellow-700",
   "to next step": "text-orange-700",

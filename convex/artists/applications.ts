@@ -1,20 +1,12 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { mutation, query } from "~/convex/_generated/server";
+import { applicationStatusValues } from "~/convex/schema";
 import { v } from "convex/values";
 
 export const updateApplicationStatus = mutation({
   args: {
     applicationId: v.id("applications"),
-    status: v.union(
-      v.literal("accepted"),
-      v.literal("rejected"),
-      v.literal("roster"),
-      v.literal("shortlisted"),
-      v.literal("to next step"),
-      v.literal("considering"),
-      v.literal("applied"),
-      v.literal("remove"),
-    ),
+    status: v.union(...applicationStatusValues, v.literal("remove")),
     notes: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
@@ -27,10 +19,6 @@ export const updateApplicationStatus = mutation({
       await ctx.db.delete(application._id);
       return null;
     }
-
-    // await ctx.db.patch(application._id, {
-    //   applicationStatus: args.status,
-    // });
 
     const patchData: Record<string, unknown> = {
       applicationStatus: args.status,
@@ -63,31 +51,8 @@ export const updateApplicationNotes = mutation({
     });
   },
 });
-//"accepted" | "rejected" | "roster" | "shortlisted" | "to next step" | "external apply" | "considering" | "applied" | "pending" | null | undefined
 
-export const getArtistApplication = query({
-  args: {
-    eventId: v.optional(v.id("events")),
-  },
-  handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) return null;
-    const artist = await ctx.db
-      .query("artists")
-      .withIndex("by_artistId", (q) => q.eq("artistId", userId))
-      .unique();
-    if (!artist) return null;
-
-    const applications = await ctx.db
-      .query("applications")
-      .withIndex("by_artistId", (q) => q.eq("artistId", userId))
-      .collect();
-
-    return applications;
-  },
-});
-
-export const getArtistApplications = query({
+export const getArtistData = query({
   // args: {
   //   artistId: v.optional(v.id("artists")),
   // },
@@ -114,22 +79,15 @@ export const getArtistApplications = query({
   },
 });
 
-export const getArtistApplications2 = query({
+export const getArtistApplications = query({
   args: {},
   handler: async (ctx) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) return null;
 
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_userId", (q) => q.eq("userId", userId))
-      .unique();
-
-    if (!user) return null;
-
     const applications = await ctx.db
       .query("applications")
-      .withIndex("by_artistId", (q) => q.eq("artistId", user._id))
+      .withIndex("by_artistId", (q) => q.eq("artistId", userId))
       .collect();
 
     const openCallIds = [...new Set(applications.map((app) => app.openCallId))];
@@ -164,7 +122,7 @@ export const getArtistApplications2 = query({
         productionStart: event?.dates.prodDates?.[0]?.start ?? "-",
         productionEnd: event?.dates.prodDates?.at(-1)?.end ?? "-",
         applicationTime: app.applicationTime ?? 0,
-        applicationStatus: app.applicationStatus ?? "-",
+        applicationStatus: app.applicationStatus,
         manualApplied: app.manualApplied ?? false,
         responseTime: app.responseTime ?? 0,
         // response: app.response ?? "-",
@@ -173,3 +131,26 @@ export const getArtistApplications2 = query({
     });
   },
 });
+
+//! Not currently in use. Will need configured when I implement the application system
+// export const getArtistApplication = query({
+//   args: {
+//     eventId: v.optional(v.id("events")),
+//   },
+//   handler: async (ctx, args) => {
+//     const userId = await getAuthUserId(ctx);
+//     if (!userId) return null;
+//     const artist = await ctx.db
+//       .query("artists")
+//       .withIndex("by_artistId", (q) => q.eq("artistId", userId))
+//       .unique();
+//     if (!artist) return null;
+
+//     const applications = await ctx.db
+//       .query("applications")
+//       .withIndex("by_artistId", (q) => q.eq("artistId", userId))
+//       .collect();
+
+//     return applications;
+//   },
+// });

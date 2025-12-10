@@ -2,8 +2,21 @@
 
 import { getSupportCategoryLabel } from "@/constants/supportConsts";
 
-import type { Priority } from "@/constants/kanbanConsts";
 import type { SupportCategory } from "@/constants/supportConsts";
+// _id: Id<"support">;
+// _creationTime: number;
+// updatedAt?: number | undefined;
+// updatedBy?: Id<"users"> | undefined;
+// userId: Id<"users"> | null;
+// name: string;
+// email: string;
+// createdAt: number;
+// category: string;
+// status: "pending" | "open" | "resolved" | "closed";
+// ticketNumber: number;
+// message: string;
+
+import type { FunctionReturnType } from "convex/server";
 
 import { ColumnDef } from "@tanstack/react-table";
 
@@ -27,7 +40,7 @@ import {
 } from "@/features/admin/dashboard/components/admin-support-actions";
 import { cn } from "@/helpers/utilsFns";
 
-import { type Doc, type Id } from "~/convex/_generated/dataModel";
+import { api } from "~/convex/_generated/api";
 
 export const supportColumnLabels: Record<string, string> = {
   ticketNumber: "Ticket #",
@@ -55,25 +68,12 @@ const getRank = (status: string) => {
   }
 };
 
-// _id: Id<"support">;
-// _creationTime: number;
-// updatedAt?: number | undefined;
-// updatedBy?: Id<"users"> | undefined;
-// userId: Id<"users"> | null;
-// name: string;
-// email: string;
-// createdAt: number;
-// category: string;
-// status: "pending" | "open" | "resolved" | "closed";
-// ticketNumber: number;
-// message: string;
+type SupportResults = FunctionReturnType<
+  typeof api.support.tickets.getSupportTickets
+>;
+type SupportResult = NonNullable<SupportResults>[number];
 
-type SupportColumnsProps = Doc<"support"> & {
-  kanbanId?: Id<"todoKanban">;
-  priority?: Priority;
-};
-
-export const supportColumns: ColumnDef<SupportColumnsProps>[] = [
+export const supportColumns: ColumnDef<SupportResult>[] = [
   {
     accessorKey: "ticketNumber",
     id: "ticketNumber",

@@ -1,8 +1,9 @@
 "use client";
 
+import type { FunctionReturnType } from "convex/server";
+
 import { ColumnDef } from "@tanstack/react-table";
 
-import type { UserAddOnStatus } from "~/convex/schema";
 import { DataTableColumnHeader } from "@/components/data-table/DataTableColumnHeader";
 import { Link } from "@/components/ui/custom-link";
 import {
@@ -11,7 +12,7 @@ import {
   ViewNotes,
 } from "@/features/resources/components/online-event-table-actions";
 
-import { Id } from "~/convex/_generated/dataModel";
+import { api } from "~/convex/_generated/api";
 
 export const userAddOnColumnLabels: Record<string, string> = {
   name: "Name",
@@ -25,23 +26,12 @@ export const userAddOnColumnLabels: Record<string, string> = {
   order: "Order",
 };
 
-interface UserAddOnColumnsProps {
-  _id: Id<"userAddOns">;
-  name: string;
-  email: string;
-  link?: string;
-  notes?: string;
-  paid: boolean;
-  plan?: number;
-  canceled: boolean;
-  status: UserAddOnStatus;
-  order?: number;
-  capacity: number;
-  _creationTime: number;
-  takenOrders: number[];
-}
+type UserAddOns = FunctionReturnType<
+  typeof api.userAddOns.onlineEvents.getAllRegistrationsForEvent
+>;
+type UserAddOn = NonNullable<UserAddOns>[number];
 
-export const userAddOnColumns: ColumnDef<UserAddOnColumnsProps>[] = [
+export const userAddOnColumns: ColumnDef<UserAddOn>[] = [
   {
     accessorKey: "rowNumber",
     id: "rowNumber",

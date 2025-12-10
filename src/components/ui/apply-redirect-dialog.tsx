@@ -1,4 +1,3 @@
-import type { ApplicationStatus } from "@/types/applications";
 import type { OpenCallStatus } from "@/types/openCallTypes";
 import type { User } from "@/types/user";
 
@@ -17,6 +16,7 @@ import {
   X,
 } from "lucide-react";
 
+import type { ApplicationStatus } from "~/convex/schema";
 import {
   AlertDialog,
   AlertDialogCancel,

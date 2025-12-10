@@ -1,7 +1,7 @@
 //add functions here for organizers to handle/manage applications later
 import { getAuthUserId } from "@convex-dev/auth/server";
-import { ConvexError, v } from "convex/values";
 import { query } from "~/convex/_generated/server";
+import { ConvexError, v } from "convex/values";
 
 export const getOpenCallApplications = query({
   args: {
@@ -12,10 +12,7 @@ export const getOpenCallApplications = query({
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new ConvexError("Not authenticated");
 
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_userId", (q) => q.eq("userId", userId))
-      .unique();
+    const user = await ctx.db.get(userId);
 
     if (!user) throw new ConvexError("User not found");
 
@@ -66,16 +63,12 @@ export const getOpenCallApplications = query({
   },
 });
 
-
 export const getAllApplications = query({
   handler: async (ctx) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) return null;
 
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_userId", (q) => q.eq("userId", userId))
-      .unique();
+    const user = await ctx.db.get(userId);
 
     if (!user || !user.role?.includes("admin")) return null;
 

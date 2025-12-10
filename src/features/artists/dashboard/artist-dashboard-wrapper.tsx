@@ -35,7 +35,7 @@ export function ArtistDashboardTableWrapper({
   const bookmarksPage = page === "bookmarks";
   const hiddenPage = page === "hidden";
   const applicationData = useQuery(
-    api.artists.applications.getArtistApplications2,
+    api.artists.applications.getArtistApplications,
     appsPage && isArtist ? {} : "skip",
   );
   const bookmarkData = useQuery(

@@ -82,6 +82,22 @@ const userPrefsFull = v.object(userPrefsFullValidator);
 
 export type UserPrefsType = Infer<typeof userPrefsValidator>;
 // #endregion
+// #region ------------- Artist Validators --------------
+export const applicationStatusValues = [
+  v.literal("accepted"),
+  v.literal("rejected"),
+  v.literal("roster"),
+  v.literal("shortlisted"),
+  v.literal("to next step"),
+  v.literal("external apply"),
+  v.literal("considering"),
+  v.literal("applied"),
+  v.literal("pending"),
+];
+const applicationStatusValidator = v.union(...applicationStatusValues);
+
+export type ApplicationStatus = Infer<typeof applicationStatusValidator>;
+
 // #region ------------- Organization Validators --------------
 const primaryContacts = v.union(
   v.literal("email"),
@@ -767,20 +783,8 @@ const applicationsSchema = {
   artistId: v.id("users"),
   applicationTime: v.optional(v.number()),
   // applicationId: v.string(), //would just be the ._id of the application. No reason to make a separate field for this.
-  applicationStatus: v.optional(
-    v.union(
-      v.literal("accepted"),
-      v.literal("rejected"),
-      v.literal("roster"),
-      v.literal("shortlisted"),
-      v.literal("to next step"),
-      v.literal("external apply"),
-      v.literal("considering"),
-      v.literal("applied"),
-      v.literal("pending"),
-      v.null(),
-    ),
-  ),
+  applicationStatus: applicationStatusValidator,
+
   manualApplied: v.optional(v.boolean()),
   responseTime: v.optional(v.number()),
   notes: v.optional(v.string()),

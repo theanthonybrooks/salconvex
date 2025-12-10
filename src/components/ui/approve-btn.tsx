@@ -1,4 +1,3 @@
-import { ApplicationStatus } from "@/types/applications";
 import {
   EventCategory,
   EventData,
@@ -9,6 +8,7 @@ import { User } from "@/types/user";
 
 import { useRouter } from "next/navigation";
 
+import type { ApplicationStatus } from "~/convex/schema";
 import { Button } from "@/components/ui/button";
 import EventContextMenu from "@/features/events/ui/event-context-menu";
 import { getEventCategoryLabel } from "@/helpers/eventFns";

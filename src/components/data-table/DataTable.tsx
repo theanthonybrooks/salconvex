@@ -8,7 +8,6 @@ import {
 } from "@/constants/resourcesConsts";
 
 import {
-  ApplicationStatus,
   NonNullApplicationStatus,
   positiveApplicationStatuses,
   statusBgColorMap,
@@ -34,7 +33,11 @@ import {
   VisibilityState,
 } from "@tanstack/react-table";
 
-import type { OnlineEventStateType, UserAddOnStatus } from "~/convex/schema";
+import type {
+  ApplicationStatus,
+  OnlineEventStateType,
+  UserAddOnStatus,
+} from "~/convex/schema";
 import {
   Table,
   TableBody,
@@ -382,7 +385,7 @@ export function DataTable<TData, TValue>({
                   }
                 } else if (tableType === "applications") {
                   const { applicationStatus } = row.original as {
-                    applicationStatus: ApplicationStatus | null;
+                    applicationStatus: ApplicationStatus;
                   };
                   const statusColor =
                     statusBgColorMap[

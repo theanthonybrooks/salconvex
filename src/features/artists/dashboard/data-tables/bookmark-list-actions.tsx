@@ -1,12 +1,10 @@
 import { bookmarkIntents } from "@/constants/data-table-constants";
 
-import {
-  ApplicationStatus,
-  positiveApplicationStatuses,
-} from "@/types/applications";
+import { positiveApplicationStatuses } from "@/types/applications";
 
 import { capitalize } from "lodash";
 
+import type { ApplicationStatus } from "~/convex/schema";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { SelectSimple } from "@/components/ui/select";
 import { useArtistApplicationActions } from "@/features/artists/helpers/appActions";
@@ -18,7 +16,7 @@ import { useMutation } from "convex/react";
 interface BookmarkListActionSelectorProps {
   eventId: Id<"events">;
   initialValue?: string;
-  appStatus?: ApplicationStatus;
+  appStatus?: ApplicationStatus | null;
   openCallId: Id<"openCalls"> | null;
   isPast?: boolean;
 }
@@ -75,7 +73,7 @@ export const BookmarkListActionSelector = ({
   return (
     <SelectSimple
       hasReset
-      placeholder="-"
+      placeholder="Select reason"
       disabled={disabledValue}
       value={value ?? ""}
       onChangeAction={handleChange}

@@ -1,11 +1,12 @@
 "use client";
 
+import type { FunctionReturnType } from "convex/server";
+
 import Image from "next/image";
 import { ColumnDef } from "@tanstack/react-table";
 
 import { Check, Pencil } from "lucide-react";
 
-import type { OnlineEventStateType } from "~/convex/schema";
 import { DataTableColumnHeader } from "@/components/data-table/DataTableColumnHeader";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,7 +20,7 @@ import {
 } from "@/features/resources/components/online-event-table-actions";
 import { cn } from "@/helpers/utilsFns";
 
-import { Id } from "~/convex/_generated/dataModel";
+import { api } from "~/convex/_generated/api";
 
 export const resourcesColumnLabels: Record<string, string> = {
   name: "Name",
@@ -37,30 +38,12 @@ export const resourcesColumnLabels: Record<string, string> = {
   requirements: "Requirements",
 };
 
-interface ResourceColumnsProps {
-  _id: Id<"onlineEvents">;
-  name: string;
-  slug: string;
-  img?: string;
-  description: string;
-  startDate: number;
-  endDate: number;
-  regDeadline: number;
-  price: number;
-  capacity: {
-    max: number;
-    current: number;
-  };
-  organizer: Id<"users">;
-  terms: string[];
-  requirements: string[];
-  location: string;
-  updatedAt?: number;
-  createdAt: number;
-  state: OnlineEventStateType;
-}
+type ResourceResults = FunctionReturnType<
+  typeof api.userAddOns.onlineEvents.getAllOnlineEvents
+>;
+type ResourceResult = NonNullable<ResourceResults>["events"][number];
 
-export const resourceColumns: ColumnDef<ResourceColumnsProps>[] = [
+export const resourceColumns: ColumnDef<ResourceResult>[] = [
   {
     accessorKey: "rowNumber",
     id: "rowNumber",

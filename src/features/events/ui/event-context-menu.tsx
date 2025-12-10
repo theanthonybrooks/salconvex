@@ -1,6 +1,5 @@
 "use client";
 
-import { ApplicationStatus } from "@/types/applications";
 import {
   EventCategory,
   EventData,
@@ -28,6 +27,7 @@ import {
   Pencil,
 } from "lucide-react";
 
+import type { ApplicationStatus } from "~/convex/schema";
 import { Button } from "@/components/ui/button";
 import { CopyableItem } from "@/components/ui/copyable-item";
 import {

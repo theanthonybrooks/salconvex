@@ -271,10 +271,7 @@ export const isAdmin = query({
     const userId = await getAuthUserId(ctx);
     if (!userId) return null;
 
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_userId", (q) => q.eq("userId", userId))
-      .unique();
+    const user = await ctx.db.get(userId);
     // if (!user) throw new ConvexError("User not found");
 
     if (user?.role.includes("admin")) {
@@ -306,10 +303,7 @@ export const getCurrentUser = query({
     const userId = await getAuthUserId(ctx);
     // if (!userId) console.log("user id not found");
     if (!userId) return null;
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_userId", (q) => q.eq("userId", userId))
-      .unique();
+    const user = await ctx.db.get(userId);
 
     // console.log("userId", userId)
     // if (!user) console.log("user not found");
@@ -579,10 +573,7 @@ export const updateUserPrefs = mutation({
       });
     }
 
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_userId", (q) => q.eq("userId", userId))
-      .unique();
+    const user = await ctx.db.get(userId);
     if (!user) throw new ConvexError("User not found");
 
     await ctx.db.patch(user._id, { updatedAt: Date.now() });

@@ -1,6 +1,8 @@
 //TODO: Add ability for me (or other admins) to bookmark users. Also to flag or ban users.
 "use client";
 
+import type { FunctionReturnType } from "convex/server";
+
 import { ColumnDef } from "@tanstack/react-table";
 
 import { LucideClipboardCopy, MoreHorizontal } from "lucide-react";
@@ -26,7 +28,7 @@ import { TooltipSimple } from "@/components/ui/tooltip";
 import { ConvexDashboardLink } from "@/features/events/ui/convex-dashboard-link";
 import { cn } from "@/helpers/utilsFns";
 
-import { Id } from "~/convex/_generated/dataModel";
+import { api } from "~/convex/_generated/api";
 
 export const artistColumnLabels: Record<string, string> = {
   name: "Name",
@@ -39,20 +41,12 @@ export const artistColumnLabels: Record<string, string> = {
   notes: "Notes",
   createdAt: "Created",
 };
+type ArtistResults = FunctionReturnType<
+  typeof api.artists.artistQueries.getActiveArtists
+>;
+type ArtistResult = NonNullable<ArtistResults>[number];
 
-export interface ArtistColumnProps {
-  artistId: Id<"artists">;
-  name: string;
-  nationality: string[];
-  instagram: string;
-  website: string;
-  canFeature: boolean | undefined;
-  feature: boolean | string;
-  notes: string;
-  createdAt: number;
-}
-
-export const artistColumns: ColumnDef<ArtistColumnProps>[] = [
+export const artistColumns: ColumnDef<ArtistResult>[] = [
   {
     accessorKey: "rowNumber",
     id: "rowNumber",

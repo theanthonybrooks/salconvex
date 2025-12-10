@@ -1,4 +1,5 @@
-import { ApplicationStatus } from "@/types/applications";
+import type { ApplicationStatus } from "~/convex/schema";
+
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { Id } from "~/convex/_generated/dataModel";
 import { query } from "~/convex/_generated/server";
@@ -12,7 +13,7 @@ export type ArtistEventMetadata = {
   applicationData: Record<
     Id<"openCalls">,
     {
-      status: ApplicationStatus | null;
+      status: ApplicationStatus;
       manualApplied: boolean;
     }
   >;
@@ -24,10 +25,7 @@ export const getArtistEventMetadata = query({
     const userId = await getAuthUserId(ctx);
     if (!userId) return null;
 
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_userId", (q) => q.eq("userId", userId))
-      .unique();
+    const user = await ctx.db.get(userId);
     if (!user) return null;
 
     const isAdmin = user.role.includes("admin");
@@ -75,7 +73,7 @@ export const getArtistEventMetadata = query({
     const applied: Id<"events">[] = [];
     const applicationData: Record<
       Id<"openCalls">,
-      { status: string | null; manualApplied: boolean }
+      { status: ApplicationStatus; manualApplied: boolean }
     > = {};
 
     for (const app of applications) {

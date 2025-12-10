@@ -2,9 +2,12 @@
 
 import { appStatusOptionValues } from "@/constants/data-table-constants";
 
+import type { FunctionReturnType } from "convex/server";
+
 import { ColumnDef } from "@tanstack/react-table";
 import { formatInTimeZone } from "date-fns-tz";
 
+import type { api } from "~/convex/_generated/api";
 import { DataTableColumnHeader } from "@/components/data-table/DataTableColumnHeader";
 import { Link } from "@/components/ui/custom-link";
 import { ListActionSelector } from "@/features/artists/dashboard/data-tables/bookmark-hidden-selector";
@@ -13,8 +16,6 @@ import {
   BookmarkNotesInput,
 } from "@/features/artists/dashboard/data-tables/bookmark-list-actions";
 import { cn } from "@/helpers/utilsFns";
-
-import { Id } from "~/convex/_generated/dataModel";
 
 export const bookmarkColumnLabels: Record<string, string> = {
   name: "Event Name",
@@ -29,26 +30,13 @@ export const bookmarkColumnLabels: Record<string, string> = {
   bookmarkNote: "Notes",
 };
 
-interface BookmarkColumnsProps {
-  _id: Id<"events">;
-  name: string;
-  deadline: string;
-  isPast: boolean;
-  timeZone: string;
-  edition: number;
-  eventStart: string;
-  eventEnd: string;
-  prodStart: string;
-  prodEnd: string;
-  bookmarkStatus: boolean;
-  slug: string;
-  bookmarkNote: string;
-  eventIntent: string;
-  applicationStatus: string | null;
-  openCallId: Id<"openCalls"> | null;
-}
+type ArtistBookmarks = FunctionReturnType<
+  typeof api.artists.listActions.getBookmarkedEventsWithDetails
+>;
 
-export const bookmarkColumns: ColumnDef<BookmarkColumnsProps>[] = [
+type BookmarkData = NonNullable<ArtistBookmarks>[number];
+
+export const bookmarkColumns: ColumnDef<BookmarkData>[] = [
   {
     accessorKey: "rowNumber",
     id: "rowNumber",

@@ -100,7 +100,7 @@ export default function Dashboard() {
     isAdmin ? {} : "skip",
   );
   const { data: artistData } = useQueryWithStatus(
-    api.artists.applications.getArtistApplications,
+    api.artists.applications.getArtistData,
     hasValidSub || isAdmin ? {} : "skip",
   );
   //  const artistData = useQuery(api.artists.applications.getArtistApplications);

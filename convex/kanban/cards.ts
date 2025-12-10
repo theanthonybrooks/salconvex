@@ -488,10 +488,7 @@ export const deleteCard = mutation({
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new Error("User not authenticated");
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_userId", (q) => q.eq("userId", userId))
-      .unique();
+    const user = await ctx.db.get(userId);
     if (!user) throw new Error("User not found");
     if (user.role.includes("admin")) {
       const kanbanCard = await ctx.db.get(args.id);

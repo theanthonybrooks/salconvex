@@ -113,10 +113,7 @@ export const getSubmittedOpenCallCount = query({
   handler: async (ctx) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) return null;
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_userId", (q) => q.eq("userId", userId))
-      .unique();
+    const user = await ctx.db.get(userId);
     if (!user) throw new ConvexError("User not found");
     const isAdmin = user?.role?.includes("admin");
     if (!isAdmin)
@@ -190,10 +187,7 @@ export const createNewOpenCall = mutation({
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new ConvexError("Not authenticated");
 
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_userId", (q) => q.eq("userId", userId))
-      .unique();
+    const user = await ctx.db.get(userId);
     if (!user) throw new ConvexError("User not found");
 
     const openCallData = {
@@ -282,10 +276,7 @@ export const updateOpenCall = mutation({
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new ConvexError("Not authenticated");
 
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_userId", (q) => q.eq("userId", userId))
-      .unique();
+    const user = await ctx.db.get(userId);
     if (!user) throw new ConvexError("User not found");
 
     const existingOpenCall = args.openCallId

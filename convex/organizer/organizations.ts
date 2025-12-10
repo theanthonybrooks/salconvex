@@ -187,10 +187,7 @@ export const getOrgContactInfo = query({
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) return null;
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_userId", (q) => q.eq("userId", userId))
-      .unique();
+    const user = await ctx.db.get(userId);
     if (!user) return null;
     const userIsAdmin = user.role.includes("admin");
     const event = await ctx.db.get(args.eventId);
@@ -446,10 +443,7 @@ export const markOrganizationComplete = mutation({
     console.log(args);
     const userId = await getAuthUserId(ctx);
     if (!userId) return null;
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_userId", (q) => q.eq("userId", userId))
-      .unique();
+    const user = await ctx.db.get(userId);
 
     if (!user) {
       throw new ConvexError("User not authenticated");
@@ -505,10 +499,7 @@ export const updateOrganization = mutation({
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) return null;
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_userId", (q) => q.eq("userId", userId))
-      .unique();
+    const user = await ctx.db.get(userId);
 
     if (!user) {
       throw new ConvexError("User not found");
@@ -580,10 +571,7 @@ export const deleteOrganization = mutation({
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new ConvexError("Not authenticated");
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_userId", (q) => q.eq("userId", userId))
-      .unique();
+    const user = await ctx.db.get(userId);
 
     if (!user) {
       throw new ConvexError("User not found");
@@ -778,10 +766,7 @@ export const isOwnerOrIsNewOrg = query({
     });
     const userId = await getAuthUserId(ctx);
     if (!userId) return null;
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_userId", (q) => q.eq("userId", userId))
-      .unique();
+    const user = await ctx.db.get(userId);
 
     if (!user) return null;
 

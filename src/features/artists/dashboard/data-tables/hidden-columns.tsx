@@ -1,18 +1,17 @@
 "use client";
 
-import type { EventLocation } from "@/types/eventTypes";
-import { EventCategory, EventType } from "@/types/eventTypes";
+import type { FunctionReturnType } from "convex/server";
+import { EventType } from "@/types/eventTypes";
 
 import { ColumnDef } from "@tanstack/react-table";
 
+import type { api } from "~/convex/_generated/api";
 import { DataTableColumnHeader } from "@/components/data-table/DataTableColumnHeader";
 import { Link } from "@/components/ui/custom-link";
 import { ListActionSelector } from "@/features/artists/dashboard/data-tables/bookmark-hidden-selector";
 import { getEventCategoryLabel, getEventTypeLabel } from "@/helpers/eventFns";
 import { getFormattedLocationString } from "@/helpers/locationFns";
 import { cn } from "@/helpers/utilsFns";
-
-import { Id } from "~/convex/_generated/dataModel";
 
 export const hiddenColumnLabels: Record<string, string> = {
   name: "Event Name",
@@ -23,18 +22,13 @@ export const hiddenColumnLabels: Record<string, string> = {
   hiddenStatus: "Status",
 };
 
-interface hiddenColumnsProps {
-  _id: Id<"events">;
-  name: string;
-  location: EventLocation;
-  edition: number;
-  category: EventCategory;
-  type: EventType[];
-  hiddenStatus: boolean;
-  slug: string;
-}
+type HiddenEvents = FunctionReturnType<
+  typeof api.artists.listActions.getHiddenEvents
+>;
 
-export const hiddenColumns: ColumnDef<hiddenColumnsProps>[] = [
+type HiddenEvent = NonNullable<HiddenEvents>[number];
+
+export const hiddenColumns: ColumnDef<HiddenEvent>[] = [
   {
     accessorKey: "rowNumber",
     id: "rowNumber",

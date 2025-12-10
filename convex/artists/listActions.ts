@@ -1,9 +1,7 @@
-import {
-  ApplicationStatus,
-  positiveApplicationStatuses,
-} from "@/types/applications";
+import { positiveApplicationStatuses } from "@/types/applications";
 
 import type { Id } from "~/convex/_generated/dataModel";
+import type { ApplicationStatus } from "~/convex/schema";
 
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { mutation, query } from "~/convex/_generated/server";
@@ -16,10 +14,7 @@ export const getHiddenEvents = query({
     const userId = await getAuthUserId(ctx);
     if (!userId) return null;
 
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_userId", (q) => q.eq("userId", userId))
-      .unique();
+    const user = await ctx.db.get(userId);
     if (!user) return null;
 
     const isAdmin = user.role.includes("admin");
@@ -72,10 +67,7 @@ export const getBookmarkedEvents = query({
     const userId = await getAuthUserId(ctx);
     if (!userId) return null;
 
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_userId", (q) => q.eq("userId", userId))
-      .unique();
+    const user = await ctx.db.get(userId);
     if (!user) return null;
 
     const isAdmin = user.role.includes("admin");
@@ -115,10 +107,7 @@ export const getBookmarkedEventsWithDetails = query({
     const userId = await getAuthUserId(ctx);
     if (!userId) return null;
 
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_userId", (q) => q.eq("userId", userId))
-      .unique();
+    const user = await ctx.db.get(userId);
     if (!user) return null;
     const userPreferences = await ctx.db
       .query("userPreferences")
@@ -144,7 +133,6 @@ export const getBookmarkedEventsWithDetails = query({
       .withIndex("by_artistId_bookmarked", (q) =>
         q.eq("artistId", user._id).eq("bookmarked", true),
       )
-
       .collect();
 
     const bookmarkedMap = new Map(listActions.map((a) => [a.eventId, a]));
@@ -160,7 +148,7 @@ export const getBookmarkedEventsWithDetails = query({
     const result = [];
     for (const event of nonNullEvents) {
       const metadata = bookmarkedMap.get(event._id);
-      let applicationStatus: string | null = null;
+      let applicationStatus: ApplicationStatus | null = null;
       let openCallId: Id<"openCalls"> | null = null;
       let eventIntent: string = "";
       let deadline: string = "-";
@@ -193,8 +181,7 @@ export const getBookmarkedEventsWithDetails = query({
           .first();
 
         if (application) {
-          applicationStatus =
-            application.applicationStatus as ApplicationStatus;
+          applicationStatus = application.applicationStatus;
           if (
             application.applicationStatus &&
             positiveApplicationStatuses.includes(application.applicationStatus)
@@ -250,10 +237,7 @@ export const updateBookmark = mutation({
     const userId = await getAuthUserId(ctx);
     if (!userId) return null;
 
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_userId", (q) => q.eq("userId", userId))
-      .unique();
+    const user = await ctx.db.get(userId);
     if (!user) return null;
 
     const bookmark = await ctx.db

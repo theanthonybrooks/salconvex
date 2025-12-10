@@ -59,10 +59,7 @@ export const updateOrCreateArtist = mutation({
     if (args.artistLogoStorageId) {
       fileUrl = await ctx.storage.getUrl(args.artistLogoStorageId);
     }
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_userId", (q) => q.eq("userId", userId))
-      .unique();
+    const user = await ctx.db.get(userId);
 
     if (!user) {
       throw new ConvexError("User not found");
@@ -279,7 +276,7 @@ export const artistApplicationActions = mutation({
           applicationTime: hasApplied ? Date.now() : undefined,
           artistId: userId,
           manualApplied: hasApplied ?? false,
-          ...(hasApplied ? { applicationStatus: "applied" } : {}),
+          applicationStatus: "applied",
         });
       } else {
         await ctx.db.patch(application._id, {
@@ -352,20 +349,6 @@ export const artistListActions = mutation({
     }
   },
 });
-
-// export type ArtistEventMetadata = {
-//   bookmarked: Id<"events">[];
-//   hidden: Id<"events">[];
-//   applied: Id<"events">[];
-//   artistNationality: string[];
-//   applicationData: Record<
-//     Id<"openCalls">,
-//     {
-//       status: ApplicationStatus | null;
-//       manualApplied: boolean;
-//     }
-//   >;
-// };
 
 export type ArtistListActions = Pick<
   ArtistEventMetadata,

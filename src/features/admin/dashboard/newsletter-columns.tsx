@@ -5,16 +5,21 @@ import {
   NewsletterType,
 } from "@/constants/newsletterConsts";
 
+import type { FunctionReturnType } from "convex/server";
+
 import { ColumnDef } from "@tanstack/react-table";
 
 import { FaEnvelope } from "react-icons/fa6";
 import {
+  BadgeIcon,
   CheckCircle2,
   LucideClipboardCopy,
   MoreHorizontal,
+  Verified,
   X,
 } from "lucide-react";
 
+import type { api } from "~/convex/_generated/api";
 import { DeleteNewsletterSubscription } from "@/components/data-table/actions/DataTableAdminUserActions";
 import { DataTableColumnHeader } from "@/components/data-table/DataTableColumnHeader";
 import { Button } from "@/components/ui/button";
@@ -31,8 +36,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/helpers/utilsFns";
 
-import { Id } from "~/convex/_generated/dataModel";
-
 export const newsletterColumnLabels: Record<string, string> = {
   name: "Name",
   email: "Email",
@@ -46,21 +49,14 @@ export const newsletterColumnLabels: Record<string, string> = {
   createdAt: "Created",
 };
 
-interface NewsletterColumnsProps {
-  _id: Id<"newsletter">;
-  name: string;
-  email: string;
-  userPlan?: number;
-  userType?: string;
-  active: boolean;
-  type?: NewsletterType[];
-  frequency?: NewsletterFrequency;
-  timesAttempted: number;
-  lastAttempt: number;
-  createdAt: number;
-}
+type NewsletterSubscribers = FunctionReturnType<
+  typeof api.newsletter.subscriber.getNewsletterSubscribers
+>;
 
-export const newsletterColumns: ColumnDef<NewsletterColumnsProps>[] = [
+type NewsletterSubscriber =
+  NonNullable<NewsletterSubscribers>["subscribers"][number];
+
+export const newsletterColumns: ColumnDef<NewsletterSubscriber>[] = [
   {
     accessorKey: "rowNumber",
     id: "rowNumber",
@@ -108,18 +104,44 @@ export const newsletterColumns: ColumnDef<NewsletterColumnsProps>[] = [
     accessorKey: "active",
     id: "active",
     minSize: 60,
-    maxSize: 90,
+    maxSize: 60,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Active" />
     ),
     cell: ({ row }) => {
-      const active = row.getValue("active") as boolean | undefined;
+      const { active } = row.original;
       return (
         <div className="flex justify-center">
           {active ? (
             <CheckCircle2 className="size-4 text-emerald-600" />
           ) : (
             <X className="size-4 text-red-500" />
+          )}
+        </div>
+      );
+    },
+    filterFn: (row, columnId, filterValue) => {
+      if (!Array.isArray(filterValue)) return true;
+      const value = row.getValue(columnId);
+      return filterValue.includes(String(value));
+    },
+  },
+  {
+    accessorKey: "verified",
+    id: "verified",
+    minSize: 60,
+    maxSize: 60,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Ver." />
+    ),
+    cell: ({ row }) => {
+      const { verified } = row.original;
+      return (
+        <div className="flex justify-center">
+          {verified ? (
+            <Verified className="size-4 text-emerald-600" />
+          ) : (
+            <BadgeIcon className="size-4 text-red-500" />
           )}
         </div>
       );
@@ -168,7 +190,7 @@ export const newsletterColumns: ColumnDef<NewsletterColumnsProps>[] = [
   {
     accessorKey: "userPlan",
     minSize: 60,
-    maxSize: 80,
+    maxSize: 60,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Plan" />
     ),
@@ -196,8 +218,8 @@ export const newsletterColumns: ColumnDef<NewsletterColumnsProps>[] = [
   {
     accessorKey: "userType",
     id: "userType",
-    minSize: 120,
-    maxSize: 120,
+    minSize: 100,
+    maxSize: 100,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="User Type" />
     ),

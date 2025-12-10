@@ -1,4 +1,5 @@
-import { ApplicationStatus } from "@/types/applications";
+import type { ApplicationStatus } from "~/convex/schema";
+
 import { Doc, Id } from "~/convex/_generated/dataModel";
 
 export interface ArtistResidency {
