@@ -17,10 +17,8 @@ import RecentLoginEmail, {
 
 import { Resend as ResendComponent } from "@convex-dev/resend";
 import { api, components, internal } from "~/convex/_generated/api";
-import {
-  newsletterFrequencyValidator,
-  newsletterTypeValidator,
-} from "~/convex/schema";
+import schema from "~/convex/schema";
+import { doc } from "convex-helpers/validators";
 import { ConvexError, v } from "convex/values";
 import { action, internalAction } from "../_generated/server";
 
@@ -71,19 +69,17 @@ export const sendTestEmail = action({
 
 export const sendNewsletter = action({
   args: {
-    type: newsletterTypeValidator,
-    frequency: newsletterFrequencyValidator,
-    plan: v.union(v.literal(0), v.literal(1), v.literal(2), v.literal(3)),
+    audience: v.array(doc(schema, "newsletter")),
     sender: v.optional(v.string()),
   },
-  handler: async (ctx, args) => {
-    const senderName = args.sender ?? "no-reply";
-    const audienceDocs = await ctx.runQuery(
-      api.newsletter.subscriber.getAudience,
-      args,
-    );
-    for (const subscriber of audienceDocs) {
-      console.log("subscriber", subscriber);
+  handler: async (
+    ctx,
+    args,
+  ): Promise<{ success: boolean; totalSent: number }> => {
+    const { audience, sender } = args;
+    const senderName = sender ?? "no-reply";
+
+    for (const subscriber of audience) {
       const html = await pretty(
         await render(
           <TestNewsletterEmail
@@ -101,6 +97,7 @@ export const sendNewsletter = action({
         html,
       });
     }
+    return { success: true, totalSent: audience.length };
   },
 });
 

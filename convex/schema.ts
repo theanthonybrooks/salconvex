@@ -797,7 +797,7 @@ export const newsletterFrequencyValidator = v.union(
   v.literal("monthly"),
   v.literal("weekly"),
 );
-const newsletterSchema = {
+export const newsletterSchema = {
   userId: v.union(v.id("users"), v.null()),
   firstName: v.string(),
   email: v.string(),
@@ -809,7 +809,12 @@ const newsletterSchema = {
   timesAttempted: v.number(),
   lastAttempt: v.number(),
   verified: v.optional(v.boolean()),
+  tester: v.optional(v.boolean()),
+  lastUpdatedBy: v.optional(v.id("users")),
+  lastUpdatedAt: v.optional(v.number()),
 };
+
+export const newsletterSubscriber = v.object(newsletterSchema);
 
 const supportSchema = {
   userId: v.union(v.id("users"), v.null()),

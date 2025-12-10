@@ -204,7 +204,7 @@ interface SelectSimpleProps {
   onChangeAction: (value: string) => void;
   value: string;
   id?: string;
-  placeholder: string;
+  placeholder?: string;
   className?: string;
   contentClassName?: string;
   itemClassName?: string;
@@ -228,7 +228,7 @@ export const SelectSimple = ({
   className,
   contentClassName,
   itemClassName,
-  placeholder,
+  placeholder = "--Select--",
   tabIndex = 0,
   invalid,
   disabled,

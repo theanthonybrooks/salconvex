@@ -15,12 +15,16 @@ import {
   CheckCircle2,
   LucideClipboardCopy,
   MoreHorizontal,
+  TestTube,
   Verified,
   X,
 } from "lucide-react";
 
 import type { api } from "~/convex/_generated/api";
-import { DeleteNewsletterSubscription } from "@/components/data-table/actions/DataTableAdminUserActions";
+import {
+  DeleteNewsletterSubscription,
+  MakeSubscriberTester,
+} from "@/components/data-table/actions/DataTableAdminUserActions";
 import { DataTableColumnHeader } from "@/components/data-table/DataTableColumnHeader";
 import { Button } from "@/components/ui/button";
 import { ConfirmingDropdown } from "@/components/ui/confirmation-dialog-context";
@@ -224,11 +228,12 @@ export const newsletterColumns: ColumnDef<NewsletterSubscriber>[] = [
       <DataTableColumnHeader column={column} title="User Type" />
     ),
     cell: ({ row }) => {
-      const { userType } = row.original;
+      const { userType, tester } = row.original;
 
       return (
-        <div className="truncate text-center text-sm capitalize text-muted-foreground">
+        <div className="flex items-center gap-1 truncate text-center text-sm capitalize text-muted-foreground">
           {userType}
+          {tester ? <TestTube className="size-3" /> : null}
         </div>
       );
     },
@@ -266,7 +271,7 @@ export const newsletterColumns: ColumnDef<NewsletterSubscriber>[] = [
     minSize: 40,
     enableResizing: false,
     cell: ({ row }) => {
-      const { _id: id, email } = row.original;
+      const { _id: id, email, tester } = row.original;
 
       // const openCallState = event.openCallState;
       // const openCallId = event.openCallId;
@@ -302,6 +307,7 @@ export const newsletterColumns: ColumnDef<NewsletterSubscriber>[] = [
                     <FaEnvelope className="size-4" /> Contact
                   </Link>
                 </DropdownMenuItem>
+                <MakeSubscriberTester subscriberId={id} tester={tester} />
                 <DropdownMenuItem>
                   <CopyableItem
                     copyContent={id}

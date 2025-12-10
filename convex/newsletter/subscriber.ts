@@ -334,6 +334,7 @@ export const getNewsletterSubscribers = query({
           active: subscriber.newsletter,
           verified: subscriber.verified,
           type: subscriber.type,
+          tester: subscriber.tester,
           frequency: subscriber.frequency,
           timesAttempted: subscriber.timesAttempted,
           lastAttempt: subscriber.lastAttempt,
@@ -457,19 +458,25 @@ export const getAudience = query({
     type: newsletterTypeValidator,
     frequency: newsletterFrequencyValidator,
     plan: v.union(v.literal(0), v.literal(1), v.literal(2), v.literal(3)),
+    test: v.boolean(),
   },
   handler: async (ctx, args) => {
     const { type, frequency, plan } = args;
 
-    const subscribers = await ctx.db
+    let query = ctx.db
       .query("newsletter")
       .withIndex("by_active_frequency_plan", (q) =>
         q
           .eq("newsletter", true)
           .eq("frequency", frequency)
           .gte("userPlan", plan),
-      )
-      .collect();
+      );
+
+    if (args.test) {
+      query = query.filter((q) => q.eq(q.field("tester"), true));
+    }
+
+    const subscribers = await query.collect();
 
     const filteredSubscribers = subscribers.filter((subscriber) => {
       if (type.includes("openCall")) {
@@ -480,6 +487,26 @@ export const getAudience = query({
       return false;
     });
 
-    return filteredSubscribers;
+    return { success: true, data: filteredSubscribers };
+  },
+});
+
+export const updateNewsletterUserAdmin = mutation({
+  args: {
+    subscriberId: v.id("newsletter"),
+    tester: v.optional(v.boolean()),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return null;
+    const { subscriberId, tester } = args;
+    const newsletterSub = await ctx.db.get(subscriberId);
+    if (!newsletterSub) return null;
+
+    await ctx.db.patch(subscriberId, {
+      tester: tester ?? false,
+      lastUpdatedAt: Date.now(),
+      lastUpdatedBy: userId,
+    });
   },
 });
