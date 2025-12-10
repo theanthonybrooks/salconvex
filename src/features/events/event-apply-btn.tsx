@@ -35,7 +35,7 @@ interface ApplyButtonShortProps {
   eventId: Id<"events">;
   slug: string;
   edition: number;
-  appStatus: ApplicationStatus;
+  appStatus: ApplicationStatus | null;
   openCall: OpenCallStatus;
   publicView?: boolean;
   appFee: number;
@@ -145,7 +145,7 @@ interface ApplyButtonProps {
   appLinkformat?: string;
   edition: number;
   finalButton?: boolean;
-  manualApplied: ApplicationStatus;
+  appStatus: ApplicationStatus | null;
   // setManualApplied: React.Dispatch<React.SetStateAction<ApplicationStatus>>;
   isBookmarked: boolean;
   setIsBookmarked?: React.Dispatch<React.SetStateAction<boolean>>;
@@ -184,7 +184,7 @@ export const ApplyButton = ({
   activeSub,
   //isExternalApply, //todo: think about this. Could just use appUrl if it exists to gather the same assumption and user outcome.
 
-  manualApplied: appStatus,
+  appStatus,
   // setManualApplied,
   isBookmarked,
   setIsBookmarked,

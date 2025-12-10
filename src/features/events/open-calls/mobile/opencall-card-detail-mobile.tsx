@@ -379,7 +379,7 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
               // appStatus={appStatus}
               openCall={openCallStatus}
               callType={callType}
-              manualApplied={appStatus}
+              appStatus={appStatus}
               // setManualApplied={setManualApplied}
               isBookmarked={bookmarked}
               // setIsBookmarked={setIsBookmarked}

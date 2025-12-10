@@ -419,7 +419,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                   edition={event.dates.edition}
                   openCall={openCallStatus}
                   callType={callType}
-                  manualApplied={appStatus}
+                  appStatus={appStatus}
                   isBookmarked={bookmarked}
                   isHidden={hidden}
                   eventCategory={eventCategory}
@@ -460,7 +460,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                 edition={event.dates.edition}
                 openCall={openCallStatus}
                 callType={callType}
-                manualApplied={appStatus}
+                appStatus={appStatus}
                 isBookmarked={bookmarked}
                 isHidden={hidden}
                 orgPreview
@@ -682,7 +682,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                   edition={event.dates.edition}
                   openCall={openCallStatus}
                   callType={callType}
-                  manualApplied={appStatus}
+                  appStatus={appStatus}
                   isBookmarked={bookmarked}
                   isHidden={hidden}
                   eventCategory={eventCategory}
