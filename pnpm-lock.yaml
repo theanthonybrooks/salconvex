@@ -140,7 +140,7 @@ importers:
         version: 2.0.1(@react-email/body@0.2.0(react@19.1.2))(@react-email/button@0.2.0(react@19.1.2))(@react-email/code-block@0.2.0(react@19.1.2))(@react-email/code-inline@0.0.5(react@19.1.2))(@react-email/container@0.0.15(react@19.1.2))(@react-email/heading@0.0.15(react@19.1.2))(@react-email/hr@0.0.11(react@19.1.2))(@react-email/img@0.0.11(react@19.1.2))(@react-email/link@0.0.12(react@19.1.2))(@react-email/preview@0.0.13(react@19.1.2))(@react-email/text@0.1.5(react@19.1.2))(react@19.1.2)
       '@sentry/nextjs':
         specifier: ^10.5.0
-        version: 10.28.0(@opentelemetry/context-async-hooks@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(next@15.4.8(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(react-dom@19.1.2(react@19.1.2))(react@19.1.2)(sass@1.94.2))(react@19.1.2)(webpack@5.103.0)
+        version: 10.28.0(@opentelemetry/context-async-hooks@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(next@15.4.9(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(react-dom@19.1.2(react@19.1.2))(react@19.1.2)(sass@1.94.2))(react@19.1.2)(webpack@5.103.0)
       '@sparticuz/chromium':
         specifier: ^138.0.2
         version: 138.0.2
@@ -278,7 +278,7 @@ importers:
         version: 12.23.25(@emotion/is-prop-valid@1.4.0)(react-dom@19.1.2(react@19.1.2))(react@19.1.2)
       geist:
         specifier: ^1.4.2
-        version: 1.5.1(next@15.4.8(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(react-dom@19.1.2(react@19.1.2))(react@19.1.2)(sass@1.94.2))
+        version: 1.5.1(next@15.4.9(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(react-dom@19.1.2(react@19.1.2))(react@19.1.2)(sass@1.94.2))
       html-react-parser:
         specifier: ^5.2.6
         version: 5.2.10(@types/react@19.1.10)(react@19.1.2)
@@ -319,8 +319,8 @@ importers:
         specifier: ^3.7.1
         version: 3.7.2
       next:
-        specifier: 15.4.8
-        version: 15.4.8(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(react-dom@19.1.2(react@19.1.2))(react@19.1.2)(sass@1.94.2)
+        specifier: 15.4.9
+        version: 15.4.9(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(react-dom@19.1.2(react@19.1.2))(react@19.1.2)(sass@1.94.2)
       next-themes:
         specifier: ^0.4.6
         version: 0.4.6(react-dom@19.1.2(react@19.1.2))(react@19.1.2)
@@ -1349,8 +1349,8 @@ packages:
   '@napi-rs/wasm-runtime@0.2.12':
     resolution: {integrity: sha512-ZVWUcfwY4E/yPitQJl481FjFo3K22D6qF0DuFH6Y/nbnE11GY5uguDxZMGXPQ8WQ0128MXQD7TnfHyK4oWoIJQ==}
 
-  '@next/env@15.4.8':
-    resolution: {integrity: sha512-LydLa2MDI1NMrOFSkO54mTc8iIHSttj6R6dthITky9ylXV2gCGi0bHQjVCtLGRshdRPjyh2kXbxJukDtBWQZtQ==}
+  '@next/env@15.4.9':
+    resolution: {integrity: sha512-OYR0RulK5phnbxxzcLE4/ECgfx1PL3EHrDbjyelJ7jauaO+/Qvj5gG8JPMltB51CygC2KrZ0aAfYLjPYjYY17A==}
 
   '@next/eslint-plugin-next@15.4.6':
     resolution: {integrity: sha512-2NOu3ln+BTcpnbIDuxx6MNq+pRrCyey4WSXGaJIyt0D2TYicHeO9QrUENNjcf673n3B1s7hsiV5xBYRCK1Q8kA==}
@@ -5078,8 +5078,8 @@ packages:
       react: ^16.8 || ^17 || ^18 || ^19 || ^19.0.0-rc
       react-dom: ^16.8 || ^17 || ^18 || ^19 || ^19.0.0-rc
 
-  next@15.4.8:
-    resolution: {integrity: sha512-jwOXTz/bo0Pvlf20FSb6VXVeWRssA2vbvq9SdrOPEg9x8E1B27C2rQtvriAn600o9hH61kjrVRexEffv3JybuA==}
+  next@15.4.9:
+    resolution: {integrity: sha512-/NedNmbiH4Umt/7SohT9VKxEdBt02Lj33xHrukE7d8Li6juT+75sEq4a4U06jggrvdbklKgr78OZEyWZ8XRrtw==}
     engines: {node: ^18.18.0 || ^19.8.0 || >= 20.0.0}
     hasBin: true
     peerDependencies:
@@ -7332,7 +7332,7 @@ snapshots:
       '@tybys/wasm-util': 0.10.1
     optional: true
 
-  '@next/env@15.4.8': {}
+  '@next/env@15.4.9': {}
 
   '@next/eslint-plugin-next@15.4.6':
     dependencies:
@@ -8636,7 +8636,7 @@ snapshots:
 
   '@sentry/core@10.28.0': {}
 
-  '@sentry/nextjs@10.28.0(@opentelemetry/context-async-hooks@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(next@15.4.8(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(react-dom@19.1.2(react@19.1.2))(react@19.1.2)(sass@1.94.2))(react@19.1.2)(webpack@5.103.0)':
+  '@sentry/nextjs@10.28.0(@opentelemetry/context-async-hooks@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(next@15.4.9(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(react-dom@19.1.2(react@19.1.2))(react@19.1.2)(sass@1.94.2))(react@19.1.2)(webpack@5.103.0)':
     dependencies:
       '@opentelemetry/api': 1.9.0
       '@opentelemetry/semantic-conventions': 1.38.0
@@ -8649,7 +8649,7 @@ snapshots:
       '@sentry/react': 10.28.0(react@19.1.2)
       '@sentry/vercel-edge': 10.28.0
       '@sentry/webpack-plugin': 4.6.1(webpack@5.103.0)
-      next: 15.4.8(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(react-dom@19.1.2(react@19.1.2))(react@19.1.2)(sass@1.94.2)
+      next: 15.4.9(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(react-dom@19.1.2(react@19.1.2))(react@19.1.2)(sass@1.94.2)
       resolve: 1.22.8
       rollup: 4.53.3
       stacktrace-parser: 0.1.11
@@ -10583,9 +10583,9 @@ snapshots:
 
   functions-have-names@1.2.3: {}
 
-  geist@1.5.1(next@15.4.8(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(react-dom@19.1.2(react@19.1.2))(react@19.1.2)(sass@1.94.2)):
+  geist@1.5.1(next@15.4.9(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(react-dom@19.1.2(react@19.1.2))(react@19.1.2)(sass@1.94.2)):
     dependencies:
-      next: 15.4.8(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(react-dom@19.1.2(react@19.1.2))(react@19.1.2)(sass@1.94.2)
+      next: 15.4.9(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(react-dom@19.1.2(react@19.1.2))(react@19.1.2)(sass@1.94.2)
 
   generator-function@2.0.1: {}
 
@@ -11248,9 +11248,9 @@ snapshots:
       react: 19.1.2
       react-dom: 19.1.2(react@19.1.2)
 
-  next@15.4.8(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(react-dom@19.1.2(react@19.1.2))(react@19.1.2)(sass@1.94.2):
+  next@15.4.9(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(react-dom@19.1.2(react@19.1.2))(react@19.1.2)(sass@1.94.2):
     dependencies:
-      '@next/env': 15.4.8
+      '@next/env': 15.4.9
       '@swc/helpers': 0.5.15
       caniuse-lite: 1.0.30001759
       postcss: 8.4.31

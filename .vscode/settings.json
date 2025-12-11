@@ -43,7 +43,8 @@
     "Artist Highlight",
     "Old Site",
     "Zod",
-    "User"
+    "User",
+    "Nextjs"
   ],
   "typescript.tsdk": "node_modules\\typescript\\lib",
   "python.analysis.autoImportCompletions": true
