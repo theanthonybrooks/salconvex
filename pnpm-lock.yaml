@@ -17,22 +17,22 @@ importers:
         version: 0.37.0
       '@convex-dev/aggregate':
         specifier: ^0.1.25
-        version: 0.1.25(convex@1.30.0(react@19.1.2))
+        version: 0.1.25(convex@1.31.0(react@19.1.2))
       '@convex-dev/auth':
         specifier: ^0.0.88
-        version: 0.0.88(@auth/core@0.37.0)(convex@1.30.0(react@19.1.2))(react@19.1.2)
+        version: 0.0.88(@auth/core@0.37.0)(convex@1.31.0(react@19.1.2))(react@19.1.2)
       '@convex-dev/migrations':
         specifier: ^0.2.9
-        version: 0.2.9(convex@1.30.0(react@19.1.2))
+        version: 0.2.9(convex@1.31.0(react@19.1.2))
       '@convex-dev/resend':
         specifier: ^0.2.0
-        version: 0.2.0(convex-helpers@0.1.106(convex@1.30.0(react@19.1.2))(react@19.1.2)(typescript@5.9.3)(zod@4.1.13))(convex@1.30.0(react@19.1.2))(react@19.1.2)
+        version: 0.2.0(convex-helpers@0.1.106(convex@1.31.0(react@19.1.2))(react@19.1.2)(typescript@5.9.3)(zod@4.1.13))(convex@1.31.0(react@19.1.2))(react@19.1.2)
       '@convex-dev/sharded-counter':
         specifier: ^0.1.8
-        version: 0.1.8(convex@1.30.0(react@19.1.2))
+        version: 0.1.8(convex@1.31.0(react@19.1.2))
       '@convex-dev/workpool':
         specifier: ^0.2.18
-        version: 0.2.19(convex-helpers@0.1.106(convex@1.30.0(react@19.1.2))(react@19.1.2)(typescript@5.9.3)(zod@4.1.13))(convex@1.30.0(react@19.1.2))
+        version: 0.2.19(convex-helpers@0.1.106(convex@1.31.0(react@19.1.2))(react@19.1.2)(typescript@5.9.3)(zod@4.1.13))(convex@1.31.0(react@19.1.2))
       '@emotion/react':
         specifier: ^11.14.0
         version: 11.14.0(@types/react@19.1.10)(react@19.1.2)
@@ -235,11 +235,11 @@ importers:
         specifier: ^1.8.2
         version: 1.8.2
       convex:
-        specifier: ^1.25.4
-        version: 1.30.0(react@19.1.2)
+        specifier: ^1.31.0
+        version: 1.31.0(react@19.1.2)
       convex-helpers:
         specifier: ^0.1.104
-        version: 0.1.106(convex@1.30.0(react@19.1.2))(react@19.1.2)(typescript@5.9.3)(zod@4.1.13)
+        version: 0.1.106(convex@1.31.0(react@19.1.2))(react@19.1.2)(typescript@5.9.3)(zod@4.1.13)
       currency-codes:
         specifier: ^2.2.0
         version: 2.2.0
@@ -3748,8 +3748,8 @@ packages:
       zod:
         optional: true
 
-  convex@1.30.0:
-    resolution: {integrity: sha512-YvFFxLg3bICP7u5hSVxW6BUYgI4LkWJHdim+9XrXUkdyOziloiQ21EbSCq6NNG2ycba2x7hsgxUKCGAhJmkv1g==}
+  convex@1.31.0:
+    resolution: {integrity: sha512-ht3dtpWQmxX62T8PT3p/5PDlRzSW5p2IDTP4exKjQ5dqmvhtn1wLFakJAX4CCeu1s0Ch0dKY5g2dk/wETTRAOw==}
     engines: {node: '>=18.0.0', npm: '>=7.0.0'}
     hasBin: true
     peerDependencies:
@@ -6697,16 +6697,16 @@ snapshots:
       '@babel/helper-string-parser': 7.27.1
       '@babel/helper-validator-identifier': 7.28.5
 
-  '@convex-dev/aggregate@0.1.25(convex@1.30.0(react@19.1.2))':
+  '@convex-dev/aggregate@0.1.25(convex@1.31.0(react@19.1.2))':
     dependencies:
-      convex: 1.30.0(react@19.1.2)
+      convex: 1.31.0(react@19.1.2)
 
-  '@convex-dev/auth@0.0.88(@auth/core@0.37.0)(convex@1.30.0(react@19.1.2))(react@19.1.2)':
+  '@convex-dev/auth@0.0.88(@auth/core@0.37.0)(convex@1.31.0(react@19.1.2))(react@19.1.2)':
     dependencies:
       '@auth/core': 0.37.0
       '@oslojs/crypto': 1.0.1
       '@oslojs/encoding': 1.1.0
-      convex: 1.30.0(react@19.1.2)
+      convex: 1.31.0(react@19.1.2)
       cookie: 1.1.1
       is-network-error: 1.3.0
       jose: 5.10.0
@@ -6718,40 +6718,40 @@ snapshots:
     optionalDependencies:
       react: 19.1.2
 
-  '@convex-dev/migrations@0.2.9(convex@1.30.0(react@19.1.2))':
+  '@convex-dev/migrations@0.2.9(convex@1.31.0(react@19.1.2))':
     dependencies:
-      convex: 1.30.0(react@19.1.2)
+      convex: 1.31.0(react@19.1.2)
 
-  '@convex-dev/rate-limiter@0.3.0(convex@1.30.0(react@19.1.2))(react@19.1.2)':
+  '@convex-dev/rate-limiter@0.3.0(convex@1.31.0(react@19.1.2))(react@19.1.2)':
     dependencies:
-      convex: 1.30.0(react@19.1.2)
+      convex: 1.31.0(react@19.1.2)
     optionalDependencies:
       react: 19.1.2
 
-  '@convex-dev/resend@0.2.0(convex-helpers@0.1.106(convex@1.30.0(react@19.1.2))(react@19.1.2)(typescript@5.9.3)(zod@4.1.13))(convex@1.30.0(react@19.1.2))(react@19.1.2)':
+  '@convex-dev/resend@0.2.0(convex-helpers@0.1.106(convex@1.31.0(react@19.1.2))(react@19.1.2)(typescript@5.9.3)(zod@4.1.13))(convex@1.31.0(react@19.1.2))(react@19.1.2)':
     dependencies:
-      '@convex-dev/rate-limiter': 0.3.0(convex@1.30.0(react@19.1.2))(react@19.1.2)
-      '@convex-dev/workpool': 0.3.0(convex-helpers@0.1.106(convex@1.30.0(react@19.1.2))(react@19.1.2)(typescript@5.9.3)(zod@4.1.13))(convex@1.30.0(react@19.1.2))
-      convex: 1.30.0(react@19.1.2)
-      convex-helpers: 0.1.106(convex@1.30.0(react@19.1.2))(react@19.1.2)(typescript@5.9.3)(zod@4.1.13)
+      '@convex-dev/rate-limiter': 0.3.0(convex@1.31.0(react@19.1.2))(react@19.1.2)
+      '@convex-dev/workpool': 0.3.0(convex-helpers@0.1.106(convex@1.31.0(react@19.1.2))(react@19.1.2)(typescript@5.9.3)(zod@4.1.13))(convex@1.31.0(react@19.1.2))
+      convex: 1.31.0(react@19.1.2)
+      convex-helpers: 0.1.106(convex@1.31.0(react@19.1.2))(react@19.1.2)(typescript@5.9.3)(zod@4.1.13)
       remeda: 2.32.0
       svix: 1.82.0
     transitivePeerDependencies:
       - react
 
-  '@convex-dev/sharded-counter@0.1.8(convex@1.30.0(react@19.1.2))':
+  '@convex-dev/sharded-counter@0.1.8(convex@1.31.0(react@19.1.2))':
     dependencies:
-      convex: 1.30.0(react@19.1.2)
+      convex: 1.31.0(react@19.1.2)
 
-  '@convex-dev/workpool@0.2.19(convex-helpers@0.1.106(convex@1.30.0(react@19.1.2))(react@19.1.2)(typescript@5.9.3)(zod@4.1.13))(convex@1.30.0(react@19.1.2))':
+  '@convex-dev/workpool@0.2.19(convex-helpers@0.1.106(convex@1.31.0(react@19.1.2))(react@19.1.2)(typescript@5.9.3)(zod@4.1.13))(convex@1.31.0(react@19.1.2))':
     dependencies:
-      convex: 1.30.0(react@19.1.2)
-      convex-helpers: 0.1.106(convex@1.30.0(react@19.1.2))(react@19.1.2)(typescript@5.9.3)(zod@4.1.13)
+      convex: 1.31.0(react@19.1.2)
+      convex-helpers: 0.1.106(convex@1.31.0(react@19.1.2))(react@19.1.2)(typescript@5.9.3)(zod@4.1.13)
 
-  '@convex-dev/workpool@0.3.0(convex-helpers@0.1.106(convex@1.30.0(react@19.1.2))(react@19.1.2)(typescript@5.9.3)(zod@4.1.13))(convex@1.30.0(react@19.1.2))':
+  '@convex-dev/workpool@0.3.0(convex-helpers@0.1.106(convex@1.31.0(react@19.1.2))(react@19.1.2)(typescript@5.9.3)(zod@4.1.13))(convex@1.31.0(react@19.1.2))':
     dependencies:
-      convex: 1.30.0(react@19.1.2)
-      convex-helpers: 0.1.106(convex@1.30.0(react@19.1.2))(react@19.1.2)(typescript@5.9.3)(zod@4.1.13)
+      convex: 1.31.0(react@19.1.2)
+      convex-helpers: 0.1.106(convex@1.31.0(react@19.1.2))(react@19.1.2)(typescript@5.9.3)(zod@4.1.13)
 
   '@csstools/color-helpers@5.1.0': {}
 
@@ -9784,15 +9784,15 @@ snapshots:
 
   convert-source-map@2.0.0: {}
 
-  convex-helpers@0.1.106(convex@1.30.0(react@19.1.2))(react@19.1.2)(typescript@5.9.3)(zod@4.1.13):
+  convex-helpers@0.1.106(convex@1.31.0(react@19.1.2))(react@19.1.2)(typescript@5.9.3)(zod@4.1.13):
     dependencies:
-      convex: 1.30.0(react@19.1.2)
+      convex: 1.31.0(react@19.1.2)
     optionalDependencies:
       react: 19.1.2
       typescript: 5.9.3
       zod: 4.1.13
 
-  convex@1.30.0(react@19.1.2):
+  convex@1.31.0(react@19.1.2):
     dependencies:
       esbuild: 0.25.4
       prettier: 3.7.4

@@ -71,7 +71,7 @@ export const SocialDropdownMenus = ({
             handlePostEvent("toPost");
             if (!openCallState) return;
             window.open(
-              `/thelist/event/${slug}/${edition}/call/social`,
+              `/dashboard/admin/socials`,
               "_blank",
               "noopener,noreferrer",
             );
