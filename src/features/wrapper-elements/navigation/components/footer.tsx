@@ -221,20 +221,22 @@ export default function Footer({ className }: { className?: string }) {
               className="mx-auto flex w-full flex-col justify-center sm:px-10"
             >
               {newsletterSub ? (
-                <Link
-                  href="/newsletter"
-                  className={cn(isNewsletterPage && "pointer-events-none")}
+                <Button
+                  variant="salWithShadowHiddenBg"
+                  disabled={isNewsletterPage}
+                  className="w-full sm:w-auto"
+                  asChild
                 >
-                  <Button
-                    variant="salWithShadowHiddenBg"
-                    disabled={isNewsletterPage}
-                    className="w-full sm:w-auto"
+                  <Link
+                    href="/newsletter"
+                    className={cn(isNewsletterPage && "pointer-events-none")}
+                    variant="standard"
                   >
                     {isNewsletterPage
                       ? "You're already subscribed!"
                       : "View Newsletter Preferences"}
-                  </Button>
-                </Link>
+                  </Link>
+                </Button>
               ) : (
                 <Form {...form}>
                   <form
@@ -324,18 +326,28 @@ export default function Footer({ className }: { className?: string }) {
               {SOCIAL_MEDIA_LINKS.filter(
                 ({ label }) => label !== "Patreon",
               ).map(({ label, icon: Icon, path }) => (
-                <Link href={path} key={label} target="_blank">
-                  <Button variant="icon" size="icon" aria-label={label}>
+                <Button
+                  key={label}
+                  variant="icon"
+                  size="icon"
+                  aria-label={label}
+                  asChild
+                >
+                  <Link href={path} variant="standard" target="_blank">
                     <Icon className="size-7 md:size-5" />
-                  </Button>
-                </Link>
+                  </Link>
+                </Button>
               ))}
 
-              <Link href={`mailto:${infoEmail}`} target="_blank">
-                <Button variant="icon" size="icon" aria-label="Email">
+              <Button variant="icon" size="icon" aria-label="Email" asChild>
+                <Link
+                  variant="standard"
+                  href={`mailto:${infoEmail}`}
+                  target="_blank"
+                >
                   <FaRegEnvelope className="size-7 md:size-5" />
-                </Button>
-              </Link>
+                </Link>
+              </Button>
             </div>
             <div className="flex items-center space-x-1 text-sm">
               <p className="inline-flex items-center gap-x-1">

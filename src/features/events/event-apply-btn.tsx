@@ -19,6 +19,7 @@ import {
 import type { ApplicationStatus } from "~/convex/schema";
 import { ApplyRedirectDialog } from "@/components/ui/apply-redirect-dialog";
 import { Button } from "@/components/ui/button";
+import { Link } from "@/components/ui/custom-link";
 import { TooltipSimple } from "@/components/ui/tooltip";
 import { useToggleListAction } from "@/features/artists/helpers/listActions";
 import EventContextMenu from "@/features/events/ui/event-context-menu";
@@ -267,9 +268,7 @@ export const ApplyButton = ({
       runAnalytics("bookmark", finalButton ? "ocPage" : "theList");
     }
   };
-  const router = useRouter();
 
-  const currentUrl = window.location.href;
   const href =
     detailCard && appUrl
       ? appUrl
@@ -316,14 +315,7 @@ export const ApplyButton = ({
     >
       {!finalButton && (
         <Button
-          onClick={() => {
-            setPending("load");
-            runAnalytics("view", src ?? "theList");
-            window.history.pushState({}, "", currentUrl);
-            router.push(href);
-            setTimeout(() => setPending(false), 2000);
-          }}
-          // disabled={pending}
+          asChild
           variant="salWithShadowHiddenLeft"
           size="lg"
           className={cn(
@@ -333,7 +325,16 @@ export const ApplyButton = ({
             pending && "pointer-events-none",
           )}
         >
-          <span className={cn("flex items-center gap-x-1", fontSize)}>
+          <Link
+            variant="standard"
+            onClick={() => {
+              setPending("load");
+              runAnalytics("view", src ?? "theList");
+              setTimeout(() => setPending(false), 2000);
+            }}
+            href={href}
+            className={cn("flex items-center gap-x-1", fontSize)}
+          >
             {pending === "load" ? (
               <LoaderCircle className="size-4 animate-spin" />
             ) : (
@@ -349,7 +350,7 @@ export const ApplyButton = ({
                 )}
               </>
             )}
-          </span>
+          </Link>
         </Button>
       )}
       {finalButton && (

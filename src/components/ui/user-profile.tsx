@@ -162,55 +162,67 @@ export function UserProfile({
                     <DropdownMenuPortal>
                       <DropdownMenuSubContent className="border-2">
                         {isAdmin && (
-                          <Link
-                            href={`/dashboard/admin/users`}
-                            className="underline-offset-2 hover:cursor-pointer hover:underline"
+                          <DropdownMenuItem
+                            className="gap-x-1 focus:bg-salYellow/50"
+                            asChild
                           >
-                            <DropdownMenuItem className="gap-x-1 focus:bg-salYellow/50">
+                            <Link
+                              href={`/dashboard/admin/users`}
+                              className="underline-offset-2 hover:cursor-pointer hover:underline"
+                            >
                               <Squirrel className="mr-2 size-4" />
 
                               <p>Admin</p>
-                            </DropdownMenuItem>
-                          </Link>
+                            </Link>
+                          </DropdownMenuItem>
                         )}
 
                         {hasActiveSub && (
-                          <Link
-                            href={artistDashboardLink}
-                            className="underline-offset-2 hover:cursor-pointer hover:underline"
+                          <DropdownMenuItem
+                            className="gap-x-1 focus:bg-salYellow/50"
+                            asChild
                           >
-                            <DropdownMenuItem className="gap-x-1 focus:bg-salYellow/50">
+                            <Link
+                              href={artistDashboardLink}
+                              className="underline-offset-2 hover:cursor-pointer hover:underline"
+                            >
                               <PaintRoller className="mr-2 size-4" />
                               <p>Artist</p>
-                            </DropdownMenuItem>
-                          </Link>
+                            </Link>
+                          </DropdownMenuItem>
                         )}
                         {isOrganizer && (
-                          <Link
-                            href={organizerDashboardLink}
-                            className="underline-offset-2 hover:cursor-pointer hover:underline"
+                          <DropdownMenuItem
+                            className="gap-x-1 focus:bg-salYellow/50"
+                            asChild
                           >
-                            <DropdownMenuItem className="gap-x-1 focus:bg-salYellow/50">
+                            <Link
+                              href={organizerDashboardLink}
+                              className="underline-offset-2 hover:cursor-pointer hover:underline"
+                            >
                               <Users2 className="mr-2 size-4" />
                               <p>Organizer</p>
-                            </DropdownMenuItem>
-                          </Link>
+                            </Link>
+                          </DropdownMenuItem>
                         )}
                       </DropdownMenuSubContent>
                     </DropdownMenuPortal>
                   </DropdownMenuSub>
                 ) : (
-                  <Link
-                    href={
-                      isArtist ? artistDashboardLink : organizerDashboardLink
-                    }
-                    className="underline-offset-2 hover:cursor-pointer hover:underline"
+                  <DropdownMenuItem
+                    className="gap-x-1 focus:bg-salYellow/50"
+                    asChild
                   >
-                    <DropdownMenuItem className="gap-x-1 focus:bg-salYellow/50">
+                    <Link
+                      href={
+                        isArtist ? artistDashboardLink : organizerDashboardLink
+                      }
+                      className="underline-offset-2 hover:cursor-pointer hover:underline"
+                    >
                       <LucideLayoutDashboard className="mr-2 size-4" />
                       <p>Dashboard</p>
-                    </DropdownMenuItem>
-                  </Link>
+                    </Link>
+                  </DropdownMenuItem>
                 )}
               </>
             )}
@@ -222,79 +234,97 @@ export function UserProfile({
               </DropdownMenuSubTrigger>
               <DropdownMenuPortal>
                 <DropdownMenuSubContent>
-                  <Link
-                    href="/dashboard/settings/account"
-                    className="underline-offset-2 hover:cursor-pointer hover:underline"
+                  <DropdownMenuItem
+                    className="gap-x-1 focus:bg-salYellow/50"
+                    asChild
                   >
-                    <DropdownMenuItem className="gap-x-1 focus:bg-salYellow/50">
+                    <Link
+                      href="/dashboard/settings/account"
+                      className="underline-offset-2 hover:cursor-pointer hover:underline"
+                    >
                       <User className="mr-2 size-4" />
                       <p>Account</p>
-                    </DropdownMenuItem>
-                  </Link>
-                  <Link
-                    href="/dashboard/settings/notifications"
-                    className="underline-offset-2 hover:cursor-pointer hover:underline"
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="gap-x-1 focus:bg-salYellow/50"
+                    asChild
                   >
-                    <DropdownMenuItem className="gap-x-1 focus:bg-salYellow/50">
+                    <Link
+                      href="/dashboard/settings/notifications"
+                      className="underline-offset-2 hover:cursor-pointer hover:underline"
+                    >
                       <Bell className="mr-2 size-4" />
                       <p>Notifications</p>
-                    </DropdownMenuItem>
-                  </Link>
-                  <Link
-                    href="/dashboard/settings/appearance"
-                    className="underline-offset-2 hover:cursor-pointer hover:underline"
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="gap-x-1 focus:bg-salYellow/50"
+                    asChild
                   >
-                    <DropdownMenuItem className="gap-x-1 focus:bg-salYellow/50">
+                    <Link
+                      href="/dashboard/settings/appearance"
+                      className="underline-offset-2 hover:cursor-pointer hover:underline"
+                    >
                       <Sparkles className="mr-2 size-4" />
                       <p>Appearance</p>
-                    </DropdownMenuItem>
-                  </Link>
-                  <Link
-                    href="/dashboard/settings/security"
-                    className="underline-offset-2 hover:cursor-pointer hover:underline"
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="gap-x-1 focus:bg-salYellow/50"
+                    asChild
                   >
-                    <DropdownMenuItem className="gap-x-1 focus:bg-salYellow/50">
+                    <Link
+                      href="/dashboard/settings/security"
+                      className="underline-offset-2 hover:cursor-pointer hover:underline"
+                    >
                       <Lock className="mr-2 size-4" />
                       <p>Security</p>
-                    </DropdownMenuItem>
-                  </Link>
+                    </Link>
+                  </DropdownMenuItem>
                 </DropdownMenuSubContent>
               </DropdownMenuPortal>
             </DropdownMenuSub>
             {hasActiveSub && subStatus !== "canceled" && (
-              <Link
-                href="/dashboard/billing"
-                className="underline-offset-2 hover:cursor-pointer hover:underline"
+              <DropdownMenuItem
+                className="gap-x-1 focus:bg-salYellow/50"
+                asChild
               >
-                <DropdownMenuItem className="gap-x-1 focus:bg-salYellow/50">
+                <Link
+                  href="/dashboard/billing"
+                  className="underline-offset-2 hover:cursor-pointer hover:underline"
+                >
                   <PiPiggyBank className="mr-2 size-4" />
                   <p>Manage Membership</p>
-                </DropdownMenuItem>
-              </Link>
+                </Link>
+              </DropdownMenuItem>
             )}
 
             {subStatus === "canceled" && isArtist && (
-              <Link
-                href="/pricing?type=artist"
-                className="underline-offset-2 hover:cursor-pointer hover:underline"
+              <DropdownMenuItem
+                className="gap-x-1 focus:bg-salYellow/50"
+                asChild
               >
-                <DropdownMenuItem className="gap-x-1 focus:bg-salYellow/50">
+                <Link
+                  href="/pricing?type=artist"
+                  className="underline-offset-2 hover:cursor-pointer hover:underline"
+                >
                   <PiPiggyBank className="mr-2 size-4" />
                   <p>Renew Membership</p>
-                </DropdownMenuItem>
-              </Link>
+                </Link>
+              </DropdownMenuItem>
             )}
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
-          <Link
-            href="/support"
-            className="underline-offset-2 hover:cursor-pointer hover:underline"
-          >
-            <DropdownMenuItem className="gap-x-1 focus:bg-salYellow/50">
+          <DropdownMenuItem className="gap-x-1 focus:bg-salYellow/50" asChild>
+            <Link
+              href="/support"
+              className="underline-offset-2 hover:cursor-pointer hover:underline"
+            >
               <HelpCircle className="mr-2 size-4" />
               <p>Help & Support</p>
-            </DropdownMenuItem>
-          </Link>
+            </Link>
+          </DropdownMenuItem>
           <DropdownMenuSeparator />
           <SignOutBtn email={user?.email}>
             <DropdownMenuItem className="gap-x-1 focus:bg-salPink/50">

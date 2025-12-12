@@ -50,6 +50,7 @@ const CustomLink = ({
         className,
         fontSize,
         disabled && "pointer-events-none",
+        disabled && variant === "standard" && "opacity-50",
       )}
       {...props}
     />

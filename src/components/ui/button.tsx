@@ -27,11 +27,11 @@ const buttonVariants = cva(
       variant: {
         richTextButton:
           "border border-foreground/20 bg-white text-foreground hover:bg-salYellow/30 [&_svg]:pointer-events-none [&_svg]:size-4",
-        icon: "bg-transparent text-foreground hover:scale-105 [&_svg]:shrink-0",
-        default: `border bg-white text-foreground hover:bg-salYellow/30`,
+        icon: "bg-transparent text-foreground active:scale-95 [&_svg]:shrink-0",
+        default: `border bg-white text-foreground hover:bg-salYellow/30 active:scale-975`,
         destructive: `bg-destructive text-destructive-foreground hover:bg-destructive/90`,
         outline: `border-1.5 border-foreground bg-background hover:bg-white/30`,
-        hiddenOutline: `active:scale-975 border-2 border-transparent bg-background text-base font-semibold text-foreground hover:border-foreground/70 hover:bg-card/20 sm:text-base`,
+        hiddenOutline: `border-2 border-transparent bg-background text-base font-semibold text-foreground hover:border-foreground/70 hover:bg-card/20 active:scale-975 sm:text-base`,
         secondary: `bg-secondary text-secondary-foreground hover:bg-secondary/80`,
         ghost: `border border-transparent hover:scale-105 active:scale-[0.975]`,
         ghost2: `hover:scale-105 hover:bg-none hover:text-accent-foreground active:scale-[0.975]`,

@@ -565,23 +565,24 @@ export default function NavBar(
                 </NavigationMenu>
 
                 {filteredNavbarLinks.map((link) => (
-                  <Link key={link.title} href={link.href} prefetch={true}>
-                    {!link.isIcon ? (
-                      <Button className="h-9 border-2 border-transparent bg-transparent font-semibold text-foreground hover:border-foreground/70 hover:bg-card/20 sm:text-base">
-                        {link.title}
-                      </Button>
-                    ) : (
-                      <Button
-                        variant="icon"
-                        className={cn(
-                          "text-foreground transition-all duration-200 ease-in-out hover:scale-110 hover:border-foreground",
-                        )}
-                        size="icon"
-                      >
-                        {link.icon}
-                      </Button>
+                  <Button
+                    asChild
+                    key={link.title}
+                    className={cn(
+                      "border-2 border-transparent bg-transparent font-semibold text-foreground hover:border-foreground/70 hover:bg-card/20",
                     )}
-                  </Link>
+                    variant={link.isIcon ? "icon" : "default"}
+                    size={link.isIcon ? "icon" : "default"}
+                  >
+                    <Link
+                      href={link.href}
+                      prefetch={true}
+                      className="!text-base"
+                      variant="standard"
+                    >
+                      {link.isIcon ? link.icon : link.title}
+                    </Link>
+                  </Button>
                 ))}
               </motion.div>
 
@@ -656,17 +657,6 @@ export default function NavBar(
           {/* ------ Mobile Right side ------ */}
 
           <div className="z-20 flex w-full items-center justify-end lg:hidden">
-            {/* {userId !== "guest" && user && <UserProfile user={user} />} */}
-            {/* <Unauthenticated>
-              <Link href='/auth/sign-in' prefetch={true}>
-                <Button
-                  variant='salWithShadowHidden'
-                  className='font-bold bg-background'
-                  size='lg'>
-                  Sign in
-                </Button>
-              </Link>
-            </Unauthenticated> */}
             <FullPageNav
               // userId={userId}
               isMobile={isMobile}
