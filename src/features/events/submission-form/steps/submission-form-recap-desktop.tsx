@@ -4,8 +4,8 @@
 
 import { EligibilityType } from "@/types/openCallTypes";
 
-import { capitalize } from "lodash";
 import { useState } from "react";
+import { capitalize } from "lodash";
 import { useFormContext } from "react-hook-form";
 
 import { Checkbox } from "@/components/ui/checkbox";

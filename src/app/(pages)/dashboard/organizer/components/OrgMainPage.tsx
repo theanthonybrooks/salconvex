@@ -107,7 +107,7 @@ export const OrgMainPage = () => {
             getItemValue={(org) => org._id}
             onChange={(val) => setSelectedOrg(val as Id<"organizations">)}
             searchFields={["name", "slug"]}
-            className={cn("h-12 justify-start bg-card py-2")}
+            className={cn("h-12 min-w-80 justify-start bg-card py-2")}
             popover={{
               align: "center",
               contentClassName: "max-w-[90vw] ",

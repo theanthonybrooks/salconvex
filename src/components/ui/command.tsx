@@ -65,7 +65,7 @@ const CommandList = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <CommandPrimitive.List
     ref={ref}
-    className={cn("scrollable mini justy invis", className)}
+    className={cn("scrollable mini justy", className)}
     {...props}
   />
 ));
