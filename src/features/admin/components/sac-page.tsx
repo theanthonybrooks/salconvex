@@ -28,8 +28,9 @@ export default function SACAdminPage() {
 
     try {
       setPending(true);
-      const res = await fetch("/api/cron/sac-fetch", {
-        method: "GET",
+      const res = await fetch("/api/admin/sac-fetch", {
+        method: "POST",
+        cache: "no-store",
       });
 
       if (!res.ok) {

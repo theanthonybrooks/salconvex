@@ -273,7 +273,6 @@ export const isAdmin = query({
 
     const user = await ctx.db.get(userId);
     // if (!user) throw new ConvexError("User not found");
-
     if (user?.role.includes("admin")) {
       return true;
     }
