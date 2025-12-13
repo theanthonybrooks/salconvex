@@ -16,6 +16,7 @@ import {
 import { artistColumnLabels } from "@/features/admin/dashboard/artist-columns";
 import { newsletterColumnLabels } from "@/features/admin/dashboard/newsletter-columns";
 import { resourcesColumnLabels } from "@/features/admin/dashboard/resources-column";
+import { sacColumnLabels } from "@/features/admin/dashboard/sac-columns";
 import { socialsColumnLabels } from "@/features/admin/dashboard/socials-columns";
 import { supportColumnLabels } from "@/features/admin/dashboard/support-columns";
 import { userColumnLabels } from "@/features/admin/dashboard/user-columns";
@@ -43,6 +44,7 @@ const labelMaps: Record<string, Record<string, string>> = {
   userAddOns: userAddOnColumnLabels,
   resources: resourcesColumnLabels,
   support: supportColumnLabels,
+  sac: sacColumnLabels,
 };
 
 export function DataTableViewOptions<TData>({
@@ -68,7 +70,7 @@ export function DataTableViewOptions<TData>({
       <DropdownMenuContent align="end" className="min-w-[150px]">
         <DropdownMenuLabel>Toggle columns</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <div className="scrollable mini darkbar flex max-h-[50dvh] flex-col gap-y-0.5">
+        <div className="scrollable mini darkbar flex max-h-[min(50vh,200px)] flex-col gap-y-0.5">
           {table
             .getAllColumns()
             .filter(

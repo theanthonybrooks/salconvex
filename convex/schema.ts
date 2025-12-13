@@ -72,7 +72,6 @@ const notificationTargetRoleValidator = v.union(
   v.literal("designer"),
 );
 
-//TODO: Ensure that duplicate notifications are not created. Currently, they are. How can I prevent this?
 const notificationsSchema = {
   type: notificationTypeValidator,
   dedupeKey: v.string(),
@@ -80,6 +79,7 @@ const notificationsSchema = {
   userId: v.union(v.id("users"), v.null()),
   targetRole: notificationTargetRoleValidator,
   displayText: v.optional(v.string()),
+  redirectUrl: v.optional(v.string()),
 };
 
 const userPrefsBaseValues = {

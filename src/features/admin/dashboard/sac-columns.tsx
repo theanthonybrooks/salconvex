@@ -22,14 +22,11 @@ import { SacCheckedSelector } from "@/features/admin/dashboard/components/admin-
 import { api } from "~/convex/_generated/api";
 
 export const sacColumnLabels: Record<string, string> = {
-  ticketNumber: "Ticket #",
-  name: "User Name",
-  email: "User Email",
-  category: "Category",
-  status: "Status",
-  _creationTime: "Created At",
+  createdAt: "Created At",
   updatedAt: "Last Updated",
-  message: "Message",
+  checked: "Checked",
+  salUpdatedAt: "SAL Updated",
+  appLink: "App Link",
 };
 
 // type SacResults = ({
@@ -163,6 +160,7 @@ export const sacColumns: ColumnDef<SacResult>[] = [
   },
   {
     accessorKey: "checked",
+    accessorFn: (row) => String(row.checked),
     minSize: 60,
     maxSize: 60,
     header: ({ column }) => (
