@@ -2,10 +2,7 @@
   "crons": [
     {
       "path": "/api/cron/sac-fetch",
-      "schedule": "0 8 * * *",
-      "headers": {
-        "x-cron-key": "@sac-cron-key"
-      }
+      "schedule": "0 8 * * *"
     }
   ]
 }

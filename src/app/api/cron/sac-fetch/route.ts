@@ -7,9 +7,9 @@ export const maxDuration = 60;
 
 export async function GET() {
   const hdrs = await headers();
-  const key = hdrs.get("x-cron-key");
+  const auth = hdrs.get("authorization");
 
-  if (!key || key !== process.env.SAC_CRON_KEY) {
+  if (auth !== `Bearer ${process.env.CRON_SECRET}`) {
     return new NextResponse("Unauthorized", { status: 401 });
   }
 
