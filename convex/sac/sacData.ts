@@ -9,9 +9,11 @@ export const upsertManyBySacIdInternal = internalMutation({
     items: v.array(sacValidator),
   },
   handler: async (ctx, { items }) => {
+    let insertCount = 0;
+    let updateCount = 0;
     for (const item of items) {
       // find existing doc by sacId via your index
-      console.log("deadline: ", item.openCall?.deadline);
+
       const existing = await ctx.db
         .query("sacData")
         .withIndex("by_sacId", (q) => q.eq("sacId", item.sacId))
@@ -24,13 +26,8 @@ export const upsertManyBySacIdInternal = internalMutation({
           checked: false,
           salUpdatedAt: Date.now(),
         });
-        await ctx.db.insert("notifications", {
-          type: "newSac",
-          userId: null,
-          targetRole: "admin",
-          displayText: "New Street Art Call",
-          dismissed: false,
-        });
+
+        insertCount += 1;
         continue;
       }
 
@@ -46,25 +43,53 @@ export const upsertManyBySacIdInternal = internalMutation({
         createdAt: item.createdAt,
         updatedAt: item.updatedAt,
         salUpdatedAt: Date.now(),
+        checked: false,
         // no `checked` here → it stays whatever it was
       });
+
+      updateCount += 1;
+    }
+    const date = new Date();
+    const currentDay = date.getDate();
+    const currentMonth = date.getMonth();
+    const hour = date.getHours();
+    if (insertCount > 0) {
       await ctx.db.insert("notifications", {
         type: "newSac",
         userId: null,
+        dedupeKey: `sac-added-${currentDay}-${currentMonth}-${hour}`,
         targetRole: "admin",
-        displayText: "Updated Street Art Call",
+        displayText: `${insertCount} Street Art Call${insertCount > 1 ? "s" : ""} added`,
         dismissed: false,
       });
     }
+    if (updateCount > 0) {
+      await ctx.db.insert("notifications", {
+        type: "newSac",
+        userId: null,
+        dedupeKey: `sac-updated-${currentDay}-${currentMonth}`,
+        targetRole: "admin",
+        displayText: `${updateCount} Street Art Call${updateCount > 1 ? "s" : ""} updated`,
+        dismissed: false,
+      });
+    }
+
+    return { insertCount, updateCount };
   },
 });
 
 export const upsertManyBySacId = mutation({
   args: { items: v.array(sacValidator) },
-  handler: async (ctx, { items }) => {
-    await ctx.runMutation(internal.sac.sacData.upsertManyBySacIdInternal, {
-      items,
-    });
+  handler: async (
+    ctx,
+    { items },
+  ): Promise<{ insertCount: number; updateCount: number }> => {
+    return await ctx.runMutation(
+      internal.sac.sacData.upsertManyBySacIdInternal,
+      {
+        items,
+      },
+    );
   },
 });
 

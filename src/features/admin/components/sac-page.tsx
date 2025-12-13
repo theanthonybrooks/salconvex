@@ -1,5 +1,7 @@
 "use client";
 
+import type { SacApiResponse } from "@/lib/jobs/syncSacData";
+
 import { useState } from "react";
 
 import { LoaderCircle } from "lucide-react";
@@ -7,21 +9,31 @@ import { LoaderCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PopoverSimple } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
+import { getTrailingS } from "@/helpers/stylingFns";
 
 type State =
   | { status: "idle" }
   | { status: "loading" }
-  | { status: "success"; data: { dataItems: unknown[] } }
+  | { status: "success"; data: SacApiResponse }
   | { status: "error"; message: string };
 
 export default function SACAdminPage() {
   //   const { preloadedUserData } = useConvexPreload();
   //   const userData = usePreloadedQuery(preloadedUserData);
   //   const { user } = userData || {};
+  let insertCount: number | undefined;
+  let updateCount: number | undefined;
+  let numResults: number | undefined;
   const [state, setState] = useState<State>({ status: "idle" });
   const [pending, setPending] = useState(false);
-  const hasResults =
-    state.status === "success" && state.data.dataItems?.length > 0;
+  const { status } = state;
+  const hasResults = status === "success" && state.data.dataItems?.length > 0;
+
+  if (status === "success") {
+    insertCount = state.data.counts.insertCount;
+    updateCount = state.data.counts.updateCount;
+    numResults = state.data.dataItems?.length;
+  }
 
   const handleFetchData = async () => {
     setState({ status: "loading" });
@@ -40,7 +52,6 @@ export default function SACAdminPage() {
       const data = await res.json();
 
       setState({ status: "success", data });
-      console.log("results", data.dataItems?.length, data);
     } catch (err) {
       setState({
         status: "error",
@@ -60,7 +71,7 @@ export default function SACAdminPage() {
             <Button
               variant="salWithShadowHidden"
               onClick={handleFetchData}
-              disabled={state.status === "loading"}
+              disabled={status === "loading"}
               className="!sm:h-10 w-full md:w-40"
               type="button"
             >
@@ -89,25 +100,47 @@ export default function SACAdminPage() {
             clickOnly
             content={
               <div className="scrollable mini darkbar max-h-30 px-3">
-                {/* <ol className="ml-1 list-outside list-decimal text-sm">
-                      {audience.map((a) => (
+                <ol className="ml-1 list-outside list-decimal text-sm">
+                  {/* {audience.map((a) => (
                         <li key={a._id}>
                           <p className="truncate">{a.email}</p>
                         </li>
-                      ))}
-                    </ol> */}
-                <span className="mb-3 w-full text-center text-sm sm:w-auto">
+                      ))} */}
+                  <li>
+                    <p className="truncate">
+                      {insertCount} item
+                      {getTrailingS(insertCount)} added
+                    </p>
+                  </li>
+                  <li>
+                    <p className="truncate">
+                      {updateCount} item
+                      {getTrailingS(updateCount)} updated
+                    </p>
+                  </li>
+                </ol>
+                {/* <span className="mb-3 w-full text-center text-sm sm:w-auto">
                   {state.data.dataItems?.length} items found
-                </span>
+                </span> */}
               </div>
             }
           >
-            <span className="mb-3 w-full text-center text-sm sm:w-auto">
-              {state.data.dataItems?.length} items found
+            <span className="mb-3 flex w-full items-center gap-1 text-center text-sm sm:w-auto">
+              <p>
+                {numResults} item{getTrailingS(numResults)} found,
+              </p>
+              <p>
+                {insertCount} item
+                {getTrailingS(insertCount)} added,
+              </p>
+              <p>
+                {updateCount} item
+                {getTrailingS(updateCount)} updated,
+              </p>
             </span>
           </PopoverSimple>
         )}
-        {state.status === "error" && (
+        {status === "error" && (
           <span className="text-red-600">{state.message}</span>
         )}
       </div>

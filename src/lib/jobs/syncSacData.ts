@@ -35,7 +35,7 @@ type SacApiItem = {
   };
 };
 
-type SacApiResponse = {
+export type SacApiResponse = {
   dataItems: SacApiItem[];
   pagingMetadata: {
     count: number;
@@ -44,6 +44,10 @@ type SacApiResponse = {
     tooManyToCount: boolean;
     cursors: Record<string, unknown>;
     hasNext: boolean;
+  };
+  counts: {
+    insertCount: number;
+    updateCount: number;
   };
 };
 
@@ -144,7 +148,16 @@ export async function syncSacData(): Promise<SacApiResponse> {
     };
   });
 
-  await fetchMutation(api.sac.sacData.upsertManyBySacId, { items });
+  const result = await fetchMutation(api.sac.sacData.upsertManyBySacId, {
+    items,
+  });
 
-  return capturedData;
+  console.log(
+    "inserted: ",
+    result.insertCount,
+    "updated: ",
+    result.updateCount,
+  );
+
+  return { ...capturedData, counts: result };
 }

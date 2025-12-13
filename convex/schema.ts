@@ -75,7 +75,7 @@ const notificationTargetRoleValidator = v.union(
 //TODO: Ensure that duplicate notifications are not created. Currently, they are. How can I prevent this?
 const notificationsSchema = {
   type: notificationTypeValidator,
-  triggerId: v.optional(v.string()),
+  dedupeKey: v.string(),
   dismissed: v.boolean(),
   userId: v.union(v.id("users"), v.null()),
   targetRole: notificationTargetRoleValidator,

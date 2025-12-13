@@ -70,3 +70,8 @@ export function getUserFontSizePref(pref?: FontSizeType): FontPref | null {
   };
   return fontPref;
 }
+
+export function getTrailingS(value: number | undefined): string {
+  if (!value) return "s";
+  return value > 1 ? "s" : "";
+}
