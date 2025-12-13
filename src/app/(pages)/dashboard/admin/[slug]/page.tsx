@@ -57,6 +57,7 @@ export default async function AdminPage({
     case "applications":
     case "newsletter":
     case "resources":
+    case "sac":
       return <AdminDashboardTableWrapper page={slug} />;
 
     default:

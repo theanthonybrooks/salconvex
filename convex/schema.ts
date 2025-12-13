@@ -52,6 +52,36 @@ export const fontSizeValidator = v.union(
 );
 export type FontSizeType = Infer<typeof fontSizeValidator> | undefined;
 
+const notificationTypeValidator = v.union(
+  v.literal("newSubmission"),
+  v.literal("newMessage"),
+  v.literal("newFollow"),
+  v.literal("newResponse"),
+  v.literal("newSupport"),
+  v.literal("newApplication"),
+  v.literal("newOpenCall"),
+  v.literal("newPublishedCall"),
+  v.literal("newEvent"),
+  v.literal("newSac"),
+);
+
+const notificationTargetRoleValidator = v.union(
+  v.literal("admin"),
+  v.literal("organizer"),
+  v.literal("artist"),
+  v.literal("designer"),
+);
+
+//TODO: Ensure that duplicate notifications are not created. Currently, they are. How can I prevent this?
+const notificationsSchema = {
+  type: notificationTypeValidator,
+  triggerId: v.optional(v.string()),
+  dismissed: v.boolean(),
+  userId: v.union(v.id("users"), v.null()),
+  targetRole: notificationTargetRoleValidator,
+  displayText: v.optional(v.string()),
+};
+
 const userPrefsBaseValues = {
   autoApply: v.optional(v.boolean()),
   hideAppFees: v.optional(v.boolean()),
@@ -655,6 +685,49 @@ const eventOpenCallSchema = {
   lastEdited: v.optional(v.number()),
 };
 
+const incomingSacFields = {
+  sacId: v.string(),
+  dataCollectionId: v.string(),
+  location: v.object({
+    city: v.string(),
+    country: v.string(),
+  }),
+  event: v.object({
+    name: v.string(),
+    slug: v.string(),
+    about: v.string(),
+    date: v.string(),
+  }),
+  openCall: v.optional(
+    v.object({
+      past: v.boolean(),
+      deadline: v.string(),
+      applicationLink: v.string(),
+      provided: v.object({
+        food: v.union(v.boolean(), v.string()),
+        artistFee: v.union(v.boolean(), v.string()),
+        transportation: v.union(v.boolean(), v.string()),
+        accommodation: v.union(v.boolean(), v.string()),
+        materials: v.union(v.boolean(), v.string()),
+      }),
+    }),
+  ),
+  contact: v.object({
+    email: v.optional(v.string()),
+    website: v.string(),
+  }),
+  createdAt: v.string(),
+  updatedAt: v.optional(v.string()),
+};
+
+const sacSchema = {
+  ...incomingSacFields,
+  salUpdatedAt: v.number(),
+  checked: v.boolean(),
+};
+
+export const sacValidator = v.object(incomingSacFields);
+
 //TODO: Only push to this once the event is approved and published
 
 const eventLookupSchema = {
@@ -1095,6 +1168,15 @@ export default defineSchema({
     TAGS: v.string(),
     TIMEZONE: v.string(),
   }),
+
+  sacData: defineTable(sacSchema)
+    .index("by_sacId", ["sacId"])
+    .index("by_updatedAt", ["updatedAt"])
+    .index("by_dataCollectionId", ["dataCollectionId"])
+    .index("by_location_city", ["location.city"])
+    .index("by_location_country", ["location.country"])
+    .index("by_event_name", ["event.name"])
+    .index("by_event_slug", ["event.slug"]),
 
   eventAnalytics: defineTable(eventAnalyticsSchema)
     .index("by_userId", ["userId"])
@@ -1639,6 +1721,10 @@ export default defineSchema({
     .index("by_paletteId", ["paletteId"])
     .index("by_paletteId_value", ["paletteId", "value"])
     .index("by_value", ["value"]),
+  notifications: defineTable(notificationsSchema)
+    .index("by_userId", ["userId"])
+    .index("by_type", ["type"])
+    .index("by_dismissed", ["dismissed"]),
 });
 
 // #endregion

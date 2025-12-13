@@ -6,6 +6,10 @@ import {
   registrationStatusBgColorMap,
   registrationStatusColorMap,
 } from "@/constants/resourcesConsts";
+import {
+  checkedStatusBgColorMap,
+  checkedStatusColorMap,
+} from "@/constants/sac-consts";
 
 import {
   NonNullApplicationStatus,
@@ -64,6 +68,7 @@ export const selectableTableTypes: TableTypes[] = [
   "openCalls",
   "resources",
   "support",
+  "sac",
 ];
 
 export const numberedTableTypes: TableTypes[] = [
@@ -409,6 +414,13 @@ export function DataTable<TData, TValue>({
                   };
                   const statusColor = registrationStatusBgColorMap[status];
                   const textColor = registrationStatusColorMap[status];
+                  bgStatusClass = `${statusColor} ${textColor}`;
+                } else if (tableType === "sac") {
+                  const { checked } = row.original as {
+                    checked: boolean;
+                  };
+                  const statusColor = checkedStatusBgColorMap[String(checked)];
+                  const textColor = checkedStatusColorMap[String(checked)];
                   bgStatusClass = `${statusColor} ${textColor}`;
                 }
 

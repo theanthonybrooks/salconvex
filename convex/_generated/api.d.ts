@@ -44,6 +44,7 @@ import type * as organizer_staff from "../organizer/staff.js";
 import type * as otp_resendOtp from "../otp/resendOtp.js";
 import type * as otp_resetOtp from "../otp/resetOtp.js";
 import type * as plans from "../plans.js";
+import type * as sac_sacData from "../sac/sacData.js";
 import type * as stripe_stripeAddOns from "../stripe/stripeAddOns.js";
 import type * as stripe_stripeBase from "../stripe/stripeBase.js";
 import type * as stripe_stripeOrganizations from "../stripe/stripeOrganizations.js";
@@ -99,6 +100,7 @@ declare const fullApi: ApiFromModules<{
   "otp/resendOtp": typeof otp_resendOtp;
   "otp/resetOtp": typeof otp_resetOtp;
   plans: typeof plans;
+  "sac/sacData": typeof sac_sacData;
   "stripe/stripeAddOns": typeof stripe_stripeAddOns;
   "stripe/stripeBase": typeof stripe_stripeBase;
   "stripe/stripeOrganizations": typeof stripe_stripeOrganizations;

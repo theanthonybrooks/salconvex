@@ -1,14 +1,16 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { api } from "~/convex/_generated/api";
-import { makeUseQueryWithStatus } from "convex-helpers/react";
-import { usePreloadedQuery, useQueries } from "convex/react";
 
 import { ApplicationChart } from "@/components/ui/charts/application-chart-interactive";
 import WorldMapComponent from "@/components/ui/map/map-component";
+import SACAdminPage from "@/features/admin/components/sac-page";
 import ThisweekRecapPost from "@/features/events/thisweek-recap-post";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
+
+import { api } from "~/convex/_generated/api";
+import { makeUseQueryWithStatus } from "convex-helpers/react";
+import { usePreloadedQuery, useQueries } from "convex/react";
 
 export default function AdminScreen() {
   const pathname = usePathname();
@@ -33,6 +35,8 @@ export default function AdminScreen() {
       return <ThisweekRecapPost source="nextweek" />;
     case "/admin/map":
       return <WorldMapComponent />;
+    case "/admin/sac":
+      return <SACAdminPage />;
     case "/admin/applications":
       return (
         <ApplicationChart data={applicationData ?? []} loading={isPending} />

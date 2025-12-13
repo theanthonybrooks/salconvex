@@ -47,5 +47,8 @@
     "Nextjs"
   ],
   "typescript.tsdk": "node_modules\\typescript\\lib",
-  "python.analysis.autoImportCompletions": true
+  "python.analysis.autoImportCompletions": true,
+  //Prettier
+  "prettier.requireConfig": true,
+  "prettier.prettierPath": "./node_modules/prettier"
 }

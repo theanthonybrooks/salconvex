@@ -14,9 +14,11 @@ import { ResponsiveDataTable } from "@/components/data-table/DataTableWrapper";
 import { Card } from "@/components/ui/card";
 import { Link } from "@/components/ui/custom-link";
 import { useAdminPreload } from "@/features/admin/admin-preload-context";
+import SACAdminPage from "@/features/admin/components/sac-page";
 import { artistColumns } from "@/features/admin/dashboard/artist-columns";
 import { newsletterColumns } from "@/features/admin/dashboard/newsletter-columns";
 import { resourceColumns } from "@/features/admin/dashboard/resources-column";
+import { sacColumns } from "@/features/admin/dashboard/sac-columns";
 import { socialColumns } from "@/features/admin/dashboard/socials-columns";
 import { supportColumns } from "@/features/admin/dashboard/support-columns";
 import { AdminToolbar } from "@/features/admin/dashboard/user-admin-toolbar";
@@ -66,6 +68,7 @@ export function AdminDashboardTableWrapper({
   const newsletterPage = page === "newsletter";
   const resourcesPage = page === "resources";
   const socialsPage = page === "socials";
+  const sacPage = page === "sac";
 
   const usersData = useQuery(
     api.users.usersWithSubscriptions,
@@ -109,6 +112,8 @@ export function AdminDashboardTableWrapper({
       ? { ticketId: selectedRow as Id<"support"> }
       : "skip",
   );
+
+  const sacData = useQuery(api.sac.sacData.getSacData, sacPage ? {} : "skip");
 
   return (
     <>
@@ -357,6 +362,22 @@ export function AdminDashboardTableWrapper({
               </Card>
             </div>
           )}
+        </>
+      )}
+      {sacPage && (
+        <>
+          <SACAdminPage />
+          <ResponsiveDataTable
+            title="Street Art Calls Data"
+            columns={sacColumns}
+            data={sacData ?? []}
+            adminActions={adminActions}
+            tableType="sac"
+            pageType="dashboard"
+            defaultSort={[{ id: "updatedAt", desc: true }]}
+            defaultVisibility={{}}
+            defaultFilters={[]}
+          />
         </>
       )}
     </>

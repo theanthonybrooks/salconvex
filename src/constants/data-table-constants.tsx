@@ -20,7 +20,9 @@ import {
   Calendar,
   CalendarHeart,
   CheckCircle,
+  CheckIcon,
   CircleCheck,
+  CircleX,
   Clock,
   DollarSign,
   Ghost,
@@ -406,6 +408,16 @@ export const TABLE_FILTERS: TableFilterConfig = {
       columnId: "category",
       title: "Category",
       options: [...supportCategoryOptions],
+    },
+  ],
+  sac: [
+    {
+      columnId: "checked",
+      title: "Checked",
+      options: [
+        { value: "true", label: "Yes", icon: CheckIcon },
+        { value: "false", label: "No", icon: CircleX },
+      ],
     },
   ],
   events: [

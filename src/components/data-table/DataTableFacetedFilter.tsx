@@ -145,7 +145,7 @@ export function DataTableFacetedFilter<TData, TValue>({
                   >
                     <div
                       className={cn(
-                        "mr-2 flex size-4 shrink-0 items-center justify-center rounded-sm border border-primary hover:cursor-pointer",
+                        "flex size-4 shrink-0 items-center justify-center rounded-sm border border-primary hover:cursor-pointer",
                         isSelected
                           ? "bg-card text-foreground"
                           : "opacity-50 [&_svg]:invisible",
@@ -154,7 +154,7 @@ export function DataTableFacetedFilter<TData, TValue>({
                       <FaCheck className="size-3 translate-y-[1.1px]" />
                     </div>
                     {option.icon && (
-                      <option.icon className="mr-2 h-4 w-4 text-muted-foreground" />
+                      <option.icon className="h-4 w-4 text-muted-foreground" />
                     )}
                     <span>{option.label}</span>
                     {(facets?.get(option.value) ??
