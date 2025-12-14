@@ -4,7 +4,7 @@ import { TableTypes } from "@/types/tanstack-table";
 
 import { useState } from "react";
 import { useDashboard } from "@/app/(pages)/dashboard/_components/DashboardContext";
-import { NewsletterMainPage } from "@/app/(pages)/dashboard/admin/_components/newsletter/newsletterMainPage";
+import { NewsletterToolbar } from "@/app/(pages)/dashboard/admin/_components/newsletter/newsletterToolbar";
 
 import { X } from "lucide-react";
 
@@ -14,7 +14,7 @@ import { ResponsiveDataTable } from "@/components/data-table/DataTableWrapper";
 import { Card } from "@/components/ui/card";
 import { Link } from "@/components/ui/custom-link";
 import { useAdminPreload } from "@/features/admin/admin-preload-context";
-import SACAdminPage from "@/features/admin/components/sac-page";
+import SACToolbar from "@/features/admin/components/sac-toolbar";
 import { artistColumns } from "@/features/admin/dashboard/artist-columns";
 import { newsletterColumns } from "@/features/admin/dashboard/newsletter-columns";
 import { resourceColumns } from "@/features/admin/dashboard/resources-column";
@@ -215,7 +215,7 @@ export function AdminDashboardTableWrapper({
       )}
       {newsletterPage && (
         <>
-          <NewsletterMainPage />
+          <NewsletterToolbar />
           <ResponsiveDataTable
             title="Newsletter Subscriptions"
             description="View newsletter subscribers & their preferences"
@@ -365,20 +365,18 @@ export function AdminDashboardTableWrapper({
         </>
       )}
       {sacPage && (
-        <>
-          <SACAdminPage />
-          <ResponsiveDataTable
-            title="Street Art Calls Data"
-            columns={sacColumns}
-            data={sacData ?? []}
-            adminActions={adminActions}
-            tableType="sac"
-            pageType="dashboard"
-            defaultSort={[{ id: "updatedAt", desc: true }]}
-            defaultVisibility={{}}
-            defaultFilters={[]}
-          />
-        </>
+        <ResponsiveDataTable
+          title="Street Art Calls Data"
+          extraToolbar={<SACToolbar />}
+          columns={sacColumns}
+          data={sacData ?? []}
+          adminActions={adminActions}
+          tableType="sac"
+          pageType="dashboard"
+          defaultSort={[{ id: "updatedAt", desc: true }]}
+          defaultVisibility={{}}
+          defaultFilters={[{ id: "checked", value: ["false"] }]}
+        />
       )}
     </>
   );

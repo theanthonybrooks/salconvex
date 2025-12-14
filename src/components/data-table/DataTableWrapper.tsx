@@ -92,7 +92,7 @@ export function ResponsiveDataTable<TData, TValue>({
             {description}
           </p>
         )}
-        {extraToolbar}
+        {extraToolbar && <div className="mb-6">{extraToolbar}</div>}
         <DataTable
           columns={columns}
           data={data}

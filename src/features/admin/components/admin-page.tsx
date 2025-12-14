@@ -4,7 +4,7 @@ import { usePathname, useRouter } from "next/navigation";
 
 import { ApplicationChart } from "@/components/ui/charts/application-chart-interactive";
 import WorldMapComponent from "@/components/ui/map/map-component";
-import SACAdminPage from "@/features/admin/components/sac-page";
+import SACAdminPage from "@/features/admin/components/sac-toolbar";
 import ThisweekRecapPost from "@/features/events/thisweek-recap-post";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 

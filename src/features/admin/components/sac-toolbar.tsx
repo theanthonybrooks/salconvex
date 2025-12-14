@@ -17,7 +17,7 @@ type State =
   | { status: "success"; data: SacApiResponse }
   | { status: "error"; message: string };
 
-export default function SACAdminPage() {
+export default function SACToolbar() {
   //   const { preloadedUserData } = useConvexPreload();
   //   const userData = usePreloadedQuery(preloadedUserData);
   //   const { user } = userData || {};
@@ -63,32 +63,29 @@ export default function SACAdminPage() {
   };
 
   return (
-    <div className="px-10 pt-10">
-      <div className="flex flex-col items-end gap-3 rounded-lg border-1.5 border-dashed border-foreground/30 bg-background/50 p-3 md:flex-row">
-        <section className="flex w-full flex-col gap-2 md:w-auto">
-          <h3>Admin Functions:</h3>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="salWithShadowHidden"
-              onClick={handleFetchData}
-              disabled={status === "loading"}
-              className="!sm:h-10 w-full md:w-40"
-              type="button"
-            >
-              {hasResults ? (
-                pending ? (
-                  "Loading..."
-                ) : (
-                  "Load More Data"
-                )
-              ) : pending ? (
-                <LoaderCircle className="size-4 animate-spin" />
+    <div className="">
+      <div className="flex flex-col items-end gap-3 rounded-lg border-1.5 border-dashed border-foreground/20 bg-card/70 p-3 md:flex-row">
+        <div className="flex items-center gap-2">
+          <Button
+            variant="salWithShadowHidden"
+            onClick={handleFetchData}
+            disabled={status === "loading"}
+            className="!sm:h-10 w-full md:w-40"
+            type="button"
+          >
+            {hasResults ? (
+              pending ? (
+                "Loading..."
               ) : (
-                "Load Current Data"
-              )}
-            </Button>
-          </div>
-        </section>
+                "Load More Data"
+              )
+            ) : pending ? (
+              <LoaderCircle className="size-4 animate-spin" />
+            ) : (
+              "Load Current Data"
+            )}
+          </Button>
+        </div>
         <Separator
           thickness={2}
           className="mx-2 hidden h-10 md:block"

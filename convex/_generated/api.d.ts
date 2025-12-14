@@ -35,6 +35,7 @@ import type * as kanban_cards from "../kanban/cards.js";
 import type * as kanban_display from "../kanban/display.js";
 import type * as map_worldMap from "../map/worldMap.js";
 import type * as migrations from "../migrations.js";
+import type * as newsletter_campaign from "../newsletter/campaign.js";
 import type * as newsletter_emails from "../newsletter/emails.js";
 import type * as newsletter_subscriber from "../newsletter/subscriber.js";
 import type * as openCalls_openCall from "../openCalls/openCall.js";
@@ -91,6 +92,7 @@ declare const fullApi: ApiFromModules<{
   "kanban/display": typeof kanban_display;
   "map/worldMap": typeof map_worldMap;
   migrations: typeof migrations;
+  "newsletter/campaign": typeof newsletter_campaign;
   "newsletter/emails": typeof newsletter_emails;
   "newsletter/subscriber": typeof newsletter_subscriber;
   "openCalls/openCall": typeof openCalls_openCall;

@@ -42,6 +42,7 @@ import {
   Shield,
   Star,
   User,
+  UserSearch,
 } from "lucide-react";
 
 import type { linktreeLinkTypeValidator } from "~/convex/schema";
@@ -366,17 +367,7 @@ export const dashboardNavItems: DashNavItem[] = [
     sub: [],
     userType: [],
   },
-  {
-    label: "Newsletter",
-    href: "/dashboard/admin/newsletter",
-    icon: Newspaper,
-    subsection: true,
-    sectionCat: "admin",
-    desc: "Newsletter Subscribers",
-    userRole: ["admin"],
-    sub: [],
-    userType: [],
-  },
+
   {
     label: "Resources",
     href: "/dashboard/admin/resources",
@@ -464,6 +455,20 @@ export const dashboardNavItems: DashNavItem[] = [
     desc: "Hidden events/projects",
     sub: ["active", "trialing"],
     userType: ["artist"],
+  },
+  {
+    label: "Audience",
+    href: "/dashboard/admin/newsletter",
+    icon: UserSearch,
+    section: true,
+    sectionIcon: Newspaper,
+    sectionCat: "newsletter",
+    sectionHead: true,
+    heading: "Newsletter",
+    desc: "Newsletter Dashboard",
+    userRole: ["admin"],
+    sub: [],
+    userType: [],
   },
   // {
   //   label: "Submitted",

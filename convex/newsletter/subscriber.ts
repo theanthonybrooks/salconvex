@@ -456,22 +456,26 @@ export const getNewsletterStatus = query({
 export const getAudience = query({
   args: {
     type: newsletterTypeValidator,
-    frequency: newsletterFrequencyValidator,
+    frequency: v.union(newsletterFrequencyValidator, v.literal("all")),
     plan: v.union(v.literal(0), v.literal(1), v.literal(2), v.literal(3)),
     test: v.boolean(),
   },
   handler: async (ctx, args) => {
     const { type, frequency, plan } = args;
 
-    let query = ctx.db
-      .query("newsletter")
-      .withIndex("by_active_frequency_plan", (q) =>
-        q
-          .eq("newsletter", true)
-          .eq("frequency", frequency)
-          .gte("userPlan", plan),
+    let query = ctx.db.query("newsletter").withIndex("by_active_plan", (q) =>
+      q
+        .eq("newsletter", true)
+        .gte("userPlan", plan),
+    );
+    if (frequency !== "all") {
+      query = query.filter((f) =>
+        f.or(
+          f.eq(f.field("frequency"), frequency),
+          f.eq(f.field("frequency"), "weekly"),
+        ),
       );
-
+    }
     if (args.test) {
       query = query.filter((q) => q.eq(q.field("tester"), true));
     }
@@ -486,6 +490,8 @@ export const getAudience = query({
       }
       return false;
     });
+
+    
 
     return { success: true, data: filteredSubscribers };
   },

@@ -19,3 +19,8 @@ export function showToast(
 
   return toast(message, { ...mergedOptions, type });
 }
+
+export function showLoadingToast(message: string, options?: ToastOptions) {
+  toast.dismiss();
+  return toast.loading(message, { ...defaultOptions, ...options });
+}

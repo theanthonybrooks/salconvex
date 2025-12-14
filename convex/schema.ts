@@ -72,11 +72,19 @@ const notificationTargetRoleValidator = v.union(
   v.literal("designer"),
 );
 
+const importanceValidator = v.union(
+  v.literal("low"),
+  v.literal("medium"),
+  v.literal("high"),
+);
+
 const notificationsSchema = {
   type: notificationTypeValidator,
   dedupeKey: v.string(),
   dismissed: v.boolean(),
   userId: v.union(v.id("users"), v.null()),
+  importance: v.optional(importanceValidator),
+  deadline: v.optional(v.number()),
   targetRole: notificationTargetRoleValidator,
   displayText: v.optional(v.string()),
   redirectUrl: v.optional(v.string()),
@@ -889,6 +897,66 @@ export const newsletterSchema = {
 
 export const newsletterSubscriber = v.object(newsletterSchema);
 
+export const newsletterCampaign = {
+  title: v.string(),
+  slug: v.string(),
+  status: v.union(
+    v.literal("draft"),
+    v.literal("scheduled"),
+    v.literal("sending"),
+    v.literal("sent"),
+    v.literal("cancelled"),
+  ),
+  type: v.union(v.literal("general"), v.literal("openCall")),
+  frequency: v.union(
+    v.literal("monthly"),
+    v.literal("weekly"),
+    v.literal("all"),
+  ),
+
+  userPlan: v.union(v.literal(0), v.literal(1), v.literal(2), v.literal(3)),
+  emailContent: v.optional(v.string()),
+  isTest: v.boolean(),
+  sendTime: v.number(),
+  plannedSendTime: v.optional(v.number()),
+  startedSendTime: v.optional(v.number()),
+  finishedSendTime: v.optional(v.number()),
+  audienceCount: v.optional(v.number()),
+  audienceStatus: v.union(
+    v.literal("pending"),
+    v.literal("inProgress"),
+    v.literal("complete"),
+    v.literal("failed"),
+  ),
+  audienceError: v.optional(v.string()),
+  createdBy: v.id("users"),
+};
+
+export const newsletterCampaignAudience = {
+  campaignId: v.id("newsletterCampaign"),
+  subscriberId: v.id("newsletter"),
+  email: v.string(),
+
+  status: v.union(
+    v.literal("pending"),
+    v.literal("sending"),
+    v.literal("sent"),
+    v.literal("delivered"),
+    v.literal("bounced"),
+    v.literal("failed"),
+    v.literal("unsubscribed"),
+    v.literal("skipped"),
+  ),
+  sentAt: v.optional(v.number()),
+  deliveredAt: v.optional(v.number()),
+  bouncedAt: v.optional(v.number()),
+  unsubscribedAt: v.optional(v.number()),
+
+  updatedAt: v.optional(v.number()),
+  errorCode: v.optional(v.string()),
+  errorMessage: v.optional(v.string()),
+};
+
 const supportSchema = {
   userId: v.union(v.id("users"), v.null()),
   ticketNumber: v.number(),
@@ -1696,9 +1764,22 @@ export default defineSchema({
     .index("by_userId", ["userId"]),
 
   newsletter: defineTable(newsletterSchema)
-    .index("by_active_frequency_plan", ["newsletter", "frequency", "userPlan"])
+    .index("by_active_plan", ["newsletter", "userPlan"])
     .index("by_userId", ["userId"])
     .index("by_email", ["email"]),
+
+  newsletterCampaign: defineTable(newsletterCampaign)
+    .index("by_slug", ["slug"])
+    .index("by_status", ["status"])
+    .index("by_type", ["type"])
+    .index("by_frequency", ["frequency"])
+    .index("by_userPlan", ["userPlan"])
+    .index("by_isTest", ["isTest"]),
+
+  newsletterCampaignAudience: defineTable(newsletterCampaignAudience)
+    .index("by_campaignId", ["campaignId"])
+    .index("by_subscriberId", ["subscriberId"])
+    .index("by_status", ["status"]),
 
   openCallFiles: defineTable(openCallFilesSchema)
     .index("by_storageId", ["storageId"])

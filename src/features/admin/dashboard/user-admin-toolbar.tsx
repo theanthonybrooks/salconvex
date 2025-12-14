@@ -66,7 +66,7 @@ export const AdminToolbar = ({ toolbarData }: UserAdminToolbarProps) => {
   return (
     <div
       className={cn(
-        "mx-auto mb-6 flex w-full max-w-[80vw] flex-row items-center justify-between gap-2 rounded-lg border-1.5 border-foreground/20 bg-card/70 p-2 sm:max-w-full",
+        "mx-auto flex w-full max-w-[80vw] flex-row items-center justify-between gap-2 rounded-lg border-1.5 border-foreground/20 bg-card/70 p-2 sm:max-w-full",
       )}
     >
       <div className="flex flex-col gap-2 text-sm sm:flex-row sm:pl-4">
