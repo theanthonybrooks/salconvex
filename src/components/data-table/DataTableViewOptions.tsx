@@ -14,7 +14,8 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { artistColumnLabels } from "@/features/admin/dashboard/artist-columns";
-import { newsletterColumnLabels } from "@/features/admin/dashboard/newsletter-columns";
+import { audienceColumnLabels } from "@/features/admin/dashboard/audience-columns";
+import { campaignColumnLabels } from "@/features/admin/dashboard/campaign-columns";
 import { resourcesColumnLabels } from "@/features/admin/dashboard/resources-column";
 import { sacColumnLabels } from "@/features/admin/dashboard/sac-columns";
 import { socialsColumnLabels } from "@/features/admin/dashboard/socials-columns";
@@ -40,7 +41,9 @@ const labelMaps: Record<string, Record<string, string>> = {
   orgEvents: orgEventColumnLabels,
   users: userColumnLabels,
   artists: artistColumnLabels,
-  newsletter: newsletterColumnLabels,
+  audience: audienceColumnLabels,
+  campaigns: campaignColumnLabels,
+
   userAddOns: userAddOnColumnLabels,
   resources: resourcesColumnLabels,
   support: supportColumnLabels,

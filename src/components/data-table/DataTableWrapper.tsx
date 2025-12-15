@@ -41,6 +41,8 @@ type ResponsiveDataTableProps<TData, TValue> = {
   className?: string;
   mobileClassName?: string;
   extraToolbar?: ReactNode;
+  renderSubrow?: (row: TData) => ReactNode;
+  subColumns?: ColumnDef<TData, TValue>[];
   minimalView?: MaybeResponsive<boolean>;
   collapsedSidebar?: MaybeResponsive<boolean>;
 };
@@ -63,6 +65,7 @@ export function ResponsiveDataTable<TData, TValue>({
   extraToolbar,
   minimalView,
   collapsedSidebar,
+  subColumns,
 }: ResponsiveDataTableProps<TData, TValue>) {
   const resolve = <T,>(
     value: MaybeResponsive<T> | undefined,
@@ -106,6 +109,7 @@ export function ResponsiveDataTable<TData, TValue>({
           pageSize={resolve(pageSize, "desktop")}
           minimalView={resolve(minimalView, "desktop")}
           collapsedSidebar={resolve(collapsedSidebar, "desktop")}
+          subColumns={subColumns}
         />
       </div>
 
@@ -140,6 +144,7 @@ export function ResponsiveDataTable<TData, TValue>({
           pageSize={resolve(pageSize, "mobile")}
           minimalView={resolve(minimalView, "mobile")}
           collapsedSidebar={resolve(collapsedSidebar, "mobile")}
+          subColumns={subColumns}
           className="w-full overflow-x-auto"
         />
       </div>

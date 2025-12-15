@@ -50,16 +50,12 @@ export default async function DashboardLayout({
     {},
     { token },
   );
-  const user = await fetchQuery(api.users.getCurrentUser, {}, { token });
-
-  // const userSub = subStatus?.subStatus;
-  // const userType = user?.user?.accountType;
-
+  const userData = await fetchQuery(api.users.getCurrentUser, {}, { token });
+  const { user } = userData || {};
   if (!user) redirect("/auth/sign-in");
-  if (!subStatus) redirect("/pricing?type=artist");
-  // if (subStatus?.subStatus === "canceled") {
-  //   redirect("/pricing#plans")
-  // }
+  const isAdmin = user.role.includes("admin") || user.role.includes("creator");
+
+  if (!subStatus && !isAdmin) redirect("/pricing?type=artist");
 
   return <DashboardWrapper>{children}</DashboardWrapper>;
 }

@@ -22,7 +22,7 @@ export default async function OrganizerPage({
     { token },
   );
   const userData = await fetchQuery(api.users.getCurrentUser, {}, { token });
-  const user = userData?.user;
+  const { user } = userData || {};
   const subStatus = subscription?.status;
 
   if (!user) {
@@ -31,15 +31,14 @@ export default async function OrganizerPage({
 
   if (
     !user?.role.includes("admin") &&
+    !user?.role.includes("creator") &&
     !user?.accountType?.includes("organizer")
   ) {
     if (!subStatus || subStatus === "canceled") {
       redirect("/pricing?type=artist");
     }
-    redirect("/thelist");
+    redirect("/dashboard");
   }
-
-  // console.log(orgEventsData);
 
   switch (slug) {
     case "update-event":

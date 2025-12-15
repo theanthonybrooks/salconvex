@@ -30,6 +30,7 @@ import type * as events_socials from "../events/socials.js";
 import type * as functions_customGoogle from "../functions/customGoogle.js";
 import type * as functions_customPassword from "../functions/customPassword.js";
 import type * as functions_palettes from "../functions/palettes.js";
+import type * as helpers_authHelpers from "../helpers/authHelpers.js";
 import type * as http from "../http.js";
 import type * as kanban_cards from "../kanban/cards.js";
 import type * as kanban_display from "../kanban/display.js";
@@ -87,6 +88,7 @@ declare const fullApi: ApiFromModules<{
   "functions/customGoogle": typeof functions_customGoogle;
   "functions/customPassword": typeof functions_customPassword;
   "functions/palettes": typeof functions_palettes;
+  "helpers/authHelpers": typeof helpers_authHelpers;
   http: typeof http;
   "kanban/cards": typeof kanban_cards;
   "kanban/display": typeof kanban_display;

@@ -17,6 +17,7 @@ import {
   statusBgColorMap,
   statusColorMap,
 } from "@/types/applications";
+import { newsletterTableTypes } from "@/types/tableTypes";
 import { PageTypes, TableTypes } from "@/types/tanstack-table";
 
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -25,8 +26,10 @@ import {
   ColumnDef,
   ColumnFiltersState,
   ColumnSort,
+  ExpandedState,
   flexRender,
   getCoreRowModel,
+  getExpandedRowModel,
   getFacetedRowModel,
   getFacetedUniqueValues,
   getFilteredRowModel,
@@ -72,14 +75,16 @@ export const selectableTableTypes: TableTypes[] = [
 ];
 
 export const numberedTableTypes: TableTypes[] = [
+  ...newsletterTableTypes,
   "users",
   "artists",
-  "newsletter",
   "applications",
   "bookmarks",
   "hidden",
   "resources",
 ];
+
+export const expandableTableTypes: TableTypes[] = ["campaigns"];
 
 export type AdminActions = {
   isAdmin: boolean;
@@ -106,6 +111,7 @@ interface DataTableProps<TData, TValue> {
   pageSize?: number;
   isMobile?: boolean;
   collapsedSidebar?: boolean;
+  subColumns?: ColumnDef<TData, TValue>[];
 }
 
 export function DataTable<TData, TValue>({
@@ -129,10 +135,15 @@ export function DataTable<TData, TValue>({
   pageSize = 10,
   isMobile,
   collapsedSidebar,
+
+  subColumns,
 }: DataTableProps<TData, TValue>) {
   const searchParams = useSearchParams();
+  const isExpandable = tableType
+    ? expandableTableTypes.includes(tableType)
+    : false;
   const isSelectable = tableType
-    ? selectableTableTypes.includes(tableType)
+    ? selectableTableTypes.includes(tableType) || isExpandable
     : false;
 
   const defaultFiltersFromUrl: ColumnFiltersState = useMemo(() => {
@@ -159,6 +170,8 @@ export function DataTable<TData, TValue>({
 
   const { isAdmin, isEditor } = adminActions ?? {};
 
+  const [expanded, setExpanded] = useState<ExpandedState>({});
+
   const [rowSelection, setRowSelection] = useState(selectedRow ?? {});
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
     defaultVisibility ?? {},
@@ -177,9 +190,6 @@ export function DataTable<TData, TValue>({
     return defaultFiltersFromUrl;
   });
 
-  // const initialSort = useMemo<SortingState>(() => {
-  //   return defaultSort ? [{ id: defaultSort.id, desc: defaultSort.desc }] : [];
-  // }, [defaultSort]);
   const initialSort = useMemo<SortingState>(() => {
     return defaultSort ?? [];
   }, [defaultSort]);
@@ -210,17 +220,29 @@ export function DataTable<TData, TValue>({
     },
 
     state: {
+      expanded,
       sorting,
       columnVisibility,
       rowSelection,
       columnFilters,
     },
+    onExpandedChange: setExpanded,
     enableRowSelection: isSelectable,
     onRowSelectionChange: (updater) => {
       const newSelection =
         typeof updater === "function" ? updater(rowSelection) : updater;
 
       setRowSelection(newSelection);
+
+      if (isExpandable) {
+        const nextExpanded: ExpandedState = {};
+
+        for (const rowId of Object.keys(newSelection)) {
+          nextExpanded[rowId] = true;
+        }
+
+        setExpanded(nextExpanded);
+      }
 
       const selectedKey = Object.keys(newSelection)[0];
       const selectedRow =
@@ -253,7 +275,15 @@ export function DataTable<TData, TValue>({
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
+    getExpandedRowModel: getExpandedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
+    getRowCanExpand: () => isExpandable,
+  });
+
+  const subTable = useReactTable({
+    data,
+    columns: subColumns ?? [],
+    getCoreRowModel: getCoreRowModel(),
   });
 
   const tableRows = table.getRowModel?.().rows ?? [];
@@ -359,6 +389,10 @@ export function DataTable<TData, TValue>({
           <TableBody>
             {hasRows ? (
               table.getRowModel().rows.map((row) => {
+                const subRow = subColumns
+                  ? subTable.getRowModel().rows.find((r) => r.id === row.id)
+                  : null;
+
                 let bgStatusClass = "";
 
                 if (tableType === "artists") {
@@ -425,48 +459,104 @@ export function DataTable<TData, TValue>({
                 }
 
                 return (
-                  <TableRow
-                    key={row.id}
-                    onClick={row.getToggleSelectedHandler()}
-                    data-state={row.getIsSelected() && "selected"}
-                    className={cn(
-                      "data-[state=selected]:bg-salPink/30",
-                      "bg-white/50",
-                      tableType &&
-                        selectableTableTypes.includes(tableType) &&
-                        "hover:cursor-pointer hover:bg-salYellow/10",
+                  <>
+                    <TableRow
+                      key={row.id}
+                      onClick={row.getToggleSelectedHandler()}
+                      data-state={row.getIsSelected() && "selected"}
+                      className={cn(
+                        "data-[state=selected]:bg-salPink/30",
+                        "bg-white/50",
+                        isSelectable &&
+                          "hover:cursor-pointer hover:bg-salYellow/10",
 
-                      bgStatusClass,
+                        bgStatusClass,
+                      )}
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell
+                          style={{
+                            width: cell.column.getSize(),
+                            minWidth: cell.column.columnDef.minSize,
+                            maxWidth: cell.column.columnDef.maxSize,
+                          }}
+                          // width={cell.column.columnDef.size ?? undefined}
+                          key={cell.id}
+                          className={cn(
+                            "px-3",
+                            cell.column.getIndex() > 1
+                              ? "border-l border-foreground/30 sm:border-dashed"
+                              : undefined,
+                            tableType &&
+                              !selectableTableTypes.includes(tableType) &&
+                              !numberedTableTypes.includes(tableType) &&
+                              cell.column.getIndex() >= 1 &&
+                              "border-l border-foreground/30 sm:border-dashed",
+                          )}
+                        >
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
+                          )}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                    {row.getIsExpanded() && subRow && (
+                      <TableRow>
+                        <TableCell
+                          colSpan={row.getVisibleCells().length}
+                          className="bg-card/80 p-0"
+                        >
+                          <Table className="w-full">
+                            <TableHeader>
+                              {subTable.getHeaderGroups().map((headerGroup) => (
+                                <TableRow key={headerGroup.id}>
+                                  {headerGroup.headers.map((header) => (
+                                    <TableHead
+                                      key={header.id}
+                                      className="px-3 text-xs"
+                                    >
+                                      {header.isPlaceholder
+                                        ? null
+                                        : flexRender(
+                                            header.column.columnDef.header,
+                                            header.getContext(),
+                                          )}
+                                    </TableHead>
+                                  ))}
+                                </TableRow>
+                              ))}
+                            </TableHeader>
+                            <TableBody>
+                              <TableRow>
+                                {subRow.getVisibleCells().map((cell) => (
+                                  <TableCell
+                                    key={`${cell.id}-subRow`}
+                                    style={{
+                                      width: cell.column.getSize(),
+                                      minWidth: cell.column.columnDef.minSize,
+                                      maxWidth: cell.column.columnDef.maxSize,
+                                    }}
+                                    className={cn(
+                                      "px-3",
+                                      cell.column.getIndex() > 1
+                                        ? "border-l border-foreground/30 sm:border-dashed"
+                                        : undefined,
+                                    )}
+                                  >
+                                    {flexRender(
+                                      cell.column.columnDef.cell,
+                                      cell.getContext(),
+                                    )}
+                                  </TableCell>
+                                ))}
+                              </TableRow>
+                            </TableBody>
+                          </Table>
+                        </TableCell>
+                      </TableRow>
                     )}
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell
-                        style={{
-                          width: cell.column.getSize(),
-                          minWidth: cell.column.columnDef.minSize,
-                          maxWidth: cell.column.columnDef.maxSize,
-                        }}
-                        // width={cell.column.columnDef.size ?? undefined}
-                        key={cell.id}
-                        className={cn(
-                          "px-3",
-                          cell.column.getIndex() > 1
-                            ? "border-l border-foreground/30 sm:border-dashed"
-                            : undefined,
-                          tableType &&
-                            !selectableTableTypes.includes(tableType) &&
-                            !numberedTableTypes.includes(tableType) &&
-                            cell.column.getIndex() >= 1 &&
-                            "border-l border-foreground/30 sm:border-dashed",
-                        )}
-                      >
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext(),
-                        )}
-                      </TableCell>
-                    ))}
-                  </TableRow>
+                  </>
                 );
               })
             ) : (

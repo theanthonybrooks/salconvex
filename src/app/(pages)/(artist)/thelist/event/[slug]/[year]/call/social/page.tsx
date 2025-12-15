@@ -1,3 +1,4 @@
+import type { ParamsYearProps } from "@/types/nextTypes";
 import { OpenCallData } from "@/types/openCallTypes";
 
 import { Metadata } from "next";
@@ -10,11 +11,9 @@ import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
 import { api } from "~/convex/_generated/api";
 import { fetchQuery } from "convex/nextjs";
 
-type Props = {
-  params: Promise<{ slug: string; year: string }>;
-};
-
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: ParamsYearProps): Promise<Metadata> {
   const token = await convexAuthNextjsToken();
   const { slug, year } = await params;
 

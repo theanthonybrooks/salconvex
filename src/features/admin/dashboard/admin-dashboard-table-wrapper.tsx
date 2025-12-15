@@ -4,7 +4,6 @@ import { TableTypes } from "@/types/tanstack-table";
 
 import { useState } from "react";
 import { useDashboard } from "@/app/(pages)/dashboard/_components/DashboardContext";
-import { NewsletterToolbar } from "@/app/(pages)/dashboard/admin/_components/newsletter/newsletterToolbar";
 
 import { X } from "lucide-react";
 
@@ -16,7 +15,6 @@ import { Link } from "@/components/ui/custom-link";
 import { useAdminPreload } from "@/features/admin/admin-preload-context";
 import SACToolbar from "@/features/admin/components/sac-toolbar";
 import { artistColumns } from "@/features/admin/dashboard/artist-columns";
-import { newsletterColumns } from "@/features/admin/dashboard/newsletter-columns";
 import { resourceColumns } from "@/features/admin/dashboard/resources-column";
 import { sacColumns } from "@/features/admin/dashboard/sac-columns";
 import { socialColumns } from "@/features/admin/dashboard/socials-columns";
@@ -25,7 +23,6 @@ import { AdminToolbar } from "@/features/admin/dashboard/user-admin-toolbar";
 import { userColumns } from "@/features/admin/dashboard/user-columns";
 import { userAddOnColumns } from "@/features/admin/dashboard/userAddon-columns";
 import { getEventColumns } from "@/features/events/components/events-data-table/event-columns";
-import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { cn } from "@/helpers/utilsFns";
 
 import { api } from "~/convex/_generated/api";
@@ -48,24 +45,19 @@ export function AdminDashboardTableWrapper({
   const { isSidebarCollapsed } = useDashboard();
 
   const { preloadedEventData } = useAdminPreload();
-  const { preloadedUserData } = useConvexPreload();
   const [selectedRow, setSelectedRow] = useState<string | null>(null);
-  const userData = usePreloadedQuery(preloadedUserData);
-  const userRole = userData?.user?.role;
-  const isAdmin = userRole?.includes("admin") ?? false;
 
   const allEventsData = usePreloadedQuery(preloadedEventData);
 
   const eventsData = allEventsData ?? [];
   const adminActions = {
-    isAdmin,
+    isAdmin: true,
   };
   const submissionsPage = page === "events";
   // const appsPage = page === "applications";
   const usersPage = page === "users";
   const supportPage = page === "support";
   const artistsPage = page === "artists";
-  const newsletterPage = page === "newsletter";
   const resourcesPage = page === "resources";
   const socialsPage = page === "socials";
   const sacPage = page === "sac";
@@ -73,10 +65,6 @@ export function AdminDashboardTableWrapper({
   const usersData = useQuery(
     api.users.usersWithSubscriptions,
     usersPage ? {} : "skip",
-  );
-  const newsletterData = useQuery(
-    api.newsletter.subscriber.getNewsletterSubscribers,
-    newsletterPage ? {} : "skip",
   );
 
   const artistsData = useQuery(
@@ -122,7 +110,7 @@ export function AdminDashboardTableWrapper({
           <div className="hidden max-h-full w-full px-10 pb-10 pt-7 lg:block">
             <h3 className="mb-3 text-xl">Submitted Events & Open Calls</h3>
             <DataTable
-              columns={getEventColumns(isAdmin)}
+              columns={getEventColumns(true)}
               data={eventsData}
               // columnVisibility={{
               //   category: true,
@@ -142,7 +130,7 @@ export function AdminDashboardTableWrapper({
           </div>
           <div className="flex flex-col items-center justify-center gap-4 py-7 lg:hidden">
             <DataTable
-              columns={getEventColumns(isAdmin)}
+              columns={getEventColumns(true)}
               data={eventsData}
               defaultVisibility={{
                 type: false,
@@ -213,23 +201,7 @@ export function AdminDashboardTableWrapper({
           )}
         </>
       )}
-      {newsletterPage && (
-        <>
-          <NewsletterToolbar />
-          <ResponsiveDataTable
-            title="Newsletter Subscriptions"
-            description="View newsletter subscribers & their preferences"
-            data={newsletterData?.subscribers ?? []}
-            defaultFilters={[{ id: `active`, value: ["true"] }]}
-            defaultSort={[{ id: `createdAt`, desc: true }]}
-            columns={newsletterColumns}
-            tableType="newsletter"
-            pageType="dashboard"
-            pageSize={{ desktop: 50, mobile: 10 }}
-            adminActions={adminActions}
-          />
-        </>
-      )}
+
       {usersPage && (
         <ResponsiveDataTable
           extraToolbar={

@@ -273,7 +273,7 @@ export const isAdmin = query({
 
     const user = await ctx.db.get(userId);
     // if (!user) throw new ConvexError("User not found");
-    if (user?.role.includes("admin")) {
+    if (user?.role.includes("admin") || user?.role.includes("creator")) {
       return true;
     }
 
@@ -286,10 +286,7 @@ export const currentUser = query({
   handler: async (ctx) => {
     const userId = await getAuthUserId(ctx);
 
-    if (userId === null) {
-      return null;
-    }
-
+    if (!userId) return null;
     return await ctx.db.get(userId);
   },
 });
@@ -300,26 +297,14 @@ export const getCurrentUser = query({
   },
   handler: async (ctx) => {
     const userId = await getAuthUserId(ctx);
-    // if (!userId) console.log("user id not found");
-    if (!userId) return null;
-    const user = await ctx.db.get(userId);
-
-    // console.log("userId", userId)
-    // if (!user) console.log("user not found");
-
-    if (!user) return null;
-    // console.log("user", user.name);
-
+    const user = userId ? await ctx.db.get(userId) : null;
+    if (!user || !userId) return null;
     const userPref = await ctx.db
       .query("userPreferences")
       .withIndex("by_userId", (q) => q.eq("userId", userId))
       .unique();
 
-    if (!userPref) {
-      // console.log("userPref not found");
-      return null;
-    }
-
+    if (!userPref) return null;
     if (!user?.role?.includes("admin")) {
       console.log("query called: ", user);
     }

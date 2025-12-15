@@ -59,7 +59,9 @@ export function DateTimePickerField({
   const [hasChanges, setHasChanges] = useState(false);
   const [pending, setPending] = useState(false);
 
-  const initialDate = initialValue ? new Date(initialValue) : undefined;
+  const initialDate = initialValue
+    ? new Date(new Date(initialValue).setSeconds(0, 0))
+    : undefined;
   const [date, setDate] = useState<Date | undefined>(initialDate);
   const [timeStr, setTimeStr] = useState<string>(() => {
     if (!initialDate) return "12:00 AM";
@@ -91,8 +93,9 @@ export function DateTimePickerField({
 
     const updated = new Date(date ?? d);
     updated.setFullYear(d.getFullYear(), d.getMonth(), d.getDate());
-    updated.setHours(h);
-    updated.setMinutes(m);
+    // updated.setHours(h);
+    // updated.setMinutes(m);
+    updated.setHours(h, m, 0, 0);
 
     setDate(updated);
     // onChange(updated.getTime());
@@ -135,15 +138,16 @@ export function DateTimePickerField({
     try {
       if (!date) throw new Error("Date is required");
       const [hourStr, minuteStr, period] = timeStr.split(/[:\s]/);
-      let hour = parseInt(hourStr);
-      const minute = parseInt(minuteStr);
-      if (period === "PM" && hour < 12) hour += 12;
-      if (period === "AM" && hour === 12) hour = 0;
+      let h = parseInt(hourStr);
+      const m = parseInt(minuteStr);
+      if (period === "PM" && h < 12) h += 12;
+      if (period === "AM" && h === 12) h = 0;
 
       const updated = new Date(date);
       if (withTime) {
-        updated.setHours(hour);
-        updated.setMinutes(minute);
+        // updated.setHs(h);
+        // updated.setMinutes(minute);
+        updated.setHours(h, m, 0, 0);
       } else {
         updated.setHours(0, 0, 0, 0);
       }

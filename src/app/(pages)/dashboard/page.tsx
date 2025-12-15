@@ -62,14 +62,12 @@ export default function Dashboard() {
   const subFontSize = fontSizePref?.small;
   const accountType = user?.accountType;
   const role = user?.role;
+  const isCreator = role?.includes("creator");
   const isAdmin = role?.includes("admin");
   const isArtist = accountType?.includes("artist");
-
-  const hasValidSub =
-    (hasActiveSubscription && isArtist) || (isAdmin && isArtist);
-  // const isArtist =
-  //   (accountType?.includes("artist") && hasActiveSubscription) || isAdmin;
-  const isOrganizer = accountType?.includes("organizer") || isAdmin;
+  const adminPrivileges = isAdmin || isCreator;
+  const hasValidSub = (hasActiveSubscription && isArtist) || isCreator;
+  const isOrganizer = accountType?.includes("organizer") || adminPrivileges;
 
   const { data: latestFive, isPending: latestPending } = useQueryWithStatus(
     api.events.event.get5latestPublishedEvents,
@@ -77,33 +75,33 @@ export default function Dashboard() {
 
   const { data: totalOpenCallsData } = useQueryWithStatus(
     api.openCalls.openCall.getTotalNumberOfOpenCalls,
-    isAdmin ? {} : "skip",
+    adminPrivileges ? {} : "skip",
   );
 
   const { data: allEventsData } = useQueryWithStatus(
     api.events.event.getTotalNumberOfEvents,
-    isAdmin ? {} : "skip",
+    adminPrivileges ? {} : "skip",
   );
 
   const { data: totalSubmittedEventCount } = useQueryWithStatus(
     api.events.event.getSubmittedEventCount,
-    isAdmin ? {} : "skip",
+    adminPrivileges ? {} : "skip",
   );
 
   const { data: totalUsersData } = useQueryWithStatus(
     api.users.getTotalUsers,
-    isAdmin ? {} : "skip",
+    adminPrivileges ? {} : "skip",
   );
 
   const { data: totalNewsletterSubsData } = useQueryWithStatus(
     api.newsletter.subscriber.getNewsletterSubscribers,
-    isAdmin ? {} : "skip",
+    adminPrivileges ? {} : "skip",
   );
   const { data: artistData } = useQueryWithStatus(
     api.artists.applications.getArtistData,
     hasValidSub || isAdmin ? {} : "skip",
   );
-  //  const artistData = useQuery(api.artists.applications.getArtistApplications);
+
   const totalUsers = totalUsersData ?? 0;
   const totalNewsletterSubs = totalNewsletterSubsData?.totalSubscribers ?? 0;
   const totalOpenCalls = totalOpenCallsData?.totalOpenCalls ?? 0;
@@ -152,7 +150,7 @@ export default function Dashboard() {
 
       {/* Quick Stats Row */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {isAdmin && (
+        {adminPrivileges && (
           <div className="col-span-full flex flex-col gap-4">
             <h3 className="underline underline-offset-2">Admin Dashboard:</h3>
             <div className="scrollable justx flex flex-col flex-wrap gap-4 sm:flex-row">
@@ -332,7 +330,7 @@ export default function Dashboard() {
             </Button>
 
             {/* TODO: add this logic once I've gotten the application system up and there's a reason for users to upload a portfolio and related files */}
-            {isAdmin && hasValidSub && (
+            {isCreator && (
               <Button
                 asChild
                 variant="salWithShadowHiddenYlw"
@@ -345,7 +343,7 @@ export default function Dashboard() {
                 </Link>
               </Button>
             )}
-            {isAdmin && (
+            {adminPrivileges && (
               <Button
                 asChild
                 variant="salWithShadowHiddenYlw"
@@ -385,7 +383,7 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        {(hasValidSub || isAdmin) && (
+        {(hasValidSub || adminPrivileges) && (
           <Card className="lg:col-span-2 min-[1400px]:col-span-3">
             <CardHeader>
               <CardTitle>Latest Updates</CardTitle>
@@ -451,7 +449,7 @@ export default function Dashboard() {
             </CardFooter>
           </Card>
         )}
-        {isAdmin && <ChartWrapper className="col-span-full" />}
+        {adminPrivileges && <ChartWrapper className="col-span-full" />}
       </div>
     </div>
   );

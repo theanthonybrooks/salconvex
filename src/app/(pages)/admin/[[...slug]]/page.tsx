@@ -1,19 +1,20 @@
-// import { AuthScreen } from "@/features/auth/components/auth-screen"
 import { DEFAULT_ICON } from "@/constants/pageTitles";
 
+import type { ParamsProps } from "@/types/nextTypes";
 import type { Metadata } from "next";
 
+import { notFound, redirect } from "next/navigation";
 import { capitalize } from "lodash";
 
 import AdminScreen from "@/features/admin/components/admin-page";
 
-type AuthPageProps = {
-  params: Promise<{ slug: string }>;
-};
+import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
+import { api } from "~/convex/_generated/api";
+import { fetchQuery } from "convex/nextjs";
 
 export async function generateMetadata({
   params,
-}: AuthPageProps): Promise<Metadata> {
+}: ParamsProps): Promise<Metadata> {
   const { slug } = await params;
   const slugValue = Array.isArray(slug) ? slug[0] : slug;
 
@@ -42,7 +43,11 @@ export async function generateMetadata({
   };
 }
 
-const AdminPage = () => {
+const AdminPage = async () => {
+  const token = await convexAuthNextjsToken();
+  if (!token) redirect("/auth/sign-in");
+  const isAdmin = await fetchQuery(api.users.isAdmin, {}, { token });
+  if (!isAdmin) notFound();
   return <AdminScreen />;
 };
 

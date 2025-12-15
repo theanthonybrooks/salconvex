@@ -1,10 +1,11 @@
-import { redirect } from "next/navigation";
-import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
-import { api } from "~/convex/_generated/api";
-import { fetchQuery } from "convex/nextjs";
+import { notFound, redirect } from "next/navigation";
 
 import Footer from "@/features/wrapper-elements/navigation/components/footer";
 import { NavbarWrapper } from "@/features/wrapper-elements/navigation/components/navbar-wrapper";
+
+import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
+import { api } from "~/convex/_generated/api";
+import { fetchQuery } from "convex/nextjs";
 
 export default async function AdminLayout({
   children,
@@ -18,9 +19,7 @@ export default async function AdminLayout({
   const user = userData?.user;
   const isAdmin = user?.role.includes("admin");
 
-  if (!isAdmin) {
-    redirect("/thelist");
-  }
+  if (!isAdmin) notFound();
 
   return (
     <>

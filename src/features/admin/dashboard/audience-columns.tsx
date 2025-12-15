@@ -40,7 +40,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/helpers/utilsFns";
 
-export const newsletterColumnLabels: Record<string, string> = {
+export const audienceColumnLabels: Record<string, string> = {
   name: "Name",
   email: "Email",
   active: "Active",
@@ -60,7 +60,7 @@ type NewsletterSubscribers = FunctionReturnType<
 type NewsletterSubscriber =
   NonNullable<NewsletterSubscribers>["subscribers"][number];
 
-export const newsletterColumns: ColumnDef<NewsletterSubscriber>[] = [
+export const audienceColumns: ColumnDef<NewsletterSubscriber>[] = [
   {
     accessorKey: "rowNumber",
     id: "rowNumber",

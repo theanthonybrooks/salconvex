@@ -73,6 +73,8 @@ export default function DashboardSideBar({
 
   const statusKey = subStatus ? subStatus : "none";
   const isAdmin = role?.includes("admin") || false;
+  const isCreator = role?.includes("creator") || false;
+  const adminPrivileges = isAdmin || isCreator;
   const userType = user?.accountType;
   const userRole = user?.role;
   const fontSizePref = getUserFontSizePref(userPref?.fontSize);
@@ -80,16 +82,16 @@ export default function DashboardSideBar({
   const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
   const { data: submittedEventsData } = useQueryWithStatus(
     api.events.event.getSubmittedEventCount,
-    isAdmin ? {} : "skip",
+    adminPrivileges ? {} : "skip",
   );
   const { data: submittedOpenCallsData } = useQueryWithStatus(
     api.openCalls.openCall.getSubmittedOpenCallCount,
-    isAdmin ? {} : "skip",
+    adminPrivileges ? {} : "skip",
   );
 
   const { data: queuedEventsData } = useQuery(
     api.events.socials.getNumberOfQueuedEvents,
-    isAdmin ? {} : "skip",
+    adminPrivileges ? {} : "skip",
   );
 
   const queuedEvents = queuedEventsData?.data ? queuedEventsData?.data : 0;
@@ -102,10 +104,8 @@ export default function DashboardSideBar({
   const filteredNavItems = useMemo(() => {
     return navItems.filter((item) => {
       const isAllowedBySub = item.sub.includes(statusKey);
-      const hasAdminRole = userRole?.includes("admin");
-      const hasCreatorRole =
-        userRole?.includes("creator") && !item.label.includes("Help");
-      // const isAdmin = isAdmin && !item.label.includes("Help");
+      const hasAdminRole = isAdmin;
+      const hasCreatorRole = isCreator && !item.label.includes("Help");
       const hasSharedType = userType?.some((type) =>
         item.userType?.includes(type),
       );
@@ -129,7 +129,7 @@ export default function DashboardSideBar({
         isPublic
       );
     });
-  }, [statusKey, userType, userRole]);
+  }, [statusKey, userType, isAdmin, isCreator, userRole]);
 
   useEffect(() => {
     const matchingSection = filteredNavItems.find(

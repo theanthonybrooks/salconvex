@@ -2,30 +2,11 @@
 
 import { usePathname, useRouter } from "next/navigation";
 
-import { ApplicationChart } from "@/components/ui/charts/application-chart-interactive";
-import WorldMapComponent from "@/components/ui/map/map-component";
-import SACAdminPage from "@/features/admin/components/sac-toolbar";
 import ThisweekRecapPost from "@/features/events/thisweek-recap-post";
-import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
-
-import { api } from "~/convex/_generated/api";
-import { makeUseQueryWithStatus } from "convex-helpers/react";
-import { usePreloadedQuery, useQueries } from "convex/react";
 
 export default function AdminScreen() {
   const pathname = usePathname();
   const router = useRouter();
-  const { preloadedUserData } = useConvexPreload();
-  const userData = usePreloadedQuery(preloadedUserData);
-  const isAdmin = userData?.user?.role?.includes("admin");
-  const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
-
-  const { data: applicationData, isPending } = useQueryWithStatus(
-    api.analytics.eventAnalytics.getEventAnalytics,
-    isAdmin ? {} : "skip",
-  );
-
-  if (!isAdmin) router.push("/thelist");
 
   // Create booleans based on the URL.
   switch (pathname) {
@@ -33,16 +14,9 @@ export default function AdminScreen() {
       return <ThisweekRecapPost source="thisweek" />;
     case "/admin/nextweek":
       return <ThisweekRecapPost source="nextweek" />;
-    case "/admin/map":
-      return <WorldMapComponent />;
-    case "/admin/sac":
-      return <SACAdminPage />;
-    case "/admin/applications":
-      return (
-        <ApplicationChart data={applicationData ?? []} loading={isPending} />
-      );
+
     default:
-      router.push("/thelist");
+      router.push("/404-not-found");
       return;
   }
 }

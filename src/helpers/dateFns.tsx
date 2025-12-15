@@ -7,6 +7,20 @@ export const FAR_FUTURE = new Date("9999-12-31");
 const zone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
 export const seasonalTerms = ["spring", "summer", "fall", "winter"];
+
+export const getNextHour = () => {
+  const now = new Date();
+  const nextHour = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate(),
+    now.getHours() + 1,
+    0,
+    0,
+    0,
+  );
+  return nextHour;
+};
 export const formatEventDates = (
   start: string,
   end: string,

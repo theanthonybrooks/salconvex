@@ -1,3 +1,5 @@
+import type { ParamsProps } from "@/types/nextTypes";
+
 import { Metadata } from "next";
 import EventDetail from "@/app/(pages)/(artist)/thelist/components/EventPage";
 
@@ -7,11 +9,9 @@ import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
 import { api } from "~/convex/_generated/api";
 import { fetchQuery } from "convex/nextjs";
 
-type Props = {
-  params: Promise<{ slug: string }>;
-};
-
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: ParamsProps): Promise<Metadata> {
   const token = await convexAuthNextjsToken();
   const { slug } = await params;
 

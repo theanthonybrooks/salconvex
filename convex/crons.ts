@@ -36,6 +36,12 @@ crons.hourly(
   internal.userAddOns.onlineEvents.archivePastEvents,
 );
 
+crons.interval(
+  "check scheduled newsletter campaigns",
+  { minutes: 30 }, // every half hour
+  internal.newsletter.campaign.processScheduledCampaigns,
+);
+
 // crons.hourly(
 //   "Delete unconfirmed users",
 //   { minuteUTC: 0 }, // Run hourly  UTC (-1 from Berlin)

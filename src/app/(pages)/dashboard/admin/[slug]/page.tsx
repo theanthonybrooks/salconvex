@@ -32,7 +32,7 @@ export default async function AdminPage({
     redirect("/auth/sign-in");
   }
 
-  if (!user?.role.includes("admin")) {
+  if (!user?.role.includes("admin") && !user?.role.includes("creator")) {
     if (!subStatus || subStatus === "canceled") {
       redirect("/dashboard/settings");
     }

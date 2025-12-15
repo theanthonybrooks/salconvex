@@ -525,4 +525,6 @@ export const TABLE_FILTERS: TableFilterConfig = {
       options: editionOptions,
     },
   ],
+  audience: [],
+  campaigns: [],
 };

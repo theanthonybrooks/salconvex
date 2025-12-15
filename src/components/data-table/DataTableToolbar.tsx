@@ -126,6 +126,8 @@ export function DataTableToolbar<TData>({
         return "name";
       case "support":
         return "ticketNumber";
+      case "campaigns":
+        return "title";
       default:
         return "name";
     }

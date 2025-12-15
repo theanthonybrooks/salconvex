@@ -1,8 +1,9 @@
+import { capitalize } from "lodash";
 import slugify from "slugify";
 
-import { getAuthUserId } from "@convex-dev/auth/server";
 import { internal } from "~/convex/_generated/api";
 import { internalMutation, mutation, query } from "~/convex/_generated/server";
+import { ensureAdminOrCreator } from "~/convex/helpers/authHelpers";
 import { v } from "convex/values";
 
 export const getCampaignById = query({
@@ -14,6 +15,39 @@ export const getCampaignById = query({
     const campaign = await ctx.db.get(campaignId);
     if (!campaign) return null;
     return campaign;
+  },
+});
+
+export const getCampaigns = query({
+  handler: async (ctx) => {
+    const adminUser = await ensureAdminOrCreator(ctx);
+    if (!adminUser) return null;
+
+    const campaigns = await ctx.db.query("newsletterCampaign").collect();
+
+    return campaigns;
+  },
+});
+
+export const updateNewsletterCampaignStatus = mutation({
+  args: {
+    campaignId: v.id("newsletterCampaign"),
+    status: v.union(
+      v.literal("draft"),
+      v.literal("scheduled"),
+      v.literal("sending"),
+      v.literal("sent"),
+      v.literal("cancelled"),
+    ),
+  },
+  handler: async (ctx, args) => {
+    const { campaignId, status } = args;
+    const campaign = await ctx.db.get(campaignId);
+    if (!campaign) return null;
+    await ctx.db.patch(campaign._id, {
+      status,
+      updatedAt: Date.now(),
+    });
   },
 });
 
@@ -33,15 +67,24 @@ export const createNewsletterCampaign = mutation({
   handler: async (ctx, args) => {
     const { title, type, frequency, userPlan, isTest, plannedSendTime } = args;
 
-    const userId = await getAuthUserId(ctx);
-    const user = userId ? await ctx.db.get(userId) : null;
-    if (!userId || !user?.role?.includes("admin"))
+    const adminUser = await ensureAdminOrCreator(ctx);
+    if (!adminUser)
       return {
         success: false,
         message: "You must be an admin to create a campaign",
       };
+    const getFormattedDate = (date: number, options: { public: boolean }) => {
+      const hideDay = options.public;
+      return new Date(date).toLocaleString(undefined, {
+        month: "short",
+        day: hideDay ? undefined : "2-digit",
+        year: "2-digit",
+      });
+    };
 
-    const slug = slugify(title, { lower: true, strict: true });
+    const formattedTitle = `${title} (${capitalize(type)} | ${capitalize(frequency)} - ${getFormattedDate(plannedSendTime, { public: false })}) ${isTest ? "(TEST)" : ""}`;
+    const publicTitle = `${title} (${capitalize(frequency)}) - ${getFormattedDate(plannedSendTime, { public: true })}`;
+    const slug = slugify(formattedTitle, { lower: true, strict: true });
     const existingCampaign = await ctx.db
       .query("newsletterCampaign")
       .withIndex("by_slug", (q) => q.eq("slug", slug))
@@ -54,15 +97,16 @@ export const createNewsletterCampaign = mutation({
     }
 
     const campaignId = await ctx.db.insert("newsletterCampaign", {
-      title,
+      title: formattedTitle,
+      publicTitle,
       slug,
       status: "draft",
       type,
       frequency,
       userPlan,
       isTest,
-      sendTime: plannedSendTime,
-      createdBy: userId,
+      plannedSendTime,
+      createdBy: adminUser._id,
       audienceStatus: "pending",
     });
 
@@ -166,6 +210,28 @@ export const populateCampaignAudienceBatch = internalMutation({
         audienceStatus: "complete",
         ...(campaign.audienceError && { audienceError: undefined }),
       });
+    }
+  },
+});
+
+export const processScheduledCampaigns = internalMutation({
+  args: {},
+  handler: async (ctx) => {
+    const now = Date.now();
+
+    const campaigns = await ctx.db
+      .query("newsletterCampaign")
+      .withIndex("by_status_plannedSendTime", (q) =>
+        q.eq("status", "scheduled").lte("plannedSendTime", now),
+      )
+      .take(50); // some reasonable batch size
+
+    for (const campaign of campaigns) {
+      await ctx.scheduler.runAfter(
+        0,
+        internal.newsletter.emails.startSendingCampaignInternal,
+        { campaignId: campaign._id },
+      );
     }
   },
 });

@@ -899,6 +899,7 @@ export const newsletterSubscriber = v.object(newsletterSchema);
 
 export const newsletterCampaign = {
   title: v.string(),
+  publicTitle: v.string(),
   slug: v.string(),
   status: v.union(
     v.literal("draft"),
@@ -917,8 +918,7 @@ export const newsletterCampaign = {
   userPlan: v.union(v.literal(0), v.literal(1), v.literal(2), v.literal(3)),
   emailContent: v.optional(v.string()),
   isTest: v.boolean(),
-  sendTime: v.number(),
-  plannedSendTime: v.optional(v.number()),
+  plannedSendTime: v.number(),
   startedSendTime: v.optional(v.number()),
   finishedSendTime: v.optional(v.number()),
   audienceCount: v.optional(v.number()),
@@ -930,12 +930,14 @@ export const newsletterCampaign = {
   ),
   audienceError: v.optional(v.string()),
   createdBy: v.id("users"),
+  updatedAt: v.optional(v.number()),
 };
 
 export const newsletterCampaignAudience = {
   campaignId: v.id("newsletterCampaign"),
   subscriberId: v.id("newsletter"),
   email: v.string(),
+  resendEmailId: v.optional(v.string()),
 
   status: v.union(
     v.literal("pending"),
@@ -950,6 +952,7 @@ export const newsletterCampaignAudience = {
   sentAt: v.optional(v.number()),
   deliveredAt: v.optional(v.number()),
   bouncedAt: v.optional(v.number()),
+  failedAt: v.optional(v.number()),
   unsubscribedAt: v.optional(v.number()),
 
   updatedAt: v.optional(v.number()),
@@ -1772,12 +1775,15 @@ export default defineSchema({
     .index("by_slug", ["slug"])
     .index("by_status", ["status"])
     .index("by_type", ["type"])
+    .index("by_status_plannedSendTime", ["status", "plannedSendTime"])
     .index("by_frequency", ["frequency"])
     .index("by_userPlan", ["userPlan"])
     .index("by_isTest", ["isTest"]),
 
   newsletterCampaignAudience: defineTable(newsletterCampaignAudience)
+    .index("by_resendEmailId", ["resendEmailId"])
     .index("by_campaignId", ["campaignId"])
+    .index("by_campaignId_status", ["campaignId", "status"])
     .index("by_subscriberId", ["subscriberId"])
     .index("by_status", ["status"]),
 

@@ -1,5 +1,6 @@
 import { DEFAULT_ICON } from "@/constants/pageTitles";
 
+import type { ParamsYearProps } from "@/types/nextTypes";
 import type { Metadata } from "next";
 
 import { notFound } from "next/navigation";
@@ -9,11 +10,9 @@ import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
 import { api } from "~/convex/_generated/api";
 import { fetchQuery, preloadedQueryResult, preloadQuery } from "convex/nextjs";
 
-type Props = {
-  params: Promise<{ slug: string; year: string }>;
-};
-
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: ParamsYearProps): Promise<Metadata> {
   const token = await convexAuthNextjsToken();
   const { slug } = await params;
   const slugValue = Array.isArray(slug) ? slug[0] : slug;

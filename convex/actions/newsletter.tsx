@@ -581,3 +581,56 @@ export const sendNewsletterUpdateConfirmation = action({
 //   loginDevice,
 //   loginLocation,
 //   loginIp,
+
+export const sendBatchAction = internalAction({
+  args: {
+    campaignId: v.id("newsletterCampaign"),
+    audienceIds: v.array(v.id("newsletterCampaignAudience")),
+    emails: v.array(v.string()),
+  },
+  handler: async (ctx, { campaignId, audienceIds, emails }) => {
+    const senderName = "no-reply";
+    const campaign = await ctx.runQuery(
+      api.newsletter.campaign.getCampaignById,
+      { campaignId },
+    );
+
+    if (!campaign) {
+      throw new ConvexError({
+        code: "NOT_FOUND",
+        message: "Campaign not found",
+      });
+    }
+
+    if (!campaign.emailContent || campaign.emailContent.trim() === "") {
+      throw new ConvexError({
+        code: "NOT_FOUND",
+        message: "Campaign has no email content",
+      });
+    }
+
+    const html = campaign.emailContent;
+
+    const emailIds: string[] = [];
+
+    for (let i = 0; i < emails.length; i++) {
+      const email = emails[i];
+
+      // 1) capture the EmailId from the component
+      const emailId = await resendComponent.sendEmail(ctx, {
+        from: `The Street Art List <${senderName}@newsletter.thestreetartlist.com>`,
+        to: email,
+        subject: campaign.publicTitle,
+        html,
+      });
+
+      emailIds.push(emailId);
+    }
+
+    // 2) mark this batch as sending AND store the EmailIds
+    await ctx.runMutation(internal.newsletter.emails.markBatchAsSending, {
+      audienceIds,
+      emailIds,
+    });
+  },
+});
