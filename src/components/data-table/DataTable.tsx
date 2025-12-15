@@ -20,7 +20,7 @@ import {
 import { newsletterTableTypes } from "@/types/tableTypes";
 import { PageTypes, TableTypes } from "@/types/tanstack-table";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import {
   ColumnDef,
@@ -459,9 +459,9 @@ export function DataTable<TData, TValue>({
                 }
 
                 return (
-                  <>
+                  <Fragment key={row.id}>
                     <TableRow
-                      key={row.id}
+                      key={`${row.id}-expanded`}
                       onClick={row.getToggleSelectedHandler()}
                       data-state={row.getIsSelected() && "selected"}
                       className={cn(
@@ -556,7 +556,7 @@ export function DataTable<TData, TValue>({
                         </TableCell>
                       </TableRow>
                     )}
-                  </>
+                  </Fragment>
                 );
               })
             ) : (

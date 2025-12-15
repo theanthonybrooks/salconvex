@@ -356,7 +356,7 @@ export const campaignColumns: ColumnDef<Campaign>[] = [
     minSize: 60,
     enableResizing: false,
     cell: ({ row }) => {
-      const { _id: id, plannedSendTime, status } = row.original;
+      const { _id: id, status } = row.original;
 
       // const openCallState = event.openCallState;
       // const openCallId = event.openCallId;
