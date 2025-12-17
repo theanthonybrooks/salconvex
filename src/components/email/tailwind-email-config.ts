@@ -9,15 +9,7 @@ export const emailTailwindConfig = {
   theme: {
     extend: {
       fontFamily: {
-        tanker: ["var(--font-tanker-reg)"],
-        spaceGrotesk: ["var(--font-space-grotesk)"],
-        spaceMono: ["var(--font-space-mono)"],
-        libreFranklin: ["var(--font-libre-franklin)"],
-        bebasNeue: ["var(--font-bebas-neue)"],
-        acumin: ['"acumin-variable"', "sans-serif"],
-        ramaE: ["rama-gothic-e"],
-        ramaM: ["rama-gothic-m"],
-        ramaC: ["rama-gothic-c"],
+        spaceGrotesk: ['"Space Grotesk"', "Helvetica", "Arial", "sans-serif"],
       },
       colors: {
         background: "hsl(var(--background))",
@@ -36,6 +28,10 @@ export const emailTailwindConfig = {
         smd: "-3px 3px 0 0 #000000",
         ssm: "-2px 2px 0 0 #000000",
         dropdown: "-5px 5px 0 0 #000000",
+      },
+      lineHeight: {
+        1.8: "1.8",
+        2: "2",
       },
     },
   },

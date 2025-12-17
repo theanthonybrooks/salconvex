@@ -44,7 +44,8 @@
     "Old Site",
     "Zod",
     "User",
-    "Nextjs"
+    "Nextjs",
+    "Organizations"
   ],
   "typescript.tsdk": "node_modules\\typescript\\lib",
   "python.analysis.autoImportCompletions": true,

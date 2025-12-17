@@ -330,3 +330,82 @@ export const newsletterStyling = html`
     }
   </style>
 `;
+export const baseEmailStyling = html`
+  <style>
+    body {
+      font-family: "Space Grotesk", Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      font-size: 14px;
+      line-height: 1.6;
+      margin: 0;
+      padding: 0;
+      -ms-text-size-adjust: 100%;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    /* -------------------------------------
+        TYPOGRAPHY
+    ------------------------------------- */
+    h1,
+    h2,
+    h3,
+    h4 {
+      color: #06090f;
+      font-family: "Space Grotesk", Helvetica, Arial, sans-serif;
+      font-weight: 400;
+      line-height: 1.4;
+      margin: 0;
+    }
+
+    h1 {
+      font-size: 35px;
+      font-weight: 300;
+      text-align: center;
+      text-transform: capitalize;
+    }
+
+    p {
+      text-align: left;
+      line-height: 2;
+    }
+
+    p,
+    ul,
+    ol {
+      font-family: "Space Grotesk", Helvetica, Arial, sans-serif;
+      font-size: 14px;
+      font-weight: normal;
+      margin: 0;
+      margin-bottom: 15px;
+    }
+    p li,
+    ul li,
+    ol li {
+      list-style-position: inside;
+      margin-left: 5px;
+    }
+
+    a {
+      text-decoration: none;
+      font-weight: 700;
+      color: black;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .heading {
+      font-size: 1.2rem;
+      text-align: start;
+      margin: 30px 0;
+    }
+
+    hr {
+      border: none;
+      border-top: 2px solid black;
+      max-width: 80vw;
+      margin: 20px auto;
+      height: 0;
+    }
+  </style>
+`;

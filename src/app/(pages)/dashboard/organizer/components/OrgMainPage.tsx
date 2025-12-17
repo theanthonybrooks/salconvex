@@ -16,6 +16,7 @@ import { SearchMappedSelect } from "@/components/ui/mapped-select";
 import NavTabs from "@/components/ui/nav-tabs";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getEventColumns } from "@/features/events/components/events-data-table/event-columns";
+import { OrgDelete } from "@/features/organizers/components/org-delete";
 import { OrganizerLogoName } from "@/features/organizers/components/organizer-logo-name-card";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { getUserFontSizePref } from "@/helpers/stylingFns";
@@ -55,7 +56,11 @@ export const OrgMainPage = () => {
 
   const userOrgs = useMemo(() => userOrgData ?? [], [userOrgData]);
   const currentOrgEvents = useMemo(() => orgEventsData ?? [], [orgEventsData]);
+  const hasEvents = currentOrgEvents.length > 0;
   const noOrgs = userOrgs.length === 0;
+  const canDelete = isAdmin && selectedOrg && !hasEvents;
+
+  console.log(isAdmin, selectedOrg, hasEvents, currentOrgEvents);
 
   const tabList = [
     { id: "orgInfo", label: "Organization Info" },
@@ -87,6 +92,10 @@ export const OrgMainPage = () => {
   const adminActions = {
     isAdmin: Boolean(isAdmin),
     isEditor: isOrgOwner || allowedEditor || isAdmin,
+  };
+
+  const handleResetSelection = () => {
+    setSelectedOrg(null);
   };
 
   return (
@@ -151,6 +160,13 @@ export const OrgMainPage = () => {
                     ? "Admin"
                     : "Guest"}
             </p>
+            {canDelete && (
+              <OrgDelete
+                orgId={selectedOrg}
+                hasEvents={hasEvents}
+                resetSelection={handleResetSelection}
+              />
+            )}
           </div>
         )}
         {/*//todo: replace this with the actual title/role within the org*/}
