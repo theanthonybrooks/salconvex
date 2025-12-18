@@ -64,6 +64,7 @@ export const notificationTypeValidator = v.union(
   v.literal("newEvent"),
   v.literal("newSac"),
   v.literal("newSocial"),
+  v.literal("newTaskAssignment")
 );
 
 export type NotificationType = Infer<typeof notificationTypeValidator>;

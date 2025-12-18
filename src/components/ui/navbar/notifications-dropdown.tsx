@@ -96,6 +96,8 @@ export const NotificationsDropdown = ({
       : []
   ).filter(isVisible);
 
+  console.log(userNotifications);
+
   const visibleUserNotifications = userNotifications?.filter(isVisible) ?? [];
   const allNotifications = [
     ...visibleUserNotifications,

@@ -2,6 +2,7 @@ import type { ColumnType } from "@/constants/kanbanConsts";
 
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { DataModel } from "~/convex/_generated/dataModel";
+import { upsertNotification } from "~/convex/general/notifications";
 import {
   kanbanColumnValidator,
   kanbanPurposeValidator,
@@ -96,8 +97,11 @@ export const getCards = query({
     userRole: userRoleArrayValidator,
     full: v.optional(v.boolean()),
     userId: v.optional(v.id("users")),
+    cardId: v.optional(v.id("todoKanban")),
   },
   handler: async (ctx, args) => {
+    const card = args.cardId ? await ctx.db.get(args.cardId) : null;
+    if (card) return [card];
     // console.log("user id: ", args.userId);
     const userIsCreator = args.userRole.includes("creator");
 
@@ -567,6 +571,15 @@ export const updateAssignedUser = mutation({
     await ctx.db.patch(kanbanCard._id, {
       assignedId: args.userId,
       secondaryAssignedId: args.secondaryUserId,
+    });
+    await upsertNotification(ctx, {
+      type: "newTaskAssignment",
+      userId: args.userId ?? null,
+      targetRole: "staff",
+      importance: "medium",
+      redirectUrl: `/dashboard/admin/todos?id=${kanbanCard._id}`,
+      displayText: "New Task Assignment",
+      dedupeKey: `kanban-assignment-${kanbanCard._id}`,
     });
   },
 });

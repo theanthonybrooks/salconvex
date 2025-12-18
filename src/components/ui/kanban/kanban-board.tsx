@@ -119,7 +119,10 @@ const Board = ({ purpose: basePurpose }: KanbanBoardProps) => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const initialSearchTerm = searchParams.get("searchTerm") ?? "";
+  const initialCardId = searchParams.get("id") ?? null;
+  const initialSearchTerm = initialCardId
+    ? `"${initialCardId}"`
+    : (searchParams.get("searchTerm") ?? "");
   const hasSearchParam = searchParams.has("searchTerm");
 
   const initialPurpose = (searchParams.get("purpose") ??
@@ -165,7 +168,7 @@ const Board = ({ purpose: basePurpose }: KanbanBoardProps) => {
   //TODO: use useQueryWithStatus instead to enable a loading/pending state. Or maybe just make a handler that's run via a button. Something. The form currently feels like it's just laggy.
   const searchResults = useQuery(
     api.kanban.cards.searchCards,
-    debouncedSearch !== ""
+    debouncedSearch !== "" && !initialCardId
       ? {
           purpose,
           searchTerm: debouncedSearch,
@@ -180,7 +183,7 @@ const Board = ({ purpose: basePurpose }: KanbanBoardProps) => {
   const rawResults =
     useQuery(
       api.kanban.cards.getCards,
-      debouncedSearch === ""
+      debouncedSearch === "" || initialCardId
         ? {
             purpose,
             category,
@@ -188,6 +191,9 @@ const Board = ({ purpose: basePurpose }: KanbanBoardProps) => {
               ? (userFilter?.userId as Id<"users">)
               : undefined,
             userRole: userFilter?.role ?? [],
+            cardId: initialCardId
+              ? (initialCardId as Id<"todoKanban">)
+              : undefined,
           }
         : "skip",
     ) ||
@@ -295,7 +301,7 @@ const Board = ({ purpose: basePurpose }: KanbanBoardProps) => {
                   value={searchTerm}
                   onChange={(e) => {
                     setSearchTerm(e.target.value);
-                    if (hasSearchParam) clearSearchParam();
+                    if (hasSearchParam || initialCardId) clearSearchParam();
                   }}
                   placeholder="Search"
                   className="w-full min-w-60 max-w-md"
@@ -305,7 +311,7 @@ const Board = ({ purpose: basePurpose }: KanbanBoardProps) => {
                   variant="salWithShadowHidden"
                   onClick={() => {
                     setSearchTerm("");
-                    if (hasSearchParam) clearSearchParam();
+                    if (hasSearchParam || initialCardId) clearSearchParam();
                   }}
                   className={"h-11 disabled:border-foreground/40"}
                   disabled={debouncedSearch === ""}
