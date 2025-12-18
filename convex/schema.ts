@@ -52,7 +52,7 @@ export const fontSizeValidator = v.union(
 );
 export type FontSizeType = Infer<typeof fontSizeValidator> | undefined;
 
-const notificationTypeValidator = v.union(
+export const notificationTypeValidator = v.union(
   v.literal("newSubmission"),
   v.literal("newMessage"),
   v.literal("newFollow"),
@@ -63,20 +63,18 @@ const notificationTypeValidator = v.union(
   v.literal("newPublishedCall"),
   v.literal("newEvent"),
   v.literal("newSac"),
+  v.literal("newSocial"),
 );
 
-const notificationTargetRoleValidator = v.union(
-  v.literal("admin"),
-  v.literal("organizer"),
-  v.literal("artist"),
-  v.literal("designer"),
-);
+export type NotificationType = Infer<typeof notificationTypeValidator>;
 
-const importanceValidator = v.union(
+export const importanceValidator = v.union(
   v.literal("low"),
   v.literal("medium"),
   v.literal("high"),
 );
+
+export type Importance = Infer<typeof importanceValidator>;
 
 const notificationsSchema = {
   type: notificationTypeValidator,
@@ -85,9 +83,12 @@ const notificationsSchema = {
   userId: v.union(v.id("users"), v.null()),
   importance: v.optional(importanceValidator),
   deadline: v.optional(v.number()),
-  targetRole: notificationTargetRoleValidator,
-  displayText: v.optional(v.string()),
+  targetRole: userRoleValidator,
+  minPlan: v.optional(v.number()),
+  targetUserType: v.optional(accountTypeValidator),
+  displayText: v.string(),
   redirectUrl: v.optional(v.string()),
+  updatedAt: v.number(),
 };
 
 const userPrefsBaseValues = {
@@ -1809,8 +1810,19 @@ export default defineSchema({
     .index("by_paletteId_value", ["paletteId", "value"])
     .index("by_value", ["value"]),
   notifications: defineTable(notificationsSchema)
-    .index("by_userId", ["userId"])
+    .index("by_userId_dismissed_updatedAt", [
+      "userId",
+      "dismissed",
+      "updatedAt",
+    ])
+    .index("by_role_dismissed_updatedAt", [
+      "targetRole",
+      "dismissed",
+      "updatedAt",
+    ])
+
     .index("by_type", ["type"])
+    .index("by_dedupeKey", ["dedupeKey"])
     .index("by_dismissed", ["dismissed"]),
 });
 

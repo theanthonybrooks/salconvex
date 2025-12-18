@@ -1,6 +1,7 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { internal } from "~/convex/_generated/api";
 import { internalMutation, mutation, query } from "~/convex/_generated/server";
+import { upsertNotification } from "~/convex/general/notifications";
 import { sacValidator } from "~/convex/schema";
 import { v } from "convex/values";
 
@@ -54,23 +55,25 @@ export const upsertManyBySacIdInternal = internalMutation({
     const currentMonth = date.getMonth();
     const hour = date.getHours();
     if (insertCount > 0) {
-      await ctx.db.insert("notifications", {
+      await upsertNotification(ctx, {
         type: "newSac",
         userId: null,
         dedupeKey: `sac-added-${currentDay}-${currentMonth}-${hour}`,
         targetRole: "admin",
+        importance: "medium",
+        redirectUrl: "/dashboard/admin/sac",
         displayText: `${insertCount} Street Art Call${insertCount > 1 ? "s" : ""} added`,
-        dismissed: false,
       });
     }
     if (updateCount > 0) {
-      await ctx.db.insert("notifications", {
+      await upsertNotification(ctx, {
         type: "newSac",
         userId: null,
         dedupeKey: `sac-updated-${currentDay}-${currentMonth}`,
         targetRole: "admin",
+        importance: "medium",
+        redirectUrl: "/dashboard/admin/sac",
         displayText: `${updateCount} Street Art Call${updateCount > 1 ? "s" : ""} updated`,
-        dismissed: false,
       });
     }
 

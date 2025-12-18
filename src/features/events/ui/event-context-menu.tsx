@@ -237,6 +237,7 @@ const EventContextMenu = ({
       <DropdownMenuContent
         className="z-[21] w-max min-w-44 sm:text-sm"
         align={align}
+        alignOffset={-10}
       >
         <DropdownMenuLabel>More options</DropdownMenuLabel>
         {/* <p className="py-2 pl-4 font-bold">More options</p> */}

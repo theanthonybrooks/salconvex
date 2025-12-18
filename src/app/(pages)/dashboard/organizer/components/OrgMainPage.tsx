@@ -60,8 +60,6 @@ export const OrgMainPage = () => {
   const noOrgs = userOrgs.length === 0;
   const canDelete = isAdmin && selectedOrg && !hasEvents;
 
-  console.log(isAdmin, selectedOrg, hasEvents, currentOrgEvents);
-
   const tabList = [
     { id: "orgInfo", label: "Organization Info" },
     { id: "events", label: "My Events" },

@@ -384,6 +384,7 @@ export const getEventColumns = <T extends Event>(
     },
     {
       accessorKey: "_id",
+      id: "_id",
       minSize: 120,
       maxSize: 400,
       header: ({ column }) => (

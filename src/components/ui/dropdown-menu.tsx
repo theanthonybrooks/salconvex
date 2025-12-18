@@ -25,11 +25,19 @@ const CustomArrow = React.forwardRef<
     thick?: boolean;
   }
 >(({ thick, className, ...props }, ref) => (
-  <DropdownMenuPrimitive.Arrow asChild ref={ref} {...props}>
+  <DropdownMenuPrimitive.Arrow
+    asChild
+    ref={ref}
+    {...props}
+    className={cn(
+      "group-data-[side=bottom]/content:-translate-y-[2px]",
+      "group-data-[side=top]/content:-translate-y-[2px]",
+    )}
+  >
     <svg
       className={cn(
         "block",
-        "group-data-[side=top]/content:-translate-y-[1.8px]",
+        // "group-data-[side=top]/content:-translate-y-[1.8px]",
         // "group-data-[side=bottom]/content:-translate-y-[1.4px]",
         className,
       )}
@@ -98,26 +106,32 @@ const DropdownMenuContent = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Content> & {
     thick?: boolean;
   }
->(({ thick, className, sideOffset = 4, children, ...props }, ref) => (
-  <DropdownMenuPrimitive.Portal>
-    <DropdownMenuPrimitive.Content
-      ref={ref}
-      sideOffset={sideOffset}
-      className={cn(
-        "group/content z-50 min-w-[8rem] overflow-hidden rounded-md border-1.5 bg-popover p-1 text-popover-foreground shadow-md",
-        "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
-        thick && "border-2",
-        className,
-      )}
-      {...props}
-    >
-      {children}
-      <div className="absolute group-data-[side=bottom]/content:top-[1.8px] group-data-[side=top]/content:bottom-[0px]">
+>(
+  (
+    { thick, className, sideOffset = 4, alignOffset, children, ...props },
+    ref,
+  ) => (
+    <DropdownMenuPrimitive.Portal>
+      <DropdownMenuPrimitive.Content
+        ref={ref}
+        alignOffset={alignOffset}
+        sideOffset={sideOffset}
+        className={cn(
+          "group/content z-50 min-w-[8rem] overflow-hidden rounded-md border-1.5 bg-popover p-1 text-popover-foreground shadow-md",
+          "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+          thick && "border-2",
+          className,
+        )}
+        {...props}
+      >
+        {children}
+        {/* <div className="absolute group-data-[side=bottom]/content:top-[1.8px] group-data-[side=top]/content:bottom-[0px]"> */}
         <CustomArrow thick={thick} />
-      </div>
-    </DropdownMenuPrimitive.Content>
-  </DropdownMenuPrimitive.Portal>
-));
+        {/* </div> */}
+      </DropdownMenuPrimitive.Content>
+    </DropdownMenuPrimitive.Portal>
+  ),
+);
 DropdownMenuContent.displayName = DropdownMenuPrimitive.Content.displayName;
 
 const DropdownMenuItem = React.forwardRef<

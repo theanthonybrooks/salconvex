@@ -283,6 +283,9 @@ export function AdminDashboardTableWrapper({
             // { id: "posted", desc: true },
             { id: "plannedDate", desc: false },
           ]}
+          defaultVisibility={{
+            id: false,
+          }}
           pageSize={50}
           defaultFilters={[]}
         />

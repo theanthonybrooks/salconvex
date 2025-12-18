@@ -57,7 +57,7 @@ export function UserProfile({
   const { preloadedUserData, preloadedSubStatus } = useConvexPreload();
   const userData = usePreloadedQuery(preloadedUserData);
   const subData = usePreloadedQuery(preloadedSubStatus);
-  const { user } = userData ?? {};
+  const { user, userPref } = userData ?? {};
 
   const userRole = user?.role;
   const accountType = user?.accountType ?? [];
@@ -82,6 +82,7 @@ export function UserProfile({
           tooltipDisabled={tooltipDisabled}
           className={className}
           user={user}
+          userPref={userPref}
         />
       )}
       <DropdownMenu
@@ -120,7 +121,12 @@ export function UserProfile({
             </Button>
           </DropdownMenuTrigger>
         </TooltipSimple>
-        <DropdownMenuContent className="z-[60] w-56" thick align="end">
+        <DropdownMenuContent
+          className="z-[60] w-56"
+          thick
+          align="end"
+          alignOffset={-10}
+        >
           <DropdownMenuLabel className="font-normal">
             <div className="flex flex-row items-center gap-2 overflow-hidden">
               <Avatar className="size-9 rounded-full border border-border">

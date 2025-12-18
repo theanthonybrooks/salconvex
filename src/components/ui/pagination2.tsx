@@ -3,6 +3,7 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
+
 import { TiArrowLeftOutline, TiArrowRightOutline } from "react-icons/ti";
 
 import {
@@ -179,20 +180,6 @@ export const BasicPagination = ({
               >
                 (Back to Start)
               </p>
-
-              {/* 
-              <Tabs
-                value={viewType}
-                onValueChange={(val) => setViewAction(val as viewOptions)}
-                className="w-full sm:w-auto"
-              >
-                <TabsList className="grid w-full grid-cols-4">
-                  <TabsTrigger value="event">Events</TabsTrigger>
-                  <TabsTrigger value="openCall">Open Calls</TabsTrigger>
-                  <TabsTrigger value="archive">Archive</TabsTrigger>
-                  <TabsTrigger value="organizer">Org</TabsTrigger>
-                </TabsList>
-              </Tabs> */}
             </>
           )}
         </motion.div>

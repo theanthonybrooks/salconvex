@@ -148,6 +148,9 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   );
   const getTimezone = useAction(api.actions.getTimezone.getTimezone);
 
+  const createOpenCallNotification = useMutation(
+    api.openCalls.openCall.createOpenCallNotification,
+  );
   const createNewOrg = useMutation(api.organizer.organizations.createNewOrg);
   const createOrUpdateEvent = useMutation(api.events.event.createOrUpdateEvent);
   const updateEventStatus = useMutation(api.events.event.updateEventStatus);
@@ -1551,6 +1554,14 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
                 eventId: event._id,
                 openCallId: openCallId ?? undefined,
               });
+              if (publish && openCallId) {
+                await createOpenCallNotification({
+                  mode: "publish",
+                  eventSlug: event.slug,
+                  edition: event.dates.edition,
+                  openCallId,
+                });
+              }
             }
             eventResult = event;
             setExistingEvent(eventResult);
@@ -1616,6 +1627,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
       normalizedCurrentDocs,
       updateOpenCall,
       markOrganizationComplete,
+      createOpenCallNotification,
 
       orgData,
       generateUploadUrl,

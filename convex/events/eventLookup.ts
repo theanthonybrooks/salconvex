@@ -42,7 +42,8 @@ export const addUpdateEventLookup = internalMutation({
           .first();
     const validEvent = approvedStates.includes(event.state);
     const validOpenCall = approvedStates.includes(openCall?.state ?? "");
-    console.log("valid event: ", validEvent, event.state, event._id);
+    console.log(openCall);
+
     if (!validEvent && lookup) {
       await ctx.db.delete(lookup._id);
       return null;
@@ -100,6 +101,18 @@ export const addUpdateEventLookup = internalMutation({
       } else {
         await ctx.db.insert("eventLookup", lookupData);
       }
+      // console.log("valid oc", validOpenCall);
+      // await upsertNotification(ctx, {
+      //   type: validOpenCall ? "newOpenCall" : "newEvent",
+      //   userId: null,
+      //   targetRole: "user",
+      //   targetUserType: "artist",
+      //   minPlan: validOpenCall ? 2 : 0,
+      //   importance: "medium",
+      //   redirectUrl: `/thelist/event/${event.slug}/${event.dates.edition}${validOpenCall ? "/call" : ""}`,
+      //   displayText: `${validOpenCall ? "Open Call" : "Event"} added`,
+      //   dedupeKey: `${event._id}-added-updated`,
+      // });
     } catch (error) {
       throw new ConvexError("Failed to update event lookup" + error);
     }

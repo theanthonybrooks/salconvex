@@ -8,6 +8,7 @@ import { getAuthUserId } from "@convex-dev/auth/server";
 import { ShardedCounter } from "@convex-dev/sharded-counter";
 import { components } from "~/convex/_generated/api";
 import { mutation, query } from "~/convex/_generated/server";
+import { upsertNotification } from "~/convex/general/notifications";
 import { ConvexError, v } from "convex/values";
 
 export const counter = new ShardedCounter(components.shardedCounter);
@@ -113,6 +114,16 @@ export const createSupportTicket = mutation({
       lastUpdatedBy: userId ?? "guest",
       ticketNumber: support,
       assignedId: assignedUser,
+    });
+
+    await upsertNotification(ctx, {
+      type: "newSupport",
+      userId: null,
+      targetRole: "admin",
+      importance: "high",
+      redirectUrl: `/dashboard/admin/support?ticketNumber=${ticketNumber}`,
+      displayText: "New Support Ticket Added",
+      dedupeKey: `support-${support}-added`,
     });
 
     return { support, ticketNumber };

@@ -19,6 +19,7 @@ import {
   eventsAggregate,
   openCallsAggregate,
 } from "~/convex/aggregates/eventAggregates";
+import { upsertNotification } from "~/convex/general/notifications";
 import {
   eventFormatValidator,
   eventSchema,
@@ -1360,6 +1361,17 @@ export const createOrUpdateEvent = mutation({
       state: eventState,
       lastEditedAt: Date.now(),
     });
+    if (eventState === "submitted") {
+      await upsertNotification(ctx, {
+        type: "newSubmission",
+        userId: null,
+        targetRole: "admin",
+        importance: "high",
+        redirectUrl: `/thelist/event/${args.slug}/${args.dates.edition}`,
+        displayText: "New Event Submission",
+        dedupeKey: `event-${eventId}-submitted`,
+      });
+    }
     const newEvent = await ctx.db.get(eventId);
     if (newEvent) await eventsAggregate.insertIfDoesNotExist(ctx, newEvent);
     return { event: newEvent };
@@ -1389,6 +1401,17 @@ export const updateEventStatus = mutation({
       lastEditedBy: userId,
       approvedBy: userId,
       approvedAt: Date.now(),
+    });
+    await upsertNotification(ctx, {
+      type: "newEvent",
+      userId: null,
+      targetRole: "user",
+      targetUserType: "artist",
+      importance: "medium",
+      minPlan: 0,
+      redirectUrl: `/thelist/event/${event.slug}/${event.dates.edition}`,
+      displayText: "New Event Added",
+      dedupeKey: `event-${event._id}-added`,
     });
     const newDoc = await ctx.db.get(event._id);
     if (newDoc) await eventsAggregate.replaceOrInsert(ctx, oldDoc, newDoc);
@@ -1422,6 +1445,17 @@ export const approveEvent = mutation({
       lastEditedBy: userId,
       approvedBy: userId,
       approvedAt: Date.now(),
+    });
+    await upsertNotification(ctx, {
+      type: "newEvent",
+      userId: null,
+      targetRole: "user",
+      targetUserType: "artist",
+      importance: "medium",
+      minPlan: 0,
+      redirectUrl: `/thelist/event/${event.slug}/${event.dates.edition}`,
+      displayText: "New Event Published",
+      dedupeKey: `event-${event._id}-published`,
     });
     const newDoc = await ctx.db.get(event._id);
     if (newDoc) await eventsAggregate.replace(ctx, oldDoc, newDoc);

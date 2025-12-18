@@ -532,7 +532,7 @@ export default function SettingsPage() {
             Notifications
           </TabsTrigger>
 
-          {/* /~ //NOTE: in order to disabled, just add "disabled" to the tabs    trigger ~/ */}
+          {/* /~ //NOTE: in order to disable, just add "disabled" to the tabs    trigger ~/ */}
 
           <TabsTrigger
             value="appearance"

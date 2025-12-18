@@ -23,6 +23,20 @@ function needsLowercase(value: string): boolean {
   return value !== value.toLowerCase();
 }
 
+export const backfillNotificationUpdatedAt = migrations.define({
+  table: "notifications",
+  migrateOne: async (ctx, notification) => {
+    if (notification.updatedAt) return;
+    await ctx.db.patch(notification._id, {
+      updatedAt: notification._creationTime,
+    });
+  },
+});
+
+export const runBNUA = migrations.runner(
+  internal.migrations.backfillNotificationUpdatedAt,
+);
+
 export const backfillUserPrefNewsletter = migrations.define({
   table: "newsletter",
   migrateOne: async (ctx, newsletter) => {

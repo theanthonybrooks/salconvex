@@ -1,6 +1,7 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { internal } from "~/convex/_generated/api";
 import { mutation, query } from "~/convex/_generated/server";
+import { upsertNotification } from "~/convex/general/notifications";
 import { v } from "convex/values";
 
 export const updateEventPostStatus = mutation({
@@ -34,6 +35,17 @@ export const updateEventPostStatus = mutation({
       eventId: args.eventId,
       posted: args.posted ?? undefined,
     });
+    if (args.posted === "toPost" && !event.postPlannedDate) {
+      await upsertNotification(ctx, {
+        type: "newSocial",
+        userId: null,
+        targetRole: "admin",
+        importance: "medium",
+        redirectUrl: `dashboard/admin/socials?id=${event._id}`,
+        displayText: "New Unscheduled Social Post",
+        dedupeKey: `social-${event._id}`,
+      });
+    }
   },
 });
 
@@ -57,6 +69,16 @@ export const updateSocialPostPlannedDate = mutation({
 
     await ctx.db.patch(event._id, {
       postPlannedDate: args.plannedDate,
+    });
+
+    await upsertNotification(ctx, {
+      type: "newSocial",
+      userId: null,
+      targetRole: "admin",
+      importance: "medium",
+      redirectUrl: `dashboard/admin/socials?id=${event._id}`,
+      displayText: "New Social Event Planned",
+      dedupeKey: `social-${event._id}`,
     });
   },
 });

@@ -1,11 +1,12 @@
 //TODO: Add ability for me (or other admins) to bookmark users. Also to flag or ban users.
 "use client";
 
+import type { FunctionReturnType } from "convex/server";
+
 import { ColumnDef } from "@tanstack/react-table";
 
 import { ArrowRight, LucideClipboardCopy, MoreHorizontal } from "lucide-react";
 
-import type { PostStatusType } from "~/convex/schema";
 import { DataTableColumnHeader } from "@/components/data-table/DataTableColumnHeader";
 import { Button } from "@/components/ui/button";
 import { ConfirmingDropdown } from "@/components/ui/confirmation-dialog-context";
@@ -27,6 +28,7 @@ import {
 } from "@/features/admin/dashboard/components/admin-social-actions";
 import { cn } from "@/helpers/utilsFns";
 
+import { api } from "~/convex/_generated/api";
 import { Id } from "~/convex/_generated/dataModel";
 
 export const socialsColumnLabels: Record<string, string> = {
@@ -37,19 +39,14 @@ export const socialsColumnLabels: Record<string, string> = {
   posted: "Status",
 };
 
-export interface SocialColumnProps {
-  id: Id<"events">;
-  name: string;
-  slug: string;
-  edition: number;
-  deadline: string | null;
-  postDate?: number;
-  plannedDate?: number;
-  posted?: PostStatusType;
-  notes?: string;
-}
+type Socials = FunctionReturnType<
+  typeof api.events.socials.getEventsForSocials
+>;
 
-export const socialColumns: ColumnDef<SocialColumnProps>[] = [
+type SocialsWithData = Extract<Socials, { data: { id: Id<"events"> }[] }>;
+
+type Social = SocialsWithData["data"][number];
+export const socialColumns: ColumnDef<Social>[] = [
   {
     accessorKey: "rowNumber",
     id: "rowNumber",
@@ -243,6 +240,29 @@ export const socialColumns: ColumnDef<SocialColumnProps>[] = [
     cell: ({ row }) => {
       const { notes, id: eventId } = row.original;
       return <AdminSocialNotes eventId={eventId} notes={notes} />;
+    },
+  },
+  {
+    accessorKey: "id",
+    id: "id",
+    minSize: 120,
+    maxSize: 400,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Event ID" />
+    ),
+    enableHiding: false,
+    cell: ({ row }) => {
+      const { id: value } = row.original;
+      return (
+        <div className="flex justify-center">
+          <CopyableItem
+            defaultIcon={<LucideClipboardCopy className="size-4" />}
+            copyContent={value}
+          >
+            Event ID
+          </CopyableItem>
+        </div>
+      );
     },
   },
 

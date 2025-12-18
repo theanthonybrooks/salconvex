@@ -15,6 +15,7 @@ import {
   openCallsAggregate,
 } from "~/convex/aggregates/eventAggregates";
 import { generateUniqueNameAndSlug } from "~/convex/events/event";
+import { upsertNotification } from "~/convex/general/notifications";
 import {
   eventStateValidator,
   ocStateValidator,
@@ -349,47 +350,21 @@ export const updateOpenCall = mutation({
       ...(args.approved ? { approvedBy: userId, approvedAt: Date.now() } : {}),
     };
 
-    // // Step 1: Lookup already exists — update both openCall and lookup
-    // const lookup = await ctx.db
-    //   .query("eventOpenCalls")
-    //   .withIndex("by_eventId", (q) => q.eq("eventId", args.eventId))
-    //   .unique();
-
-    // // console.log("ocId", args.openCallId);
-    // // console.log("lookup", lookup);
-
-    // if (lookup) {
-    //   const prevOC = await ctx.db.get(lookup.openCallId);
-    //   await ctx.db.patch(lookup.openCallId, openCallData);
-    //   const newOC = await ctx.db.get(lookup.openCallId);
-    //   await ctx.db.patch(lookup._id, {
-    //     edition: args.basicInfo.dates.edition,
-    //     state: openCallState,
-    //     lastEdited: Date.now(),
-    //     ...(args.openCallId && { openCallId: args.openCallId }),
-    //   });
-    //   // console.log("prev lookup: ", prevOc?._id, "new lookup: ", newOC?._id);
-    //   console.log("is it me");
-    //!! TODO:  if (prevOC && newOC)
-    //     await openCallsAggregate.replaceOrInsert(ctx, prevOC, newOC);
-    //   if (newOC?.approvedAt) {
-    //     await ctx.runMutation(
-    //       internal.events.eventLookup.addUpdateEventLookup,
-    //       {
-    //         eventId: newOC.eventId,
-    //         openCallId: newOC._id,
-    //       },
-    //     );
-    //   }
-    //   // console.log("lookup updated", lookup, openCallData);
-    //   return openCallData;
-    // }
-
-    // Step 2: If user provided openCallId, validate and use it
-
     await ctx.db.patch(existingOpenCall._id, openCallData);
 
     const newOC = await ctx.db.get(existingOpenCall._id);
+
+    if (!ocApproved && openCallState === "submitted") {
+      await upsertNotification(ctx, {
+        type: "newSubmission",
+        userId: null,
+        targetRole: "admin",
+        importance: "high",
+        redirectUrl: `/dashboard/admin/submissions?_id=${args.eventId}`,
+        displayText: "New Open Call Submitted",
+        dedupeKey: `oc-${args.eventId}-added`,
+      });
+    }
 
     if (newOC) {
       await openCallsAggregate.replaceOrInsert(ctx, existingOpenCall, newOC);
@@ -691,6 +666,17 @@ export const changeOCStatus = mutation({
         approvedBy: approvedBy,
         approvedAt: Date.now(),
       });
+      await upsertNotification(ctx, {
+        type: "newOpenCall",
+        userId: null,
+        targetRole: "user",
+        targetUserType: "artist",
+        importance: "medium",
+        minPlan: 2,
+        redirectUrl: `/thelist/event/${prevEvent.slug}/${prevEvent.dates.edition}/call`,
+        displayText: "New Open Call Added",
+        dedupeKey: `oc-${oc._id}-added`,
+      });
     } else {
       await ctx.db.patch(eventId, {
         lastEditedAt: Date.now(),
@@ -745,5 +731,28 @@ export const getOpenCallAppLink = query({
     const openCall = await ctx.db.get(args.openCallId);
     if (!openCall) return null;
     return openCall.requirements?.applicationLink;
+  },
+});
+
+export const createOpenCallNotification = mutation({
+  args: {
+    mode: v.union(v.literal("publish"), v.literal("submit")),
+    eventSlug: v.string(),
+    edition: v.number(),
+    openCallId: v.id("openCalls"),
+  },
+  handler: async (ctx, args) => {
+    const { mode, eventSlug, edition, openCallId } = args;
+    await upsertNotification(ctx, {
+      type: "newOpenCall",
+      userId: null,
+      targetRole: "user",
+      targetUserType: "artist",
+      importance: "medium",
+      minPlan: 2,
+      redirectUrl: `/thelist/event/${eventSlug}/${edition}/call`,
+      displayText: "New Open Call Added",
+      dedupeKey: `oc-${openCallId}-added`,
+    });
   },
 });

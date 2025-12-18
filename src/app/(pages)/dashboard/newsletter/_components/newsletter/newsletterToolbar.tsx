@@ -59,10 +59,9 @@ export const NewsletterToolbar = () => {
   const {
     handleSubmit,
     setError,
-    formState: { isValid, isDirty },
+    formState: {  isDirty },
   } = form;
 
-  console.log(isValid, isDirty);
 
   const [expanded, setExpanded] = useState(isMobile);
 
