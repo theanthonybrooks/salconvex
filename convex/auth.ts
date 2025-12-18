@@ -194,6 +194,9 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
         theme: "default",
         notifications: {
           general: true,
+          inAppNotifications: {
+            account: true,
+          },
           ...(newsletterSub.newsletter && { newsletter: true }),
         },
         autoApply: true,

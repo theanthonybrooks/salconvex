@@ -448,6 +448,35 @@ export const editCard = mutation({
       }
     }
     const kanbanCard = await ctx.db.get(args.id);
+    if (!kanbanCard) throw new Error("Card not found");
+    const newAssignedUser =
+      args.assignedId && args.assignedId !== kanbanCard?.assignedId;
+    const newSecondaryAssignedUser =
+      args.secondaryAssignedId &&
+      args.secondaryAssignedId !== kanbanCard?.secondaryAssignedId;
+
+    if (newAssignedUser) {
+      await upsertNotification(ctx, {
+        type: "newTaskAssignment",
+        userId: args.assignedId ?? null,
+        targetRole: "staff",
+        importance: "medium",
+        redirectUrl: `/dashboard/admin/todos?id=${kanbanCard._id}`,
+        displayText: "New Task Assignment",
+        dedupeKey: `kanban-assignment-${kanbanCard._id}`,
+      });
+    }
+    if (newSecondaryAssignedUser) {
+      await upsertNotification(ctx, {
+        type: "newTaskAssignment",
+        userId: args.secondaryAssignedId ?? null,
+        targetRole: "staff",
+        importance: "medium",
+        redirectUrl: `/dashboard/admin/todos?id=${kanbanCard._id}`,
+        displayText: "New Task Assignment",
+        dedupeKey: `kanban-assignment-${kanbanCard._id}`,
+      });
+    }
     const supportTicket = kanbanCard?.ticketNumber;
     if (supportTicket) {
       const status =
@@ -572,15 +601,28 @@ export const updateAssignedUser = mutation({
       assignedId: args.userId,
       secondaryAssignedId: args.secondaryUserId,
     });
-    await upsertNotification(ctx, {
-      type: "newTaskAssignment",
-      userId: args.userId ?? null,
-      targetRole: "staff",
-      importance: "medium",
-      redirectUrl: `/dashboard/admin/todos?id=${kanbanCard._id}`,
-      displayText: "New Task Assignment",
-      dedupeKey: `kanban-assignment-${kanbanCard._id}`,
-    });
+    if (args.userId) {
+      await upsertNotification(ctx, {
+        type: "newTaskAssignment",
+        userId: args.userId,
+        targetRole: "staff",
+        importance: "medium",
+        redirectUrl: `/dashboard/admin/todos?id=${kanbanCard._id}`,
+        displayText: "New Task Assignment",
+        dedupeKey: `kanban-assignment-${kanbanCard._id}`,
+      });
+    }
+    if (args.secondaryUserId) {
+      await upsertNotification(ctx, {
+        type: "newTaskAssignment",
+        userId: args.secondaryUserId,
+        targetRole: "staff",
+        importance: "medium",
+        redirectUrl: `/dashboard/admin/todos?id=${kanbanCard._id}`,
+        displayText: "New Task Assignment",
+        dedupeKey: `kanban-assignment-${kanbanCard._id}`,
+      });
+    }
   },
 });
 

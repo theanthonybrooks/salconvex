@@ -218,7 +218,7 @@ export default function Dashboard() {
                   icon: Newspaper,
                   title: "Newsletter Subscribers",
                   total: totalNewsletterSubs,
-                  path: "/dashboard/admin/newsletter",
+                  path: "/dashboard/newsletter",
                 }}
               />
             </div>

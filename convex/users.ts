@@ -17,6 +17,7 @@ import { updateOrgOwnerBeforeDelete } from "~/convex/organizer/organizations";
 import {
   AccountType,
   accountTypeArrayValidator,
+  inAppNotificationValidator,
   UserPrefsType,
   userPrefsValidator,
   UserRole,
@@ -606,11 +607,66 @@ export const updateUserNotifications = mutation({
     }
     await ctx.db.patch(userPrefs._id, {
       notifications: {
+        inAppNotifications: userPrefs.notifications?.inAppNotifications ?? {},
         ...userPrefs.notifications,
         ...args,
       },
       lastUpdated: Date.now(),
     });
+  },
+});
+
+export const updateUserInAppNotifications = mutation({
+  args: {
+    inAppNotifications: v.union(v.boolean(), inAppNotificationValidator),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    const user = userId ? await ctx.db.get(userId) : null;
+    if (!user || !userId) {
+      return { success: false, message: "User not found" };
+    }
+
+    const userPrefs = await ctx.db
+      .query("userPreferences")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .unique();
+
+    if (!userPrefs) {
+      throw new ConvexError("User pref not found");
+    }
+
+    const existingNotifications = userPrefs.notifications ?? {
+      inAppNotifications: false,
+    };
+    const existingPushObject =
+      typeof existingNotifications.inAppNotifications === "object" &&
+      existingNotifications.inAppNotifications !== null
+        ? existingNotifications.inAppNotifications
+        : undefined;
+
+    let newPush: boolean | typeof existingPushObject;
+
+    if (args.inAppNotifications === false) {
+      newPush = {};
+    } else if (args.inAppNotifications === true) {
+      newPush = { account: true };
+    } else {
+      newPush = {
+        ...(existingPushObject ?? {}),
+        ...args.inAppNotifications,
+      };
+    }
+
+    await ctx.db.patch(userPrefs._id, {
+      notifications: {
+        ...existingNotifications,
+        inAppNotifications: newPush,
+      },
+      lastUpdated: Date.now(),
+    });
+
+    return { success: true };
   },
 });
 

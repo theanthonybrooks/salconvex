@@ -53,18 +53,36 @@ export const fontSizeValidator = v.union(
 export type FontSizeType = Infer<typeof fontSizeValidator> | undefined;
 
 export const notificationTypeValidator = v.union(
+  //public
+  v.literal("newEvent"),
+  v.literal("newOpenCall"),
+  v.literal("newResource"),
+  v.literal("account"),
+  //admin
   v.literal("newSubmission"),
+  v.literal("newTaskAssignment"),
+  v.literal("newSac"),
+  // online events
+  v.literal("newOERegistration"),
+  v.literal("newOECancellation"),
+  // support
+  v.literal("newSupport"),
+  v.literal("supportUpdated"),
+  //social
+  v.literal("newSocial"),
+  v.literal("socialUpdated"),
+  //newsletter
+  v.literal("campaignCreated"),
+  v.literal("campaignCompleted"),
+  v.literal("campaignFailed"),
+  v.literal("audienceSubscribed"),
+  v.literal("audienceUnsubscribed"),
+  //other
   v.literal("newMessage"),
   v.literal("newFollow"),
   v.literal("newResponse"),
-  v.literal("newSupport"),
   v.literal("newApplication"),
-  v.literal("newOpenCall"),
   v.literal("newPublishedCall"),
-  v.literal("newEvent"),
-  v.literal("newSac"),
-  v.literal("newSocial"),
-  v.literal("newTaskAssignment")
 );
 
 export type NotificationType = Infer<typeof notificationTypeValidator>;
@@ -92,6 +110,59 @@ const notificationsSchema = {
   updatedAt: v.number(),
 };
 
+export const inAppNotificationValidator = v.object({
+  //public
+  events: v.optional(v.boolean()),
+  openCalls: v.optional(v.boolean()),
+  resources: v.optional(v.boolean()),
+  account: v.optional(v.boolean()),
+  // admin
+  submissions: v.optional(v.boolean()),
+  tasks: v.optional(v.boolean()),
+  // online events
+  onlineEvents: v.optional(
+    v.object({
+      registrations: v.optional(v.boolean()),
+      cancellations: v.optional(v.boolean()),
+    }),
+  ),
+  // support
+  support: v.optional(
+    v.object({
+      ticketCreated: v.optional(v.boolean()),
+      ticketUpdated: v.optional(v.boolean()),
+    }),
+  ),
+  social: v.optional(
+    v.object({
+      scheduled: v.optional(v.boolean()),
+      unscheduled: v.optional(v.boolean()),
+    }),
+  ),
+  newsletter: v.optional(
+    v.object({
+      campaign: v.object({
+        created: v.optional(v.boolean()),
+        completed: v.optional(v.boolean()),
+        failed: v.optional(v.boolean()),
+      }),
+      audience: v.object({
+        subscribed: v.optional(v.boolean()),
+        unsubscribed: v.optional(v.boolean()),
+      }),
+    }),
+  ),
+});
+
+export const inAppNotificationBase = v.union(
+  v.boolean(),
+  inAppNotificationValidator,
+);
+
+export type InAppNotificationsType = Infer<typeof inAppNotificationBase>;
+
+export type InAppNotifications = Infer<typeof inAppNotificationValidator>;
+
 const userPrefsBaseValues = {
   autoApply: v.optional(v.boolean()),
   hideAppFees: v.optional(v.boolean()),
@@ -106,6 +177,7 @@ const userPrefsBaseValues = {
       newsletter: v.optional(v.boolean()),
       general: v.optional(v.boolean()),
       applications: v.optional(v.boolean()),
+      inAppNotifications: inAppNotificationValidator,
     }),
   ),
   cookiePrefs: v.optional(v.union(v.literal("all"), v.literal("required"))),

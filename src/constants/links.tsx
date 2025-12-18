@@ -459,7 +459,7 @@ export const dashboardNavItems: DashNavItem[] = [
   },
   {
     label: "Audience",
-    href: "/dashboard/newsletter/audience",
+    href: "/dashboard/newsletter",
     icon: UserSearch,
     section: true,
     sectionIcon: Newspaper,

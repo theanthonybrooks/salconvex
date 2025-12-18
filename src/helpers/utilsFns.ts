@@ -56,3 +56,9 @@ export function sanitizeStringMap(
     Object.entries(obj ?? {}).map(([k, v]) => [k, v?.trim() || undefined]),
   );
 }
+
+export const hasAnyTrueValue = (value: unknown): boolean => {
+  if (typeof value !== "object" || value === null) return false;
+
+  return Object.values(value).some((v) => v === true);
+};

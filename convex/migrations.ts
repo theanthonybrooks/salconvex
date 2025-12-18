@@ -23,45 +23,26 @@ function needsLowercase(value: string): boolean {
   return value !== value.toLowerCase();
 }
 
-export const backfillNotificationUpdatedAt = migrations.define({
-  table: "notifications",
-  migrateOne: async (ctx, notification) => {
-    if (notification.updatedAt) return;
-    await ctx.db.patch(notification._id, {
-      updatedAt: notification._creationTime,
-    });
-  },
-});
-
-export const runBNUA = migrations.runner(
-  internal.migrations.backfillNotificationUpdatedAt,
-);
-
-export const backfillUserPrefNewsletter = migrations.define({
-  table: "newsletter",
-  migrateOne: async (ctx, newsletter) => {
-    await ctx.db.patch(newsletter._id, {
-      verified: false,
-    });
-    const userId = newsletter.userId;
-    if (!userId) return;
-    const userPref = await ctx.db
-      .query("userPreferences")
-      .withIndex("by_userId", (q) => q.eq("userId", userId))
-      .first();
-    const newsletterSub = userPref?.notifications?.newsletter;
-    if (!userPref || newsletterSub === true) return;
+export const addDefaultInAppNotifications = migrations.define({
+  table: "userPreferences",
+  migrateOne: async (ctx, userPref) => {
+    if (userPref.notifications?.inAppNotifications) return;
+    const userPrefs = await ctx.db.get(userPref._id);
+    if (!userPrefs) return;
+    const userNotifications = userPrefs.notifications;
     await ctx.db.patch(userPref._id, {
       notifications: {
-        ...userPref.notifications,
-        newsletter: true,
+        ...userNotifications,
+        inAppNotifications: {
+          account: true,
+        },
       },
     });
   },
 });
 
-export const runBNPN = migrations.runner(
-  internal.migrations.backfillUserPrefNewsletter,
+export const runADDIN = migrations.runner(
+  internal.migrations.addDefaultInAppNotifications,
 );
 
 export const removeCurrencyFromUserPrefsWithoutSubs = migrations.define({
@@ -381,19 +362,3 @@ export const runBackfillEA = migrations.runner(
 export const runBackfillOCA = migrations.runner(
   internal.migrations.backfillOCAggregate2,
 );
-
-export const addDefaultCommPref = migrations.define({
-  table: "userPreferences",
-  migrateOne: async (ctx, userPref) => {
-    if (userPref.notifications) return;
-    //gather all newsletter subscriptions
-    //everyone gets a monthly frequency and general newsletter type
-    await ctx.db.patch(userPref._id, {
-      notifications: {
-        general: true,
-      },
-    });
-  },
-});
-
-export const runDCP = migrations.runner(internal.migrations.addDefaultCommPref);

@@ -23,6 +23,72 @@ import schema, { userRoleValidator } from "~/convex/schema";
 import { doc } from "convex-helpers/validators";
 import { v } from "convex/values";
 
+// type InAppPrefs = Doc<"userPreferences">["notifications"]["inAppNotifications"];
+
+// export function isNotificationEnabled(
+//   prefs: InAppPrefs | undefined,
+//   type: Doc<"notifications">["type"],
+// ): boolean {
+//   if (!prefs) return true; // or false, depending on your default
+
+//   switch (type) {
+//     // public
+//     case "newEvent":
+//       return prefs.events ?? true;
+//     case "newOpenCall":
+//       return prefs.openCalls ?? true;
+//     case "newResource":
+//       return prefs.resources ?? true;
+//     case "account":
+//       return prefs.account ?? true;
+
+//     // admin
+//     case "newSubmission":
+//       return prefs.submissions ?? true;
+//     case "newTaskAssignment":
+//     case "newSac":
+//       return prefs.tasks ?? true;
+
+//     // online events
+//     case "newOERegistration":
+//       return prefs.onlineEvents?.registrations ?? true;
+//     case "newOECancellation":
+//       return prefs.onlineEvents?.cancellations ?? true;
+
+//     // support
+//     case "newSupport":
+//       return prefs.support?.ticketCreated ?? true;
+//     case "supportUpdated":
+//       return prefs.support?.ticketUpdated ?? true;
+
+//     // social
+//     case "newSocial":
+//       return prefs.social?.scheduled ?? true;
+//     case "socialUpdated":
+//       return prefs.social?.unscheduled ?? true;
+
+//     // newsletter
+//     case "campaignCreated":
+//       return prefs.newsletter?.campaign.created ?? true;
+//     case "campaignCompleted":
+//       return prefs.newsletter?.campaign.completed ?? true;
+//     case "campaignFailed":
+//       return prefs.newsletter?.campaign.failed ?? true;
+//     case "audienceSubscribed":
+//       return prefs.newsletter?.audience.subscribed ?? true;
+//     case "audienceUnsubscribed":
+//       return prefs.newsletter?.audience.unsubscribed ?? true;
+
+//     // other – decide if these should be controlled by prefs or always on
+//     case "newMessage":
+//     case "newFollow":
+//     case "newResponse":
+//     case "newApplication":
+//     case "newPublishedCall":
+//       return true;
+//   }
+// }
+
 export async function cloneNotificationForUser(
   ctx: MutationCtx,
   notification: Doc<"notifications">,

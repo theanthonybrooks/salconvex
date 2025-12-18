@@ -381,13 +381,19 @@ export const updateNewsletterStatus = mutation({
       throw new ConvexError("No newsletter subscription found" + email);
     }
 
+    let effectiveFrequency = frequency ?? newsletterSubscription.frequency;
+
+    if (type && !type.includes("openCall")) {
+      effectiveFrequency = "monthly";
+    }
+
     if (newsletterSubscription) {
       await ctx.db.patch(newsletterSubscription._id, {
         newsletter,
         timesAttempted: 0,
         lastAttempt: Date.now(),
+        frequency: effectiveFrequency,
         ...(email && updateEmail && { email }),
-        ...(frequency && { frequency }),
         ...(type && { type }),
         ...(userPlan &&
           userPlan !== newsletterSubscription.userPlan && { userPlan }),
@@ -463,11 +469,11 @@ export const getAudience = query({
   handler: async (ctx, args) => {
     const { type, frequency, plan } = args;
 
-    let query = ctx.db.query("newsletter").withIndex("by_active_plan", (q) =>
-      q
-        .eq("newsletter", true)
-        .gte("userPlan", plan),
-    );
+    let query = ctx.db
+      .query("newsletter")
+      .withIndex("by_active_plan", (q) =>
+        q.eq("newsletter", true).gte("userPlan", plan),
+      );
     if (frequency !== "all") {
       query = query.filter((f) =>
         f.or(
@@ -490,8 +496,6 @@ export const getAudience = query({
       }
       return false;
     });
-
-    
 
     return { success: true, data: filteredSubscribers };
   },

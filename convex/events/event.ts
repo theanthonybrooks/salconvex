@@ -1446,17 +1446,19 @@ export const approveEvent = mutation({
       approvedBy: userId,
       approvedAt: Date.now(),
     });
-    await upsertNotification(ctx, {
-      type: "newEvent",
-      userId: null,
-      targetRole: "user",
-      targetUserType: "artist",
-      importance: "medium",
-      minPlan: 0,
-      redirectUrl: `/thelist/event/${event.slug}/${event.dates.edition}`,
-      displayText: "New Event Published",
-      dedupeKey: `event-${event._id}-published`,
-    });
+    if (event.category === "event") {
+      await upsertNotification(ctx, {
+        type: "newEvent",
+        userId: null,
+        targetRole: "user",
+        targetUserType: "artist",
+        importance: "medium",
+        minPlan: 0,
+        redirectUrl: `/thelist/event/${event.slug}/${event.dates.edition}`,
+        displayText: "New Event Published",
+        dedupeKey: `event-${event._id}-published`,
+      });
+    }
     const newDoc = await ctx.db.get(event._id);
     if (newDoc) await eventsAggregate.replace(ctx, oldDoc, newDoc);
     // await ctx.runMutation(internal.events.eventLookup.addUpdateEventLookup, {

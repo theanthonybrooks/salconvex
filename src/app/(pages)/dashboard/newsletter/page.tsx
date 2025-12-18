@@ -12,5 +12,5 @@ export default async function NewsletterPage() {
   const isAdmin = await fetchQuery(api.users.isAdmin, {}, { token });
   if (!isAdmin) redirect("/dashboard");
 
-  return <NewsletterTableWrapper page="newsletter" />;
+  return <NewsletterTableWrapper page="audience" />;
 }
