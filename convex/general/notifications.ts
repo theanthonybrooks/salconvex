@@ -213,7 +213,7 @@ export const clearNotificationsBatch = internalMutation({
   },
 });
 
-const MAX_BATCHES = 50;
+const MAX_BATCHES = 10;
 export const clearAllNotificationsForCurrentUser = internalAction({
   args: {
     user: doc(schema, "users"),

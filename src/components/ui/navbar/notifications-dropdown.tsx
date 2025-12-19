@@ -80,10 +80,12 @@ export const NotificationsDropdown = ({
 }: NotificationsDropdownProps) => {
   // const [pending, setPending] = useState(false);
 
+  const isUser = user?.role?.includes("user");
   const isAdmin = user.role.includes("admin");
   // const isCreator = user.role.includes("creator");
   const isArtist = user.accountType?.includes("artist");
   const isOrganizer = user.accountType?.includes("organizer");
+  const isBoth = isArtist && isOrganizer;
   const [activeTab, setActiveTab] = useState("all");
 
   const notificationsData = useQuery(
@@ -181,7 +183,7 @@ export const NotificationsDropdown = ({
       <DropdownMenuContent
         className={cn(
           "z-[60] p-4",
-          isAdmin ? "w-[min(28rem,90dvw)]" : "w-[min(22rem,90dvw)]",
+          isAdmin ? "w-[min(28rem,90dvw)]" : "w-[min(23rem,90dvw)]",
         )}
         thick
         align="end"
@@ -195,7 +197,11 @@ export const NotificationsDropdown = ({
             <TabsTrigger
               value="all"
               variant="underline"
-              className={cn("min-w-20", fontSize)}
+              className={cn(
+                "min-w-20",
+                isUser && !isBoth && "w-full max-w-full",
+                fontSize,
+              )}
             >
               All <NotificationCount count={uniqueNotifications.length} />
             </TabsTrigger>
@@ -214,7 +220,11 @@ export const NotificationsDropdown = ({
               <TabsTrigger
                 value="artist"
                 variant="underline"
-                className={cn("min-w-20 max-w-30", fontSize)}
+                className={cn(
+                  "min-w-20 max-w-30",
+                  isUser && !isBoth && "w-full max-w-full",
+                  fontSize,
+                )}
               >
                 Artist <NotificationCount count={artistNotifications.length} />
               </TabsTrigger>
@@ -223,7 +233,12 @@ export const NotificationsDropdown = ({
               <TabsTrigger
                 value="organizer"
                 variant="underline"
-                className={cn("min-w-25", fontSize)}
+                className={cn(
+                  "min-w-25",
+                  isUser && isOrganizer && "w-full",
+                  isUser && !isBoth && "w-full max-w-full",
+                  fontSize,
+                )}
               >
                 Organizer{" "}
                 <NotificationCount count={organizerNotifications.length} />
@@ -232,7 +247,7 @@ export const NotificationsDropdown = ({
             <TabsTrigger
               value="archive"
               variant="underline"
-              className={cn("", fontSize)}
+              className={cn("px-3", fontSize)}
             >
               <TooltipSimple content="View Archive" className="z-top">
                 <Archive className="size-4 shrink-0" />
