@@ -33,7 +33,7 @@ export const DataTableEventEdition = ({
   const currentEdition = event.dates.edition;
   const eventId = event._id;
   const currentYear = new Date().getFullYear();
-  const years = Array.from({ length: 7 }, (_, i) => currentYear - 3 + i);
+  const years = Array.from({ length: 10 }, (_, i) => currentYear - 3 + i);
 
   const handleChange = async (newValue: string) => {
     const newEdition = parseInt(newValue, 10);
@@ -74,7 +74,7 @@ export const DataTableEventEdition = ({
               <SelectValue placeholder={String(currentEdition)} />
             )}
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="max-h-40">
             {years.map((year) => (
               <SelectItem key={year} value={String(year)}>
                 {year}

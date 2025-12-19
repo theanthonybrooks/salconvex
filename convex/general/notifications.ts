@@ -1,14 +1,14 @@
 import type { Query, QueryInitializer } from "convex/server";
 
-import { subMonths } from "date-fns";
+import { addWeeks, subMonths } from "date-fns";
 
 import type { DataModel, Doc, Id } from "~/convex/_generated/dataModel";
 import type { MutationCtx } from "~/convex/_generated/server";
 import type {
   AccountType,
+  FullRole,
   Importance,
   NotificationType,
-  UserRole,
 } from "~/convex/schema";
 
 import { getAuthUserId } from "@convex-dev/auth/server";
@@ -19,75 +19,97 @@ import {
   mutation,
   query,
 } from "~/convex/_generated/server";
-import schema, { userRoleValidator } from "~/convex/schema";
+import schema, { fullRoleValidator } from "~/convex/schema";
 import { doc } from "convex-helpers/validators";
-import { v } from "convex/values";
+import { ConvexError, v } from "convex/values";
 
-// type InAppPrefs = Doc<"userPreferences">["notifications"]["inAppNotifications"];
+type UserPrefsDoc = Doc<"userPreferences">;
+type Notifications = NonNullable<UserPrefsDoc["notifications"]>;
+type InAppPrefs = Notifications["inAppNotifications"];
 
-// export function isNotificationEnabled(
-//   prefs: InAppPrefs | undefined,
-//   type: Doc<"notifications">["type"],
-// ): boolean {
-//   if (!prefs) return true; // or false, depending on your default
+export function isNotificationEnabled(
+  prefs: InAppPrefs,
+  type: Doc<"notifications">["type"],
+): boolean {
+  if (Object.keys(prefs).length === 0) return false;
+  let enabled: boolean = false;
+  console.log("prefs: ", prefs);
+  switch (type) {
+    // public
+    case "newEvent":
+      enabled = prefs.events ?? false;
+      break;
+    case "newOpenCall":
+      enabled = prefs.openCalls ?? false;
+      break;
+    case "newResource":
+      enabled = prefs.resources ?? false;
+      break;
+    case "account":
+      enabled = prefs.account ?? false;
+      break;
 
-//   switch (type) {
-//     // public
-//     case "newEvent":
-//       return prefs.events ?? true;
-//     case "newOpenCall":
-//       return prefs.openCalls ?? true;
-//     case "newResource":
-//       return prefs.resources ?? true;
-//     case "account":
-//       return prefs.account ?? true;
+    // admin
+    case "newSubmission":
+      enabled = prefs.submissions ?? false;
+      break;
+    case "newTaskAssignment":
+    case "newSac":
+      enabled = prefs.tasks ?? false;
+      break;
 
-//     // admin
-//     case "newSubmission":
-//       return prefs.submissions ?? true;
-//     case "newTaskAssignment":
-//     case "newSac":
-//       return prefs.tasks ?? true;
+    // online events
+    case "newOERegistration":
+      enabled = prefs.onlineEvents?.registrations ?? false;
+      break;
+    case "newOECancellation":
+      enabled = prefs.onlineEvents?.cancellations ?? false;
+      break;
 
-//     // online events
-//     case "newOERegistration":
-//       return prefs.onlineEvents?.registrations ?? true;
-//     case "newOECancellation":
-//       return prefs.onlineEvents?.cancellations ?? true;
+    // support
+    case "newSupport":
+      enabled = prefs.support?.ticketCreated ?? false;
+      break;
+    case "supportUpdated":
+      enabled = prefs.support?.ticketUpdated ?? false;
+      break;
 
-//     // support
-//     case "newSupport":
-//       return prefs.support?.ticketCreated ?? true;
-//     case "supportUpdated":
-//       return prefs.support?.ticketUpdated ?? true;
+    // social
+    case "newSocial":
+      enabled = prefs.social?.scheduled ?? false;
+      break;
+    case "socialUpdated":
+      enabled = prefs.social?.unscheduled ?? false;
+      break;
 
-//     // social
-//     case "newSocial":
-//       return prefs.social?.scheduled ?? true;
-//     case "socialUpdated":
-//       return prefs.social?.unscheduled ?? true;
+    // newsletter
+    case "campaignCreated":
+      enabled = prefs.newsletter?.campaign.created ?? false;
+      break;
+    case "campaignCompleted":
+      enabled = prefs.newsletter?.campaign.completed ?? false;
+      break;
+    case "campaignFailed":
+      enabled = prefs.newsletter?.campaign.failed ?? false;
+      break;
+    case "audienceSubscribed":
+      enabled = prefs.newsletter?.audience.subscribed ?? false;
+      break;
+    case "audienceUnsubscribed":
+      enabled = prefs.newsletter?.audience.unsubscribed ?? false;
+      break;
 
-//     // newsletter
-//     case "campaignCreated":
-//       return prefs.newsletter?.campaign.created ?? true;
-//     case "campaignCompleted":
-//       return prefs.newsletter?.campaign.completed ?? true;
-//     case "campaignFailed":
-//       return prefs.newsletter?.campaign.failed ?? true;
-//     case "audienceSubscribed":
-//       return prefs.newsletter?.audience.subscribed ?? true;
-//     case "audienceUnsubscribed":
-//       return prefs.newsletter?.audience.unsubscribed ?? true;
-
-//     // other – decide if these should be controlled by prefs or always on
-//     case "newMessage":
-//     case "newFollow":
-//     case "newResponse":
-//     case "newApplication":
-//     case "newPublishedCall":
-//       return true;
-//   }
-// }
+    // other – decide if these should be controlled by prefs or always on
+    case "newMessage":
+    case "newFollow":
+    case "newResponse":
+    case "newApplication":
+      enabled = false;
+      break;
+  }
+  console.log("enabled: ", enabled, type);
+  return enabled;
+}
 
 export async function cloneNotificationForUser(
   ctx: MutationCtx,
@@ -103,12 +125,44 @@ export async function cloneNotificationForUser(
   });
 }
 
+export const unarchiveNotification = mutation({
+  args: {
+    notificationId: v.id("notifications"),
+  },
+  handler: async (ctx, args) => {
+    const notification = await ctx.db.get(args.notificationId);
+    if (!notification) return null;
+    const dedupeKey = notification.dedupeKey;
+    const notifications = await ctx.db
+      .query("notifications")
+      .withIndex("by_dedupeKey", (q) => q.eq("dedupeKey", dedupeKey))
+      .collect();
+    if (notifications.length === 0)
+      throw new ConvexError({
+        code: "NOT_FOUND",
+        message: "Notification not found",
+      });
+    if (notifications.length === 1) {
+      await ctx.db.patch(notification._id, {
+        dismissed: false,
+        updatedAt: Date.now(),
+      });
+    } else {
+      const userNotifications = notifications.filter((n) => n.userId);
+
+      for (const userNotification of userNotifications) {
+        await ctx.db.delete("notifications", userNotification._id);
+      }
+    }
+  },
+});
+
 export const clearNotificationsBatch = internalMutation({
   args: v.object({
     cursor: v.union(v.string(), v.null()),
     numItems: v.number(),
     mode: v.union(v.literal("user"), v.literal("role")),
-    role: v.optional(userRoleValidator),
+    role: v.optional(fullRoleValidator),
     userId: v.id("users"),
   }),
   handler: async (ctx, args) => {
@@ -122,12 +176,14 @@ export const clearNotificationsBatch = internalMutation({
     if (mode === "user") {
       indexedQuery = tableQuery.withIndex(
         "by_userId_dismissed_updatedAt",
-        (q) => q.eq("userId", userId),
+        (q) => q.eq("userId", userId).eq("dismissed", false),
       );
     } else {
       if (!role) return { cursor: null, isDone: true };
-      indexedQuery = tableQuery.withIndex("by_role_dismissed_updatedAt", (q) =>
-        q.eq("targetRole", role).eq("dismissed", false),
+      indexedQuery = tableQuery.withIndex(
+        "by_role_userId_dismissed_updatedAt",
+        (q) =>
+          q.eq("targetRole", role).eq("userId", null).eq("dismissed", false),
       );
     }
 
@@ -157,6 +213,7 @@ export const clearNotificationsBatch = internalMutation({
   },
 });
 
+const MAX_BATCHES = 50;
 export const clearAllNotificationsForCurrentUser = internalAction({
   args: {
     user: doc(schema, "users"),
@@ -164,12 +221,14 @@ export const clearAllNotificationsForCurrentUser = internalAction({
   handler: async (ctx, args) => {
     const { user } = args;
     const userRoles = user.role;
+    const extendedRoles: FullRole = [...userRoles, "all"];
 
     {
       let cursor: string | null = null;
       let isDone = false;
+      let batches = 0;
 
-      while (!isDone) {
+      while (!isDone && batches < MAX_BATCHES) {
         const res: { cursor: string | null; isDone: boolean } =
           await ctx.runMutation(
             internal.general.notifications.clearNotificationsBatch,
@@ -182,14 +241,19 @@ export const clearAllNotificationsForCurrentUser = internalAction({
           );
         cursor = res.cursor;
         isDone = res.isDone;
+        batches++;
+      }
+      if (!isDone) {
+        throw new Error("clearAllNotifications: exceeded max batches for user");
       }
     }
 
-    for (const role of userRoles) {
+    for (const role of extendedRoles) {
       let cursor: string | null = null;
       let isDone = false;
+      let batches = 0;
 
-      while (!isDone) {
+      while (!isDone && batches < MAX_BATCHES) {
         const res: { cursor: string | null; isDone: boolean } =
           await ctx.runMutation(
             internal.general.notifications.clearNotificationsBatch,
@@ -203,6 +267,12 @@ export const clearAllNotificationsForCurrentUser = internalAction({
           );
         cursor = res.cursor;
         isDone = res.isDone;
+        batches++;
+      }
+      if (!isDone) {
+        throw new Error(
+          `clearAllNotifications: exceeded max batches for role ${role}`,
+        );
       }
     }
   },
@@ -248,9 +318,17 @@ export const getNotifications = query({
     if (!userId) return null;
     const user = await ctx.db.get(userId);
     if (!user) return null;
+    const userPrefs = await ctx.db
+      .query("userPreferences")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .first();
+    if (!userPrefs) return null;
+    const inAppNotifications =
+      userPrefs.notifications?.inAppNotifications ?? {};
     const oneMonthAgo = subMonths(new Date(), 1).getTime();
 
     const userRoles = user.role;
+    const extendedRoles: FullRole = [...userRoles, "all"];
     const [userNotifications, roleResults, dismissedNotifications] =
       await Promise.all([
         ctx.db
@@ -264,12 +342,13 @@ export const getNotifications = query({
           .order("desc")
           .take(50),
         Promise.all(
-          userRoles.map((role) =>
+          extendedRoles.map((role) =>
             ctx.db
               .query("notifications")
-              .withIndex("by_role_dismissed_updatedAt", (q) =>
+              .withIndex("by_role_userId_dismissed_updatedAt", (q) =>
                 q
                   .eq("targetRole", role)
+                  .eq("userId", null)
                   .eq("dismissed", false)
                   .gte("updatedAt", oneMonthAgo),
               )
@@ -296,15 +375,47 @@ export const getNotifications = query({
       srcArray.filter(
         (n) =>
           !dismissedDedupeKeys.has(n.dedupeKey) &&
-          (n.minPlan ?? 0) <= (user.plan ?? 0),
+          (n.minPlan ?? 0) <= (user.plan ?? 0) &&
+          isNotificationEnabled(inAppNotifications, n.type),
       );
 
-    const filteredUserNotifications = filterNotifications(userNotifications);
-    const filteredRoleNotifications = filterNotifications(roleNotifications);
+    const dedupeNotifications = (
+      notifications: Doc<"notifications">[],
+    ): Doc<"notifications">[] => {
+      const map = new Map<string, Doc<"notifications">>();
+
+      for (const n of notifications) {
+        const existing = map.get(n.dedupeKey);
+
+        if (!existing) {
+          map.set(n.dedupeKey, n);
+          continue;
+        }
+
+        if (existing.userId === null && n.userId !== null) {
+          map.set(n.dedupeKey, n);
+          continue;
+        }
+
+        if (existing.userId === n.userId && n.updatedAt > existing.updatedAt) {
+          map.set(n.dedupeKey, n);
+        }
+      }
+
+      return Array.from(map.values());
+    };
+
+    const filteredActiveNotifications = filterNotifications([
+      ...roleNotifications,
+      ...userNotifications,
+    ]);
+
+    const dedupedActiveNotifications = dedupeNotifications(
+      filteredActiveNotifications,
+    );
 
     return {
-      userNotifications: filteredUserNotifications,
-      roleNotifications: filteredRoleNotifications,
+      userNotifications: dedupedActiveNotifications,
       dismissedNotifications,
     };
   },
@@ -315,7 +426,7 @@ export async function upsertNotification(
   notification: {
     type: NotificationType;
     userId: Id<"users"> | null;
-    targetRole: UserRole[number];
+    targetRole: FullRole[number];
     targetUserType?: AccountType[number];
     importance: Importance;
     minPlan?: number;
@@ -325,15 +436,15 @@ export async function upsertNotification(
     dedupeKey: string;
   },
 ) {
-  const month = new Date().getMonth();
-  const day = new Date().getDate();
+  const today = new Date();
+  const month = today.getMonth();
+  const day = today.getDate();
+  const oneWeekFromToday = addWeeks(today, 1).getTime();
   const outputDedupeKey = `${notification.dedupeKey}-${month}-${day}`;
   const existing = await ctx.db
     .query("notifications")
     .withIndex("by_dedupeKey", (q) => q.eq("dedupeKey", outputDedupeKey))
     .first();
-
-  console.log(existing);
 
   if (existing) {
     await ctx.db.patch(existing._id, {
@@ -346,6 +457,7 @@ export async function upsertNotification(
     await ctx.db.insert("notifications", {
       ...notification,
       dedupeKey: `${notification.dedupeKey}-${month}-${day}`,
+      deadline: notification.deadline ?? oneWeekFromToday,
       dismissed: false,
       updatedAt: Date.now(),
     });

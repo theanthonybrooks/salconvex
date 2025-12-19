@@ -263,6 +263,7 @@ export const NotificationsSettings = () => {
         <CardContent className="space-y-4">
           <Separator />
           <SectionGroup
+            fontSize={fontSize}
             title="In-App Notifications"
             icon={Bell}
             description="Receive notifications for new events, open calls, and other helpful updates"
@@ -328,6 +329,7 @@ export const NotificationsSettings = () => {
           </SectionItem> */}
 
             <SectionGroup
+              fontSize={fontSize}
               title="Opportunities"
               icon={ScrollText}
               description="Notifications for new events, open calls, resources, and more"
@@ -384,7 +386,7 @@ export const NotificationsSettings = () => {
                 />
               </SectionItem>
             </SectionGroup>
-            {(isUser || !isAdmin) && (
+            {isUser && (
               <>
                 <Separator />
                 <SectionItem
@@ -406,6 +408,7 @@ export const NotificationsSettings = () => {
             {isAdmin && (
               <>
                 <SectionGroup
+                  fontSize={fontSize}
                   title="Admin"
                   icon={Shield}
                   description="Admin-only notifications
@@ -449,6 +452,7 @@ export const NotificationsSettings = () => {
                   </SectionItem>
                 </SectionGroup>
                 <SectionGroup
+                  fontSize={fontSize}
                   title="Newsletter"
                   icon={Newspaper}
                   description="Notifications for newsletter campaigns, audience, and more"
@@ -475,6 +479,7 @@ export const NotificationsSettings = () => {
                   }}
                 >
                   <SectionGroup
+                    fontSize={fontSize}
                     title="Campaign"
                     icon={Table}
                     description="Newsletter Campaign notifications"
@@ -577,6 +582,7 @@ export const NotificationsSettings = () => {
                     </SectionItem>
                   </SectionGroup>
                   <SectionGroup
+                    fontSize={fontSize}
                     title="Audience"
                     icon={Users2}
                     description="Newsletter Audience notifications"
@@ -653,6 +659,7 @@ export const NotificationsSettings = () => {
                   </SectionGroup>
                 </SectionGroup>
                 <SectionGroup
+                  fontSize={fontSize}
                   title="Online Events"
                   icon={Monitor}
                   description="Receive notifications for registrations and/or cancellations
@@ -712,6 +719,7 @@ export const NotificationsSettings = () => {
                   </SectionItem>
                 </SectionGroup>
                 <SectionGroup
+                  fontSize={fontSize}
                   title="Socials"
                   icon={FaMobileAlt}
                   description="Receive notifications for social media post scheduling
@@ -767,6 +775,7 @@ export const NotificationsSettings = () => {
                   </SectionItem>
                 </SectionGroup>
                 <SectionGroup
+                  fontSize={fontSize}
                   title="Support"
                   icon={HelpCircle}
                   description="Support Notifications

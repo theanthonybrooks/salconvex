@@ -1405,7 +1405,7 @@ export const updateEventStatus = mutation({
     await upsertNotification(ctx, {
       type: "newEvent",
       userId: null,
-      targetRole: "user",
+      targetRole: "all",
       targetUserType: "artist",
       importance: "medium",
       minPlan: 0,
@@ -1450,7 +1450,7 @@ export const approveEvent = mutation({
       await upsertNotification(ctx, {
         type: "newEvent",
         userId: null,
-        targetRole: "user",
+        targetRole: "all",
         targetUserType: "artist",
         importance: "medium",
         minPlan: 0,

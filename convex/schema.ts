@@ -43,6 +43,10 @@ export const userRoleValidator = v.union(
   v.literal("creator"),
 );
 
+export const fullRoleValidator = v.union(userRoleValidator, v.literal("all"));
+export const fullRoleArrayValidator = v.array(fullRoleValidator);
+export type FullRole = Infer<typeof fullRoleArrayValidator>;
+
 export const userRoleArrayValidator = v.array(userRoleValidator);
 export type UserRole = Infer<typeof userRoleArrayValidator>;
 
@@ -82,7 +86,6 @@ export const notificationTypeValidator = v.union(
   v.literal("newFollow"),
   v.literal("newResponse"),
   v.literal("newApplication"),
-  v.literal("newPublishedCall"),
 );
 
 export type NotificationType = Infer<typeof notificationTypeValidator>;
@@ -102,7 +105,7 @@ const notificationsSchema = {
   userId: v.union(v.id("users"), v.null()),
   importance: v.optional(importanceValidator),
   deadline: v.optional(v.number()),
-  targetRole: userRoleValidator,
+  targetRole: fullRoleValidator,
   minPlan: v.optional(v.number()),
   targetUserType: v.optional(accountTypeValidator),
   displayText: v.string(),
@@ -1888,8 +1891,9 @@ export default defineSchema({
       "dismissed",
       "updatedAt",
     ])
-    .index("by_role_dismissed_updatedAt", [
+    .index("by_role_userId_dismissed_updatedAt", [
       "targetRole",
+      "userId",
       "dismissed",
       "updatedAt",
     ])

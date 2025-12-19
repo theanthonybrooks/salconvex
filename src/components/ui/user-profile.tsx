@@ -74,7 +74,7 @@ export function UserProfile({
 
   return (
     <div className={cn("flex items-center gap-4")}>
-      {isAdmin && (
+      {user && (
         <NotificationsDropdown
           open={open}
           setOpen={setOpen}

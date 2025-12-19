@@ -669,7 +669,7 @@ export const changeOCStatus = mutation({
       await upsertNotification(ctx, {
         type: "newOpenCall",
         userId: null,
-        targetRole: "user",
+        targetRole: "all",
         targetUserType: "artist",
         importance: "medium",
         minPlan: 2,
@@ -746,7 +746,7 @@ export const createOpenCallNotification = mutation({
     await upsertNotification(ctx, {
       type: "newOpenCall",
       userId: null,
-      targetRole: "user",
+      targetRole: "all",
       targetUserType: "artist",
       importance: "medium",
       minPlan: 2,

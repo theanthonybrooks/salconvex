@@ -1,12 +1,36 @@
+import { returnNinetyNinePlus } from "@/constants/numberFns";
+
 import type { User } from "@/types/user";
 import type { FunctionReturnType } from "convex/server";
+import type { IconType } from "react-icons";
 
-import React, { useCallback, useState } from "react";
+import React, { useState } from "react";
 
-import { Archive, Bell } from "lucide-react";
+import { FaMobileAlt } from "react-icons/fa";
+import { MdOutlineSendToMobile } from "react-icons/md";
+import {
+  Archive,
+  ArchiveRestore,
+  Bell,
+  Calendar,
+  CircleAlert,
+  CircleFadingPlus,
+  InfoIcon,
+  ListTodo,
+  MailCheck,
+  MailMinus,
+  MailPlus,
+  Mails,
+  MailWarning,
+  Megaphone,
+  MessageSquareMore,
+  PaintRoller,
+  UserMinus,
+  UserPlus,
+} from "lucide-react";
 
 import type { Id } from "~/convex/_generated/dataModel";
-import type { UserPrefsType } from "~/convex/schema";
+import type { NotificationType, UserPrefsType } from "~/convex/schema";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/components/ui/custom-link";
 import {
@@ -38,11 +62,11 @@ type NotificationsDropdownProps = {
   userPref?: UserPrefsType;
 };
 
-type NotificationsType = FunctionReturnType<
+type NotificationItemsType = FunctionReturnType<
   typeof api.general.notifications.getNotifications
 >;
-type NotificationType =
-  NonNullable<NotificationsType>["userNotifications"][number];
+type NotificationItemType =
+  NonNullable<NotificationItemsType>["userNotifications"][number];
 
 export const NotificationsDropdown = ({
   open,
@@ -55,64 +79,40 @@ export const NotificationsDropdown = ({
   userPref,
 }: NotificationsDropdownProps) => {
   // const [pending, setPending] = useState(false);
-  const [optimisticallyClearedAt, setOptimisticallyClearedAt] = useState<
-    number | null
-  >(null);
+
   const isAdmin = user.role.includes("admin");
   // const isCreator = user.role.includes("creator");
   const isArtist = user.accountType?.includes("artist");
   const isOrganizer = user.accountType?.includes("organizer");
   const [activeTab, setActiveTab] = useState("all");
 
-  const isVisible = useCallback(
-    (n: NotificationType): boolean => {
-      if (!optimisticallyClearedAt) return true;
-      return n._creationTime > optimisticallyClearedAt;
-    },
-    [optimisticallyClearedAt],
-  );
-
   const notificationsData = useQuery(
     api.general.notifications.getNotifications,
     user ? {} : "skip",
   );
-  const { userNotifications, roleNotifications, dismissedNotifications } =
-    notificationsData ?? {};
+  const { userNotifications, dismissedNotifications } = notificationsData ?? {};
 
-  const adminNotifications = (
-    isAdmin
-      ? (roleNotifications?.filter((n) => n.targetRole === "admin") ?? [])
-      : []
-  ).filter(isVisible);
-  const artistNotifications = (
-    isArtist
-      ? (roleNotifications?.filter((n) => n.targetUserType === "artist") ?? [])
-      : []
-  ).filter(isVisible);
-  const organizerNotifications = (
-    isOrganizer
-      ? (roleNotifications?.filter((n) => n.targetUserType === "organizer") ??
-        [])
-      : []
-  ).filter(isVisible);
+  const adminNotifications = isAdmin
+    ? (userNotifications?.filter((n) => n.targetRole === "admin") ?? [])
+    : [];
+  const artistNotifications = isArtist
+    ? (userNotifications?.filter((n) => n.targetUserType === "artist") ?? [])
+    : [];
+  const organizerNotifications = isOrganizer
+    ? (userNotifications?.filter((n) => n.targetUserType === "organizer") ?? [])
+    : [];
 
-  console.log(userNotifications);
-
-  const visibleUserNotifications = userNotifications?.filter(isVisible) ?? [];
-  const allNotifications = [
-    ...visibleUserNotifications,
-    ...adminNotifications,
-    ...artistNotifications,
-    ...organizerNotifications,
-  ];
+  const visibleUserNotifications = userNotifications ?? [];
 
   const userDismissedNotifications = [...(dismissedNotifications ?? [])];
 
-  const sortByUpdatedAtDesc = (a: NotificationType, b: NotificationType) =>
-    b.updatedAt - a.updatedAt;
+  const sortByUpdatedAtDesc = (
+    a: NotificationItemType,
+    b: NotificationItemType,
+  ) => b.updatedAt - a.updatedAt;
 
   const uniqueNotifications = Array.from(
-    new Map(allNotifications.map((n) => [n._id, n])).values(),
+    new Map(visibleUserNotifications.map((n) => [n._id, n])).values(),
   ).sort(sortByUpdatedAtDesc);
 
   const hasUnreadNotifications = uniqueNotifications.length > 0;
@@ -132,11 +132,11 @@ export const NotificationsDropdown = ({
     notificationId?: Id<"notifications">,
   ) => {
     try {
-      if (!notificationId) setOptimisticallyClearedAt(Date.now());
+      // if (!notificationId) setOptimisticallyClearedAt(Date.now());
       await clearNotifications({ notificationId });
     } catch (error) {
       console.error("Failed to clear notifications:", error);
-      setOptimisticallyClearedAt(null);
+      // setOptimisticallyClearedAt(null);
     }
   };
   const handleTabChange = (value: string) => {
@@ -166,8 +166,13 @@ export const NotificationsDropdown = ({
           >
             <Bell className="size-6" />
             {totalPending > 0 && (
-              <div className="absolute right-0 top-0 flex size-5 items-center justify-center rounded-full border-1.5 border-salPinkDark bg-salPinkMed text-2xs font-semibold text-card hover:scale-105 hover:cursor-pointer">
-                {totalPending}
+              <div
+                className={cn(
+                  "absolute right-0 top-0 flex h-5 min-w-5 items-center justify-center rounded-full border-1.5 border-salPinkDark bg-salPinkMed text-2xs font-semibold text-card hover:scale-105 hover:cursor-pointer",
+                  totalPending > 99 && "-right-1 px-0.5",
+                )}
+              >
+                {returnNinetyNinePlus(totalPending)}
               </div>
             )}
           </Button>
@@ -186,11 +191,11 @@ export const NotificationsDropdown = ({
           Notifications
         </DropdownMenuLabel>
         <Tabs value={activeTab} onValueChange={handleTabChange}>
-          <TabsList className="scrollable invis h-12 w-full max-w-full justify-around border-none p-0 md:w-auto md:justify-start">
+          <TabsList className="scrollable invis h-12 w-full max-w-full justify-around border-none p-0 md:justify-start">
             <TabsTrigger
               value="all"
               variant="underline"
-              className={cn("", fontSize)}
+              className={cn("min-w-20", fontSize)}
             >
               All <NotificationCount count={uniqueNotifications.length} />
             </TabsTrigger>
@@ -199,7 +204,7 @@ export const NotificationsDropdown = ({
               <TabsTrigger
                 value="admin"
                 variant="underline"
-                className={cn("", fontSize)}
+                className={cn("min-w-20 max-w-25", fontSize)}
               >
                 Admin <NotificationCount count={adminNotifications.length} />
               </TabsTrigger>
@@ -209,7 +214,7 @@ export const NotificationsDropdown = ({
               <TabsTrigger
                 value="artist"
                 variant="underline"
-                className={cn("", fontSize)}
+                className={cn("min-w-20 max-w-30", fontSize)}
               >
                 Artist <NotificationCount count={artistNotifications.length} />
               </TabsTrigger>
@@ -218,7 +223,7 @@ export const NotificationsDropdown = ({
               <TabsTrigger
                 value="organizer"
                 variant="underline"
-                className={cn("", fontSize)}
+                className={cn("min-w-25", fontSize)}
               >
                 Organizer{" "}
                 <NotificationCount count={organizerNotifications.length} />
@@ -334,33 +339,35 @@ export const NotificationsDropdown = ({
           </TabsContent>
         </Tabs>
 
-        {hasUnreadNotifications && (
-          <>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup className="flex w-full justify-between px-2 pb-2 pt-4">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handleClearNotifications()}
-              >
-                Mark all as read
-              </Button>
-              <Button
-                variant="link"
-                size="sm"
-                asChild
-                // className="hover:scale-[1.025]"
-              >
-                <Link
-                  href="/dashboard/settings/notifications"
-                  variant="standard"
-                >
-                  Manage Notifications
-                </Link>
-              </Button>
-            </DropdownMenuGroup>
-          </>
-        )}
+        <DropdownMenuSeparator />
+        <DropdownMenuGroup
+          className={cn(
+            "flex w-full px-2",
+            hasUnreadNotifications
+              ? "justify-between pb-2 pt-4"
+              : "justify-end pt-2",
+          )}
+        >
+          {hasUnreadNotifications && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleClearNotifications()}
+            >
+              Mark all as read
+            </Button>
+          )}
+          <Button
+            variant="link"
+            size="sm"
+            asChild
+            // className="hover:scale-[1.025]"
+          >
+            <Link href="/dashboard/settings/notifications" variant="standard">
+              Manage Notifications
+            </Link>
+          </Button>
+        </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>
   );
@@ -371,11 +378,25 @@ const NotificationDropdownItem = ({
   handleClearNotifications,
   archived,
 }: {
-  notification: NotificationType;
+  notification: NotificationItemType;
   handleClearNotifications: (notificationId?: Id<"notifications">) => void;
   archived?: boolean;
 }) => {
-  const date = new Date(notification.updatedAt ?? notification._creationTime);
+  const {
+    _id: id,
+    type,
+    // userId,
+    // targetRole,
+    // targetUserType,
+    // dedupeKey,
+    displayText,
+    _creationTime: createdAt,
+    updatedAt,
+  } = notification;
+  const unarchive = useMutation(
+    api.general.notifications.unarchiveNotification,
+  );
+  const date = new Date(updatedAt ?? createdAt);
 
   const datePart = date.toLocaleDateString(undefined, {
     day: "numeric",
@@ -388,27 +409,67 @@ const NotificationDropdownItem = ({
     minute: "2-digit",
   });
 
+  const notificationTypeIconMap: Record<NotificationType, IconType> = {
+    newEvent: Calendar,
+    newOpenCall: Megaphone,
+    newResource: Bell,
+    //
+    account: InfoIcon,
+    newSubmission: CircleFadingPlus,
+    newTaskAssignment: ListTodo,
+    newSac: PaintRoller,
+    //
+    newOERegistration: UserPlus,
+    newOECancellation: UserMinus,
+    //
+    newSupport: CircleAlert,
+    supportUpdated: CircleAlert,
+    //
+    newSocial: FaMobileAlt,
+    socialUpdated: MdOutlineSendToMobile,
+    //
+    campaignCreated: Mails,
+    campaignCompleted: MailCheck,
+    campaignFailed: MailWarning,
+    audienceSubscribed: MailPlus,
+    audienceUnsubscribed: MailMinus,
+    //
+    newMessage: MessageSquareMore,
+    newFollow: Bell,
+    newResponse: Bell,
+    newApplication: Bell,
+  };
+
+  const Icon = notificationTypeIconMap[type];
+
   return (
-    <DropdownMenuItem key={notification._id} className="group w-full" asChild>
+    <DropdownMenuItem key={id} className="group w-full" asChild>
       <Link
-        key={notification._id}
+        key={id}
         href={notification.redirectUrl ?? "/thelist/notifications"}
         className="items-start justify-between"
         onClick={() => {
           if (archived) return;
-          handleClearNotifications(notification._id);
+          handleClearNotifications(id);
         }}
       >
-        <div className="flex flex-col gap-1">
-          <p className="line-clamp-2 font-medium">{notification.displayText}</p>
-          <p className="text-xs text-foreground/50">
-            {`${datePart} · ${timePart}`}
-          </p>
+        <div className="flex gap-3">
+          {Icon && <Icon className="mt-1 size-4 shrink-0" />}
+          <div className="flex flex-col gap-1">
+            <p className="line-clamp-2 font-medium">
+              {displayText}
+              {/* {dedupeKey}-{userId} */}
+            </p>
+            <p className="text-xs text-foreground/50">
+              {`${datePart} · ${timePart}`}
+            </p>
+          </div>
         </div>
-
-        <TooltipSimple content="Archive" className="z-top">
+        <TooltipSimple
+          content={archived ? "Unarchive" : "Archive"}
+          className="z-top"
+        >
           <Button
-            disabled={archived}
             variant="icon"
             size="sm"
             className={cn(
@@ -417,10 +478,14 @@ const NotificationDropdownItem = ({
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              handleClearNotifications(notification._id);
+              if (archived) {
+                unarchive({ notificationId: id });
+              } else {
+                handleClearNotifications(id);
+              }
             }}
           >
-            <Archive size={16} />
+            {archived ? <ArchiveRestore size={16} /> : <Archive size={16} />}
           </Button>
         </TooltipSimple>
       </Link>
@@ -437,8 +502,14 @@ const EmptyNotifications = ({ type }: { type?: string }) => (
 const NotificationCount = ({ count }: { count: number }) => {
   if (count === 0) return null;
   return (
-    <p className="ml-2 flex size-5 items-center justify-center rounded-lg border-1.5 border-salPinkDark bg-salPinkLt text-2xs font-semibold text-foreground">
-      {count}
+    <p
+      className={cn(
+        "ml-2 flex h-5 min-w-5 items-center justify-center rounded-lg border-1.5 border-salPinkDark bg-salPinkLt text-2xs font-semibold text-foreground",
+        count === 0 && "invisible",
+        count > 99 && "px-0.5",
+      )}
+    >
+      {returnNinetyNinePlus(count)}
     </p>
   );
 };
