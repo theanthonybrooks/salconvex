@@ -33,7 +33,6 @@ export function isNotificationEnabled(
 ): boolean {
   if (Object.keys(prefs).length === 0) return false;
   let enabled: boolean = false;
-  console.log("prefs: ", prefs);
   switch (type) {
     // public
     case "newEvent":
@@ -107,7 +106,6 @@ export function isNotificationEnabled(
       enabled = false;
       break;
   }
-  console.log("enabled: ", enabled, type);
   return enabled;
 }
 

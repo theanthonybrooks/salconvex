@@ -1841,6 +1841,7 @@ export default defineSchema({
     .index("by_notifications_general", ["notifications.general"])
     .index("by_notifications_newsletter", ["notifications.newsletter"])
     .index("by_notifications_applications", ["notifications.applications"])
+    .index("by_lastUpdated", ["lastUpdated"])
     .index("by_userId", ["userId"]),
 
   newsletter: defineTable(newsletterSchema)

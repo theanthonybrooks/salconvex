@@ -72,7 +72,7 @@ export const updateSocialPostPlannedDate = mutation({
     });
 
     await upsertNotification(ctx, {
-      type: "newSocial",
+      type: "socialUpdated",
       userId: null,
       targetRole: "admin",
       importance: "medium",

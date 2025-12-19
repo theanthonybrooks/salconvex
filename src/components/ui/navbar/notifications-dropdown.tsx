@@ -7,12 +7,12 @@ import type { IconType } from "react-icons";
 import React, { useState } from "react";
 
 import { FaMobileAlt } from "react-icons/fa";
-import { MdOutlineSendToMobile } from "react-icons/md";
 import {
   Archive,
   ArchiveRestore,
   Bell,
   Calendar,
+  CalendarCheck,
   CircleAlert,
   CircleFadingPlus,
   InfoIcon,
@@ -441,7 +441,7 @@ const NotificationDropdownItem = ({
     supportUpdated: CircleAlert,
     //
     newSocial: FaMobileAlt,
-    socialUpdated: MdOutlineSendToMobile,
+    socialUpdated: CalendarCheck,
     //
     campaignCreated: Mails,
     campaignCompleted: MailCheck,

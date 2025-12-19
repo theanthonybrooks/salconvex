@@ -26,7 +26,7 @@ function needsLowercase(value: string): boolean {
 export const addDefaultInAppNotifications = migrations.define({
   table: "userPreferences",
   migrateOne: async (ctx, userPref) => {
-    if (userPref.notifications?.inAppNotifications) return;
+    if (userPref.notifications?.inAppNotifications.events) return;
     const userPrefs = await ctx.db.get(userPref._id);
     if (!userPrefs) return;
     const userNotifications = userPrefs.notifications;
@@ -34,7 +34,10 @@ export const addDefaultInAppNotifications = migrations.define({
       notifications: {
         ...userNotifications,
         inAppNotifications: {
-          account: true,
+          ...(userNotifications?.inAppNotifications ?? {}),
+          events: true,
+          openCalls: true,
+          resources: true,
         },
       },
     });

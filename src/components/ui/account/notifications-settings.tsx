@@ -739,7 +739,7 @@ export const NotificationsSettings = () => {
                 >
                   <SectionItem
                     icon={Bell}
-                    title="Scheduled"
+                    title="Scheduled Posts"
                     description="Receive notifications when posts are scheduled"
                     fontSize={fontSize}
                   >
@@ -757,7 +757,7 @@ export const NotificationsSettings = () => {
                   </SectionItem>
                   <SectionItem
                     icon={Bell}
-                    title="Unscheduled"
+                    title="Unscheduled Posts"
                     description="Receive notifications when new posts are added to the queue"
                     fontSize={fontSize}
                   >
