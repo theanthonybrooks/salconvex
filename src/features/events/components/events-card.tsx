@@ -1,4 +1,7 @@
-import { noProdCategories } from "@/constants/eventConsts";
+import {
+  hasProductionCategories,
+  noProdCategories,
+} from "@/constants/eventConsts";
 
 import { EventData } from "@/types/eventTypes";
 
@@ -93,26 +96,7 @@ export const EventCard = ({
                 </AccordionContent>
               </AccordionItem>
             )}
-            {/* {event.blurb && !event.about && (
-              <AccordionItem value="about">
-                <AccordionTrigger title="About:" fontSize={fontSize} />
-                <AccordionContent>
-                  <p className={cn("mb-4 pb-3", fontSize)}>{event.blurb}</p>
-                </AccordionContent>
-              </AccordionItem>
-            )}
 
-            {event.about && (
-              <AccordionItem value="about">
-                <AccordionTrigger title="About:" fontSize={fontSize} />
-
-                <AccordionContent>
-                  <div className="mb-4 flex flex-col space-y-3 pb-3">
-                    <RichTextDisplay html={event.about} fontSize={fontSize} />
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-            )} */}
             {(event.about || event.blurb) && (
               <AccordionItem value="about">
                 <AccordionTrigger title="About:" fontSize={fontSize} />
@@ -208,19 +192,6 @@ export const EventCard = ({
               <AccordionTrigger title="Dates:" fontSize={fontSize} />
               <AccordionContent className={cn(fontSize)}>
                 <span className="flex flex-col gap-1">
-                  {/* <p className="flex flex-col items-start gap-1 text-sm">
-                    <span className="font-semibold">Category:</span>
-                    {getEventCategoryLabel(eventCategory)}
-                  </p>
-                  {eventType && eventCategory === "event" && (
-                    <p className="flex flex-col items-start gap-1 text-sm">
-                      <span className="font-semibold">Type:</span>{" "}
-                      {eventType
-                        .map((type) => getEventTypeLabel(type))
-                        .join(" | ")}
-                    </p>
-                  )}
-                  <div className="mt-3 flex flex-col gap-1"> */}
                   {event.dates.eventFormat !== "noEvent" && (
                     <div className="flex flex-col items-start gap-1">
                       <span className="space-x-1 font-semibold">
@@ -235,21 +206,20 @@ export const EventCard = ({
                     </div>
                   )}
 
-                  {((eventCategory === "project" &&
-                    dates.eventFormat === "noEvent") ||
-                    (eventCategory === "event" && prodEnd)) && (
-                    <div className="flex flex-col items-start gap-1">
-                      <span className="space-x-1 font-semibold">
-                        Painting/Production Dates:
-                      </span>
-                      <EventDates
-                        event={event}
-                        format="desktop"
-                        limit={0}
-                        type="production"
-                      />
-                    </div>
-                  )}
+                  {hasProductionCategories.includes(eventCategory) &&
+                    prodEnd && (
+                      <div className="flex flex-col items-start gap-1">
+                        <span className="space-x-1 font-semibold">
+                          Painting/Production Dates:
+                        </span>
+                        <EventDates
+                          event={event}
+                          format="desktop"
+                          limit={0}
+                          type="production"
+                        />
+                      </div>
+                    )}
                   {/* </div> */}
                 </span>
               </AccordionContent>
