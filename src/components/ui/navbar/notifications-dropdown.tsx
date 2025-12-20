@@ -165,7 +165,7 @@ export const NotificationsDropdown = ({
             variant="ghost"
             className={cn("relative size-12.5 rounded-full", className)}
           >
-            <Bell className="size-6" />
+            <Bell className="size-7 sm:size-6" />
             {totalPending > 0 && (
               <div
                 className={cn(
@@ -399,10 +399,10 @@ const NotificationDropdownItem = ({
   const {
     _id: id,
     type,
-    // userId,
+    userId,
     // targetRole,
     // targetUserType,
-    // dedupeKey,
+    dedupeKey,
     displayText,
     _creationTime: createdAt,
     updatedAt,
@@ -472,7 +472,7 @@ const NotificationDropdownItem = ({
           <div className="flex flex-col gap-1">
             <p className="line-clamp-2 font-medium">
               {displayText}
-              {/* {dedupeKey}-{userId} */}
+              {dedupeKey}-{userId}
             </p>
             <p className="text-xs text-foreground/50">
               {`${datePart} · ${timePart}`}

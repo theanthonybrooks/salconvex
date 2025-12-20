@@ -30,7 +30,7 @@ export const init = internalMutation(async (ctx) => {
       minPlan: 0,
       deadline: oneWeekFromToday,
       importance: random <= 0.3 ? "low" : random > 0.7 ? "medium" : "high",
-      displayText: "Random placeholder notification",
+      displayText: `Random placeholder notification ${count}`,
       redirectUrl: "/thelist/notifications",
       dedupeKey: `placeholder-${count}`,
       dismissed: false,
