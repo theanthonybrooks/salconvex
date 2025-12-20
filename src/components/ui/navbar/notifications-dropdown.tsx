@@ -5,6 +5,7 @@ import type { FunctionReturnType } from "convex/server";
 import type { IconType } from "react-icons";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useIsMobile } from "@/hooks/use-media-query";
 
 import { FaMobileAlt } from "react-icons/fa";
@@ -397,6 +398,7 @@ const NotificationDropdownItem = ({
   handleClearNotifications: (notificationId?: Id<"notifications">) => void;
   archived?: boolean;
 }) => {
+  const router = useRouter();
   const isMobile = useIsMobile();
   const {
     _id: id,
@@ -457,38 +459,77 @@ const NotificationDropdownItem = ({
   };
 
   const Icon = notificationTypeIconMap[type];
+  const destinationUrl = notification.redirectUrl ?? "/404";
 
   return (
-    <DropdownMenuItem key={id} className="group w-full" asChild>
-      <Link
-        key={id}
-        href={notification.redirectUrl ?? "/thelist/notifications"}
-        className="items-start justify-between"
-        onClick={() => {
-          if (archived) return;
-          handleClearNotifications(id);
-        }}
-        variant="standard"
-      >
-        <div className="flex gap-3">
-          {Icon && <Icon className="mt-1 size-4 shrink-0" />}
-          <div className="flex flex-col gap-1">
-            <p className="line-clamp-2 font-medium">
-              {displayText}
-              {/* {dedupeKey}-{userId} */}
-            </p>
-            <p className="text-xs text-foreground/50">
-              {`${datePart} · ${timePart}`}
-            </p>
+    <>
+      {isMobile ? (
+        <DropdownMenuItem
+          key={id}
+          className="group w-full"
+          onSelect={() => {
+            if (!archived) handleClearNotifications(id);
+            router.push(destinationUrl);
+          }}
+        >
+          <div className="flex gap-3">
+            {Icon && <Icon className="mt-1 size-4 shrink-0" />}
+            <div className="flex flex-col gap-1">
+              <p className="line-clamp-2 font-medium">
+                {displayText}
+                {/* {dedupeKey}-{userId} */}
+              </p>
+              <p className="text-xs text-foreground/50">
+                {`${datePart} · ${timePart}`}
+              </p>
+            </div>
           </div>
-        </div>
 
-        {((isMobile && archived) || !isMobile) && (
-          <>
+          <div
+            className={cn(
+              "flex h-9 items-center justify-center px-3 transition-opacity duration-200 ease-in-out hover:scale-[1.025] active:scale-975 group-hover:opacity-100 sm:opacity-0",
+            )}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              if (archived) {
+                unarchive({ notificationId: id });
+              } else {
+                handleClearNotifications(id);
+              }
+            }}
+          >
+            {archived ? <ArchiveRestore size={16} /> : <Archive size={16} />}
+          </div>
+        </DropdownMenuItem>
+      ) : (
+        <DropdownMenuItem key={id} className="group w-full" asChild>
+          <Link
+            key={id}
+            href={destinationUrl}
+            className="items-start justify-between"
+            onClick={() => {
+              if (archived) return;
+              handleClearNotifications(id);
+            }}
+            variant="standard"
+          >
+            <div className="flex gap-3">
+              {Icon && <Icon className="mt-1 size-4 shrink-0" />}
+              <div className="flex flex-col gap-1">
+                <p className="line-clamp-2 font-medium">
+                  {displayText}
+                  {/* {dedupeKey}-{userId} */}
+                </p>
+                <p className="text-xs text-foreground/50">
+                  {`${datePart} · ${timePart}`}
+                </p>
+              </div>
+            </div>
+
             <TooltipSimple
               content={archived ? "Unarchive" : "Archive"}
               className="z-top"
-              disabled={isMobile}
             >
               <div
                 className={cn(
@@ -511,10 +552,10 @@ const NotificationDropdownItem = ({
                 )}
               </div>
             </TooltipSimple>
-          </>
-        )}
-      </Link>
-    </DropdownMenuItem>
+          </Link>
+        </DropdownMenuItem>
+      )}
+    </>
   );
 };
 
