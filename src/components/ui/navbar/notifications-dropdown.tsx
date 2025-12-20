@@ -5,6 +5,7 @@ import type { FunctionReturnType } from "convex/server";
 import type { IconType } from "react-icons";
 
 import React, { useState } from "react";
+import { useIsMobile } from "@/hooks/use-media-query";
 
 import { FaMobileAlt } from "react-icons/fa";
 import {
@@ -396,6 +397,7 @@ const NotificationDropdownItem = ({
   handleClearNotifications: (notificationId?: Id<"notifications">) => void;
   archived?: boolean;
 }) => {
+  const isMobile = useIsMobile();
   const {
     _id: id,
     type,
@@ -466,6 +468,7 @@ const NotificationDropdownItem = ({
           if (archived) return;
           handleClearNotifications(id);
         }}
+        variant="standard"
       >
         <div className="flex gap-3">
           {Icon && <Icon className="mt-1 size-4 shrink-0" />}
@@ -479,29 +482,37 @@ const NotificationDropdownItem = ({
             </p>
           </div>
         </div>
-        <TooltipSimple
-          content={archived ? "Unarchive" : "Archive"}
-          className="z-top"
-        >
-          <Button
-            variant="icon"
-            size="sm"
-            className={cn(
-              "opacity-0 transition-opacity duration-200 ease-in-out hover:scale-[1.025] active:scale-975 group-hover:opacity-100",
-            )}
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              if (archived) {
-                unarchive({ notificationId: id });
-              } else {
-                handleClearNotifications(id);
-              }
-            }}
-          >
-            {archived ? <ArchiveRestore size={16} /> : <Archive size={16} />}
-          </Button>
-        </TooltipSimple>
+
+        {((isMobile && archived) || !isMobile) && (
+          <>
+            <TooltipSimple
+              content={archived ? "Unarchive" : "Archive"}
+              className="z-top"
+              disabled={isMobile}
+            >
+              <div
+                className={cn(
+                  "flex h-9 items-center justify-center px-3 transition-opacity duration-200 ease-in-out hover:scale-[1.025] active:scale-975 group-hover:opacity-100 sm:opacity-0",
+                )}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  if (archived) {
+                    unarchive({ notificationId: id });
+                  } else {
+                    handleClearNotifications(id);
+                  }
+                }}
+              >
+                {archived ? (
+                  <ArchiveRestore size={16} />
+                ) : (
+                  <Archive size={16} />
+                )}
+              </div>
+            </TooltipSimple>
+          </>
+        )}
       </Link>
     </DropdownMenuItem>
   );
