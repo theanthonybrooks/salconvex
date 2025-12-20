@@ -289,6 +289,19 @@ export const updateOnlineEventState = mutation({
         displayText: "New Resource Added",
         dedupeKey: `resource-${event._id}-published`,
       });
+    } else {
+      await ctx.scheduler.runAfter(
+        0,
+        internal.general.notifications.runUpdateOrDeleteByDedupeKey,
+        {
+          dedupeKey: `resource-${event._id}-published`,
+          numItems: 100,
+          mode: "patch",
+          patch: {
+            dismissed: true,
+          },
+        },
+      );
     }
 
     return event;

@@ -634,10 +634,22 @@ export const updateOrDeleteByDedupeKeyBatch = internalMutation({
   handler: async (ctx, args) => {
     const { dedupeKey, cursor, numItems, mode, patch } = args;
 
-    const page = await ctx.db
-      .query("notifications")
-      .withIndex("by_dedupeKey_userId", (q) => q.eq("dedupeKey", dedupeKey))
-      .paginate({ cursor, numItems });
+    let page;
+    if (mode === "patch") {
+      page = await ctx.db
+        .query("notifications")
+        .withIndex("by_dedupeKey_dismissed", (q) =>
+          q.eq("dedupeKey", dedupeKey).eq("dismissed", false),
+        )
+        .paginate({ cursor, numItems });
+    } else {
+      page = await ctx.db
+        .query("notifications")
+        .withIndex("by_dedupeKey_dismissed", (q) =>
+          q.eq("dedupeKey", dedupeKey),
+        )
+        .paginate({ cursor, numItems });
+    }
 
     await Promise.all(
       page.page.map(async (n) => {

@@ -684,6 +684,14 @@ export const changeOCStatus = mutation({
         displayText: "New Open Call Added",
         dedupeKey: `oc-${oc._id}-published`,
       });
+      if (prevEvent.category === "event") {
+        await upsertNotification(ctx, {
+          type: "newEvent",
+          displayText: "New Event Added",
+          redirectUrl: `/thelist/event/${prevEvent.slug}/${prevEvent.dates.edition}`,
+          dedupeKey: `event-${prevEvent._id}-added`,
+        });
+      }
     } else {
       await ctx.db.patch(eventId, {
         lastEditedAt: Date.now(),
@@ -700,6 +708,17 @@ export const changeOCStatus = mutation({
           patch: {
             dismissed: true,
           },
+        },
+      );
+    }
+    if (outputState === "submitted") {
+      await ctx.scheduler.runAfter(
+        0,
+        internal.general.notifications.runUpdateOrDeleteByDedupeKey,
+        {
+          dedupeKey: `oc-${oc._id}-published`,
+          numItems: 100,
+          mode: "delete",
         },
       );
     }

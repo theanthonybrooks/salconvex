@@ -1488,20 +1488,51 @@ export const reactivateEvent = mutation({
       lastEditedBy: userId,
       approvedBy: undefined,
     });
-
-    const oc = await ctx.db
-      .query("openCalls")
-      .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
-      .first();
-    if (oc) {
-      await ctx.db.patch(oc._id, {
-        state: eventState,
-        lastUpdatedAt: Date.now(),
-        lastUpdatedBy: userId,
-      });
-      const newOC = await ctx.db.get(oc._id);
-      if (newOC) await openCallsAggregate.replaceOrInsert(ctx, oc, newOC);
+    if (event.category === "event") {
+      if (eventState === "published") {
+        await upsertNotification(ctx, {
+          type: "newEvent",
+          displayText: "New Event Added",
+          redirectUrl: `/thelist/event/${event.slug}/${event.dates.edition}`,
+          dedupeKey: `event-${event._id}-added`,
+        });
+      } else {
+        await upsertNotification(ctx, {
+          type: "newSubmission",
+          targetRole: "admin",
+          importance: "high",
+          redirectUrl: `/thelist/event/${event.slug}/${event.dates.edition}`,
+          displayText: "New Event Submission",
+          dedupeKey: `event-${event._id}-submitted`,
+        });
+      }
     }
+
+    // const oc = await ctx.db
+    //   .query("openCalls")
+    //   .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
+    //   .first();
+    // if (oc) {
+    //   const ocEnd = oc.basicInfo?.dates?.ocEnd
+    //     ? new Date(oc.basicInfo.dates.ocEnd)
+    //     : null;
+    //   await ctx.db.patch(oc._id, {
+    //     state: eventState,
+    //     lastUpdatedAt: Date.now(),
+    //     lastUpdatedBy: userId,
+    //   });
+    //   const newOC = await ctx.db.get(oc._id);
+    //   if (newOC) await openCallsAggregate.replaceOrInsert(ctx, oc, newOC);
+    //   await upsertNotification(ctx, {
+    //     type: "newOpenCall",
+    //     targetUserType: "artist",
+    //     minPlan: 2,
+    //     deadline: ocEnd ? ocEnd.getTime() : undefined,
+    //     displayText: "New Open Call Added",
+    //     redirectUrl: `/thelist/event/${event.slug}/${event.dates.edition}/call`,
+    //     dedupeKey: `oc-${oc._id}-published`,
+    //   });
+    // }
     const newDoc = await ctx.db.get(event._id);
     if (newDoc) await eventsAggregate.replaceOrInsert(ctx, oldDoc, newDoc);
 
@@ -1666,7 +1697,6 @@ export const deleteEvent = mutation({
     if (event.state !== "draft" && !isAdmin) {
       throw new ConvexError("Active events cannot be deleted, only archived");
     }
-    console.log("attempting to delete event");
     const organization = await ctx.db.get(event.mainOrgId);
     if (!organization) throw new ConvexError("Organization not found");
     const orgLogoStorageId = organization.logoStorageId;
