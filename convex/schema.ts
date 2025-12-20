@@ -103,13 +103,14 @@ const notificationsSchema = {
   dedupeKey: v.string(),
   dismissed: v.boolean(),
   userId: v.union(v.id("users"), v.null()),
-  importance: v.optional(importanceValidator),
-  deadline: v.optional(v.number()),
+  importance: importanceValidator,
+  deadline: v.number(),
   targetRole: fullRoleValidator,
-  minPlan: v.optional(v.number()),
+  minPlan: v.number(),
   targetUserType: v.optional(accountTypeValidator),
   displayText: v.string(),
-  redirectUrl: v.optional(v.string()),
+  description: v.optional(v.string()),
+  redirectUrl: v.string(),
   updatedAt: v.number(),
 };
 
@@ -1695,7 +1696,6 @@ export default defineSchema({
     .index("by_mainOrgId", ["mainOrgId"])
     .index("by_budget", ["compensation.budget.min"])
     .index("by_endDate", ["basicInfo.dates.ocEnd"])
-    .index("by_state", ["state"])
     .index("by_state_approvedAt", ["state", "approvedAt"])
     .index("by_state_ocEnd", ["state", "basicInfo.dates.ocEnd"])
     .index("by_eligibility", ["eligibility.type"]),
@@ -1898,9 +1898,9 @@ export default defineSchema({
       "dismissed",
       "updatedAt",
     ])
-
+    .index("by_deadline", ["deadline"])
     .index("by_type", ["type"])
-    .index("by_dedupeKey", ["dedupeKey"])
+    .index("by_dedupeKey_userId", ["dedupeKey", "userId"])
     .index("by_dismissed", ["dismissed"]),
 });
 

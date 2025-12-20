@@ -121,7 +121,7 @@ export const getSubmittedOpenCallCount = query({
       throw new ConvexError("You don't have permission to view this");
     const openCalls = await ctx.db
       .query("openCalls")
-      .withIndex("by_state", (q) => q.eq("state", "submitted"))
+      .withIndex("by_state_ocEnd", (q) => q.eq("state", "submitted"))
       .collect();
 
     return openCalls.length;
@@ -134,7 +134,9 @@ export const archiveExpiredOpenCalls = internalMutation({
     const now = new Date().toISOString();
     const openCalls = await ctx.db
       .query("openCalls")
-      .withIndex("by_state", (q) => q.eq("state", "published"))
+      .withIndex("by_state_ocEnd", (q) =>
+        q.eq("state", "published").lte("basicInfo.dates.ocEnd", now),
+      )
       .collect();
 
     // console.log(now);
@@ -357,12 +359,11 @@ export const updateOpenCall = mutation({
     if (!ocApproved && openCallState === "submitted") {
       await upsertNotification(ctx, {
         type: "newSubmission",
-        userId: null,
         targetRole: "admin",
         importance: "high",
         redirectUrl: `/dashboard/admin/submissions?_id=${args.eventId}`,
         displayText: "New Open Call Submitted",
-        dedupeKey: `oc-${args.eventId}-added`,
+        dedupeKey: `oc-${existingOpenCall._id}-submitted`,
       });
     }
 
@@ -417,7 +418,7 @@ export const getPublishedOpenCalls = query({
   handler: async (ctx) => {
     const openCalls = await ctx.db
       .query("openCalls")
-      .withIndex("by_state", (q) => q.eq("state", "published"))
+      .withIndex("by_state_ocEnd", (q) => q.eq("state", "published"))
       .collect();
 
     return openCalls;
@@ -616,6 +617,15 @@ export const deleteOC = mutation({
       await ctx.db.delete(openCall._id);
       await openCallsAggregate.delete(ctx, openCall);
     }
+    await ctx.scheduler.runAfter(
+      0,
+      internal.general.notifications.runUpdateOrDeleteByDedupeKey,
+      {
+        dedupeKey: `oc-${openCall._id}-published`,
+        numItems: 100,
+        mode: "delete",
+      },
+    );
 
     return { openCall };
   },
@@ -668,19 +678,30 @@ export const changeOCStatus = mutation({
       });
       await upsertNotification(ctx, {
         type: "newOpenCall",
-        userId: null,
-        targetRole: "all",
         targetUserType: "artist",
-        importance: "medium",
         minPlan: 2,
         redirectUrl: `/thelist/event/${prevEvent.slug}/${prevEvent.dates.edition}/call`,
         displayText: "New Open Call Added",
-        dedupeKey: `oc-${oc._id}-added`,
+        dedupeKey: `oc-${oc._id}-published`,
       });
     } else {
       await ctx.db.patch(eventId, {
         lastEditedAt: Date.now(),
       });
+    }
+    if (outputState === "archived") {
+      await ctx.scheduler.runAfter(
+        0,
+        internal.general.notifications.runUpdateOrDeleteByDedupeKey,
+        {
+          dedupeKey: `oc-${oc._id}-published`,
+          numItems: 100,
+          mode: "patch",
+          patch: {
+            dismissed: true,
+          },
+        },
+      );
     }
 
     const newEvent = await ctx.db.get(eventId);
@@ -692,6 +713,7 @@ export const changeOCStatus = mutation({
       approvedBy: approvedBy,
       approvedAt: Date.now(),
     });
+
     const newOC = await ctx.db.get(oc._id);
     if (newOC) await openCallsAggregate.replaceOrInsert(ctx, oc, newOC);
     if (newOC?.approvedAt) {
@@ -734,25 +756,25 @@ export const getOpenCallAppLink = query({
   },
 });
 
-export const createOpenCallNotification = mutation({
-  args: {
-    mode: v.union(v.literal("publish"), v.literal("submit")),
-    eventSlug: v.string(),
-    edition: v.number(),
-    openCallId: v.id("openCalls"),
-  },
-  handler: async (ctx, args) => {
-    const { mode, eventSlug, edition, openCallId } = args;
-    await upsertNotification(ctx, {
-      type: "newOpenCall",
-      userId: null,
-      targetRole: "all",
-      targetUserType: "artist",
-      importance: "medium",
-      minPlan: 2,
-      redirectUrl: `/thelist/event/${eventSlug}/${edition}/call`,
-      displayText: "New Open Call Added",
-      dedupeKey: `oc-${openCallId}-added`,
-    });
-  },
-});
+// export const createOpenCallNotification = mutation({
+//   args: {
+//     mode: v.union(v.literal("publish"), v.literal("submit")),
+//     eventSlug: v.string(),
+//     edition: v.number(),
+//     openCallId: v.id("openCalls"),
+//   },
+//   handler: async (ctx, args) => {
+//     const { mode, eventSlug, edition, openCallId } = args;
+//     await upsertNotification(ctx, {
+//       type: "newOpenCall",
+//       userId: null,
+//       targetRole: "all",
+//       targetUserType: "artist",
+//       importance: "medium",
+//       minPlan: 2,
+//       redirectUrl: `/thelist/event/${eventSlug}/${edition}/call`,
+//       displayText: "New Open Call Added",
+//       dedupeKey: `oc-${openCallId}-added`,
+//     });
+//   },
+// });

@@ -62,7 +62,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
   const fontSizePref = getUserFontSizePref(userPref?.fontSize);
   const fontSize = fontSizePref?.body;
   const isArtist = user?.accountType?.includes("artist");
-  const isAdmin = user?.role?.includes("admin");
+  const isAdmin = user?.role?.includes("admin") || false;
   const isCreator = user?.role?.includes("creator");
   const hasActiveSubscription =
     (subData?.hasActiveSubscription || isAdmin) ?? false;
@@ -82,6 +82,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
     slug,
     mainOrgId,
     state: eventState,
+    adminNote,
   } = event;
 
   const manualApplied = application?.manualApplied ?? false;
@@ -502,6 +503,9 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
         <div className="flex min-h-20 w-full flex-col rounded-2xl border border-dotted border-foreground/50 bg-card-secondary p-4 white:bg-card">
           {(isAdmin || isUserOrg) && (
             <DraftPendingBanner
+              admin={{
+                adminNote,
+              }}
               format="desktop"
               openCallState={openCallState}
               eventState={eventState}

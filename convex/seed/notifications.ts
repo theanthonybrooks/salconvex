@@ -1,5 +1,7 @@
 import { randomNotificationType } from "@/constants/notificationConsts";
 
+import { addWeeks } from "date-fns";
+
 import { internalMutation } from "~/convex/_generated/server";
 
 export const init = internalMutation(async (ctx) => {
@@ -13,6 +15,8 @@ export const init = internalMutation(async (ctx) => {
 
   for (let count = existing.length; count < 205; count++) {
     const random = Math.random();
+    const today = new Date();
+    const oneWeekFromToday = addWeeks(today, 1).getTime();
 
     await ctx.db.insert("notifications", {
       type: randomNotificationType(),
@@ -23,6 +27,8 @@ export const init = internalMutation(async (ctx) => {
       //   targetRole: "admin",
       targetUserType: undefined,
       // random <= 0.3 ? "artist" : random > 0.7 ? "organizer" : undefined,
+      minPlan: 0,
+      deadline: oneWeekFromToday,
       importance: random <= 0.3 ? "low" : random > 0.7 ? "medium" : "high",
       displayText: "Random placeholder notification",
       redirectUrl: "/thelist/notifications",

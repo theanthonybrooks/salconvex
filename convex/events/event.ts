@@ -471,7 +471,7 @@ export const getSubmittedEvents = query({
         .collect(),
       ctx.db
         .query("openCalls")
-        .withIndex("by_state", (q) => q.eq("state", "submitted"))
+        .withIndex("by_state_ocEnd", (q) => q.eq("state", "submitted"))
         .collect(),
     ]);
 
@@ -1364,7 +1364,6 @@ export const createOrUpdateEvent = mutation({
     if (eventState === "submitted") {
       await upsertNotification(ctx, {
         type: "newSubmission",
-        userId: null,
         targetRole: "admin",
         importance: "high",
         redirectUrl: `/thelist/event/${args.slug}/${args.dates.edition}`,
@@ -1402,17 +1401,14 @@ export const updateEventStatus = mutation({
       approvedBy: userId,
       approvedAt: Date.now(),
     });
-    await upsertNotification(ctx, {
-      type: "newEvent",
-      userId: null,
-      targetRole: "all",
-      targetUserType: "artist",
-      importance: "medium",
-      minPlan: 0,
-      redirectUrl: `/thelist/event/${event.slug}/${event.dates.edition}`,
-      displayText: "New Event Added",
-      dedupeKey: `event-${event._id}-added`,
-    });
+    if (event.category === "event") {
+      await upsertNotification(ctx, {
+        type: "newEvent",
+        redirectUrl: `/thelist/event/${event.slug}/${event.dates.edition}`,
+        displayText: "New Event Added",
+        dedupeKey: `event-${event._id}-added`,
+      });
+    }
     const newDoc = await ctx.db.get(event._id);
     if (newDoc) await eventsAggregate.replaceOrInsert(ctx, oldDoc, newDoc);
     await ctx.runMutation(internal.events.eventLookup.addUpdateEventLookup, {
@@ -1449,11 +1445,7 @@ export const approveEvent = mutation({
     if (event.category === "event") {
       await upsertNotification(ctx, {
         type: "newEvent",
-        userId: null,
-        targetRole: "all",
         targetUserType: "artist",
-        importance: "medium",
-        minPlan: 0,
         redirectUrl: `/thelist/event/${event.slug}/${event.dates.edition}`,
         displayText: "New Event Published",
         dedupeKey: `event-${event._id}-published`,
@@ -1544,6 +1536,18 @@ export const archiveEvent = mutation({
       const newOpenCall = await ctx.db.get(openCall._id);
       if (newOpenCall)
         await openCallsAggregate.replaceOrInsert(ctx, oldOpenCall, newOpenCall);
+      await ctx.scheduler.runAfter(
+        0,
+        internal.general.notifications.runUpdateOrDeleteByDedupeKey,
+        {
+          dedupeKey: `oc-${openCall._id}-published`,
+          numItems: 100,
+          mode: "patch",
+          patch: {
+            dismissed: true,
+          },
+        },
+      );
     }
 
     const oldDoc = event;
@@ -1552,6 +1556,20 @@ export const archiveEvent = mutation({
       lastEditedAt: Date.now(),
       lastEditedBy: userId,
     });
+    if (event.category === "event") {
+      await ctx.scheduler.runAfter(
+        0,
+        internal.general.notifications.runUpdateOrDeleteByDedupeKey,
+        {
+          dedupeKey: `event-${event._id}-added`,
+          numItems: 100,
+          mode: "patch",
+          patch: {
+            dismissed: true,
+          },
+        },
+      );
+    }
     const newDoc = await ctx.db.get(event._id);
     if (newDoc) await eventsAggregate.replaceOrInsert(ctx, oldDoc, newDoc);
     await ctx.runMutation(internal.events.eventLookup.addUpdateEventLookup, {
@@ -1661,6 +1679,15 @@ export const deleteEvent = mutation({
 
       await ctx.db.delete(openCall._id);
       await openCallsAggregate.deleteIfExists(ctx, openCall);
+      await ctx.scheduler.runAfter(
+        0,
+        internal.general.notifications.runUpdateOrDeleteByDedupeKey,
+        {
+          dedupeKey: `oc-${openCall._id}-published`,
+          numItems: 100,
+          mode: "delete",
+        },
+      );
     }
 
     if (event.logoStorageId && event.logoStorageId !== orgLogoStorageId) {
@@ -1675,7 +1702,17 @@ export const deleteEvent = mutation({
     await ctx.runMutation(internal.events.eventLookup.deleteEventLookup, {
       eventId: event._id,
     });
-
+    if (event.category === "event") {
+      await ctx.scheduler.runAfter(
+        0,
+        internal.general.notifications.runUpdateOrDeleteByDedupeKey,
+        {
+          dedupeKey: `event-${event._id}-added`,
+          numItems: 100,
+          mode: "delete",
+        },
+      );
+    }
     return { event };
   },
 });

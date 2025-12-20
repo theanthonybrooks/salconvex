@@ -57,10 +57,8 @@ export const upsertManyBySacIdInternal = internalMutation({
     if (insertCount > 0) {
       await upsertNotification(ctx, {
         type: "newSac",
-        userId: null,
         dedupeKey: `sac-added-${currentDay}-${currentMonth}-${hour}`,
         targetRole: "admin",
-        importance: "medium",
         redirectUrl: "/dashboard/admin/sac",
         displayText: `${insertCount} Street Art Call${insertCount > 1 ? "s" : ""} added`,
       });
@@ -68,10 +66,8 @@ export const upsertManyBySacIdInternal = internalMutation({
     if (updateCount > 0) {
       await upsertNotification(ctx, {
         type: "newSac",
-        userId: null,
         dedupeKey: `sac-updated-${currentDay}-${currentMonth}`,
         targetRole: "admin",
-        importance: "medium",
         redirectUrl: "/dashboard/admin/sac",
         displayText: `${updateCount} Street Art Call${updateCount > 1 ? "s" : ""} updated`,
       });

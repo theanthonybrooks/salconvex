@@ -1,14 +1,22 @@
 import { SubmissionFormState as EventState } from "@/types/eventTypes";
 import { OpenCallState } from "@/types/openCallTypes";
-import { Id } from "~/convex/_generated/dataModel";
 
 import { Link } from "@/components/ui/custom-link";
+import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
+import { RichTextDisplay } from "@/helpers/richTextFns";
+import { getUserFontSizePref } from "@/helpers/stylingFns";
+
+import { Id } from "~/convex/_generated/dataModel";
+import { usePreloadedQuery } from "convex/react";
 
 interface DraftPendingBannerProps {
   format: "desktop" | "mobile";
   openCallState?: OpenCallState;
   eventState?: EventState;
   eventId: Id<"events">;
+  admin: {
+    adminNote: string | undefined;
+  };
 }
 
 export const DraftPendingBanner = ({
@@ -17,7 +25,18 @@ export const DraftPendingBanner = ({
   openCallState,
   eventState,
   eventId,
+  admin,
 }: DraftPendingBannerProps) => {
+  const { preloadedUserData } = useConvexPreload();
+  const userData = usePreloadedQuery(preloadedUserData);
+  const { user, userPref } = userData ?? {};
+  const isAdmin =
+    user?.role?.includes("admin") || user?.role?.includes("creator") || false;
+  const fontSizePref = getUserFontSizePref(userPref?.fontSize);
+  const fontSize = fontSizePref?.body;
+
+  const { adminNote } = admin;
+
   const isMobile = format === "mobile";
   const hasDraft = eventState === "draft";
   const hasPendingState =
@@ -88,6 +107,12 @@ export const DraftPendingBanner = ({
                   </Link>
                   .
                 </span>
+              )}
+              {isAdmin && adminNote && (
+                <section className="w-full max-w-[90%] flex-col gap-2 rounded border-1.5 bg-card/50 p-3">
+                  <strong>Admin Notes:</strong>{" "}
+                  <RichTextDisplay html={adminNote ?? ""} fontSize={fontSize} />
+                </section>
               )}
             </div>
           )}

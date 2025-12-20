@@ -19,7 +19,12 @@ import {
   mutation,
   query,
 } from "~/convex/_generated/server";
-import schema, { fullRoleValidator } from "~/convex/schema";
+import schema, {
+  accountTypeValidator,
+  fullRoleValidator,
+  importanceValidator,
+  notificationTypeValidator,
+} from "~/convex/schema";
 import { doc } from "convex-helpers/validators";
 import { ConvexError, v } from "convex/values";
 
@@ -128,12 +133,14 @@ export const unarchiveNotification = mutation({
     notificationId: v.id("notifications"),
   },
   handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return null;
     const notification = await ctx.db.get(args.notificationId);
     if (!notification) return null;
     const dedupeKey = notification.dedupeKey;
     const notifications = await ctx.db
       .query("notifications")
-      .withIndex("by_dedupeKey", (q) => q.eq("dedupeKey", dedupeKey))
+      .withIndex("by_dedupeKey_userId", (q) => q.eq("dedupeKey", dedupeKey))
       .collect();
     if (notifications.length === 0)
       throw new ConvexError({
@@ -423,41 +430,228 @@ export async function upsertNotification(
   ctx: MutationCtx,
   notification: {
     type: NotificationType;
-    userId: Id<"users"> | null;
-    targetRole: FullRole[number];
+    userId?: Id<"users">;
+    targetRole?: FullRole[number];
     targetUserType?: AccountType[number];
-    importance: Importance;
+    importance?: Importance;
     minPlan?: number;
     deadline?: number;
     displayText: string;
+    description?: string;
     redirectUrl: string;
     dedupeKey: string;
   },
 ) {
   const today = new Date();
-  const month = today.getMonth();
-  const day = today.getDate();
+  // const month = today.getMonth();
+  // const day = today.getDate();
   const oneWeekFromToday = addWeeks(today, 1).getTime();
-  const outputDedupeKey = `${notification.dedupeKey}-${month}-${day}`;
+  const outputDedupeKey = notification.dedupeKey;
   const existing = await ctx.db
     .query("notifications")
-    .withIndex("by_dedupeKey", (q) => q.eq("dedupeKey", outputDedupeKey))
+    .withIndex("by_dedupeKey_userId", (q) => q.eq("dedupeKey", outputDedupeKey))
     .first();
+  console.log(notification.deadline);
 
   if (existing) {
     await ctx.db.patch(existing._id, {
       ...notification,
-      dedupeKey: `${notification.dedupeKey}-${month}-${day}`,
+      userId: notification.userId ?? existing.userId ?? null,
+      targetRole: notification.targetRole ?? existing.targetRole ?? "all",
+      importance: notification.importance ?? existing.importance ?? "medium",
+      minPlan: notification.minPlan ?? existing.minPlan ?? 0,
+      deadline: notification.deadline ?? existing.deadline ?? oneWeekFromToday,
+      dedupeKey: outputDedupeKey,
       dismissed: false,
       updatedAt: Date.now(),
     });
   } else {
     await ctx.db.insert("notifications", {
       ...notification,
-      dedupeKey: `${notification.dedupeKey}-${month}-${day}`,
+      userId: notification.userId ?? null,
+      targetRole: notification.targetRole ?? "all",
+      importance: notification.importance ?? "medium",
+      minPlan: notification.minPlan ?? 0,
+      dedupeKey: outputDedupeKey,
       deadline: notification.deadline ?? oneWeekFromToday,
       dismissed: false,
       updatedAt: Date.now(),
     });
   }
 }
+
+export const createNotification = mutation({
+  args: {
+    type: notificationTypeValidator,
+    userId: v.optional(v.id("users")),
+    targetRole: v.optional(fullRoleValidator),
+    targetUserType: v.optional(accountTypeValidator),
+    importance: v.optional(importanceValidator),
+    minPlan: v.optional(v.number()),
+    deadline: v.optional(v.number()),
+    displayText: v.string(),
+    description: v.optional(v.string()),
+    redirectUrl: v.string(),
+    dedupeKey: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const {
+      type,
+      userId,
+      targetRole,
+      targetUserType,
+      importance,
+      minPlan,
+      deadline,
+      displayText,
+      description,
+      redirectUrl,
+      dedupeKey,
+    } = args;
+    console.log(deadline);
+    await upsertNotification(ctx, {
+      type,
+      userId,
+      targetRole,
+      targetUserType,
+      importance,
+      minPlan,
+      deadline,
+      displayText,
+      description,
+      redirectUrl,
+      dedupeKey,
+    });
+  },
+});
+
+export const archivePastNotificationsStarter = internalMutation({
+  args: {},
+  handler: async (ctx) => {
+    await ctx.scheduler.runAfter(
+      0,
+      internal.general.notifications.archivePastNotificationsBatch,
+      {
+        cursor: null,
+        numItems: 100,
+      },
+    );
+  },
+});
+
+export const archivePastNotificationsBatch = internalMutation({
+  args: {
+    cursor: v.union(v.string(), v.null()),
+    numItems: v.number(),
+  },
+  handler: async (ctx, args) => {
+    const now = Date.now();
+
+    const page = await ctx.db
+      .query("notifications")
+      .withIndex("by_deadline", (q) => q.lte("deadline", now))
+      .paginate({
+        cursor: args.cursor,
+        numItems: args.numItems,
+      });
+
+    await Promise.all(
+      page.page.map((notification) =>
+        ctx.db.patch(notification._id, { dismissed: true }),
+      ),
+    );
+
+    if (!page.isDone) {
+      await ctx.scheduler.runAfter(
+        0,
+        internal.general.notifications.archivePastNotificationsBatch,
+        {
+          cursor: page.continueCursor,
+          numItems: args.numItems,
+        },
+      );
+    }
+  },
+});
+
+const MAX_UPDATE_BATCHES = 50;
+
+export const runUpdateOrDeleteByDedupeKey = internalAction({
+  args: {
+    dedupeKey: v.string(),
+    numItems: v.number(),
+    mode: v.union(v.literal("patch"), v.literal("delete")),
+    patch: v.optional(v.object({ dismissed: v.boolean() })),
+  },
+  handler: async (ctx, args) => {
+    let cursor: string | null = null;
+    let isDone = false;
+    let batches = 0;
+
+    while (!isDone && batches < MAX_UPDATE_BATCHES) {
+      const res: { cursor: string | null; isDone: boolean } =
+        await ctx.runMutation(
+          internal.general.notifications.updateOrDeleteByDedupeKeyBatch,
+          {
+            dedupeKey: args.dedupeKey,
+            cursor,
+            numItems: args.numItems,
+            mode: args.mode,
+            patch: args.patch,
+          },
+        );
+
+      if (res.cursor === cursor && !res.isDone) {
+        throw new ConvexError({
+          code: "TOO_MANY_ITEMS",
+          message:
+            "runUpdateOrDeleteByDedupeKey: cursor did not advance; aborting to avoid infinite loop",
+        });
+      }
+
+      cursor = res.cursor;
+      isDone = res.isDone;
+      batches++;
+    }
+
+    if (!isDone) {
+      throw new ConvexError({
+        code: "TOO_MANY_ITEMS",
+        message: "runUpdateOrDeleteByDedupeKey: exceeded max batches; aborting",
+      });
+    }
+  },
+});
+
+export const updateOrDeleteByDedupeKeyBatch = internalMutation({
+  args: {
+    dedupeKey: v.string(),
+    cursor: v.union(v.string(), v.null()),
+    numItems: v.number(),
+    mode: v.union(v.literal("patch"), v.literal("delete")),
+    patch: v.optional(v.object({ dismissed: v.boolean() })),
+  },
+  handler: async (ctx, args) => {
+    const { dedupeKey, cursor, numItems, mode, patch } = args;
+
+    const page = await ctx.db
+      .query("notifications")
+      .withIndex("by_dedupeKey_userId", (q) => q.eq("dedupeKey", dedupeKey))
+      .paginate({ cursor, numItems });
+
+    await Promise.all(
+      page.page.map(async (n) => {
+        if (mode === "delete") {
+          await ctx.db.delete(n._id);
+        } else if (patch) {
+          await ctx.db.patch(n._id, patch);
+        }
+      }),
+    );
+
+    return {
+      cursor: page.continueCursor,
+      isDone: page.isDone,
+    };
+  },
+});

@@ -36,6 +36,12 @@ crons.hourly(
   internal.userAddOns.onlineEvents.archivePastEvents,
 );
 
+crons.hourly(
+  "archive past notifications every 60 min",
+  { minuteUTC: 0 }, // Run hourly  UTC (-1 from Berlin)
+  internal.general.notifications.archivePastNotificationsStarter,
+);
+
 crons.interval(
   "check scheduled newsletter campaigns",
   { minutes: 30 }, // every half hour

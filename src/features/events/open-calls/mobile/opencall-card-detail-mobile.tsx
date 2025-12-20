@@ -64,6 +64,7 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
   const { event, organizer, openCall, application } = data;
   const {
     // id: eventId,
+    adminNote,
     isUserOrg,
     logo: eventLogo,
     category: eventCategory,
@@ -188,6 +189,9 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
     >
       {(isAdmin || isOwner) && (
         <DraftPendingBanner
+          admin={{
+            adminNote,
+          }}
           format="mobile"
           openCallState={openCallState}
           eventState={eventState}

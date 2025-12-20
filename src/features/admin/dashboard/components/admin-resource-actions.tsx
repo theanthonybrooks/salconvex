@@ -54,7 +54,7 @@ export const DeleteEventBtn = ({ eventId }: AdminResourceActionsProps) => {
     <TooltipSimple content="Delete Event" align="end">
       <Button
         variant="outline"
-        className="ml-auto size-8 max-h-8 min-w-8 border-foreground/30 p-0 hover:cursor-pointer hover:bg-white/70 active:scale-90"
+        className="ml-auto size-8 max-h-8 min-w-8 border-foreground/30 p-0 hover:cursor-pointer hover:bg-white/70 hover:text-red-600 active:scale-90"
         onClick={handleDeleteEvent}
       >
         <span className="sr-only">Delete</span>

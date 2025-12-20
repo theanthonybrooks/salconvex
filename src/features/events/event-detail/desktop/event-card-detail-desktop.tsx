@@ -65,6 +65,7 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
   const aboutRef = useRef<HTMLDivElement | null>(null);
   const { event, organizer } = data;
   const {
+    adminNote,
     isUserOrg,
     logo: eventLogo,
     category: eventCategory,
@@ -304,6 +305,9 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
         <div className="flex min-h-20 w-full flex-col items-center gap-2 rounded-2xl border border-dotted border-foreground/50 bg-card-secondary p-4">
           {(isAdmin || isUserOrg) && (
             <DraftPendingBanner
+              admin={{
+                adminNote,
+              }}
               format="desktop"
               eventState={eventState}
               eventId={event._id}

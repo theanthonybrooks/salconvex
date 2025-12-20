@@ -52,6 +52,7 @@ export const EventCardDetailMobile = (props: EventCardProps) => {
   const { event, organizer } = data;
 
   const {
+    adminNote,
     isUserOrg,
     logo: eventLogo,
     category: eventCategory,
@@ -168,6 +169,9 @@ export const EventCardDetailMobile = (props: EventCardProps) => {
       {(isAdmin || isOwner) && (
         <DraftPendingBanner
           format="mobile"
+          admin={{
+            adminNote,
+          }}
           eventState={eventState}
           eventId={event._id}
         />

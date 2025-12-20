@@ -12,6 +12,7 @@ import type {
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { internal } from "~/convex/_generated/api";
 import { internalMutation, mutation, query } from "~/convex/_generated/server";
+import { upsertNotification } from "~/convex/general/notifications";
 import {
   onlineEventsSchema,
   onlineEventStateValues,
@@ -280,6 +281,16 @@ export const updateOnlineEventState = mutation({
       state: args.state,
     });
 
+    if (args.state === "published") {
+      await upsertNotification(ctx, {
+        type: "newResource",
+        redirectUrl: `/resources/${event.slug}`,
+        deadline: event.regDeadline,
+        displayText: "New Resource Added",
+        dedupeKey: `resource-${event._id}-published`,
+      });
+    }
+
     return event;
   },
 });
@@ -303,7 +314,7 @@ export const createOnlineEvent = mutation({
       baseName: args.name,
       slugIndexName: "by_slug",
     });
-    const event = await ctx.db.insert("onlineEvents", {
+    const eventId = await ctx.db.insert("onlineEvents", {
       name: args.name,
       img: args.img,
       slug,
@@ -321,7 +332,18 @@ export const createOnlineEvent = mutation({
       regDeadline: args.regDeadline,
       state: args.state ?? "draft",
     });
-    return event;
+    if (eventId) {
+      if (args.state === "published") {
+        await upsertNotification(ctx, {
+          type: "newResource",
+          redirectUrl: `/resources/${slug}`,
+          deadline: args.regDeadline,
+          displayText: "New Resource Added",
+          dedupeKey: `resource-${eventId}-published`,
+        });
+      }
+    }
+    return eventId;
   },
 });
 
@@ -431,6 +453,15 @@ export const deleteOnlineEvent = mutation({
     if (!event) throw new ConvexError("Event not found");
 
     await ctx.db.delete(args.eventId);
+    await ctx.scheduler.runAfter(
+      0,
+      internal.general.notifications.runUpdateOrDeleteByDedupeKey,
+      {
+        dedupeKey: `resource-${args.eventId}-published`,
+        numItems: 100,
+        mode: "delete",
+      },
+    );
   },
 });
 

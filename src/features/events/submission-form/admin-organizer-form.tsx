@@ -48,6 +48,7 @@ import { toSeason, toYearMonth } from "@/helpers/dateFns";
 import { getEventCategoryLabel } from "@/helpers/eventFns";
 import { getOcPricing } from "@/helpers/pricingFns";
 import { handleFileUrl, handleOrgFileUrl } from "@/lib/fileUploadFns";
+import { showToast } from "@/lib/toast";
 import { useDevice } from "@/providers/device-provider";
 import { useUserInfo } from "@/providers/user-info-provider";
 
@@ -148,8 +149,8 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   );
   const getTimezone = useAction(api.actions.getTimezone.getTimezone);
 
-  const createOpenCallNotification = useMutation(
-    api.openCalls.openCall.createOpenCallNotification,
+  const createNotification = useMutation(
+    api.general.notifications.createNotification,
   );
   const createNewOrg = useMutation(api.organizer.organizations.createNewOrg);
   const createOrUpdateEvent = useMutation(api.events.event.createOrUpdateEvent);
@@ -263,9 +264,11 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   const orgName = orgData?.name ?? "";
   const eventOpenCall = eventData?.hasOpenCall ?? "";
   const now = new Date();
-  const openCallEnd = openCallData?.basicInfo?.dates?.ocEnd
-    ? new Date(openCallData?.basicInfo?.dates?.ocEnd)
-    : null;
+  const openCallEnd = useMemo(() => {
+    return openCallData?.basicInfo?.dates?.ocEnd
+      ? new Date(openCallData.basicInfo.dates.ocEnd)
+      : null;
+  }, [openCallData?.basicInfo?.dates?.ocEnd]);
 
   //   console.log(eventOpenCall);
   const pastEvent = !!openCallEnd && openCallEnd < now;
@@ -1554,14 +1557,6 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
                 eventId: event._id,
                 openCallId: openCallId ?? undefined,
               });
-              if (publish && openCallId) {
-                await createOpenCallNotification({
-                  mode: "publish",
-                  eventSlug: event.slug,
-                  edition: event.dates.edition,
-                  openCallId,
-                });
-              }
             }
             eventResult = event;
             setExistingEvent(eventResult);
@@ -1581,7 +1576,30 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
           setPending(false);
         }
         if (isAdmin && publish) {
-          toast.success("Published!");
+          showToast("success", "Published!");
+          if (openCallId) {
+            const now = Date.now();
+            const ocEndTime = openCallEnd ? openCallEnd.getTime() : 0;
+            if (openCallEnd && ocEndTime > now) {
+              await createNotification({
+                type: "newOpenCall",
+                targetUserType: "artist",
+                minPlan: 2,
+                deadline: ocEndTime,
+                displayText: "New Open Call Added",
+                redirectUrl: `/thelist/event/${submissionUrl}`,
+                dedupeKey: `oc-${openCallId}-published`,
+              });
+            }
+          }
+          if (eventData?.category === "event") {
+            await createNotification({
+              type: "newEvent",
+              displayText: "New Event Added",
+              redirectUrl: `/thelist/event/${submissionUrl}`,
+              dedupeKey: `event-${eventData._id}-published`,
+            });
+          }
           setTimeout(() => {
             window.location.href = `/thelist/event/${submissionUrl}`;
             handleReset();
@@ -1627,8 +1645,8 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
       normalizedCurrentDocs,
       updateOpenCall,
       markOrganizationComplete,
-      createOpenCallNotification,
-
+      openCallEnd,
+      createNotification,
       orgData,
       generateUploadUrl,
       getTimezone,

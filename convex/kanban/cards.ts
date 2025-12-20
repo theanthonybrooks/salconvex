@@ -458,9 +458,8 @@ export const editCard = mutation({
     if (newAssignedUser) {
       await upsertNotification(ctx, {
         type: "newTaskAssignment",
-        userId: args.assignedId ?? null,
+        userId: args.assignedId,
         targetRole: "staff",
-        importance: "medium",
         redirectUrl: `/dashboard/admin/todos?id=${kanbanCard._id}`,
         displayText: "New Task Assignment",
         dedupeKey: `kanban-assignment-${kanbanCard._id}`,
@@ -469,9 +468,8 @@ export const editCard = mutation({
     if (newSecondaryAssignedUser) {
       await upsertNotification(ctx, {
         type: "newTaskAssignment",
-        userId: args.secondaryAssignedId ?? null,
+        userId: args.secondaryAssignedId,
         targetRole: "staff",
-        importance: "medium",
         redirectUrl: `/dashboard/admin/todos?id=${kanbanCard._id}`,
         displayText: "New Task Assignment",
         dedupeKey: `kanban-assignment-${kanbanCard._id}`,

@@ -118,7 +118,6 @@ export const createSupportTicket = mutation({
 
     await upsertNotification(ctx, {
       type: "newSupport",
-      userId: null,
       targetRole: "admin",
       importance: "high",
       redirectUrl: `/dashboard/admin/support?ticketNumber=${ticketNumber}`,

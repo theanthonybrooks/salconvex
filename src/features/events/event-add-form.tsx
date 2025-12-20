@@ -62,6 +62,7 @@ import { getEventCategoryLabel } from "@/helpers/eventFns";
 import { getOcPricing } from "@/helpers/pricingFns";
 import { cn } from "@/helpers/utilsFns";
 import { handleFileUrl, handleOrgFileUrl } from "@/lib/fileUploadFns";
+import { showToast } from "@/lib/toast";
 import { useDevice } from "@/providers/device-provider";
 import { useUserInfo } from "@/providers/user-info-provider";
 
@@ -226,6 +227,9 @@ export const EventOCForm = ({
   const getCheckoutUrl = useAction(
     api.stripe.stripeOrganizations.createStripeOrgCheckoutSession,
   );
+  const createNotification = useMutation(
+    api.general.notifications.createNotification,
+  );
   const createNewOrg = useMutation(api.organizer.organizations.createNewOrg);
   const saveOrgFile = useMutation(api.uploads.files.saveOrgFile);
   const createOrUpdateEvent = useMutation(api.events.event.createOrUpdateEvent);
@@ -334,9 +338,12 @@ export const EventOCForm = ({
   const orgName = orgData?.name ?? "";
   const eventOpenCall = eventData?.hasOpenCall ?? "";
   const now = new Date();
-  const openCallEnd = openCallData?.basicInfo?.dates?.ocEnd
-    ? new Date(openCallData?.basicInfo?.dates?.ocEnd)
-    : null;
+  const openCallEnd = useMemo(() => {
+    return openCallData?.basicInfo?.dates?.ocEnd
+      ? new Date(openCallData.basicInfo.dates.ocEnd)
+      : null;
+  }, [openCallData?.basicInfo?.dates?.ocEnd]);
+
   const alreadyPaid = !!openCallData?.paid;
   const alreadyApprovedOC = !!openCallData?.approvedBy;
   const alreadyApprovedEvent = !!eventData?.approvedBy;
@@ -1660,8 +1667,31 @@ export const EventOCForm = ({
           setPending(false);
         }
         if (isAdmin && publish) {
-          console.log(publish);
-          toast.success("Published!");
+          showToast("success", "Published!");
+          if (openCallId) {
+            const now = Date.now();
+            const ocEndTime = openCallEnd ? openCallEnd.getTime() : 0;
+            if (openCallEnd && ocEndTime > now) {
+              await createNotification({
+                type: "newOpenCall",
+                targetUserType: "artist",
+                minPlan: 2,
+                deadline: ocEndTime,
+                displayText: "New Open Call Added",
+                redirectUrl: `/thelist/event/${submissionUrl}`,
+                dedupeKey: `oc-${openCallId}-published`,
+              });
+            }
+          }
+          if (eventData?.category === "event") {
+            await createNotification({
+              type: "newEvent",
+              displayText: "New Event Added",
+              redirectUrl: `/thelist/event/${submissionUrl}`,
+              dedupeKey: `event-${eventData._id}-published`,
+            });
+          }
+
           setTimeout(() => {
             window.location.href = `/thelist/event/${submissionUrl}`;
             setOpen(false);
@@ -1697,6 +1727,7 @@ export const EventOCForm = ({
       }
     },
     [
+      openCallEnd,
       handleDraftUpdate,
       savedCount,
       setEditedSections,
@@ -1739,6 +1770,7 @@ export const EventOCForm = ({
       handleCheckSchema,
       pending,
       markOrganizationComplete,
+      createNotification,
     ],
   );
 
