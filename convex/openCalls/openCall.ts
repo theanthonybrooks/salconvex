@@ -676,21 +676,23 @@ export const changeOCStatus = mutation({
         approvedBy: approvedBy,
         approvedAt: Date.now(),
       });
-      await upsertNotification(ctx, {
-        type: "newOpenCall",
-        targetUserType: "artist",
-        minPlan: 2,
-        redirectUrl: `/thelist/event/${prevEvent.slug}/${prevEvent.dates.edition}/call`,
-        displayText: "New Open Call Added",
-        dedupeKey: `oc-${oc._id}-published`,
-      });
-      if (prevEvent.category === "event") {
+      if (outputState === "published") {
         await upsertNotification(ctx, {
-          type: "newEvent",
-          displayText: "New Event Added",
-          redirectUrl: `/thelist/event/${prevEvent.slug}/${prevEvent.dates.edition}`,
-          dedupeKey: `event-${prevEvent._id}-added`,
+          type: "newOpenCall",
+          targetUserType: "artist",
+          minPlan: 2,
+          redirectUrl: `/thelist/event/${prevEvent.slug}/${prevEvent.dates.edition}/call`,
+          displayText: "New Open Call Added",
+          dedupeKey: `oc-${oc._id}-published`,
         });
+        if (prevEvent.category === "event") {
+          await upsertNotification(ctx, {
+            type: "newEvent",
+            displayText: "New Event Added",
+            redirectUrl: `/thelist/event/${prevEvent.slug}/${prevEvent.dates.edition}`,
+            dedupeKey: `event-${prevEvent._id}-added`,
+          });
+        }
       }
     } else {
       await ctx.db.patch(eventId, {

@@ -442,7 +442,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
 
   //
   // #region ------------- Console Logs --------------
-  if (errors && Object.keys(errors).length > 0) {
+  if (errors && Object.keys(errors).length > 0 && isAdmin) {
     console.log("errors", errors);
   }
   // console.log(
@@ -1597,7 +1597,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
               type: "newEvent",
               displayText: "New Event Added",
               redirectUrl: `/thelist/event/${submissionUrl}`,
-              dedupeKey: `event-${eventData._id}-published`,
+              dedupeKey: `event-${eventData._id}-added`,
             });
           }
           setTimeout(() => {

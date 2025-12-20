@@ -1688,7 +1688,7 @@ export const EventOCForm = ({
               type: "newEvent",
               displayText: "New Event Added",
               redirectUrl: `/thelist/event/${submissionUrl}`,
-              dedupeKey: `event-${eventData._id}-published`,
+              dedupeKey: `event-${eventData._id}-added`,
             });
           }
 

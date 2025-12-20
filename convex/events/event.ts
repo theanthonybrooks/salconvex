@@ -1409,6 +1409,7 @@ export const updateEventStatus = mutation({
         dedupeKey: `event-${event._id}-added`,
       });
     }
+
     const newDoc = await ctx.db.get(event._id);
     if (newDoc) await eventsAggregate.replaceOrInsert(ctx, oldDoc, newDoc);
     await ctx.runMutation(internal.events.eventLookup.addUpdateEventLookup, {
@@ -1448,7 +1449,7 @@ export const approveEvent = mutation({
         targetUserType: "artist",
         redirectUrl: `/thelist/event/${event.slug}/${event.dates.edition}`,
         displayText: "New Event Published",
-        dedupeKey: `event-${event._id}-published`,
+        dedupeKey: `event-${event._id}-added`,
       });
     }
     const newDoc = await ctx.db.get(event._id);

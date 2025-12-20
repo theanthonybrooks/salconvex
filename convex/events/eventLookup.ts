@@ -42,13 +42,53 @@ export const addUpdateEventLookup = internalMutation({
           .first();
     const validEvent = approvedStates.includes(event.state);
     const validOpenCall = approvedStates.includes(openCall?.state ?? "");
-    console.log(openCall);
 
-    if (!validEvent && lookup) {
-      await ctx.db.delete(lookup._id);
+    if (!validEvent) {
+      if (lookup) {
+        await ctx.db.delete(lookup._id);
+        await ctx.scheduler.runAfter(
+          0,
+          internal.general.notifications.runUpdateOrDeleteByDedupeKey,
+          {
+            dedupeKey: `event-${event._id}-added`,
+            numItems: 100,
+            mode: "patch",
+            patch: {
+              dismissed: true,
+            },
+          },
+        );
+        if (lookup.openCallId) {
+          await ctx.scheduler.runAfter(
+            0,
+            internal.general.notifications.runUpdateOrDeleteByDedupeKey,
+            {
+              dedupeKey: `oc-${lookup.openCallId}-published`,
+              numItems: 100,
+              mode: "patch",
+              patch: {
+                dismissed: true,
+              },
+            },
+          );
+        }
+      }
       return null;
     }
-    if (!validEvent) return null;
+    if (!validOpenCall && lookup?.openCallId) {
+      await ctx.scheduler.runAfter(
+        0,
+        internal.general.notifications.runUpdateOrDeleteByDedupeKey,
+        {
+          dedupeKey: `oc-${lookup.openCallId}-published`,
+          numItems: 100,
+          mode: "patch",
+          patch: {
+            dismissed: true,
+          },
+        },
+      );
+    }
 
     const eventData = {
       eventId,
