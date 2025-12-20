@@ -6,8 +6,6 @@ import {
   theListNavbarMenuLinks as thelistitems,
 } from "@/constants/navbarsLinks";
 
-import { User } from "@/types/user";
-
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 // import { useQuery } from "convex-helpers/react/cache"
@@ -18,6 +16,7 @@ import { ArrowUpIcon } from "lucide-react";
 import FullPageNav from "@/components/full-page-nav";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/components/ui/custom-link";
+import { NotificationsDropdown } from "@/components/ui/navbar/notifications-dropdown";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -36,26 +35,12 @@ import { useDevice } from "@/providers/device-provider";
 
 import { usePreloadedQuery } from "convex/react";
 
-interface TheListNavBarProps {
-  userId?: string | undefined;
-  user?: User | undefined | null;
-  subStatus?: string | undefined;
-}
-
-export default function TheListNavBar(
-  {
-    // user,
-    // subStatus,
-  }: //   subStatus,
-  // userPref,
-  TheListNavBarProps,
-) {
+export default function TheListNavBar() {
   const { isMobile } = useDevice();
   const { preloadedUserData, preloadedSubStatus } = useConvexPreload();
   const userData = usePreloadedQuery(preloadedUserData);
   const subData = usePreloadedQuery(preloadedSubStatus);
-  const user = userData?.user ?? null;
-  const userPref = userData?.userPref ?? null;
+  const { user, userPref } = userData ?? {};
   const { subStatus } = subData ?? {};
   const pathname = usePathname();
   const { scrollY, scrollYProgress } = useScroll();
@@ -132,7 +117,7 @@ export default function TheListNavBar(
       {canGoToTop && (
         <div
           onClick={onGoToTop}
-          className="active:scale-975 fixed bottom-7 right-7 z-20 rounded-full border-2 bg-background p-1 hover:scale-105 hover:cursor-pointer"
+          className="fixed bottom-7 right-7 z-20 rounded-full border-2 bg-background p-1 hover:scale-105 hover:cursor-pointer active:scale-975"
         >
           <ArrowUpIcon className="size-8 sm:size-6" />
         </div>
@@ -208,7 +193,7 @@ export default function TheListNavBar(
                   },
                 }}
                 whileHover={{
-                  rotate: 180,
+                  rotate: isMobile ? 0 : 180,
                   transition: {
                     type: "spring",
                     stiffness: 80,
@@ -413,7 +398,7 @@ export default function TheListNavBar(
                     <FullPageNav
                       user={user}
                       subStatus={subStatus}
-                      userPref={userPref}
+                      userPref={userPref ?? null}
                     />
                   </div>
                 )}
@@ -423,12 +408,23 @@ export default function TheListNavBar(
 
           {/* ------ Mobile Right side ------ */}
 
-          <div className="z-20 flex w-full items-center justify-end lg:hidden">
+          <div className="z-20 flex w-full items-center justify-end gap-2 lg:hidden">
+            {user && (
+              <NotificationsDropdown
+                // open={notificationsOpen}
+                // setOpen={setNotificationsOpen}
+                setTooltipDisabled={() => {}}
+                tooltipDisabled={true}
+                className=""
+                user={user}
+                userPref={userPref}
+              />
+            )}
             <FullPageNav
               isMobile={isMobile}
               isScrolled={isScrolled}
               user={user}
-              userPref={userPref}
+              userPref={userPref ?? null}
               subStatus={subStatus}
             />
           </div>

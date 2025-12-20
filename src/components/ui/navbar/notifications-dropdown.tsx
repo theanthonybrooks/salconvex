@@ -52,8 +52,8 @@ import { useQuery } from "convex-helpers/react/cache";
 import { useMutation } from "convex/react";
 
 type NotificationsDropdownProps = {
-  open: boolean;
-  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  // open: boolean;
+  // setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   setTooltipDisabled: React.Dispatch<React.SetStateAction<boolean>>;
   tooltipDisabled: boolean;
   className?: string;
@@ -69,8 +69,6 @@ type NotificationItemType =
   NonNullable<NotificationItemsType>["userNotifications"][number];
 
 export const NotificationsDropdown = ({
-  open,
-  setOpen,
   setTooltipDisabled,
   tooltipDisabled,
   className,
@@ -78,6 +76,7 @@ export const NotificationsDropdown = ({
   user,
   userPref,
 }: NotificationsDropdownProps) => {
+  const [open, setOpen] = useState(false);
   // const [pending, setPending] = useState(false);
 
   const isUser = user?.role?.includes("user");
@@ -170,8 +169,8 @@ export const NotificationsDropdown = ({
             {totalPending > 0 && (
               <div
                 className={cn(
-                  "absolute right-0 top-0 flex h-5 min-w-5 items-center justify-center rounded-full border-1.5 border-salPinkDark bg-salPinkMed text-2xs font-semibold text-card hover:scale-105 hover:cursor-pointer",
-                  totalPending > 99 && "-right-1 px-0.5",
+                  "absolute right-1 top-0 flex h-5 min-w-5 items-center justify-center rounded-full border-1.5 border-salPinkDark bg-salPinkMed text-2xs font-semibold text-card hover:scale-105 hover:cursor-pointer sm:right-0",
+                  totalPending > 99 && "px-0.5 sm:-right-1",
                 )}
               >
                 {returnNinetyNinePlus(totalPending)}
@@ -182,8 +181,8 @@ export const NotificationsDropdown = ({
       </TooltipSimple>
       <DropdownMenuContent
         className={cn(
-          "z-[60] p-4",
-          isAdmin ? "w-[min(28rem,90dvw)]" : "w-[min(23rem,90dvw)]",
+          "z-[60] w-dvw p-4",
+          isAdmin ? "sm:w-[min(28rem,90dvw)]" : "sm:w-[min(23rem,90dvw)]",
         )}
         thick
         align="end"

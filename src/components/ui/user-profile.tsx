@@ -76,8 +76,8 @@ export function UserProfile({
     <div className={cn("flex items-center gap-4")}>
       {user && (
         <NotificationsDropdown
-          open={open}
-          setOpen={setOpen}
+          // open={open}
+          // setOpen={setOpen}
           setTooltipDisabled={setTooltipDisabled}
           tooltipDisabled={tooltipDisabled}
           className={className}

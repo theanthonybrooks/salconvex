@@ -1,19 +1,23 @@
 "use client";
 
+import { dashboardNavItems } from "@/constants/links";
+
+import { User } from "@/types/user";
+
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { User } from "@/types/user";
-import { UserPrefsType } from "~/convex/schema";
-import { Unauthenticated } from "convex/react";
 import { motion, useMotionValueEvent, useScroll } from "framer-motion";
 
 import FullPageNav from "@/components/full-page-nav";
 import { Button } from "@/components/ui/button";
+import { NotificationsDropdown } from "@/components/ui/navbar/notifications-dropdown";
 import { UserProfile } from "@/components/ui/user-profile";
 import { Search } from "@/features/Sidebar/Search";
-import { dashboardNavItems } from "@/constants/links";
 import { useDevice } from "@/providers/device-provider";
+
+import { UserPrefsType } from "~/convex/schema";
+import { Unauthenticated } from "convex/react";
 
 interface NavBarProps {
   userId: string | undefined;
@@ -22,7 +26,7 @@ interface NavBarProps {
   subStatus: string | undefined;
 }
 
-export default function NavBar({
+export default function DashboardNavBar({
   userId,
   subStatus,
   userPref,
@@ -113,30 +117,27 @@ export default function NavBar({
 
           {/* ------ Mobile Right side ------ */}
 
-          <div className="flex w-full items-center justify-end gap-x-6 lg:hidden">
-            {/* {userId !== "guest" && user && <UserProfile user={user} />} */}
-            {/* <Unauthenticated>
-              <Link href='/auth/sign-in' prefetch={true}>
-                <Button
-                  variant='salWithShadowHidden'
-                  className='font-bold bg-background'
-                  size='lg'>
-                  Sign in
-                </Button>
-              </Link>
-            </Unauthenticated> */}
-            <>
-              {/* <Bell className="size-7 w-fit" /> */}
-
-              <FullPageNav
-                // userId={userId}
-                isScrolled={isScrolled}
+          <div className="flex w-full items-center justify-end gap-2 lg:hidden">
+            {user && (
+              <NotificationsDropdown
+                // open={notificationsOpen}
+                // setOpen={setNotificationsOpen}
+                setTooltipDisabled={() => {}}
+                tooltipDisabled={true}
+                className=""
                 user={user}
-                isDashboard={true}
-                userPref={userPref}
-                subStatus={subStatus}
+                userPref={userPref ?? undefined}
               />
-            </>
+            )}
+
+            <FullPageNav
+              // userId={userId}
+              isScrolled={isScrolled}
+              user={user}
+              isDashboard={true}
+              userPref={userPref}
+              subStatus={subStatus}
+            />
           </div>
         </div>
       </div>

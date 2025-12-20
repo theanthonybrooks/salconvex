@@ -74,7 +74,6 @@ export default async function HomeLayout({
   const token = await convexAuthNextjsToken();
   const headersList = await headers();
   const pathname = headersList.get("x-pathname");
-  console.log(pathname);
   const userData = await fetchQuery(api.users.getCurrentUser, {}, { token });
   const { user } = userData ?? {};
   const isAdmin = user?.role?.includes("admin");

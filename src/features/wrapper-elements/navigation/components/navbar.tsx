@@ -9,7 +9,6 @@ import {
 } from "@/constants/navbarsLinks";
 
 import type { Variants } from "framer-motion";
-import { User } from "@/types/user";
 
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
@@ -22,6 +21,7 @@ import { useTheme } from "next-themes";
 import FullPageNav from "@/components/full-page-nav";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/components/ui/custom-link";
+import { NotificationsDropdown } from "@/components/ui/navbar/notifications-dropdown";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -40,63 +40,16 @@ import { cn } from "@/helpers/utilsFns";
 import { AccountTypeBase } from "~/convex/schema";
 import { usePreloadedQuery } from "convex/react";
 
-// import { useQuery } from "convex-helpers/react/cache"
-
-interface NavBarProps {
-  userId?: string;
-  user?: User | null;
-
-  subStatus?: string;
-}
-
-// const getNavBarVariants = (
-//   navBgScroll: boolean | undefined,
-//   isScrolled: boolean | undefined,
-//   homePage: boolean,
-// ): Variants => {
-//   const homePageHiddenNav = homePage && !navBgScroll;
-
-//   return {
-//     visible: {
-//       height: isScrolled || homePage ? "80px" : "100px",
-//       backgroundColor: homePage ? "hsl(var(--background))" : "",
-//       boxShadow: homePage ? "var(--nav-shadow)" : "",
-//       transition: {
-//         duration: 0.75,
-//         ease: "easeInOut",
-//       },
-//     },
-//     hidden: {
-//       height: homePage ? "80px" : "100px",
-//       backgroundColor: !homePageHiddenNav ? "hsl(var(--background))" : "",
-//       boxShadow: "",
-//       transition: {
-//         backgroundColor: {
-//           duration: 0,
-//         },
-
-//         duration: 0.75,
-//         ease: "easeInOut",
-//       },
-//     },
-//   };
-// };
-
-export default function NavBar(
-  {
-    // user,
-    // subStatus,
-  }: NavBarProps,
-) {
+export default function NavBar() {
   const isMobile = useIsMobile();
   const { theme } = useTheme();
   const viewportHeight = useViewportHeight();
   const { preloadedUserData, preloadedSubStatus } = useConvexPreload();
   const userData = usePreloadedQuery(preloadedUserData);
   const subData = usePreloadedQuery(preloadedSubStatus);
-  const user = userData?.user ?? null;
+  const { user, userPref } = userData ?? {};
   const userType = user?.accountType ?? [];
-  const userPref = userData?.userPref ?? null;
+
   // const fontSize = userPref?.fontSize === "large" ? "text-base" : "text-sm";
   const { subStatus, hasActiveSubscription } = subData ?? {};
   const isAdmin = user?.role?.includes("admin");
@@ -283,15 +236,6 @@ export default function NavBar(
                     transition: {
                       type: "spring",
                       stiffness: 120,
-                      damping: 5,
-                      mass: 1.2,
-                    },
-                  }}
-                  whileHover={{
-                    rotate: 180,
-                    transition: {
-                      type: "spring",
-                      stiffness: 80,
                       damping: 5,
                       mass: 1.2,
                     },
@@ -638,7 +582,7 @@ export default function NavBar(
                   <FullPageNav
                     user={user}
                     subStatus={subStatus}
-                    userPref={userPref}
+                    userPref={userPref ?? null}
                   />
                   {(hasActiveSubscription || isAdmin) && (
                     <Search
@@ -656,13 +600,22 @@ export default function NavBar(
 
           {/* ------ Mobile Right side ------ */}
 
-          <div className="z-20 flex w-full items-center justify-end lg:hidden">
+          <div className="z-20 flex w-full items-center justify-end gap-2 lg:hidden">
+            {user && (
+              <NotificationsDropdown
+                setTooltipDisabled={() => {}}
+                tooltipDisabled={true}
+                className=""
+                user={user}
+                userPref={userPref}
+              />
+            )}
             <FullPageNav
               // userId={userId}
               isMobile={isMobile}
               isScrolled={isScrolled}
               user={user}
-              userPref={userPref}
+              userPref={userPref ?? null}
               subStatus={subStatus}
             />
           </div>
