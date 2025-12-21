@@ -49,7 +49,7 @@ export const SectionItem = ({
         "flex flex-col items-start justify-start gap-y-2 sm:px-3 md:flex-row md:items-center md:justify-between md:gap-y-0",
         isToggle && isMobile && "w-full flex-row justify-between py-1",
         className,
-        disabled && "pointer-events-none opacity-40",
+        disabled && "pointer-events-none hidden opacity-40 sm:flex",
       )}
     >
       <div className={cn("flex items-center gap-4", fontSize)}>
