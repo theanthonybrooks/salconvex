@@ -9,6 +9,7 @@ import type {
 } from "@/constants/newsletterConsts";
 
 import { useState } from "react";
+import { useIsMobile } from "@/hooks/use-media-query";
 
 import { FaMobileAlt } from "react-icons/fa";
 import { MdOutlinePendingActions } from "react-icons/md";
@@ -54,7 +55,6 @@ import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-con
 import { getUserFontSizePref } from "@/helpers/stylingFns";
 import { cn, hasAnyTrueValue } from "@/helpers/utilsFns";
 import { showToast } from "@/lib/toast";
-import { useDevice } from "@/providers/device-provider";
 
 import { api } from "~/convex/_generated/api";
 import {
@@ -66,8 +66,7 @@ import {
 import { ConvexError } from "convex/values";
 
 export const NotificationsSettings = () => {
-  const { isMobile } = useDevice();
-
+  const isMobile = useIsMobile();
   const [pending, setPending] = useState(false);
   void pending;
   const [verificationPending, setVerificationPending] =
@@ -350,6 +349,7 @@ export const NotificationsSettings = () => {
                 icon={Calendar}
                 title="Events"
                 description="Receive notifications for new events"
+                type="toggle"
                 fontSize={fontSize}
               >
                 <Switch
@@ -363,6 +363,7 @@ export const NotificationsSettings = () => {
                 icon={Megaphone}
                 title="Open Calls"
                 description="Receive notifications for new open calls when they're added"
+                type="toggle"
                 fontSize={fontSize}
               >
                 <Switch
@@ -376,6 +377,7 @@ export const NotificationsSettings = () => {
                 icon={Monitor}
                 title="Resources"
                 description="Receive notifications for new resources when they're added"
+                type="toggle"
                 fontSize={fontSize}
               >
                 <Switch
@@ -393,6 +395,7 @@ export const NotificationsSettings = () => {
                   icon={Bell}
                   title="Account"
                   description="Account Notifications (Billing, settings, support, etc.)"
+                  type="toggle"
                   fontSize={fontSize}
                 >
                   <Switch
@@ -428,6 +431,7 @@ export const NotificationsSettings = () => {
                     icon={MdOutlinePendingActions}
                     title="Submissions"
                     description="Receive notifications for new submissions (event & open call)"
+                    type="toggle"
                     fontSize={fontSize}
                   >
                     <Switch
@@ -441,6 +445,7 @@ export const NotificationsSettings = () => {
                     icon={ListTodo}
                     title="Tasks"
                     description="Receive notifications for new tasks assigned to you"
+                    type="toggle"
                     fontSize={fontSize}
                   >
                     <Switch
@@ -506,6 +511,7 @@ export const NotificationsSettings = () => {
                       icon={Bell}
                       title="Created"
                       description="Created newsletter campaign notifications"
+                      type="toggle"
                       fontSize={fontSize}
                     >
                       <Switch
@@ -532,6 +538,7 @@ export const NotificationsSettings = () => {
                       icon={Bell}
                       title="Completed"
                       description="Completed newsletter campaign notifications"
+                      type="toggle"
                       fontSize={fontSize}
                     >
                       <Switch
@@ -558,6 +565,7 @@ export const NotificationsSettings = () => {
                       icon={Bell}
                       title="Failed"
                       description="Failed newsletter campaign notifications"
+                      type="toggle"
                       fontSize={fontSize}
                     >
                       <Switch
@@ -608,6 +616,7 @@ export const NotificationsSettings = () => {
                       icon={Bell}
                       title="Subscribed"
                       description="New subscribers notifications"
+                      type="toggle"
                       fontSize={fontSize}
                     >
                       <Switch
@@ -634,6 +643,7 @@ export const NotificationsSettings = () => {
                       icon={Bell}
                       title="Unsubscribed"
                       description="Audience unsubscribed notifications"
+                      type="toggle"
                       fontSize={fontSize}
                     >
                       <Switch
@@ -681,6 +691,7 @@ export const NotificationsSettings = () => {
                     icon={UserPlus}
                     title="Registrations"
                     description="Receive notifications when new registrations are made"
+                    type="toggle"
                     fontSize={fontSize}
                   >
                     <Switch
@@ -701,6 +712,7 @@ export const NotificationsSettings = () => {
                     icon={UserMinus}
                     title="Cancellations"
                     description="Receive notifications when registrations are cancelled"
+                    type="toggle"
                     fontSize={fontSize}
                   >
                     <Switch
@@ -741,6 +753,7 @@ export const NotificationsSettings = () => {
                     icon={Bell}
                     title="Scheduled Posts"
                     description="Receive notifications when posts are scheduled"
+                    type="toggle"
                     fontSize={fontSize}
                   >
                     <Switch
@@ -759,6 +772,7 @@ export const NotificationsSettings = () => {
                     icon={Bell}
                     title="Unscheduled Posts"
                     description="Receive notifications when new posts are added to the queue"
+                    type="toggle"
                     fontSize={fontSize}
                   >
                     <Switch
@@ -797,6 +811,7 @@ export const NotificationsSettings = () => {
                     icon={Bell}
                     title="Ticket Created"
                     description="Receive notifications when a new support ticket is created"
+                    type="toggle"
                     fontSize={fontSize}
                   >
                     <Switch
@@ -817,6 +832,7 @@ export const NotificationsSettings = () => {
                     icon={Bell}
                     title="Ticket Updated"
                     description="Receive notifications when a support ticket is updated"
+                    type="toggle"
                     fontSize={fontSize}
                   >
                     <Switch
@@ -843,6 +859,7 @@ export const NotificationsSettings = () => {
             title="General Emails"
             description="Emails about upcoming updates to the site, user surveys, and
                     other news related to The Street Art List"
+            type="toggle"
             fontSize={fontSize}
           >
             <Switch
@@ -858,6 +875,7 @@ export const NotificationsSettings = () => {
             icon={Newspaper}
             title="Newsletter"
             description={`Receive ${userPlan > 1 ? "weekly/monthly" : "monthly"} newsletter`}
+            type="toggle"
             fontSize={fontSize}
           >
             <Switch
@@ -900,6 +918,7 @@ export const NotificationsSettings = () => {
             title="Application Notifications"
             description="Receive email updates for applications"
             fontSize={fontSize}
+            type="toggle"
             disabled
             comingSoon
           >

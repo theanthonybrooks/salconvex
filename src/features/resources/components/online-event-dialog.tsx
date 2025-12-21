@@ -5,6 +5,7 @@ import type { User } from "@/types/user";
 import type { ReactNode } from "react";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useIsMobile } from "@/hooks/use-media-query";
 import { resourcesSchema } from "@/schemas/admin";
 import { getExternalRedirectHtml } from "@/utils/loading-page-html";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -45,7 +46,6 @@ import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { SelectSimple } from "@/components/ui/select";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { cn } from "@/helpers/utilsFns";
-import { useDevice } from "@/providers/device-provider";
 
 import { api } from "~/convex/_generated/api";
 import { useQuery } from "convex-helpers/react/cache";
@@ -62,7 +62,7 @@ export const OnlineEventDialog = ({
   children,
   type = "edit",
 }: OnlineEventDialogProps) => {
-  const { isMobile } = useDevice();
+  const isMobile = useIsMobile();
   const organizerRef = useRef<User | null>(null);
   const { preloadedUserData } = useConvexPreload();
   const [open, setOpen] = useState(false);

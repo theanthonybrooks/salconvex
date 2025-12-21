@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { OrgInfo } from "@/app/(pages)/dashboard/organizer/components/OrgInfo";
 import { StaffPage } from "@/app/(pages)/dashboard/organizer/components/StaffPage";
+import { useIsMobile } from "@/hooks/use-media-query";
 import { motion } from "framer-motion";
 
 import type { Doc, Id } from "~/convex/_generated/dataModel";
@@ -21,14 +22,13 @@ import { OrganizerLogoName } from "@/features/organizers/components/organizer-lo
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { getUserFontSizePref } from "@/helpers/stylingFns";
 import { cn } from "@/helpers/utilsFns";
-import { useDevice } from "@/providers/device-provider";
 
 import { api } from "~/convex/_generated/api";
 import { useQuery } from "convex-helpers/react/cache/hooks";
 import { usePreloadedQuery } from "convex/react";
 
 export const OrgMainPage = () => {
-  const { isMobile } = useDevice();
+  const isMobile = useIsMobile();
   const { preloadedUserData } = useConvexPreload();
   const userData = usePreloadedQuery(preloadedUserData);
   const [activeTab, setActiveTab] = useState("orgInfo");

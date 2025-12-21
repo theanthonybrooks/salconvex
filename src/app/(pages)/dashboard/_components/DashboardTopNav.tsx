@@ -7,6 +7,7 @@ import { User } from "@/types/user";
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useIsMobile } from "@/hooks/use-media-query";
 import { motion, useMotionValueEvent, useScroll } from "framer-motion";
 
 import FullPageNav from "@/components/full-page-nav";
@@ -14,7 +15,6 @@ import { Button } from "@/components/ui/button";
 import { NotificationsDropdown } from "@/components/ui/navbar/notifications-dropdown";
 import { UserProfile } from "@/components/ui/user-profile";
 import { Search } from "@/features/Sidebar/Search";
-import { useDevice } from "@/providers/device-provider";
 
 import { UserPrefsType } from "~/convex/schema";
 import { Unauthenticated } from "convex/react";
@@ -33,8 +33,7 @@ export default function DashboardNavBar({
   user,
 }: NavBarProps) {
   const { scrollY } = useScroll();
-  const { isMobile } = useDevice();
-
+  const isMobile = useIsMobile();
   const [isScrolled, setIsScrolled] = useState(false);
 
   useMotionValueEvent(scrollY, "change", (latest) => {

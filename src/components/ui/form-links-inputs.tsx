@@ -2,6 +2,7 @@ import type { ValidOrgLinkPath } from "@/features/organizers/schemas/event-add-s
 import type { ReactNode } from "react";
 import type { FieldValues, Path } from "react-hook-form";
 
+import { useIsMobile } from "@/hooks/use-media-query";
 import { Control, Controller, useFormContext, useWatch } from "react-hook-form";
 import PhoneInput, { Country } from "react-phone-number-input";
 
@@ -33,7 +34,6 @@ import {
   PlatformType,
 } from "@/helpers/linkFns";
 import { cn } from "@/helpers/utilsFns";
-import { useDevice } from "@/providers/device-provider";
 
 import "react-phone-number-input/style.css";
 
@@ -103,7 +103,7 @@ export const FormLinksInput = ({
     setValue,
     formState: { errors },
   } = useFormContext<EventOCFormValues>();
-  const { isMobile } = useDevice();
+  const isMobile = useIsMobile();
 
   const isEvent = type === "event";
   const isOrg = type === "organization";

@@ -8,6 +8,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useFilteredEventsQuery } from "@/hooks/use-filtered-events-query";
+import { useIsMobile } from "@/hooks/use-media-query";
 import { motion } from "framer-motion";
 import { debounce } from "lodash";
 
@@ -25,7 +26,6 @@ import { useArtistPreload } from "@/features/wrapper-elements/artist-preload-con
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { generateSkeletonGroups } from "@/helpers/skeletonFns";
 import { cn } from "@/helpers/utilsFns";
-import { useDevice } from "@/providers/device-provider";
 
 import { usePreloadedQuery } from "convex/react";
 
@@ -41,6 +41,7 @@ export type ViewOptions = (typeof viewOptionValues)[number]["value"];
 
 const ClientEventList = () => {
   // const searchParams = useSearchParams();
+  const isMobile = useIsMobile();
   const initialTitleRef = useRef<string | null>(null);
   const {
     filters,
@@ -58,7 +59,6 @@ const ClientEventList = () => {
 
   const browserTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-  const { isMobile } = useDevice();
   const { preloadedArtistData } = useArtistPreload();
   const { preloadedUserData, preloadedSubStatus, preloadedOrganizerData } =
     useConvexPreload();

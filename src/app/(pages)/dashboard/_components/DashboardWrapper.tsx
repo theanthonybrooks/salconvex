@@ -3,8 +3,10 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { DashboardProvider } from "@/app/(pages)/dashboard/_components/DashboardContext";
+import { useIsMobile } from "@/hooks/use-media-query";
 
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
+import { cn } from "@/helpers/utilsFns";
 
 import { usePreloadedQuery } from "convex/react";
 import DashboardSideBar from "./DashboardSidebar";
@@ -15,6 +17,7 @@ interface DashboardWrapperProps {
 }
 
 export function DashboardWrapper({ children }: DashboardWrapperProps) {
+  const isMobile = useIsMobile();
   const router = useRouter();
   const { preloadedUserData, preloadedSubStatus } = useConvexPreload();
 
@@ -49,7 +52,12 @@ export function DashboardWrapper({ children }: DashboardWrapperProps) {
           role={role}
           userPref={userPref}
         />
-        <main className="scrollable max-h-[calc(100dvh-5rem)] flex-1 bg-dashboardBgLt white:bg-stone-100">
+        <main
+          className={cn(
+            "scrollable max-h-[calc(100dvh-5rem)] flex-1 bg-dashboardBgLt white:bg-stone-100",
+            isMobile && "mini darkbar",
+          )}
+        >
           {children}
         </main>
       </div>

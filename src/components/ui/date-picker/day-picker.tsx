@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useIsMobile } from "@/hooks/use-media-query";
 import { format } from "date-fns";
 import { DayPicker } from "react-day-picker";
 import { toast } from "react-toastify";
@@ -20,7 +21,6 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/helpers/utilsFns";
-import { useDevice } from "@/providers/device-provider";
 
 type DayPickerProps = {
   value?: number;
@@ -54,8 +54,9 @@ export function DateTimePickerField({
   withTime = true,
   inputClassName,
 }: DayPickerProps) {
-  const { isMobile } = useDevice();
+  const isMobile = useIsMobile();
   const [open, setOpen] = useState(false);
+
   const [hasChanges, setHasChanges] = useState(false);
   const [pending, setPending] = useState(false);
 

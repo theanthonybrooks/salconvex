@@ -5,6 +5,7 @@ import { supportCategoryOptions } from "@/constants/supportConsts";
 
 import { useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useIsMobile } from "@/hooks/use-media-query";
 import { ContactFormValues, contactSchema } from "@/schemas/public";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { capitalize } from "lodash";
@@ -29,7 +30,6 @@ import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { cn } from "@/helpers/utilsFns";
-import { useDevice } from "@/providers/device-provider";
 
 import { api } from "~/convex/_generated/api";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
@@ -38,6 +38,7 @@ import { useAction, usePreloadedQuery } from "convex/react";
 import { ConvexError } from "convex/values";
 
 const SupportPage = () => {
+  const isMobile = useIsMobile();
   const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
 
   const { preloadedUserData } = useConvexPreload();
@@ -52,7 +53,6 @@ const SupportPage = () => {
   // const fontSize = getUserFontSizePref(userPref?.fontSize);
   const userId = id ?? null;
 
-  const { isMobile } = useDevice();
   const [pending, setPending] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState("");

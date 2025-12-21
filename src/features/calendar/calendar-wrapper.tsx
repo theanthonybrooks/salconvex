@@ -5,12 +5,12 @@ import type {
   EventInput,
   MoreLinkArg,
 } from "@fullcalendar/core";
+
+import { useIsMobile } from "@/hooks/use-media-query";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import listPlugin from "@fullcalendar/list";
 import FullCalendar from "@fullcalendar/react";
-
-import { useDevice } from "@/providers/device-provider";
 
 type Props = {
   events: EventInput[];
@@ -19,7 +19,7 @@ type Props = {
 };
 
 const CalendarWrapper = ({ events, onEventClick, onMoreLinkClick }: Props) => {
-  const { isMobile } = useDevice();
+  const isMobile = useIsMobile();
   return (
     <FullCalendar
       plugins={[dayGridPlugin, interactionPlugin, listPlugin]}

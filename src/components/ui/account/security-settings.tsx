@@ -49,7 +49,6 @@ import { useMutation, usePreloadedQuery, useQuery } from "convex/react";
 import { ConvexError } from "convex/values";
 
 export const SecuritySettings = () => {
-  // const { isMobile } = useDevice();
   const { signOut } = useAuthActions();
 
   const [pending, setPending] = useState(false);

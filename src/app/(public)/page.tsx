@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
+import { useIsMobile } from "@/hooks/use-media-query";
 import {
   motion,
   useMotionValueEvent,
@@ -34,7 +35,6 @@ import { Separator } from "@/components/ui/separator";
 import Pricing from "@/features/homepage/pricing";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { cn } from "@/helpers/utilsFns";
-import { useDevice } from "@/providers/device-provider";
 
 import { api } from "~/convex/_generated/api";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
@@ -44,6 +44,7 @@ import { usePreloadedQuery } from "convex/react";
 // const font = Poppins({ subsets: ["latin"], weight: "600" })
 
 export default function Home() {
+  const isMobile = useIsMobile();
   const searchParams = useSearchParams();
   const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
 
@@ -109,8 +110,6 @@ export default function Home() {
     if (popoverOpen) setPopoverOpen(false);
     setTitleOpacity(latest);
   });
-
-  const { isMobile } = useDevice();
 
   useEffect(() => {
     const errorDesc = searchParams.get("err");
@@ -291,7 +290,7 @@ export default function Home() {
                       <span
                         className={cn(
                           "block text-xs sm:hidden",
-                          currentSlide === 3 && "hidden",
+                          currentSlide === 4 && "hidden",
                         )}
                       >
                         |
@@ -305,16 +304,12 @@ export default function Home() {
                     </span>
                     <Separator
                       thickness={2}
-                      orientation={isMobile ? "horizontal" : "vertical"}
-                      className={cn(
-                        "mx-1 h-5",
-                        "[@media(max-width:768px)]:hidden",
-                      )}
+                      orientation="vertical"
+                      className={cn("mx-1 hidden h-5 md:block")}
                     />
                     <span
                       className={cn(
-                        "flex items-center gap-1 text-sm hover:cursor-pointer group-hover:font-semibold",
-                        "[@media(max-width:768px)]:hidden",
+                        "hidden items-center gap-1 text-sm hover:cursor-pointer group-hover:font-semibold sm:flex",
                       )}
                     >
                       {popoverOpen ? (

@@ -37,6 +37,7 @@ import type { User } from "@/types/user";
 
 import { useEffect, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useIsMobile } from "@/hooks/use-media-query";
 import { kanbanCardSchema } from "@/schemas/admin";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
@@ -91,7 +92,6 @@ import { TooltipSimple } from "@/components/ui/tooltip";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { RichTextDisplay } from "@/helpers/richTextFns";
 import { cn } from "@/helpers/utilsFns";
-import { useDevice } from "@/providers/device-provider";
 
 import { api } from "~/convex/_generated/api";
 import { useQuery } from "convex-helpers/react/cache";
@@ -116,6 +116,7 @@ export const getColumnColor = (column: ColumnType) => {
 };
 
 const Board = ({ purpose: basePurpose }: KanbanBoardProps) => {
+  const isMobile = useIsMobile();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -130,7 +131,6 @@ const Board = ({ purpose: basePurpose }: KanbanBoardProps) => {
     "todo") as KanbanPurpose;
 
   const { preloadedUserData } = useConvexPreload();
-  const { isMobile } = useDevice();
   const userData = usePreloadedQuery(preloadedUserData);
   // const { isSidebarCollapsed } = useDashboard();
   const user = userData?.user ?? null;

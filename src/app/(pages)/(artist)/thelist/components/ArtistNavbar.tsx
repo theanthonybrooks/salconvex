@@ -8,6 +8,7 @@ import {
 
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
+import { useIsMobile } from "@/hooks/use-media-query";
 // import { useQuery } from "convex-helpers/react/cache"
 import { motion, useMotionValueEvent, useScroll } from "framer-motion";
 
@@ -31,12 +32,11 @@ import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-con
 import { ListItem } from "@/features/wrapper-elements/navigation/components/navbar";
 import { NavbarSigninSection } from "@/features/wrapper-elements/navigation/components/navbar-signin-section";
 import { cn } from "@/helpers/utilsFns";
-import { useDevice } from "@/providers/device-provider";
 
 import { usePreloadedQuery } from "convex/react";
 
 export default function TheListNavBar() {
-  const { isMobile } = useDevice();
+  const isMobile = useIsMobile();
   const { preloadedUserData, preloadedSubStatus } = useConvexPreload();
   const userData = usePreloadedQuery(preloadedUserData);
   const subData = usePreloadedQuery(preloadedSubStatus);

@@ -37,7 +37,6 @@ import { useMutation, usePreloadedQuery } from "convex/react";
 import { ConvexError } from "convex/values";
 
 export const AccountSettings = () => {
-  // const { isMobile } = useDevice();
   const { preloadedUserData, preloadedSubStatus } = useConvexPreload();
   const userData = usePreloadedQuery(preloadedUserData);
   const subData = usePreloadedQuery(preloadedSubStatus);

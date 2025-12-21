@@ -2,6 +2,9 @@ import type { ReactNode } from "react";
 import type { IconType } from "react-icons";
 
 import { useState } from "react";
+import { useIsMobile } from "@/hooks/use-media-query";
+
+import { ChevronDown, ChevronRight } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -19,6 +22,7 @@ type SectionItemProps = {
   children: ReactNode;
   disabled?: boolean;
   comingSoon?: boolean;
+  type?: "toggle" | "general";
 };
 
 export const SectionItem = ({
@@ -30,13 +34,18 @@ export const SectionItem = ({
   fontSize,
   disabled,
   comingSoon,
+  type = "general",
   children,
 }: SectionItemProps) => {
+  const isMobile = useIsMobile();
+  const isToggle = type === "toggle";
+
   const Icon = icon;
   return (
     <div
       className={cn(
-        "flex flex-col items-start justify-start gap-y-2 px-3 md:flex-row md:items-center md:justify-between md:gap-y-0",
+        "flex flex-col items-start justify-start gap-y-2 sm:px-3 md:flex-row md:items-center md:justify-between md:gap-y-0",
+        isToggle && isMobile && "w-full flex-row justify-between py-1",
         className,
         disabled && "pointer-events-none opacity-40",
       )}
@@ -53,10 +62,14 @@ export const SectionItem = ({
             {title}
             {comingSoon && <p className="text-xs italic">(*coming soon)</p>}
           </Label>
-          {description && (
-            <p className="text-sm text-muted-foreground">{description}</p>
+          {!isMobile && (
+            <>
+              {description && (
+                <p className="text-sm text-muted-foreground">{description}</p>
+              )}
+              {descriptionNode && descriptionNode}
+            </>
           )}
-          {descriptionNode && descriptionNode}
         </div>
       </div>
       {children}
@@ -75,7 +88,7 @@ type SectionGroupProps = {
 } & SectionItemProps;
 
 export const SectionGroup = (props: SectionGroupProps) => {
-  const { children, group, className, ...rest } = props;
+  const { children, group, className, title, icon, ...rest } = props;
   const {
     groupClassName,
     sectionToggleAction,
@@ -83,26 +96,49 @@ export const SectionGroup = (props: SectionGroupProps) => {
     separator = true,
   } = group ?? {};
   const [expanded, setExpanded] = useState(false);
+  const isMobile = useIsMobile();
+  const Icon = icon;
+  const ExpandedIcon = expanded ? ChevronDown : ChevronRight;
   return (
     <>
       {separator && <Separator />}
-      <SectionItem {...rest} className={cn(className)}>
-        <div className="flex items-center justify-end gap-x-2">
-          <Button
-            variant="link"
-            onClick={() => setExpanded(!expanded)}
-            size="sm"
-          >
-            View {expanded ? "Less" : "More"}
-          </Button>
-          {sectionToggleAction && (
-            <Switch
-              checked={sectionToggleValue}
-              onCheckedChange={sectionToggleAction}
-            />
-          )}
+      {isMobile ? (
+        <div
+          className="flex items-center justify-between"
+          onClick={() => setExpanded(!expanded)}
+        >
+          <div className="flex items-center gap-x-2">
+            {Icon && <Icon className="size-5 shrink-0 text-muted-foreground" />}
+            <Label className="text-sm font-medium leading-none">{title}</Label>
+          </div>
+          <div className="flex h-9 items-center justify-center px-2">
+            <ExpandedIcon className="size-5 shrink-0" />
+          </div>
         </div>
-      </SectionItem>
+      ) : (
+        <SectionItem
+          title={title}
+          icon={icon}
+          {...rest}
+          className={cn(className)}
+        >
+          <div className="flex items-center justify-end gap-x-2">
+            <Button
+              variant="link"
+              onClick={() => setExpanded(!expanded)}
+              size="sm"
+            >
+              View {expanded ? "Less" : "More"}
+            </Button>
+            {sectionToggleAction && (
+              <Switch
+                checked={sectionToggleValue}
+                onCheckedChange={sectionToggleAction}
+              />
+            )}
+          </div>
+        </SectionItem>
+      )}
       {expanded && (
         <div className={cn("space-y-4 pl-6 sm:pl-10", groupClassName)}>
           {children}

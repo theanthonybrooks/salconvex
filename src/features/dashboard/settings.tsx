@@ -1,12 +1,14 @@
 "use client";
 
 import { useParams, usePathname, useRouter } from "next/navigation";
+import { useIsMobile } from "@/hooks/use-media-query";
 
 import { AccountSettings } from "@/components/ui/account/account-settings";
 import { AppearanceSettings } from "@/components/ui/account/appearance-settings";
 import { NotificationsSettings } from "@/components/ui/account/notifications-settings";
 import { SecuritySettings } from "@/components/ui/account/security-settings";
 import { CanceledBanner } from "@/components/ui/canceled-banner";
+import { SelectSimple } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { getUserFontSizePref } from "@/helpers/stylingFns";
@@ -32,7 +34,7 @@ export const getToastMessage = (
 };
 
 export default function SettingsPage() {
-  // const { isMobile } = useDevice();
+  const isMobile = useIsMobile();
   const router = useRouter();
   const pathname = usePathname();
   const params = useParams<{ slug?: string[] }>();
@@ -79,40 +81,54 @@ export default function SettingsPage() {
         onValueChange={handleTabChange}
         className="space-y-6"
       >
-        <TabsList className="scrollable invis h-12 w-full max-w-full justify-around bg-white/80 md:w-auto md:justify-start">
-          <TabsTrigger
-            value="account"
-            className={cn("h-9 px-4", fontSize)}
-            border
-          >
-            Account
-          </TabsTrigger>
+        {isMobile ? (
+          <SelectSimple
+            options={[
+              { value: "account", label: "Account" },
+              { value: "appearance", label: "Appearance" },
+              { value: "notifications", label: "Notifications" },
+              { value: "security", label: "Security" },
+            ]}
+            value={activeTab}
+            onChangeAction={(value) => handleTabChange(value)}
+            className="border-1.5 border-foreground/30 bg-card"
+            fontSize={fontSize}
+          />
+        ) : (
+          <TabsList className="scrollable invis h-12 w-full max-w-full justify-around bg-white/80 md:w-auto md:justify-start">
+            <TabsTrigger
+              value="account"
+              className={cn("h-9 px-4", fontSize)}
+              border
+            >
+              Account
+            </TabsTrigger>
 
-          <TabsTrigger
-            value="notifications"
-            className={cn("hidden h-9 px-4 lg:block", fontSize)}
-            border
-          >
-            Notifications
-          </TabsTrigger>
+            {/* /~ //NOTE: in order to disable, just add "disabled" to the tabs    trigger ~/ */}
 
-          {/* /~ //NOTE: in order to disable, just add "disabled" to the tabs    trigger ~/ */}
-
-          <TabsTrigger
-            value="appearance"
-            className={cn("h-9 px-4", fontSize)}
-            border
-          >
-            Appearance
-          </TabsTrigger>
-          <TabsTrigger
-            value="security"
-            className={cn("h-9 px-4", fontSize)}
-            border
-          >
-            Security
-          </TabsTrigger>
-        </TabsList>
+            <TabsTrigger
+              value="appearance"
+              className={cn("h-9 px-4", fontSize)}
+              border
+            >
+              Appearance
+            </TabsTrigger>
+            <TabsTrigger
+              value="notifications"
+              className={cn("h-9 px-4", fontSize)}
+              border
+            >
+              Notifications
+            </TabsTrigger>
+            <TabsTrigger
+              value="security"
+              className={cn("h-9 px-4", fontSize)}
+              border
+            >
+              Security
+            </TabsTrigger>
+          </TabsList>
+        )}
 
         <TabsContent value="account" className="space-y-6">
           <AccountSettings />

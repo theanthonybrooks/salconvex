@@ -10,7 +10,7 @@ import { OpenCallState, OpenCallStatus } from "@/types/openCallTypes";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useMediaQuery } from "@/hooks/use-media-query";
+import { useIsMobile, useMediaQuery } from "@/hooks/use-media-query";
 
 import { FaBookmark, FaRegBookmark, FaRegCopy } from "react-icons/fa6";
 import {
@@ -52,7 +52,6 @@ import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-con
 import { getEventCategoryLabel } from "@/helpers/eventFns";
 import { capitalizeWords } from "@/helpers/stylingFns";
 import { capitalize, cn } from "@/helpers/utilsFns";
-import { useDevice } from "@/providers/device-provider";
 
 import { api } from "~/convex/_generated/api";
 import { Id } from "~/convex/_generated/dataModel";
@@ -118,8 +117,8 @@ const EventContextMenu = ({
   src,
 }: EventContextMenuProps) => {
   // const router = useRouter();
+  const isMobile = useIsMobile();
   const pathname = usePathname();
-  const { isMobile } = useDevice();
   const eventPage = pathname?.includes("/event");
   const isLargeScreen = useMediaQuery("(min-width: 1535px)");
 

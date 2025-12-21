@@ -17,13 +17,13 @@ import { Input } from "@/components/ui/input";
 import { type OrgLinkField } from "@/features/organizers/schemas/event-add-schema";
 import { autoHttps } from "@/helpers/linkFns";
 import { cn } from "@/helpers/utilsFns";
-import { useDevice } from "@/providers/device-provider";
 
 import "react-phone-number-input/style.css";
 
 import type { OrganizationValues } from "@/schemas/organizer";
 
 import { useEffect, useRef, useState } from "react";
+import { useIsMobile } from "@/hooks/use-media-query";
 import { motion } from "framer-motion";
 
 import { Button } from "@/components/ui/button";
@@ -41,7 +41,7 @@ export const OrgLinksInput = ({}: FormLinksInputProps) => {
     formState: { errors },
   } = useFormContext<OrganizationValues>();
   const expandedRef = useRef<boolean | null>(null);
-  const { isMobile } = useDevice();
+  const isMobile = useIsMobile();
   const links = watch("links");
   const location = watch("location");
   const primaryField = watch("contact.primaryContact");

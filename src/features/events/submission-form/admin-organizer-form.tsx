@@ -10,6 +10,7 @@ import { User } from "@/types/user";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useDashboard } from "@/app/(pages)/dashboard/_components/DashboardContext";
+import { useIsMobile } from "@/hooks/use-media-query";
 import { getExternalRedirectHtml } from "@/utils/loading-page-html";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { debounce, merge } from "lodash";
@@ -49,7 +50,6 @@ import { getEventCategoryLabel } from "@/helpers/eventFns";
 import { getOcPricing } from "@/helpers/pricingFns";
 import { handleFileUrl, handleOrgFileUrl } from "@/lib/fileUploadFns";
 import { showToast } from "@/lib/toast";
-import { useDevice } from "@/providers/device-provider";
 import { useUserInfo } from "@/providers/user-info-provider";
 
 import { api } from "~/convex/_generated/api";
@@ -71,7 +71,7 @@ interface AdminEventOCFormProps {
 export type EventOCFormValues = z.infer<typeof eventWithOCSchema>;
 
 export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
-  const { isMobile } = useDevice();
+  const isMobile = useIsMobile();
   const { currency } = useUserInfo();
   const { isSidebarCollapsed } = useDashboard();
 

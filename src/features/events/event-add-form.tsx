@@ -17,6 +17,7 @@ import {
   useState,
 } from "react";
 import { useRouter } from "next/navigation";
+import { useIsMobile } from "@/hooks/use-media-query";
 import { getExternalRedirectHtml } from "@/utils/loading-page-html";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { debounce, merge } from "lodash";
@@ -63,7 +64,6 @@ import { getOcPricing } from "@/helpers/pricingFns";
 import { cn } from "@/helpers/utilsFns";
 import { handleFileUrl, handleOrgFileUrl } from "@/lib/fileUploadFns";
 import { showToast } from "@/lib/toast";
-import { useDevice } from "@/providers/device-provider";
 import { useUserInfo } from "@/providers/user-info-provider";
 
 import { api } from "~/convex/_generated/api";
@@ -156,7 +156,7 @@ export const EventOCForm = ({
 }: EventOCFormProps) => {
   // const convex = useConvex();
   const router = useRouter();
-  const { isMobile } = useDevice();
+  const isMobile = useIsMobile();
   const { currency } = useUserInfo();
   const isAdmin = user?.role?.includes("admin") || false;
   const steps = getSteps(isAdmin);
