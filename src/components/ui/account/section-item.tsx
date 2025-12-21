@@ -22,6 +22,7 @@ type SectionItemProps = {
   children: ReactNode;
   disabled?: boolean;
   comingSoon?: boolean;
+  subTitle?: string;
   type?: "toggle" | "general";
 };
 
@@ -34,6 +35,7 @@ export const SectionItem = ({
   fontSize,
   disabled,
   comingSoon,
+  subTitle,
   type = "general",
   children,
 }: SectionItemProps) => {
@@ -61,6 +63,9 @@ export const SectionItem = ({
           >
             {title}
             {comingSoon && <p className="text-xs italic">(*coming soon)</p>}
+            {subTitle && !isMobile && (
+              <p className="text-xs italic">(*{subTitle})</p>
+            )}
           </Label>
           {!isMobile && (
             <>

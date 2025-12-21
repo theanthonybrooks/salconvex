@@ -365,6 +365,9 @@ export const NotificationsSettings = () => {
                 description="Receive notifications for new open calls when they're added"
                 type="toggle"
                 disabled={!minBananaUser}
+                subTitle={
+                  minBananaUser ? undefined : "Requires minimum Banana Cap Plan"
+                }
                 fontSize={fontSize}
               >
                 <Switch
