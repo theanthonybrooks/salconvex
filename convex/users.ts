@@ -987,7 +987,6 @@ async function performDeleteAccount(
   ctx: MutationCtx,
   args: { method: string; email?: string; userId?: string; agent?: string },
 ): Promise<void> {
-  // Define the allowed methods and their configuration.
   type MethodType =
     | "deleteAccount"
     | "ban"

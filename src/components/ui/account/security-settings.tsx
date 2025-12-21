@@ -315,7 +315,10 @@ export const SecuritySettings = () => {
 
                   <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={onDeleteAccount}>
+                    <AlertDialogAction
+                      onClick={onDeleteAccount}
+                      disabled={pending}
+                    >
                       Yes, Delete
                     </AlertDialogAction>
                   </AlertDialogFooter>
@@ -323,7 +326,6 @@ export const SecuritySettings = () => {
               </AlertDialog>
             ) : (
               <Button
-                disabled={canDelete}
                 type="button"
                 variant="destructive"
                 className="w-full min-w-[150px] font-bold sm:w-auto"
