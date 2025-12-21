@@ -28,6 +28,7 @@ export default {
       screens: {
         lg: "1025px",
         tablet: "1080px",
+
         ipad: "1367px",
 
         "2xl": "1536px",

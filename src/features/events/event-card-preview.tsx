@@ -6,6 +6,7 @@ import type { User } from "@/types/user";
 
 import { useEffect, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import { useIsMobile } from "@/hooks/use-media-query";
 
 import { FaRegCheckSquare } from "react-icons/fa";
 import { FaBookmark, FaRegBookmark, FaRegSquare } from "react-icons/fa6";
@@ -66,6 +67,7 @@ const EventCardPreview = ({
   activeSub,
   viewType,
 }: EventCardPreviewProps) => {
+  const isMobile = useIsMobile(1280);
   const pathname = usePathname();
   const thisWeekPage = pathname.includes("thisweek");
   const eventView = viewType === "event";
@@ -471,7 +473,7 @@ const EventCardPreview = ({
       {/* //---------------------- (Desktop) Layout ---------------------- */}
       <Card
         className={cn(
-          "mb-10 hidden min-h-[15em] w-[95vw] min-w-[640px] grid-cols-[60px_minmax(0,auto)_15%_22%_20%] gap-x-3 rounded-3xl border-foreground/20 bg-white/40 transition-colors duration-100 ease-in-out first:mt-6 hover:bg-white/50 hover:shadow-lg sm:max-w-[min(100rem,91vw)] lg:grid xl:grid-cols-[60px_minmax(0,auto)_15%_27%_25%] 2xl:w-[90vw]",
+          "mb-10 hidden min-h-[15em] w-[95vw] min-w-[640px] grid-cols-[60px_minmax(0,auto)_15%_22%_20%] gap-x-3 rounded-3xl border-foreground/20 bg-white/40 transition-colors duration-100 ease-in-out first:mt-6 hover:bg-white/50 hover:shadow-lg lg:grid lg:max-w-[min(100rem,93vw)] xl:grid-cols-[60px_minmax(0,auto)_15%_27%_25%] 2xl:w-[90vw]",
         )}
       >
         <div className="flex flex-col items-center justify-between border-r border-foreground/20 pb-3 pt-5">
@@ -629,7 +631,7 @@ const EventCardPreview = ({
               <span className="font-semibold">Dates:</span>
               <EventDates
                 event={event}
-                format="desktop"
+                format={isMobile ? "mobile" : "desktop"}
                 limit={1}
                 preview={true}
                 type="event"
@@ -646,7 +648,9 @@ const EventCardPreview = ({
               >
                 <p className="font-semibold">Type:</p>
                 {eventType
-                  .map((type) => getEventTypeLabel(type, fontPref === "large"))
+                  .map((type) =>
+                    getEventTypeLabel(type, isMobile || fontPref === "large"),
+                  )
                   .join(" | ")}
               </span>
             )}
@@ -881,7 +885,7 @@ const EventCardPreview = ({
             openCall={event.openCallStatus}
             publicView={publicPreview || isUserOrg ? false : publicView}
             appFee={basicInfo ? basicInfo.appFee : 0}
-            className="max-w-40 ipad:hidden"
+            className="max-w-40 xl:hidden"
           />
 
           <ApplyButton
@@ -910,7 +914,7 @@ const EventCardPreview = ({
             eventCategory={eventCategory}
             isPreview={true}
             appFee={basicInfo ? basicInfo.appFee : 0}
-            className="hidden ipad:flex"
+            className="hidden xl:flex"
             fontSize={fontSize}
           />
           {isCurrentlyOpen && basicInfo.callFormat && (

@@ -21,8 +21,8 @@ export function useMediaQuery(query: string) {
   return matches;
 }
 
-export function useIsMobile(maxHeight?: number): boolean {
+export function useIsMobile(maxWidth?: number): boolean {
   const { isMobile: isMobileDevice } = useDevice();
-  const isMobileSize = useMediaQuery(`(max-width: ${maxHeight ?? 1024}px)`);
+  const isMobileSize = useMediaQuery(`(max-width: ${maxWidth ?? 1024}px)`);
   return isMobileDevice || isMobileSize;
 }
