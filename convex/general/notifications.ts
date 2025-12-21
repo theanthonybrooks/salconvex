@@ -119,12 +119,23 @@ export async function cloneNotificationForUser(
   notification: Doc<"notifications">,
   userId: Id<"users">,
 ) {
+  const existing = await ctx.db
+    .query("notifications")
+    .withIndex("by_dedupeKey_userId_dismissed", (q) =>
+      q
+        .eq("dedupeKey", notification.dedupeKey)
+        .eq("userId", userId)
+        .eq("dismissed", true),
+    )
+    .first();
+
+  if (existing) return;
+
   const { _id, _creationTime, userId: _oldUserId, ...rest } = notification;
   await ctx.db.insert("notifications", {
     ...rest,
     userId,
     dismissed: true,
-    updatedAt: Date.now(),
   });
 }
 
@@ -140,7 +151,9 @@ export const unarchiveNotification = mutation({
     const dedupeKey = notification.dedupeKey;
     const notifications = await ctx.db
       .query("notifications")
-      .withIndex("by_dedupeKey_userId", (q) => q.eq("dedupeKey", dedupeKey))
+      .withIndex("by_dedupeKey_userId_dismissed", (q) =>
+        q.eq("dedupeKey", dedupeKey),
+      )
       .collect();
     if (notifications.length === 0)
       throw new ConvexError({
@@ -449,7 +462,9 @@ export async function upsertNotification(
   const outputDedupeKey = notification.dedupeKey;
   const existing = await ctx.db
     .query("notifications")
-    .withIndex("by_dedupeKey_userId", (q) => q.eq("dedupeKey", outputDedupeKey))
+    .withIndex("by_dedupeKey_userId_dismissed", (q) =>
+      q.eq("dedupeKey", outputDedupeKey),
+    )
     .first();
   console.log(notification.deadline);
 

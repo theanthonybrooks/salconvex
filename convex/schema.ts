@@ -1902,7 +1902,11 @@ export default defineSchema({
     ])
     .index("by_deadline", ["deadline"])
     .index("by_type", ["type"])
-    .index("by_dedupeKey_userId", ["dedupeKey", "userId"])
+    .index("by_dedupeKey_userId_dismissed", [
+      "dedupeKey",
+      "userId",
+      "dismissed",
+    ])
     .index("by_dedupeKey_dismissed", ["dedupeKey", "dismissed"]),
 });
 
