@@ -279,7 +279,7 @@ const RegisterForm = ({ switchFlow }: RegisterFormProps) => {
             targetRole: "user",
             importance: "high",
             userId: userData?.userId,
-            redirectUrl: "/dashboard/settings/notifications",
+            redirectUrl: "/dashboard/settings",
             displayText: "Welcome to The Street Art List!",
             description:
               "Take a look around and see what's happening! You can personalize your experience in the dashboard",
