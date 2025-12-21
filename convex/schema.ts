@@ -85,6 +85,7 @@ export const notificationTypeValidator = v.union(
   v.literal("audienceSubscribed"),
   v.literal("audienceUnsubscribed"),
   //other
+  v.literal("general"),
   v.literal("newMessage"),
   v.literal("newFollow"),
   v.literal("newResponse"),

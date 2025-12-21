@@ -406,6 +406,7 @@ const NotificationDropdownItem = ({
     // targetRole,
     // targetUserType,
     // dedupeKey,
+    importance,
     description,
     displayText,
     _creationTime: createdAt,
@@ -459,13 +460,21 @@ const NotificationDropdownItem = ({
     newFollow: Bell,
     newResponse: Bell,
     newApplication: Bell,
+    general: Bell,
   };
 
   const Icon = notificationTypeIconMap[type];
   const destinationUrl = notification.redirectUrl ?? "/404";
 
   return (
-    <DropdownMenuItem key={id} className="group w-full" asChild>
+    <DropdownMenuItem
+      key={id}
+      className={cn(
+        "group w-full",
+        !archived && importance === "high" && "bg-salPinkLt/70",
+      )}
+      asChild
+    >
       <Link
         key={id}
         href={destinationUrl}

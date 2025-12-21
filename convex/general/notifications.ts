@@ -36,7 +36,7 @@ export function isNotificationEnabled(
   prefs: InAppPrefs,
   type: Doc<"notifications">["type"],
 ): boolean {
-  if (Object.keys(prefs).length === 0) return false;
+  // if (Object.keys(prefs).length === 0) return false;
   let enabled: boolean = false;
   switch (type) {
     // public
@@ -111,6 +111,11 @@ export function isNotificationEnabled(
       break;
     case "audienceUnsubscribed":
       enabled = prefs.newsletter?.audience.unsubscribed ?? false;
+      break;
+
+    //default true options
+    case "general":
+      enabled = true;
       break;
 
     // other – decide if these should be controlled by prefs or always on

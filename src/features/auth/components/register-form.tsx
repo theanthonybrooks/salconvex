@@ -270,9 +270,20 @@ const RegisterForm = ({ switchFlow }: RegisterFormProps) => {
             type: "newUser",
             targetRole: "admin",
             redirectUrl: `/dashboard/admin/users?id=${userData?.userId}`,
-            displayText: `New User Registered`,
+            displayText: `New user registered`,
             description: `${userData?.name} signed up!`,
             dedupeKey: `user-${userData?.userId}-added`,
+          });
+          await createNotification({
+            type: "general",
+            targetRole: "user",
+            importance: "high",
+            userId: userData?.userId,
+            redirectUrl: "/dashboard/settings/notifications",
+            displayText: "Welcome to The Street Art List!",
+            description:
+              "Take a look around and see what's happening! You can personalize your experience in the dashboard",
+            dedupeKey: `user-${userData?.userId}-welcome`,
           });
           setSuccess("Successfully signed up and verified!");
           setTimeout(() => {

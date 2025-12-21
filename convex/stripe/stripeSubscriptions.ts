@@ -162,7 +162,7 @@ export const createStripeCheckoutSession = action({
       const priceId =
         (args.interval && plan.prices[args.interval]?.[currency]?.stripeId) ||
         plan.prices.month.currency.stripeId;
-
+      console.log("priceId: ", priceId, currency);
       // console.log("priceId which: ", priceId);
 
       if (!priceId)
@@ -416,13 +416,6 @@ export const subscriptionStoreWebhook = mutation({
             customerId: args.body.data.object.customer,
             paidStatus: paymentStatus === "paid",
           });
-          await upsertNotification(ctx, {
-            type: "newSubscription",
-            targetRole: "admin",
-            redirectUrl: `/dashboard/admin/users?id=${metadata.userId}`,
-            displayText: "New user Subscription",
-            dedupeKey: `user-${metadata.userId}-subscribed`,
-          });
         }
 
         // console.log("should be able to do logic for one-time here");
@@ -442,7 +435,7 @@ export const subscriptionStoreWebhook = mutation({
             type: "newSubscription",
             targetRole: "admin",
             redirectUrl: `/dashboard/admin/users?id=${existingUser._id}`,
-            displayText: "New user Subscription",
+            displayText: "New user subscription",
             description: `${existingUser.name} has a new subscription`,
             dedupeKey: `user-${existingUser._id}-subscribed`,
           });
@@ -460,6 +453,21 @@ export const subscriptionStoreWebhook = mutation({
             });
           }
         }
+        await upsertNotification(ctx, {
+          type: "newSubscription",
+          targetRole: "admin",
+          redirectUrl: `/dashboard/admin/users?id=${metadata.userId}`,
+          displayText: "New user subscription",
+          dedupeKey: `user-${metadata.userId}-subscribed`,
+        });
+        await upsertNotification(ctx, {
+          type: "account",
+          targetRole: "user",
+          userId: metadata.userId,
+          redirectUrl: `/dashboard/billing`,
+          displayText: "You're successfully subscribed!",
+          dedupeKey: `user-${metadata.userId}-subscription-created`,
+        });
 
         break;
 
@@ -744,6 +752,23 @@ export const subscriptionStoreWebhook = mutation({
             plan: 0,
             subscription: undefined,
           });
+          await upsertNotification(ctx, {
+            type: "account",
+            targetRole: "user",
+            userId: userData._id,
+            importance: "high",
+            redirectUrl: `/dashboard/billing`,
+            displayText: "Your subscription was cancelled",
+            dedupeKey: `user-${userData._id}-subscription-cancelled`,
+          });
+          await upsertNotification(ctx, {
+            type: "canceledSubscription",
+            targetRole: "admin",
+            redirectUrl: `/dashboard/admin/users?id=${userData._id}`,
+            displayText: "User subscription cancelled",
+            description: `${userData.name} cancelled their subscription`,
+            dedupeKey: `user-${userData._id}-cancelled`,
+          });
         }
 
         break;
@@ -899,6 +924,11 @@ export const subscriptionStoreWebhook = mutation({
           .first();
 
         if (canceledSub) {
+          const canceledUser = await ctx.db.get(
+            canceledSub.userId as Id<"users">,
+          );
+          console.log(canceledSub.userId, canceledUser);
+
           await ctx.db.patch(canceledSub._id, {
             plan: undefined,
             status: args.body.data.object.status,
@@ -912,6 +942,16 @@ export const subscriptionStoreWebhook = mutation({
             customerCancellationFeedback:
               args.body.data.object.customer_cancellation_feedback || undefined,
           });
+          if (canceledUser) {
+            await upsertNotification(ctx, {
+              type: "canceledSubscription",
+              targetRole: "admin",
+              redirectUrl: `/dashboard/admin/users?id=${canceledUser._id}`,
+              displayText: "User subscription cancelled",
+              description: `${canceledUser.name} cancelled their subscription`,
+              dedupeKey: `user-${canceledUser._id}-cancelled`,
+            });
+          }
         }
         break;
 

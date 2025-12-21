@@ -1180,6 +1180,11 @@ async function deleteRelatedDocuments(
     q.eq("userId", userId),
   );
 
+  // 3. Delete notifications
+  await deleteInBatches("notifications", "by_userId_dismissed_updatedAt", (q) =>
+    q.eq("userId", userId),
+  );
+
   const newsletterSub = await ctx.db
     .query("newsletter")
     .withIndex("by_userId", (q: any) => q.eq("userId", userId))
