@@ -425,13 +425,17 @@ export const getNotifications = query({
       ...userNotifications,
     ]);
 
+    const filteredDismissedNotifications = dismissedNotifications.filter((n) =>
+      isNotificationEnabled(inAppNotifications, n.type),
+    );
+
     const dedupedActiveNotifications = dedupeNotifications(
       filteredActiveNotifications,
     );
 
     return {
       userNotifications: dedupedActiveNotifications,
-      dismissedNotifications,
+      dismissedNotifications: filteredDismissedNotifications,
     };
   },
 });

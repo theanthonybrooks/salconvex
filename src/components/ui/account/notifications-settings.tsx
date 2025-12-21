@@ -364,10 +364,13 @@ export const NotificationsSettings = () => {
                 title="Open Calls"
                 description="Receive notifications for new open calls when they're added"
                 type="toggle"
+                disabled={!minBananaUser}
                 fontSize={fontSize}
               >
                 <Switch
-                  checked={inAppNotifications?.openCalls ?? false}
+                  checked={
+                    (minBananaUser && inAppNotifications?.openCalls) ?? false
+                  }
                   onCheckedChange={(value) =>
                     handleUpdateinAppNotifications({ openCalls: value })
                   }
