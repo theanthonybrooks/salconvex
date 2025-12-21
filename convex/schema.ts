@@ -106,7 +106,8 @@ const notificationsSchema = {
   type: notificationTypeValidator,
   dedupeKey: v.string(),
   dismissed: v.boolean(),
-  userId: v.union(v.id("users"), v.null()),
+  userId: v.nullable(v.id("users")),
+  eventId: v.optional(v.id("events")),
   importance: importanceValidator,
   deadline: v.number(),
   targetRole: fullRoleValidator,
@@ -1172,6 +1173,7 @@ export const analyticsSrcSchema = v.union(
   v.literal("orgPage"),
   v.literal("ocPage"),
   v.literal("eventPage"),
+  v.literal("notifications"),
 );
 
 export type AnalyticsSrcType = Infer<typeof analyticsSrcSchema>;

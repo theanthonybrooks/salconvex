@@ -565,6 +565,17 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
           `You've successfully updated your ${getEventCategoryLabel(eventCategory, true)}!`,
         );
       }
+      await createNotification({
+        type: "newSubmission",
+        targetRole: "admin",
+        importance: "high",
+        redirectUrl: `/thelist/event/${submissionUrl}`,
+        displayText: "New Event Submission",
+        description: `${eventData.name}`,
+        dedupeKey: openCallId
+          ? `oc-${openCallId}-submitted`
+          : `event-${eventData._id}-submitted`,
+      });
       setTimeout(() => {
         window.location.href = `/thelist/event/${submissionUrl}`;
       }, 1000);
@@ -1600,6 +1611,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
                 description: `${eventData.name}`,
                 redirectUrl: `/thelist/event/${submissionUrl}`,
                 dedupeKey: `oc-${openCallId}-published`,
+                eventId: eventData._id,
               });
             }
           }
@@ -1610,6 +1622,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
               description: `${eventData.name}`,
               redirectUrl: `/thelist/event/${submissionUrl}`,
               dedupeKey: `event-${eventData._id}-added`,
+              eventId: eventData._id,
             });
           }
           setTimeout(() => {

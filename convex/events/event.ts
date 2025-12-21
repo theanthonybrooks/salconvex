@@ -1323,6 +1323,7 @@ export const createOrUpdateEvent = mutation({
           },
         );
       }
+
       return { event: updatedEvent };
     }
 
@@ -1361,17 +1362,17 @@ export const createOrUpdateEvent = mutation({
       state: eventState,
       lastEditedAt: Date.now(),
     });
-    if (eventState === "submitted") {
-      await upsertNotification(ctx, {
-        type: "newSubmission",
-        targetRole: "admin",
-        importance: "high",
-        redirectUrl: `/thelist/event/${args.slug}/${args.dates.edition}`,
-        displayText: "New Event Submission",
-        description: args.name.trim(),
-        dedupeKey: `event-${eventId}-submitted`,
-      });
-    }
+    // if (eventState === "submitted") {
+    //   await upsertNotification(ctx, {
+    //     type: "newSubmission",
+    //     targetRole: "admin",
+    //     importance: "high",
+    //     redirectUrl: `/thelist/event/${args.slug}/${args.dates.edition}`,
+    //     displayText: "New Event Submission",
+    //     description: args.name.trim(),
+    //     dedupeKey: `event-${eventId}-submitted`,
+    //   });
+    // }
     const newEvent = await ctx.db.get(eventId);
     if (newEvent) await eventsAggregate.insertIfDoesNotExist(ctx, newEvent);
     return { event: newEvent };
@@ -1408,6 +1409,7 @@ export const updateEventStatus = mutation({
         redirectUrl: `/thelist/event/${event.slug}/${event.dates.edition}`,
         displayText: "New Event Added",
         description: event.name,
+        eventId: event._id,
         dedupeKey: `event-${event._id}-added`,
       });
     }
@@ -1452,6 +1454,7 @@ export const approveEvent = mutation({
         redirectUrl: `/thelist/event/${event.slug}/${event.dates.edition}`,
         displayText: "New Event Published",
         description: event.name,
+        eventId: event._id,
         dedupeKey: `event-${event._id}-added`,
       });
     }
@@ -1499,19 +1502,21 @@ export const reactivateEvent = mutation({
           displayText: "New Event Added",
           description: event.name,
           redirectUrl: `/thelist/event/${event.slug}/${event.dates.edition}`,
+          eventId: event._id,
           dedupeKey: `event-${event._id}-added`,
         });
-      } else {
-        await upsertNotification(ctx, {
-          type: "newSubmission",
-          targetRole: "admin",
-          importance: "high",
-          redirectUrl: `/thelist/event/${event.slug}/${event.dates.edition}`,
-          displayText: "New Event Submission",
-          description: event.name,
-          dedupeKey: `event-${event._id}-submitted`,
-        });
       }
+      // else {
+      //   await upsertNotification(ctx, {
+      //     type: "newSubmission",
+      //     targetRole: "admin",
+      //     importance: "high",
+      //     redirectUrl: `/thelist/event/${event.slug}/${event.dates.edition}`,
+      //     displayText: "New Event Submission",
+      //     description: event.name,
+      //     dedupeKey: `event-${event._id}-submitted`,
+      //   });
+      // }
     }
 
     // const oc = await ctx.db

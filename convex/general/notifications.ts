@@ -196,9 +196,10 @@ export const clearNotificationsBatch = internalMutation({
     mode: v.union(v.literal("user"), v.literal("role")),
     role: v.optional(fullRoleValidator),
     userId: v.id("users"),
+    userPlan: v.optional(v.number()),
   }),
   handler: async (ctx, args) => {
-    const { cursor, numItems, mode, role, userId } = args;
+    const { cursor, numItems, mode, role, userId, userPlan } = args;
 
     const tableQuery: QueryInitializer<DataModel["notifications"]> =
       ctx.db.query("notifications");
@@ -225,6 +226,13 @@ export const clearNotificationsBatch = internalMutation({
     });
 
     for (const notification of page) {
+      if (
+        mode === "role" &&
+        userPlan !== undefined &&
+        (notification.minPlan ?? 0) > userPlan
+      ) {
+        continue;
+      }
       if (mode === "user") {
         if (notification.userId) {
           await ctx.db.patch(notification._id, {
@@ -252,6 +260,7 @@ export const clearAllNotificationsForCurrentUser = internalAction({
   handler: async (ctx, args) => {
     const { user } = args;
     const userRoles = user.role;
+    const userPlan = user.plan ?? 0;
     const extendedRoles: FullRole = [...userRoles, "all"];
 
     {
@@ -294,6 +303,7 @@ export const clearAllNotificationsForCurrentUser = internalAction({
               userId: user._id,
               cursor,
               numItems: 100,
+              userPlan,
             },
           );
         cursor = res.cursor;
@@ -463,6 +473,7 @@ export async function upsertNotification(
     targetRole?: FullRole[number];
     targetUserType?: AccountType[number];
     importance?: Importance;
+    eventId?: Id<"events">;
     minPlan?: number;
     deadline?: number;
     displayText: string;
@@ -517,6 +528,7 @@ export const createNotification = mutation({
     targetRole: v.optional(fullRoleValidator),
     targetUserType: v.optional(accountTypeValidator),
     importance: v.optional(importanceValidator),
+    eventId: v.optional(v.string()),
     minPlan: v.optional(v.number()),
     deadline: v.optional(v.number()),
     displayText: v.string(),
@@ -528,6 +540,7 @@ export const createNotification = mutation({
     const {
       type,
       userId,
+      eventId,
       targetRole,
       targetUserType,
       importance,
@@ -542,6 +555,7 @@ export const createNotification = mutation({
     await upsertNotification(ctx, {
       type,
       userId,
+
       targetRole,
       targetUserType,
       importance,
@@ -551,6 +565,7 @@ export const createNotification = mutation({
       description,
       redirectUrl,
       dedupeKey,
+      ...(eventId && { eventId: eventId as Id<"events"> }),
     });
   },
 });

@@ -357,17 +357,17 @@ export const updateOpenCall = mutation({
 
     const newOC = await ctx.db.get(existingOpenCall._id);
 
-    if (!ocApproved && openCallState === "submitted") {
-      await upsertNotification(ctx, {
-        type: "newSubmission",
-        targetRole: "admin",
-        importance: "high",
-        redirectUrl: `/dashboard/admin/submissions?_id=${args.eventId}`,
-        displayText: "New Open Call Submitted",
-        description: `${event?.name ?? "Unknown Name"}`,
-        dedupeKey: `oc-${existingOpenCall._id}-submitted`,
-      });
-    }
+    // if (!ocApproved && openCallState === "submitted") {
+    //   await upsertNotification(ctx, {
+    //     type: "newSubmission",
+    //     targetRole: "admin",
+    //     importance: "high",
+    //     redirectUrl: `/dashboard/admin/submissions?_id=${args.eventId}`,
+    //     displayText: "New Open Call Submitted",
+    //     description: `${event?.name ?? "Unknown Name"}`,
+    //     dedupeKey: `oc-${existingOpenCall._id}-submitted`,
+    //   });
+    // }
 
     if (newOC) {
       await openCallsAggregate.replaceOrInsert(ctx, existingOpenCall, newOC);
@@ -687,6 +687,7 @@ export const changeOCStatus = mutation({
           displayText: "New Open Call Added",
           description: `${prevEvent.name}`,
           dedupeKey: `oc-${oc._id}-published`,
+          eventId: prevEvent._id,
         });
         if (prevEvent.category === "event") {
           await upsertNotification(ctx, {
@@ -695,6 +696,7 @@ export const changeOCStatus = mutation({
             description: `${prevEvent.name}`,
             redirectUrl: `/thelist/event/${prevEvent.slug}/${prevEvent.dates.edition}`,
             dedupeKey: `event-${prevEvent._id}-added`,
+            eventId: prevEvent._id,
           });
         }
       }

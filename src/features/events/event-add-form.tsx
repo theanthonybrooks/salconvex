@@ -629,10 +629,23 @@ export const EventOCForm = ({
       } else if (paidCall && alreadyPaid) {
         //TODO: Make some sort of confirmation page and/or forward the user to... dashboard? The list? Their event (?)
         // handleReset();
-        toast.success(
+
+        showToast(
+          "success",
           `You've successfully updated your ${getEventCategoryLabel(eventCategory)}!`,
         );
       }
+      await createNotification({
+        type: "newSubmission",
+        targetRole: "admin",
+        importance: "high",
+        redirectUrl: `/thelist/event/${submissionUrl}`,
+        displayText: "New Event Submission",
+        description: `${eventData.name}`,
+        dedupeKey: openCallId
+          ? `oc-${openCallId}-submitted`
+          : `event-${eventData._id}-submitted`,
+      });
       setTimeout(() => {
         setOpen(false);
         window.location.href = `/thelist/event/${submissionUrl}`;
@@ -1691,6 +1704,7 @@ export const EventOCForm = ({
                 description: `${eventData.name}`,
                 redirectUrl: `/thelist/event/${submissionUrl}`,
                 dedupeKey: `oc-${openCallId}-published`,
+                eventId: eventData._id,
               });
             }
           }
@@ -1701,6 +1715,7 @@ export const EventOCForm = ({
               description: `${eventData.name}`,
               redirectUrl: `/thelist/event/${submissionUrl}`,
               dedupeKey: `event-${eventData._id}-added`,
+              eventId: eventData._id,
             });
           }
 

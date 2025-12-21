@@ -23,29 +23,29 @@ function needsLowercase(value: string): boolean {
   return value !== value.toLowerCase();
 }
 
-export const addDefaultInAppNotifications = migrations.define({
-  table: "userPreferences",
-  migrateOne: async (ctx, userPref) => {
-    if (userPref.notifications?.inAppNotifications.events) return;
-    const userPrefs = await ctx.db.get(userPref._id);
-    if (!userPrefs) return;
-    const userNotifications = userPrefs.notifications;
-    await ctx.db.patch(userPref._id, {
-      notifications: {
-        ...userNotifications,
-        inAppNotifications: {
-          ...(userNotifications?.inAppNotifications ?? {}),
-          events: true,
-          openCalls: true,
-          resources: true,
+export const removeOpenCallNotificationsFromUsersWithoutSufficientPlan =
+  migrations.define({
+    table: "userPreferences",
+    migrateOne: async (ctx, userPref) => {
+      const user = await ctx.db.get(userPref.userId);
+      if (!user) return;
+      const userPlan = user.plan ?? 0;
+      if (userPlan >= 2) return;
+      const notifications = userPref.notifications;
+      await ctx.db.patch(userPref._id, {
+        notifications: {
+          ...notifications,
+          inAppNotifications: {
+            ...(notifications?.inAppNotifications ?? {}),
+            openCalls: false,
+          },
         },
-      },
-    });
-  },
-});
+      });
+    },
+  });
 
-export const runADDIN = migrations.runner(
-  internal.migrations.addDefaultInAppNotifications,
+export const runROFN = migrations.runner(
+  internal.migrations.removeOpenCallNotificationsFromUsersWithoutSufficientPlan,
 );
 
 export const removeCurrencyFromUserPrefsWithoutSubs = migrations.define({

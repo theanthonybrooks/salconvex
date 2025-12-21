@@ -264,6 +264,7 @@ export const NotificationsDropdown = ({
                     key={notification._id}
                     notification={notification}
                     handleClearNotifications={handleClearNotifications}
+                    user={user}
                   />
                 ))}
               </DropdownMenuGroup>
@@ -284,6 +285,7 @@ export const NotificationsDropdown = ({
                       key={notification._id}
                       notification={notification}
                       handleClearNotifications={handleClearNotifications}
+                      user={user}
                     />
                   ))}
                 </DropdownMenuGroup>
@@ -305,6 +307,7 @@ export const NotificationsDropdown = ({
                       key={notification._id}
                       notification={notification}
                       handleClearNotifications={handleClearNotifications}
+                      user={user}
                     />
                   ))}
                 </DropdownMenuGroup>
@@ -325,6 +328,7 @@ export const NotificationsDropdown = ({
                       key={notification._id}
                       notification={notification}
                       handleClearNotifications={handleClearNotifications}
+                      user={user}
                     />
                   ))}
                 </DropdownMenuGroup>
@@ -344,6 +348,7 @@ export const NotificationsDropdown = ({
                     key={notification._id}
                     notification={notification}
                     handleClearNotifications={handleClearNotifications}
+                    user={user}
                     archived
                   />
                 ))
@@ -392,13 +397,18 @@ const NotificationDropdownItem = ({
   notification,
   handleClearNotifications,
   archived,
+  user,
 }: {
+  user: User;
   notification: NotificationItemType;
   handleClearNotifications: (notificationId?: Id<"notifications">) => void;
   archived?: boolean;
 }) => {
   // const router = useRouter();
   const isMobile = useIsMobile();
+  const { role } = user;
+  const isAdmin = role?.includes("admin") || false;
+
   const {
     _id: id,
     type,
@@ -406,12 +416,17 @@ const NotificationDropdownItem = ({
     // targetRole,
     // targetUserType,
     // dedupeKey,
+    eventId,
     importance,
     description,
     displayText,
     _creationTime: createdAt,
     updatedAt,
   } = notification;
+  const updateEventAnalytics = useMutation(
+    api.analytics.eventAnalytics.markEventAnalytics,
+  );
+  const updateUserLastActive = useMutation(api.users.updateUserLastActive);
   const unarchive = useMutation(
     api.general.notifications.unarchiveNotification,
   );
@@ -466,6 +481,19 @@ const NotificationDropdownItem = ({
   const Icon = notificationTypeIconMap[type];
   const destinationUrl = notification.redirectUrl ?? "/404";
 
+  const handleRunAnalytics = (eventId: Id<"events">) => {
+    if (isAdmin) return;
+
+    updateEventAnalytics({
+      eventId,
+      plan: user?.plan ?? 0,
+      action: "view",
+      src: "notifications",
+      userType: user?.accountType,
+      hasSub: Boolean(user?.plan),
+    });
+  };
+
   return (
     <DropdownMenuItem
       key={id}
@@ -480,6 +508,8 @@ const NotificationDropdownItem = ({
         href={destinationUrl}
         className="items-start justify-between"
         onClick={() => {
+          updateUserLastActive({ email: user?.email ?? "" });
+          if (eventId) handleRunAnalytics(eventId);
           if (archived) return;
           handleClearNotifications(id);
         }}
