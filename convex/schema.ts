@@ -745,6 +745,8 @@ export const eventSchema = {
   posted: v.optional(postStatusValidator),
   postPlannedDate: v.optional(v.number()),
   postedAt: v.optional(v.number()),
+  postUpdatedAt: v.optional(v.number()),
+
   postedBy: v.optional(v.id("users")),
   active: v.optional(v.boolean()),
   lastEditedAt: v.optional(v.number()),

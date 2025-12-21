@@ -80,10 +80,10 @@ export function isNotificationEnabled(
 
     // social
     case "newSocial":
-      enabled = prefs.social?.scheduled ?? false;
+      enabled = prefs.social?.unscheduled ?? false;
       break;
     case "socialUpdated":
-      enabled = prefs.social?.unscheduled ?? false;
+      enabled = prefs.social?.scheduled ?? false;
       break;
 
     // newsletter

@@ -265,6 +265,41 @@ export const socialColumns: ColumnDef<Social>[] = [
       );
     },
   },
+  {
+    id: "postUpdatedAt",
+    minSize: 120,
+    maxSize: 200,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Updated At" />
+    ),
+    cell: ({ row }) => {
+      const { postUpdatedAt: value } = row.original;
+      return (
+        <>
+          <p className="text-center text-sm lg:hidden">
+            {value
+              ? new Date(value).toLocaleString(undefined, {
+                  month: "short",
+                  day: "numeric",
+                  year: "2-digit",
+                })
+              : "-"}
+          </p>
+          <p className="hidden text-center text-sm lg:block">
+            {value
+              ? new Date(value).toLocaleString(undefined, {
+                  month: "short",
+                  day: "numeric",
+                  year: "2-digit",
+                  hour: "numeric",
+                  minute: "2-digit",
+                })
+              : "-"}
+          </p>
+        </>
+      );
+    },
+  },
 
   {
     id: "actions",

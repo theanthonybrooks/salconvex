@@ -22,6 +22,7 @@ export const updateEventPostStatus = mutation({
 
     await ctx.db.patch(event._id, {
       posted,
+      postUpdatedAt: Date.now(),
       ...(args.posted === "posted"
         ? { postedAt: Date.now(), postedBy: userId }
         : {
@@ -53,7 +54,6 @@ export const updateSocialPostPlannedDate = mutation({
     plannedDate: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    console.log(args);
     const userId = await getAuthUserId(ctx);
 
     const user = userId ? await ctx.db.get(userId) : null;
@@ -63,10 +63,9 @@ export const updateSocialPostPlannedDate = mutation({
     const isAdmin = user.role.includes("admin");
     if (!isAdmin) return null;
 
-    console.log(args.plannedDate, args.eventId);
-
     await ctx.db.patch(event._id, {
       postPlannedDate: args.plannedDate,
+      postUpdatedAt: Date.now(),
     });
 
     await upsertNotification(ctx, {
@@ -137,6 +136,7 @@ export const getEventsForSocials = query({
           deadline: openCalls[0]?.basicInfo?.dates?.ocEnd,
           postDate: event.postedAt,
           plannedDate: event.postPlannedDate,
+          postUpdatedAt: event.postUpdatedAt,
           posted: event.posted,
           notes: event.adminNote,
           createdAt: event._creationTime,

@@ -244,7 +244,7 @@ export default function TheListNavBar() {
           )}
 
           {!isMobile && (
-            <div className="flex items-center gap-2">
+            <div className="flex w-full items-center justify-between gap-2">
               <Link href="/submit">
                 <Button variant="hiddenOutline" className="h-9 sm:text-base">
                   Submit
