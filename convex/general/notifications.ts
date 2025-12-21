@@ -163,7 +163,6 @@ export const unarchiveNotification = mutation({
     if (notifications.length === 1) {
       await ctx.db.patch(notification._id, {
         dismissed: false,
-        updatedAt: Date.now(),
       });
     } else {
       const userNotifications = notifications.filter((n) => n.userId);
@@ -215,7 +214,6 @@ export const clearNotificationsBatch = internalMutation({
         if (notification.userId) {
           await ctx.db.patch(notification._id, {
             dismissed: true,
-            updatedAt: Date.now(),
           });
         } else {
           await cloneNotificationForUser(ctx, notification, userId);
@@ -314,7 +312,6 @@ export const clearNotifications = mutation({
       if (notification.userId) {
         await ctx.db.patch(notificationId, {
           dismissed: true,
-          updatedAt: Date.now(),
         });
       } else {
         await cloneNotificationForUser(ctx, notification, userId);
@@ -466,7 +463,6 @@ export async function upsertNotification(
       q.eq("dedupeKey", outputDedupeKey),
     )
     .first();
-  console.log(notification.deadline);
 
   if (existing) {
     await ctx.db.patch(existing._id, {

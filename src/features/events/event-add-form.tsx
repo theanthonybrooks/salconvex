@@ -1,6 +1,6 @@
 //TODO: Replace current loading/reloading logic with queries first, then using that data in the default values. Reset when the search param is changed. perhaps also just combine multiple forms rather than one giant one. I don't know why I went that approach anyways?
 
-import { validOCVals } from "@/constants/openCallConsts";
+import { ongoingOCVals, validOCVals } from "@/constants/openCallConsts";
 
 import { EnrichedEvent, EventCategory } from "@/types/eventTypes";
 import { OpenCallState } from "@/types/openCallTypes";
@@ -343,6 +343,11 @@ export const EventOCForm = ({
       ? new Date(openCallData.basicInfo.dates.ocEnd)
       : null;
   }, [openCallData?.basicInfo?.dates?.ocEnd]);
+  const openCallStart = useMemo(() => {
+    return openCallData?.basicInfo?.dates?.ocStart
+      ? new Date(openCallData.basicInfo.dates.ocStart)
+      : null;
+  }, [openCallData?.basicInfo?.dates?.ocStart]);
 
   const alreadyPaid = !!openCallData?.paid;
   const alreadyApprovedOC = !!openCallData?.approvedBy;
@@ -1670,14 +1675,19 @@ export const EventOCForm = ({
           showToast("success", "Published!");
           if (openCallId) {
             const now = Date.now();
-            const ocEndTime = openCallEnd ? openCallEnd.getTime() : 0;
-            if (openCallEnd && ocEndTime > now) {
+            const ocEndTime = openCallEnd ? openCallEnd.getTime() : null;
+            const ocStartTime = openCallStart ? openCallStart.getTime() : 0;
+            const futureOpenCall = ocStartTime > now;
+            const validType = ongoingOCVals.includes(eventData.hasOpenCall);
+            if ((ocEndTime && ocEndTime > now) || validType) {
               await createNotification({
                 type: "newOpenCall",
                 targetUserType: "artist",
                 minPlan: 2,
-                deadline: ocEndTime,
-                displayText: "New Open Call Added",
+                deadline: ocEndTime ?? undefined,
+                displayText: futureOpenCall
+                  ? "New Open Call Coming Soon"
+                  : "New Open Call Added",
                 description: `${eventData.name}`,
                 redirectUrl: `/thelist/event/${submissionUrl}`,
                 dedupeKey: `oc-${openCallId}-published`,
@@ -1730,6 +1740,7 @@ export const EventOCForm = ({
     },
     [
       openCallEnd,
+      openCallStart,
       handleDraftUpdate,
       savedCount,
       setEditedSections,

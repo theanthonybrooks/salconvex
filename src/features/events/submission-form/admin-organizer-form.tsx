@@ -2,7 +2,7 @@
 
 "use client";
 
-import { validOCVals } from "@/constants/openCallConsts";
+import { ongoingOCVals, validOCVals } from "@/constants/openCallConsts";
 
 import { EnrichedEvent, EventCategory } from "@/types/eventTypes";
 import { User } from "@/types/user";
@@ -269,6 +269,11 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
       ? new Date(openCallData.basicInfo.dates.ocEnd)
       : null;
   }, [openCallData?.basicInfo?.dates?.ocEnd]);
+  const openCallStart = useMemo(() => {
+    return openCallData?.basicInfo?.dates?.ocStart
+      ? new Date(openCallData.basicInfo.dates.ocStart)
+      : null;
+  }, [openCallData?.basicInfo?.dates?.ocStart]);
 
   //   console.log(eventOpenCall);
   const pastEvent = !!openCallEnd && openCallEnd < now;
@@ -1579,14 +1584,19 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
           showToast("success", "Published!");
           if (openCallId) {
             const now = Date.now();
-            const ocEndTime = openCallEnd ? openCallEnd.getTime() : 0;
-            if (openCallEnd && ocEndTime > now) {
+            const ocEndTime = openCallEnd ? openCallEnd.getTime() : null;
+            const ocStartTime = openCallStart ? openCallStart.getTime() : 0;
+            const futureOpenCall = ocStartTime > now;
+            const validType = ongoingOCVals.includes(eventData.hasOpenCall);
+            if ((ocEndTime && ocEndTime > now) || validType) {
               await createNotification({
                 type: "newOpenCall",
                 targetUserType: "artist",
                 minPlan: 2,
-                deadline: ocEndTime,
-                displayText: "New Open Call Added",
+                deadline: ocEndTime ?? undefined,
+                displayText: futureOpenCall
+                  ? "New Open Call Coming Soon"
+                  : "New Open Call Added",
                 description: `${eventData.name}`,
                 redirectUrl: `/thelist/event/${submissionUrl}`,
                 dedupeKey: `oc-${openCallId}-published`,
@@ -1648,6 +1658,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
       updateOpenCall,
       markOrganizationComplete,
       openCallEnd,
+      openCallStart,
       createNotification,
       orgData,
       generateUploadUrl,
@@ -2119,7 +2130,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
         onBackStep={handleBackStep}
         steps={steps}
         skipped={skipped}
-        className="px-4 pb-4 xl:px-8"
+        className="mx-auto w-[min(1200px,90vw)] px-4 pb-4 xl:px-8"
         finalLabel={alreadyPaid || alreadyApproved ? "Update" : "Submit"}
         onFinalSubmit={handleSubmit(() => onSubmit())}
         onViewEvent={() => router.push(eventLink)}

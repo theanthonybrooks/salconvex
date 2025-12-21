@@ -202,7 +202,12 @@ const OpenCallCard = ({
                 <div className={cn("flex flex-col gap-y-2", fontSize)}>
                   <span>
                     <span className="font-semibold underline underline-offset-2">
-                      {openCallStatus === "ended" ? "Ended" : "Deadline"}:
+                      {openCallStatus === "ended"
+                        ? "Ended"
+                        : openCallStatus === "coming-soon"
+                          ? "Coming soon"
+                          : "Deadline"}
+                      :
                     </span>
                     <br />{" "}
                     <span className="flex flex-col gap-x-2">
@@ -522,7 +527,12 @@ const OpenCallCard = ({
               <div className={cn("flex flex-col gap-y-3 p-3", fontSize)}>
                 <span>
                   <span className="font-semibold underline underline-offset-2">
-                    {openCallStatus === "ended" ? "Ended" : "Deadline"}:
+                    {openCallStatus === "ended"
+                      ? "Ended"
+                      : openCallStatus === "coming-soon"
+                        ? "Coming soon"
+                        : "Deadline"}
+                    :
                   </span>
                   <br />{" "}
                   <span className="flex items-center gap-x-2">
