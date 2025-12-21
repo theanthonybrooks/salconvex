@@ -291,6 +291,7 @@ export const updateOpenCall = mutation({
             .first()
         : null;
     if (!existingOpenCall) throw new ConvexError("Open call not found");
+    const event = await ctx.db.get(args.eventId);
 
     const allDocs = [
       ...(existingOpenCall?.documents ?? []),
@@ -363,6 +364,7 @@ export const updateOpenCall = mutation({
         importance: "high",
         redirectUrl: `/dashboard/admin/submissions?_id=${args.eventId}`,
         displayText: "New Open Call Submitted",
+        description: `${event?.name ?? "Unknown Name"}`,
         dedupeKey: `oc-${existingOpenCall._id}-submitted`,
       });
     }
@@ -683,12 +685,14 @@ export const changeOCStatus = mutation({
           minPlan: 2,
           redirectUrl: `/thelist/event/${prevEvent.slug}/${prevEvent.dates.edition}/call`,
           displayText: "New Open Call Added",
+          description: `${prevEvent.name}`,
           dedupeKey: `oc-${oc._id}-published`,
         });
         if (prevEvent.category === "event") {
           await upsertNotification(ctx, {
             type: "newEvent",
             displayText: "New Event Added",
+            description: `${prevEvent.name}`,
             redirectUrl: `/thelist/event/${prevEvent.slug}/${prevEvent.dates.edition}`,
             dedupeKey: `event-${prevEvent._id}-added`,
           });

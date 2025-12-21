@@ -61,6 +61,7 @@ export const upsertManyBySacIdInternal = internalMutation({
         targetRole: "admin",
         redirectUrl: "/dashboard/admin/sac",
         displayText: `${insertCount} Street Art Call${insertCount > 1 ? "s" : ""} added`,
+        description: `${items[0].event.name}${insertCount > 1 ? `+${insertCount - 1} more` : ""}`,
       });
     }
     if (updateCount > 0) {
@@ -70,6 +71,7 @@ export const upsertManyBySacIdInternal = internalMutation({
         targetRole: "admin",
         redirectUrl: "/dashboard/admin/sac",
         displayText: `${updateCount} Street Art Call${updateCount > 1 ? "s" : ""} updated`,
+        description: `${items[0].event.name}${updateCount > 1 ? `+${updateCount - 1} more` : ""}`,
       });
     }
 

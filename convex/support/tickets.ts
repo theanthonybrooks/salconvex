@@ -122,6 +122,7 @@ export const createSupportTicket = mutation({
       importance: "high",
       redirectUrl: `/dashboard/admin/support?ticketNumber=${ticketNumber}`,
       displayText: "New Support Ticket Added",
+      description: `Support Ticket #${ticketNumber}`,
       dedupeKey: `support-${support}-added`,
     });
 
@@ -172,6 +173,14 @@ export const updateSupportTicket = mutation({
         completedAt: args.status !== "open" ? Date.now() : undefined,
       });
     }
+    await upsertNotification(ctx, {
+      type: "supportUpdated",
+      targetRole: "admin",
+      displayText: "Support Ticket Updated",
+      description: `Support Ticket #${support.ticketNumber}`,
+      redirectUrl: `/dashboard/admin/support?ticketNumber=${support.ticketNumber}`,
+      dedupeKey: `support-${support}-added`,
+    });
 
     return { support };
   },

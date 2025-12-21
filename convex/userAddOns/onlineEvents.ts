@@ -287,6 +287,7 @@ export const updateOnlineEventState = mutation({
         redirectUrl: `/resources/${event.slug}`,
         deadline: event.regDeadline,
         displayText: "New Resource Added",
+        description: event.name,
         dedupeKey: `resource-${event._id}-published`,
       });
     } else {
@@ -352,6 +353,7 @@ export const createOnlineEvent = mutation({
           redirectUrl: `/resources/${slug}`,
           deadline: args.regDeadline,
           displayText: "New Resource Added",
+          description: args.name,
           dedupeKey: `resource-${eventId}-published`,
         });
       }

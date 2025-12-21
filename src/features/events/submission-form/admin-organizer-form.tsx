@@ -1587,6 +1587,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
                 minPlan: 2,
                 deadline: ocEndTime,
                 displayText: "New Open Call Added",
+                description: `${eventData.name}`,
                 redirectUrl: `/thelist/event/${submissionUrl}`,
                 dedupeKey: `oc-${openCallId}-published`,
               });
@@ -1596,6 +1597,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
             await createNotification({
               type: "newEvent",
               displayText: "New Event Added",
+              description: `${eventData.name}`,
               redirectUrl: `/thelist/event/${submissionUrl}`,
               dedupeKey: `event-${eventData._id}-added`,
             });

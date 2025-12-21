@@ -462,6 +462,7 @@ export const editCard = mutation({
         targetRole: "staff",
         redirectUrl: `/dashboard/admin/todos?id=${kanbanCard._id}`,
         displayText: "New Task Assignment",
+        description: kanbanCard.title,
         dedupeKey: `kanban-assignment-${kanbanCard._id}`,
       });
     }
@@ -472,6 +473,7 @@ export const editCard = mutation({
         targetRole: "staff",
         redirectUrl: `/dashboard/admin/todos?id=${kanbanCard._id}`,
         displayText: "New Task Assignment",
+        description: kanbanCard.title,
         dedupeKey: `kanban-assignment-${kanbanCard._id}`,
       });
     }
@@ -607,6 +609,7 @@ export const updateAssignedUser = mutation({
         importance: "medium",
         redirectUrl: `/dashboard/admin/todos?id=${kanbanCard._id}`,
         displayText: "New Task Assignment",
+        description: kanbanCard.title,
         dedupeKey: `kanban-assignment-${kanbanCard._id}`,
       });
     }
@@ -618,6 +621,7 @@ export const updateAssignedUser = mutation({
         importance: "medium",
         redirectUrl: `/dashboard/admin/todos?id=${kanbanCard._id}`,
         displayText: "New Task Assignment",
+        description: kanbanCard.title,
         dedupeKey: `kanban-assignment-${kanbanCard._id}`,
       });
     }

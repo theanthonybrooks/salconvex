@@ -131,7 +131,7 @@ export default function TheListNavBar() {
         transition={{ duration: 0.3, ease: "easeOut" }}
         className="fixed left-0 right-0 top-0 z-20 h-25 w-screen bg-background"
       >
-        <div className="relative mx-auto flex h-full w-screen items-center justify-between px-8">
+        <div className="relative mx-auto flex h-full w-screen items-center justify-between gap-2 px-8">
           <motion.div
             initial={{ height: 90, width: 90 }}
             animate={{

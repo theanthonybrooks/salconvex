@@ -1368,6 +1368,7 @@ export const createOrUpdateEvent = mutation({
         importance: "high",
         redirectUrl: `/thelist/event/${args.slug}/${args.dates.edition}`,
         displayText: "New Event Submission",
+        description: args.name.trim(),
         dedupeKey: `event-${eventId}-submitted`,
       });
     }
@@ -1406,6 +1407,7 @@ export const updateEventStatus = mutation({
         type: "newEvent",
         redirectUrl: `/thelist/event/${event.slug}/${event.dates.edition}`,
         displayText: "New Event Added",
+        description: event.name,
         dedupeKey: `event-${event._id}-added`,
       });
     }
@@ -1449,6 +1451,7 @@ export const approveEvent = mutation({
         targetUserType: "artist",
         redirectUrl: `/thelist/event/${event.slug}/${event.dates.edition}`,
         displayText: "New Event Published",
+        description: event.name,
         dedupeKey: `event-${event._id}-added`,
       });
     }
@@ -1494,6 +1497,7 @@ export const reactivateEvent = mutation({
         await upsertNotification(ctx, {
           type: "newEvent",
           displayText: "New Event Added",
+          description: event.name,
           redirectUrl: `/thelist/event/${event.slug}/${event.dates.edition}`,
           dedupeKey: `event-${event._id}-added`,
         });
@@ -1504,6 +1508,7 @@ export const reactivateEvent = mutation({
           importance: "high",
           redirectUrl: `/thelist/event/${event.slug}/${event.dates.edition}`,
           displayText: "New Event Submission",
+          description: event.name,
           dedupeKey: `event-${event._id}-submitted`,
         });
       }

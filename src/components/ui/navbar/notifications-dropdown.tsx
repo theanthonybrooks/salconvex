@@ -406,6 +406,7 @@ const NotificationDropdownItem = ({
     // targetRole,
     // targetUserType,
     // dedupeKey,
+    description,
     displayText,
     _creationTime: createdAt,
     updatedAt,
@@ -477,8 +478,10 @@ const NotificationDropdownItem = ({
           <div className="flex flex-col gap-1">
             <p className="line-clamp-2 font-medium">
               {displayText}
+
               {/* {dedupeKey}-{userId} */}
             </p>
+            {description && <p>{description}</p>}
             <p className="text-xs text-foreground/50">
               {`${datePart} · ${timePart}`}
             </p>

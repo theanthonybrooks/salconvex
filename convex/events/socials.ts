@@ -42,6 +42,7 @@ export const updateEventPostStatus = mutation({
         targetRole: "admin",
         redirectUrl: `/dashboard/admin/socials?id=${event._id}`,
         displayText: "New Unscheduled Social Post",
+        description: event.name,
         dedupeKey: `social-${event._id}`,
       });
     }
@@ -73,6 +74,7 @@ export const updateSocialPostPlannedDate = mutation({
       targetRole: "admin",
       redirectUrl: `/dashboard/admin/socials?id=${event._id}`,
       displayText: "New Social Event Planned",
+      description: event.name,
       dedupeKey: `social-${event._id}`,
     });
   },
