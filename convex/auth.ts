@@ -139,14 +139,11 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
       });
 
       if (newUserId) {
-        console.log("newUserId: ", newUserId);
         const result = await checkNewsletterUser(ctx, profile.email);
-        console.log("result: ", result);
         if (result.newsletter && result.subscriptionId) {
           await updateNewsletterUser(ctx, newUserId, result.subscriptionId);
         }
       }
-      // console.log("newUserId: ", newUserId);
 
       const userAccountType = profile.accountType as string[];
 
@@ -196,6 +193,8 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
           general: true,
           inAppNotifications: {
             account: true,
+            events: true,
+            resources: true,
           },
           ...(newsletterSub.newsletter && { newsletter: true }),
         },

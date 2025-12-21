@@ -26,6 +26,7 @@ import {
   Megaphone,
   Monitor,
   Newspaper,
+  PiggyBank,
   ScrollText,
   Shield,
   Table,
@@ -270,7 +271,7 @@ export const NotificationsSettings = () => {
               sectionToggleAction: (value) => {
                 const defaultBase = {
                   events: true,
-                  openCalls: true,
+                  openCalls: minBananaUser ? true : false,
                   resources: true,
                   account: true,
                 };
@@ -283,6 +284,11 @@ export const NotificationsSettings = () => {
                           ...defaultBase,
                           submissions: true,
                           tasks: true,
+                          users: true,
+                          subscriptions: {
+                            newSub: true,
+                            canceledSub: true,
+                          },
                           onlineEvents: {
                             registrations: true,
                             cancellations: true,
@@ -427,10 +433,17 @@ export const NotificationsSettings = () => {
                       handleUpdateinAppNotifications({
                         submissions: value,
                         tasks: value,
+                        users: value,
+                        subscriptions: {
+                          newSub: value,
+                          canceledSub: value,
+                        },
                       }),
                     sectionToggleValue:
                       (inAppNotifications?.submissions ?? false) ||
-                      (inAppNotifications?.tasks ?? false),
+                      (inAppNotifications?.tasks ?? false) ||
+                      (inAppNotifications?.users ?? false) ||
+                      hasAnyTrueValue(inAppNotifications?.subscriptions),
                   }}
                 >
                   <SectionItem
@@ -461,6 +474,82 @@ export const NotificationsSettings = () => {
                       }
                     />
                   </SectionItem>
+                  <SectionItem
+                    icon={UserPlus}
+                    title="New Users"
+                    description="Receive notifications for new user signups"
+                    type="toggle"
+                    fontSize={fontSize}
+                  >
+                    <Switch
+                      checked={inAppNotifications?.users ?? false}
+                      onCheckedChange={(value) =>
+                        handleUpdateinAppNotifications({ users: value })
+                      }
+                    />
+                  </SectionItem>
+                  <SectionGroup
+                    fontSize={fontSize}
+                    title="Subscriptions"
+                    icon={PiggyBank}
+                    description="User subscription notifications"
+                    group={{
+                      sectionToggleAction: (value) =>
+                        handleUpdateinAppNotifications({
+                          subscriptions: {
+                            newSub: value,
+                            canceledSub: value,
+                          },
+                        }),
+                      sectionToggleValue: hasAnyTrueValue(
+                        inAppNotifications?.subscriptions,
+                      ),
+                    }}
+                  >
+                    <SectionItem
+                      icon={Bell}
+                      title="New Subscription"
+                      description="New user subscription"
+                      type="toggle"
+                      fontSize={fontSize}
+                    >
+                      <Switch
+                        checked={
+                          inAppNotifications?.subscriptions?.newSub ?? false
+                        }
+                        onCheckedChange={(value) =>
+                          handleUpdateinAppNotifications({
+                            subscriptions: {
+                              ...inAppNotifications?.subscriptions,
+                              newSub: value,
+                            },
+                          })
+                        }
+                      />
+                    </SectionItem>
+                    <SectionItem
+                      icon={Bell}
+                      title="Canceled Subscription"
+                      description="Canceled user subscription"
+                      type="toggle"
+                      fontSize={fontSize}
+                    >
+                      <Switch
+                        checked={
+                          inAppNotifications?.subscriptions?.canceledSub ??
+                          false
+                        }
+                        onCheckedChange={(value) =>
+                          handleUpdateinAppNotifications({
+                            subscriptions: {
+                              ...inAppNotifications?.subscriptions,
+                              canceledSub: value,
+                            },
+                          })
+                        }
+                      />
+                    </SectionItem>
+                  </SectionGroup>
                 </SectionGroup>
                 <SectionGroup
                   fontSize={fontSize}

@@ -69,6 +69,9 @@ const RegisterForm = ({ switchFlow }: RegisterFormProps) => {
   const userId = uuidv4();
   const convex = useConvex();
   const updateVerification = useMutation(api.users.updateUserEmailVerification);
+  const createNotification = useMutation(
+    api.general.notifications.createNotification,
+  );
 
   const DeleteAccount = useMutation(api.users.deleteAccount);
   const otpInputRef = useRef<HTMLInputElement>(null);
@@ -251,7 +254,9 @@ const RegisterForm = ({ switchFlow }: RegisterFormProps) => {
       }
 
       try {
-        await convex.query(api.users.hasVerifiedEmail, { email });
+        const userData = await convex.query(api.users.hasVerifiedEmail, {
+          email,
+        });
 
         const result = await signIn("password", {
           email,
@@ -261,6 +266,14 @@ const RegisterForm = ({ switchFlow }: RegisterFormProps) => {
 
         if (result) {
           await updateVerification({ email });
+          await createNotification({
+            type: "newUser",
+            targetRole: "admin",
+            redirectUrl: `/dashboard/admin/users?id=${userData?.userId}`,
+            displayText: `New User Registered`,
+            description: `${userData?.name} signed up!`,
+            dedupeKey: `user-${userData?.userId}-added`,
+          });
           setSuccess("Successfully signed up and verified!");
           setTimeout(() => {
             setSuccess(
@@ -313,6 +326,7 @@ const RegisterForm = ({ switchFlow }: RegisterFormProps) => {
       email,
       form,
       signIn,
+      createNotification,
       updateVerification,
       convex,
     ],

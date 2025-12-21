@@ -754,7 +754,7 @@ export const hasVerifiedEmail = query({
       throw new ConvexError("User not found: " + args.email);
     }
     console.log("verified", user?.emailVerified);
-    return user?.emailVerified;
+    return { verified: user?.emailVerified, userId: user._id, name: user.name };
   },
 });
 

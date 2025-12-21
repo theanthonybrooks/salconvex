@@ -4,6 +4,7 @@ import Stripe from "stripe";
 
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { Id } from "~/convex/_generated/dataModel";
+import { upsertNotification } from "~/convex/general/notifications";
 import { updateUserNewsletter } from "~/convex/newsletter/subscriber";
 import { ConvexError, v } from "convex/values";
 import { api, internal } from "../_generated/api";
@@ -415,6 +416,13 @@ export const subscriptionStoreWebhook = mutation({
             customerId: args.body.data.object.customer,
             paidStatus: paymentStatus === "paid",
           });
+          await upsertNotification(ctx, {
+            type: "newSubscription",
+            targetRole: "admin",
+            redirectUrl: `/dashboard/admin/users?id=${metadata.userId}`,
+            displayText: "New user Subscription",
+            dedupeKey: `user-${metadata.userId}-subscribed`,
+          });
         }
 
         // console.log("should be able to do logic for one-time here");
@@ -429,6 +437,15 @@ export const subscriptionStoreWebhook = mutation({
         if (existingUser) {
           console.log("account type: ", metadata?.accountType);
           console.log("oc id: ", metadata?.openCallId);
+
+          await upsertNotification(ctx, {
+            type: "newSubscription",
+            targetRole: "admin",
+            redirectUrl: `/dashboard/admin/users?id=${existingUser._id}`,
+            displayText: "New user Subscription",
+            description: `${existingUser.name} has a new subscription`,
+            dedupeKey: `user-${existingUser._id}-subscribed`,
+          });
 
           if (metadata?.accountType === "artist") {
             // TODO: Update this to run a query and update for the user plan in all places. It's getting a bit hectic, so I'd rather not do it like this and would prefer to just have a lookup table or something.
@@ -728,7 +745,7 @@ export const subscriptionStoreWebhook = mutation({
             subscription: undefined,
           });
         }
-  
+
         break;
 
       case "customer.discount.created":
@@ -810,16 +827,19 @@ export const subscriptionStoreWebhook = mutation({
             await ctx.db.patch(invoicePaid.userId as Id<"users">, {
               plan: productPlan.plan,
             });
+          if (dataObject.charge) {
+            await ctx.db.patch(invoicePaid._id, {
+              paidStatus: dataObject.paid,
+              ...(typeof dataObject.charge === "string" && {
+                chargeId: dataObject.charge,
+              }),
+              ...(typeof productPlan === "number" && { plan: productPlan }),
 
-          await ctx.db.patch(invoicePaid._id, {
-            paidStatus: args.body.data.object.paid,
-            chargeId: dataObject.charge,
-            ...(typeof productPlan === "number" && { plan: productPlan }),
-
-            customerCancellationComment: undefined,
-            customerCancellationReason: undefined,
-            customerCancellationFeedback: undefined,
-          });
+              customerCancellationComment: undefined,
+              customerCancellationReason: undefined,
+              customerCancellationFeedback: undefined,
+            });
+          }
         }
 
         break;

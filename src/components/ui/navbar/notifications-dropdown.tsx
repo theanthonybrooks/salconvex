@@ -435,7 +435,10 @@ const NotificationDropdownItem = ({
     account: InfoIcon,
     newSubmission: CircleFadingPlus,
     newTaskAssignment: ListTodo,
+    newUser: UserPlus,
     newSac: PaintRoller,
+    newSubscription: UserPlus,
+    canceledSubscription: UserMinus,
     //
     newOERegistration: UserPlus,
     newOECancellation: UserMinus,

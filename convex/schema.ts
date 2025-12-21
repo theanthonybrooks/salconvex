@@ -66,6 +66,9 @@ export const notificationTypeValidator = v.union(
   v.literal("newSubmission"),
   v.literal("newTaskAssignment"),
   v.literal("newSac"),
+  v.literal("newUser"),
+  v.literal("newSubscription"),
+  v.literal("canceledSubscription"),
   // online events
   v.literal("newOERegistration"),
   v.literal("newOECancellation"),
@@ -123,6 +126,13 @@ export const inAppNotificationValidator = v.object({
   // admin
   submissions: v.optional(v.boolean()),
   tasks: v.optional(v.boolean()),
+  users: v.optional(v.boolean()),
+  subscriptions: v.optional(
+    v.object({
+      newSub: v.optional(v.boolean()),
+      canceledSub: v.optional(v.boolean()),
+    }),
+  ),
   // online events
   onlineEvents: v.optional(
     v.object({

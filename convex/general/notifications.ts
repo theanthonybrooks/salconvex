@@ -54,12 +54,22 @@ export function isNotificationEnabled(
       break;
 
     // admin
+    case "newSac":
     case "newSubmission":
       enabled = prefs.submissions ?? false;
       break;
     case "newTaskAssignment":
-    case "newSac":
       enabled = prefs.tasks ?? false;
+      break;
+    case "newUser":
+      enabled = prefs.users ?? false;
+      break;
+    // subscriptions
+    case "newSubscription":
+      enabled = prefs.subscriptions?.newSub ?? false;
+      break;
+    case "canceledSubscription":
+      enabled = prefs.subscriptions?.canceledSub ?? false;
       break;
 
     // online events
