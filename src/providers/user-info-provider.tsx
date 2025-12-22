@@ -4,7 +4,7 @@ import { IBAN_COUNTRIES } from "@/constants/locationConsts";
 
 import type { ReactNode } from "react";
 
-import { createContext, useContext, useEffect, useRef, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 
@@ -90,30 +90,45 @@ type UserInfoType = {
   location: string;
   ip: string;
 };
-async function getClientInfo(): Promise<UserInfoType> {
+type ClientInfoReturnType = {
+  status: "success" | "error";
+  userInfo: UserInfoType;
+};
+async function getClientInfo(): Promise<ClientInfoReturnType> {
   let currency: CurrencyOptions = "usd";
   let location: string = "";
   let ip: string = "0.0.0.0";
-  try {
-    const res = await fetch("https://ipapi.co/json/");
-    if (!res.ok) throw new Error("Failed to fetch location");
-    const data = await res.json();
-    const country = data.country;
-    if (country && IBAN_COUNTRIES.has(country)) {
-      currency = "eur";
-    }
-    location = `${data.city}, ${data.region_code ? data.region_code + ", " : ""} ${data.country}`;
-    ip = data.ip;
-    // console.log("data", data);
-  } catch (error) {
-    console.error("Error fetching client location:", error);
-  } finally {
+
+  let res = await fetch("https://ipapi.co/json/").catch(() => null);
+
+  if (!res || !res.ok) {
+    res = await fetch("https://ipinfo.io/json").catch(() => null);
+  }
+
+  if (!res || !res.ok)
     return {
+      status: "error",
+      userInfo: {
+        currency,
+        location,
+        ip,
+      },
+    };
+  const data = await res.json();
+  if (data.country && IBAN_COUNTRIES.has(data.country)) {
+    currency = "eur";
+  }
+  location = `${data.city}, ${data.region_code ? data.region_code + ", " : ""} ${data.country}`;
+  ip = data.ip;
+
+  return {
+    status: "success",
+    userInfo: {
       currency,
       location,
       ip,
-    };
-  }
+    },
+  };
 }
 
 // ---------------------------------------------
@@ -132,20 +147,26 @@ export const UserInfoProvider = ({ children }: Props) => {
     location: "",
     ip: "0.0.0.0",
   });
-  const ipRef = useRef<string>("0.0.0.0");
 
   useEffect(() => {
     // if (ipRef.current !== "0.0.0.0") return;
+    // console.log(userPrefCurrency);
     const loadUserInfo = async () => {
       const userData = await getClientInfo();
-      const { currency, ip } = userData;
-      ipRef.current = ip;
+      // console.log(userData);
+      const { status, userInfo: userInfoResults } = userData;
+      const { currency } = userInfoResults;
+      // console.log(userPrefCurrency, status, currency);
       const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
       if (user) {
         if (userPrefCurrency) {
           setUserInfo({
-            ...userData,
-            currency: userPrefCurrency.toLowerCase() as CurrencyOptions,
+            ...userInfoResults,
+            currency:
+              status === "success"
+                ? currency
+                : (userPrefCurrency.toLowerCase() as CurrencyOptions),
+            // currency: userPrefCurrency.toLowerCase() as CurrencyOptions,
           });
         } else {
           await updateUserPrefs({ currency });
@@ -156,12 +177,15 @@ export const UserInfoProvider = ({ children }: Props) => {
       if (stored) {
         const decoded = await decrypt(stored);
         if (decoded) {
-          setUserInfo({ ...userData, currency: decoded as CurrencyOptions });
+          setUserInfo({
+            ...userInfoResults,
+            currency: decoded as CurrencyOptions,
+          });
           return;
         }
       }
 
-      setUserInfo(userData);
+      setUserInfo(userInfoResults);
       const encrypted = await encrypt(currency);
       localStorage.setItem(LOCAL_STORAGE_KEY, encrypted);
     };

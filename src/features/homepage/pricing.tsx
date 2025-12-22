@@ -629,10 +629,12 @@ export default function Pricing() {
   const { fontSize, currency: userPrefCurrency } = userPref ?? {};
   const fontSizePref = getUserFontSizePref(fontSize);
   const baseFontSize = fontSizePref?.body;
+  const currencySource = hasSub
+    ? (userPrefCurrency ?? userCurrency)
+    : userCurrency;
+
   const currency = (
-    userPrefCurrency ??
-    userCurrency ??
-    "usd"
+    currencySource ?? "usd"
   ).toLowerCase() as UserCurrenciesType;
 
   const bannedSub = subscription?.banned;
