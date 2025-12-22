@@ -1713,7 +1713,7 @@ export const EventOCForm = ({
               type: "newEvent",
               displayText: "New Event Added",
               description: `${eventData.name}`,
-              redirectUrl: `/thelist/event/${submissionUrl}`,
+              redirectUrl: `/thelist/event/${submissionUrl}/call?tab=event`,
               dedupeKey: `event-${eventData._id}-added`,
               eventId: eventData._id,
             });

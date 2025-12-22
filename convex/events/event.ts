@@ -1406,7 +1406,7 @@ export const updateEventStatus = mutation({
     if (event.category === "event") {
       await upsertNotification(ctx, {
         type: "newEvent",
-        redirectUrl: `/thelist/event/${event.slug}/${event.dates.edition}`,
+        redirectUrl: `/thelist/event/${event.slug}/${event.dates.edition}/call?tab=event`,
         displayText: "New Event Added",
         description: event.name,
         eventId: event._id,
@@ -1451,7 +1451,7 @@ export const approveEvent = mutation({
       await upsertNotification(ctx, {
         type: "newEvent",
         targetUserType: "artist",
-        redirectUrl: `/thelist/event/${event.slug}/${event.dates.edition}`,
+        redirectUrl: `/thelist/event/${event.slug}/${event.dates.edition}/call?tab=event`,
         displayText: "New Event Published",
         description: event.name,
         eventId: event._id,
@@ -1501,7 +1501,7 @@ export const reactivateEvent = mutation({
           type: "newEvent",
           displayText: "New Event Added",
           description: event.name,
-          redirectUrl: `/thelist/event/${event.slug}/${event.dates.edition}`,
+          redirectUrl: `/thelist/event/${event.slug}/${event.dates.edition}?tab=event`,
           eventId: event._id,
           dedupeKey: `event-${event._id}-added`,
         });

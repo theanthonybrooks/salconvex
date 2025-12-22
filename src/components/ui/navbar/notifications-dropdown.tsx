@@ -45,12 +45,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TooltipSimple } from "@/components/ui/tooltip";
+import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { getUserFontSizePref } from "@/helpers/stylingFns";
 import { cn } from "@/helpers/utilsFns";
 
 import { api } from "~/convex/_generated/api";
 import { useQuery } from "convex-helpers/react/cache";
-import { useMutation } from "convex/react";
+import { useMutation, usePreloadedQuery } from "convex/react";
 
 type NotificationsDropdownProps = {
   // open: boolean;
@@ -80,7 +81,7 @@ export const NotificationsDropdown = ({
   const [open, setOpen] = useState(false);
   // const [pending, setPending] = useState(false);
 
-  const isUser = user?.role?.includes("user");
+  const isUser = user.role?.includes("user");
   const isAdmin = user.role.includes("admin");
   // const isCreator = user.role.includes("creator");
   const isArtist = user.accountType?.includes("artist");
@@ -405,9 +406,13 @@ const NotificationDropdownItem = ({
   archived?: boolean;
 }) => {
   // const router = useRouter();
+  const { preloadedSubStatus } = useConvexPreload();
+  const subData = usePreloadedQuery(preloadedSubStatus);
+  const { hasActiveSubscription, subPlan } = subData ?? {};
   const isMobile = useIsMobile();
   const { role } = user;
   const isAdmin = role?.includes("admin") || false;
+  const userPlan = subPlan ?? 0;
 
   const {
     _id: id,
@@ -416,6 +421,7 @@ const NotificationDropdownItem = ({
     // targetRole,
     // targetUserType,
     // dedupeKey,
+    redirectUrl,
     eventId,
     importance,
     description,
@@ -479,14 +485,17 @@ const NotificationDropdownItem = ({
   };
 
   const Icon = notificationTypeIconMap[type];
-  const destinationUrl = notification.redirectUrl ?? "/404";
+  const formatUrlBySubscription = () => {
+    if (hasActiveSubscription) return redirectUrl;
+    return redirectUrl.replace("/call?tab=event", "");
+  };
 
   const handleRunAnalytics = (eventId: Id<"events">) => {
     if (isAdmin) return;
 
     updateEventAnalytics({
       eventId,
-      plan: user?.plan ?? 0,
+      plan: userPlan,
       action: "view",
       src: "notifications",
       userType: user?.accountType,
@@ -505,7 +514,7 @@ const NotificationDropdownItem = ({
     >
       <Link
         key={id}
-        href={destinationUrl}
+        href={formatUrlBySubscription()}
         className="items-start justify-between"
         onClick={() => {
           updateUserLastActive({ email: user?.email ?? "" });
