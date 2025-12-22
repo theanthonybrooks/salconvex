@@ -126,6 +126,7 @@ export const UserInfoProvider = ({ children }: Props) => {
   const { preloadedUserData } = useConvexPreload();
   const userData = usePreloadedQuery(preloadedUserData);
   const { user, userPref } = userData ?? {};
+  const userPrefCurrency = userPref?.currency;
   const [userInfo, setUserInfo] = useState<UserInfoType>({
     currency: "usd",
     location: "",
@@ -134,17 +135,17 @@ export const UserInfoProvider = ({ children }: Props) => {
   const ipRef = useRef<string>("0.0.0.0");
 
   useEffect(() => {
-    if (ipRef.current !== "0.0.0.0") return;
+    // if (ipRef.current !== "0.0.0.0") return;
     const loadUserInfo = async () => {
       const userData = await getClientInfo();
       const { currency, ip } = userData;
       ipRef.current = ip;
       const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
       if (user) {
-        if (userPref?.currency) {
+        if (userPrefCurrency) {
           setUserInfo({
             ...userData,
-            currency: userPref.currency.toLowerCase() as CurrencyOptions,
+            currency: userPrefCurrency.toLowerCase() as CurrencyOptions,
           });
         } else {
           await updateUserPrefs({ currency });
@@ -166,7 +167,7 @@ export const UserInfoProvider = ({ children }: Props) => {
     };
 
     loadUserInfo();
-  }, [user, userPref, updateUserPrefs]);
+  }, [user, userPrefCurrency, updateUserPrefs]);
   const symbol = userInfo.currency === "usd" ? "$" : "€";
 
   return (

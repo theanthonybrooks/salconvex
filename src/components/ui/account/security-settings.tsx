@@ -107,10 +107,10 @@ export const SecuritySettings = () => {
   };
   const handleDeleteSessions = async () => {
     try {
-      if (!user) {
+      if (!userId) {
         throw new Error("User not found");
       }
-      await deleteSessions({ userId: user?.userId });
+      await deleteSessions({ userId });
       // await invalidateSessions({ userId: user?.userId })
       showToast("success", "Sessions deleted!");
       sessionStorage.clear();
@@ -134,7 +134,7 @@ export const SecuritySettings = () => {
     localStorage.clear();
 
     try {
-      await DeleteAccount({ method: "deleteAccount", userId: user?.userId });
+      await DeleteAccount({ method: "deleteAccount", userId });
       sessionStorage.clear();
       await signOut();
     } catch (err) {

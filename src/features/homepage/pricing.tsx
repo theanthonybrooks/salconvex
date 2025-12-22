@@ -37,8 +37,7 @@ import { useUserInfo } from "@/providers/user-info-provider";
 import { api } from "~/convex/_generated/api";
 import { Doc } from "~/convex/_generated/dataModel";
 import { AccountTypeBase } from "~/convex/schema";
-import { useQuery } from "convex-helpers/react/cache";
-import { useAction, usePreloadedQuery } from "convex/react";
+import { useAction, usePreloadedQuery, useQuery } from "convex/react";
 
 export type UserCurrenciesType = "usd" | "eur";
 
@@ -627,10 +626,15 @@ export default function Pricing() {
     subscription,
     hadTrial,
   } = subData ?? {};
-  const { fontSize } = userPref ?? {};
+  const { fontSize, currency: userPrefCurrency } = userPref ?? {};
   const fontSizePref = getUserFontSizePref(fontSize);
   const baseFontSize = fontSizePref?.body;
-  const currency = (userCurrency?.toLowerCase() ?? "usd") as UserCurrenciesType;
+  const currency = (
+    userPrefCurrency ??
+    userCurrency ??
+    "usd"
+  ).toLowerCase() as UserCurrenciesType;
+
   const bannedSub = subscription?.banned;
   const subInterval = subscription?.intervalNext ?? subscription?.interval;
 
@@ -688,6 +692,8 @@ export default function Pricing() {
 
   const plans = useQuery(api.plans.getUserPlans, !bannedSub ? {} : "skip");
   const orgPlans = useQuery(api.plans.getOrgPlans, !bannedSub ? {} : "skip");
+
+  console.log(currency);
 
   if (bannedSub)
     return (

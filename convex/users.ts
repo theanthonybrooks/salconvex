@@ -25,7 +25,7 @@ import {
 } from "~/convex/schema";
 import { ConvexError, v } from "convex/values";
 import {
-  action,
+  internalAction,
   internalMutation,
   mutation,
   MutationCtx,
@@ -297,7 +297,8 @@ export const getCurrentUser = query({
     token: v.optional(v.string()),
   },
   handler: async (ctx) => {
-    const userId = await getAuthUserId(ctx);
+    const sessionId = await getAuthSessionId(ctx);
+    const userId = sessionId ? await getAuthUserId(ctx) : null;
     const user = userId ? await ctx.db.get(userId) : null;
     if (!user || !userId) return null;
     const userPref = await ctx.db
@@ -852,8 +853,8 @@ export const updatePassword = mutation({
     if (args.method === "userUpdate") {
       const authAccount = await ctx.db
         .query("authAccounts")
-        .withIndex("userIdAndProvider", (q: any) =>
-          q.eq("provider", "password").eq("userId", user._id),
+        .withIndex("userIdAndProvider", (q) =>
+          q.eq("userId", user._id).eq("provider", "password"),
         )
         .unique();
 
@@ -883,7 +884,7 @@ export const updatePassword = mutation({
   },
 });
 
-//TODO:: Require users to first cancel any active subscriptions before deleting their account
+//TODO:: Require users to first cancel all active subscriptions before deleting their account
 
 export const deleteUnconfirmedUsers = internalMutation({
   handler: async (ctx) => {
@@ -955,7 +956,7 @@ export const deleteUnverifiedPendingEmails = internalMutation({
 export const deleteAccount = mutation({
   args: {
     method: v.string(),
-    userId: v.optional(v.string()),
+    userId: v.optional(v.id("users")),
     email: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
@@ -963,7 +964,7 @@ export const deleteAccount = mutation({
     let userId: Id<"users"> | undefined = undefined;
     let agent: string = "user-self";
     if (args.userId) {
-      userId = args.userId as Id<"users">;
+      userId = args.userId;
     } else if (args.email) {
       const user = await ctx.db
         .query("users")
@@ -978,14 +979,19 @@ export const deleteAccount = mutation({
     }
     await performDeleteAccount(ctx, { ...args, agent });
     if (userId) {
-      await updateOrgOwnerBeforeDelete(ctx, userId as Id<"users">);
+      await updateOrgOwnerBeforeDelete(ctx, userId);
     }
   },
 });
 
 async function performDeleteAccount(
   ctx: MutationCtx,
-  args: { method: string; email?: string; userId?: string; agent?: string },
+  args: {
+    method: string;
+    email?: string;
+    userId?: Id<"users">;
+    agent?: string;
+  },
 ): Promise<void> {
   type MethodType =
     | "deleteAccount"
@@ -1069,10 +1075,8 @@ async function performDeleteAccount(
 
   const userId = user._id;
 
-  // Delete related documents.
   await deleteRelatedDocuments(ctx, userId);
 
-  // Delete the user document if it exists.
   const userDoc = await ctx.db.get(userId);
   if (userDoc) {
     await ctx.db.delete(userId);
@@ -1083,7 +1087,6 @@ async function performDeleteAccount(
     .withIndex("userId", (q) => q.eq("userId", userId))
     .collect();
 
-  // Log the deletion.
   await ctx.db.insert("deleteAccountLog", {
     email: user.email ?? "unknown",
     userId,
@@ -1096,7 +1099,7 @@ async function performDeleteAccount(
   const userLogId = await ctx.db
     .query("userLog")
     .withIndex("by_userId", (q) => q.eq("userId", userId))
-    .unique();
+    .first();
   if (userLogId) {
     await ctx.db.patch(userLogId._id, {
       deleted: true,
@@ -1123,182 +1126,16 @@ async function performDeleteAccount(
       userEmail: user.email,
     });
   }
-
-  // await ctx.db.patch("userLog", userId), {
-
-  // }
-}
-
-async function deleteRelatedDocuments(
-  ctx: {
-    db: { query: Function; delete: Function; get: Function; patch: Function };
-  },
-  userId: string,
-) {
-  const pageSize = 50;
-
-  async function deleteInBatches(
-    queryName: string,
-    indexName: string,
-    queryFn: (q: any) => any,
-  ) {
-    let hasMore = true;
-    while (hasMore) {
-      const docs = await ctx.db
-        .query(queryName)
-        .withIndex(indexName, queryFn)
-        .limit(pageSize)
-        .collect();
-      if (docs.length === 0) {
-        hasMore = false;
-        break;
-      }
-      for (const doc of docs) {
-        try {
-          const existingDoc = await ctx.db.get(doc._id);
-          if (existingDoc) {
-            await ctx.db.delete(doc._id);
-          }
-        } catch (error) {
-          console.error(
-            `Error deleting document ${doc._id} in ${queryName}:`,
-            error,
-          );
-        }
-      }
-    }
-  }
-
-  // 1. Delete passwordResetLog entries.
-  await deleteInBatches("passwordResetLog", "userId", (q) =>
-    q.eq("userId", userId),
-  );
-
-  // 2. Delete user preferences
-  await deleteInBatches("userPreferences", "by_userId", (q) =>
-    q.eq("userId", userId),
-  );
-
-  // 3. Delete notifications
-  await deleteInBatches("notifications", "by_userId_dismissed_updatedAt", (q) =>
-    q.eq("userId", userId),
-  );
-
-  const newsletterSub = await ctx.db
-    .query("newsletter")
-    .withIndex("by_userId", (q: any) => q.eq("userId", userId))
-    .first();
-
-  if (newsletterSub) {
-    await ctx.db.patch(newsletterSub._id, {
-      userId: null,
-      userPlan: 0,
-    });
-  }
-
-  // 3. Delete user organizations if incomplete
-  const incompleteOrgs = await ctx.db
-    .query("organizations")
-    .withIndex("by_complete_with_ownerId", (q: any) =>
-      q.eq("isComplete", false).eq("ownerId", userId),
-    )
-    .collect();
-
-  for (const org of incompleteOrgs) {
-    try {
-      const orgDoc = await ctx.db.get(org._id);
-      if (orgDoc) {
-        await ctx.db.delete(org._id);
-      }
-    } catch (error) {
-      console.error("Error deleting organization:", error);
-    }
-  }
-
-  // 3.1 Change completed orgs to admin ownership
-  const completedOrgs = await ctx.db
-    .query("organizations")
-    .withIndex("by_complete_with_ownerId", (q: any) =>
-      q.eq("isComplete", true).eq("ownerId", userId),
-    )
-    .collect();
-  const adminUser = await ctx.db
-    .query("users")
-    .withIndex("by_role", (q: any) => q.eq("role", ["admin"]))
-    .first();
-  const adminUserId = adminUser?._id as Id<"users">;
-  for (const org of completedOrgs) {
-    try {
-      const orgDoc = await ctx.db.get(org._id);
-      if (orgDoc) {
-        await ctx.db.patch(org._id, {
-          ownerId: adminUserId,
-          updatedAt: Date.now(),
-          lastUpdatedBy: "system admin",
-        });
-      }
-    } catch (error) {
-      console.error("Error changing organization ownership:", error);
-    }
-  }
-
-  // 4. Delete authAccounts and then their verification codes.
-  const authAccounts = await ctx.db
-    .query("authAccounts")
-    .withIndex("userIdAndProvider", (q: any) => q.eq("userId", userId))
-    .collect();
-  for (const account of authAccounts) {
-    try {
-      const accountDoc = await ctx.db.get(account._id);
-      if (accountDoc) {
-        await ctx.db.delete(account._id);
-      }
-    } catch (error) {
-      console.error(`Error deleting authAccount ${account._id}:`, error);
-    }
-    // Delete authVerificationCodes linked to this account.
-    await deleteInBatches("authVerificationCodes", "accountId", (q: any) =>
-      q.eq("accountId", account._id),
-    );
-  }
-  // 4.1 Delete User Password
-  const userPWs = await ctx.db
-    .query("userPW")
-    .withIndex("by_userId", (q: any) => q.eq("userId", userId))
-    .collect();
-  for (const pw of userPWs) {
-    await ctx.db.delete(pw._id);
-  }
-
-  // 4.2 Delete authSessions and then their refresh tokens.
-  const sessions = await ctx.db
-    .query("authSessions")
-    .withIndex("userId", (q: any) => q.eq("userId", userId))
-    .collect();
-  for (const session of sessions) {
-    try {
-      const sessionDoc = await ctx.db.get(session._id);
-      if (sessionDoc) {
-        await ctx.db.delete(session._id);
-      }
-    } catch (error) {
-      console.error(`Error deleting authSession ${session._id}:`, error);
-    }
-    // Delete authRefreshTokens linked to this session.
-    await deleteInBatches("authRefreshTokens", "sessionId", (q: any) =>
-      q.eq("sessionId", session._id),
-    );
-  }
 }
 
 export const deleteSessions = mutation({
   args: {
-    userId: v.string(),
+    userId: v.id("users"),
   },
   handler: async (ctx, args) => {
     const sessions = await ctx.db
       .query("authSessions")
-      .withIndex("userId", (q: any) => q.eq("userId", args.userId))
+      .withIndex("userId", (q) => q.eq("userId", args.userId))
       .collect();
 
     if (sessions.length === 0) {
@@ -1306,10 +1143,13 @@ export const deleteSessions = mutation({
     }
 
     await Promise.all(sessions.map((session) => ctx.db.delete(session._id)));
+    await ctx.scheduler.runAfter(0, internal.users.forceLogoutUser, {
+      userId: args.userId,
+    });
   },
 });
 
-export const invalidateSessionsAction = action({
+export const forceLogoutUser = internalAction({
   args: {
     userId: v.id("users"),
   },
@@ -1320,12 +1160,12 @@ export const invalidateSessionsAction = action({
 
 export const countSessions = query({
   args: {
-    userId: v.string(),
+    userId: v.id("users"),
   },
   handler: async (ctx, args) => {
     const sessions = await ctx.db
       .query("authSessions")
-      .withIndex("userId", (q: any) => q.eq("userId", args.userId))
+      .withIndex("userId", (q) => q.eq("userId", args.userId))
       .collect();
 
     return sessions.length;
@@ -1414,5 +1254,190 @@ export async function syncRoles(
   );
   for (const item of toDelete) {
     await ctx.db.delete(item._id);
+  }
+}
+
+export async function deleteRelatedDocuments(
+  ctx: MutationCtx,
+  userId: Id<"users">,
+) {
+  const pageSize = 50;
+
+  // 1. Delete passwordResetLog entries.
+  try {
+    while (true) {
+      const docs = await ctx.db
+        .query("passwordResetLog")
+        .withIndex("userId", (q) => q.eq("userId", userId))
+        .take(pageSize);
+      if (docs.length === 0) break;
+      for (const doc of docs) {
+        await ctx.db.delete(doc._id);
+      }
+    }
+  } catch (error) {
+    console.error("Error deleting passwordResetLog:", userId, error);
+  }
+
+  // 2. Delete user preferences
+  try {
+    while (true) {
+      const docs = await ctx.db
+        .query("userPreferences")
+        .withIndex("by_userId", (q) => q.eq("userId", userId))
+        .take(pageSize);
+      if (docs.length === 0) break;
+      for (const doc of docs) {
+        await ctx.db.delete(doc._id);
+      }
+    }
+  } catch (error) {
+    console.error("Error deleting userPreferences:", userId, error);
+  }
+
+  // 3. Delete notifications
+  try {
+    while (true) {
+      const docs = await ctx.db
+        .query("notifications")
+        .withIndex("by_userId_dismissed_updatedAt", (q) =>
+          q.eq("userId", userId),
+        )
+        .take(pageSize);
+      if (docs.length === 0) break;
+      for (const doc of docs) {
+        await ctx.db.delete(doc._id);
+      }
+    }
+  } catch (error) {
+    console.error("Error deleting notifications:", userId, error);
+  }
+
+  // Newsletter subscription: patch instead of delete
+  try {
+    const newsletterSub = await ctx.db
+      .query("newsletter")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .first();
+
+    if (newsletterSub) {
+      await ctx.db.patch(newsletterSub._id, {
+        userId: null,
+        userPlan: 0,
+      });
+    }
+  } catch (error) {
+    console.error("Error deleting newsletter subscription:", userId, error);
+  }
+  // 3. Delete user organizations if incomplete
+  try {
+    const incompleteOrgs = await ctx.db
+      .query("organizations")
+      .withIndex("by_complete_with_ownerId", (q) =>
+        q.eq("isComplete", false).eq("ownerId", userId),
+      )
+      .collect();
+
+    for (const org of incompleteOrgs) {
+      await ctx.db.delete(org._id);
+    }
+  } catch (error) {
+    console.error("Error deleting user organizations:", userId, error);
+  }
+
+  // 3.1 Change completed orgs to admin ownership
+  try {
+    const completedOrgs = await ctx.db
+      .query("organizations")
+      .withIndex("by_complete_with_ownerId", (q) =>
+        q.eq("isComplete", true).eq("ownerId", userId),
+      )
+      .collect();
+
+    const creator = await ctx.db
+      .query("userRoles")
+      .withIndex("by_role", (q) => q.eq("role", "creator"))
+      .first();
+
+    if (creator) {
+      const creatorUserId = creator.userId;
+      for (const org of completedOrgs) {
+        await ctx.db.patch(org._id, {
+          ownerId: creatorUserId,
+          updatedAt: Date.now(),
+          lastUpdatedBy: "system admin",
+        });
+      }
+    }
+  } catch (error) {
+    console.error(
+      "Error changing completed orgs to admin ownership:",
+      userId,
+      error,
+    );
+  }
+
+  // 4. Delete authAccounts and then their verification codes.
+  try {
+    const authAccounts = await ctx.db
+      .query("authAccounts")
+      .withIndex("userIdAndProvider", (q) => q.eq("userId", userId))
+      .collect();
+
+    for (const account of authAccounts) {
+      await ctx.db.delete(account._id);
+
+      // Delete authVerificationCodes linked to this account.
+      while (true) {
+        const codes = await ctx.db
+          .query("authVerificationCodes")
+          .withIndex("accountId", (q) => q.eq("accountId", account._id))
+          .take(pageSize);
+        if (codes.length === 0) break;
+        for (const code of codes) {
+          await ctx.db.delete(code._id);
+        }
+      }
+    }
+  } catch (error) {
+    console.error("Error deleting authAccounts:", userId, error);
+  }
+
+  // 4.1 Delete User Password
+  try {
+    const userPWs = await ctx.db
+      .query("userPW")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .collect();
+    for (const pw of userPWs) {
+      await ctx.db.delete(pw._id);
+    }
+  } catch (error) {
+    console.error("Error deleting user password:", error);
+  }
+
+  // 4.2 Delete authSessions and then their refresh tokens.
+  try {
+    const sessions = await ctx.db
+      .query("authSessions")
+      .withIndex("userId", (q) => q.eq("userId", userId))
+      .collect();
+
+    for (const session of sessions) {
+      await ctx.db.delete(session._id);
+
+      while (true) {
+        const tokens = await ctx.db
+          .query("authRefreshTokens")
+          .withIndex("sessionId", (q) => q.eq("sessionId", session._id))
+          .take(pageSize);
+        if (tokens.length === 0) break;
+        for (const token of tokens) {
+          await ctx.db.delete(token._id);
+        }
+      }
+    }
+  } catch (error) {
+    console.error("Error deleting authSessions:", error);
   }
 }
