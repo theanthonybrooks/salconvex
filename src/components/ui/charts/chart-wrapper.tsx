@@ -1,3 +1,5 @@
+import type { FunctionReturnType } from "convex/server";
+
 import { useState } from "react";
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 
@@ -25,10 +27,12 @@ import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { useQueries } from "convex-helpers/react/cache/hooks";
 
 export const chartTimeOptions = [
-  { value: "90d", label: "Last 3 months" },
-  { value: "30d", label: "Last 30 days" },
-  { value: "7d", label: "Last 7 days" },
-];
+  { value: "90", label: "Last 3 months" },
+  { value: "30", label: "Last 30 days" },
+  { value: "7", label: "Last 7 days" },
+] as const;
+
+type TimeRange = (typeof chartTimeOptions)[number]["value"];
 
 export const chartTypeOptions = [
   { value: "application", label: "Applications" },
@@ -80,6 +84,11 @@ type ChartContainerProps = {
   className?: string;
 };
 
+type UserAnalyticsType = FunctionReturnType<
+  typeof api.analytics.eventAnalytics.getEventUserAnalytics
+>;
+type UserTotalsType = NonNullable<UserAnalyticsType>["totals"];
+
 type ConfigMap = Record<string, { label: string; color: string }>;
 
 function TotalsList(props: {
@@ -104,38 +113,28 @@ function TotalsList(props: {
 
 export const ChartWrapper = ({ eventId, className }: ChartContainerProps) => {
   const [chartType, setChartType] = useState<ChartType>("application");
-  const [timeRange, setTimeRange] = useState("90d");
+  const [timeRange, setTimeRange] = useState<TimeRange>("90");
 
   const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
 
   const { data: appChartData, isPending: appChartLoading } = useQueryWithStatus(
     api.analytics.eventAnalytics.getEventAnalytics,
-    chartType === "application" ? { eventId } : "skip",
+    chartType === "application" ? { eventId, timeRange } : "skip",
   );
 
-  const { data: userChartData, isPending: userChartLoading } =
-    useQueryWithStatus(
-      api.analytics.eventAnalytics.getEventUserAnalytics,
-      chartType === "user" ? { eventId } : "skip",
-    );
+  const { data: userResults, isPending: userChartLoading } = useQueryWithStatus(
+    api.analytics.eventAnalytics.getEventUserAnalytics,
+    chartType === "user" ? { eventId, timeRange } : "skip",
+  );
+
+  const { perDay: userChartData, totals: userTotalsData } = userResults ?? {};
 
   const loading =
     chartType === "application" ? appChartLoading : userChartLoading;
 
-  function filterByRange<T extends { date: string }>(
-    rows: T[],
-    timeRange: string,
-  ): T[] {
-    const referenceDate = new Date();
-    const daysToSubtract =
-      timeRange === "30d" ? 30 : timeRange === "7d" ? 7 : 90;
-    const startDate = new Date(referenceDate);
-    startDate.setDate(startDate.getDate() - daysToSubtract);
-    return rows.filter((item) => new Date(item.date) >= startDate);
-  }
-
-  const appFilteredData = filterByRange(appChartData ?? [], timeRange);
-  const userFilteredData = filterByRange(userChartData ?? [], timeRange);
+  const appFilteredData = appChartData ?? [];
+  const userFilteredData = userChartData ?? [];
+  const userTotals = userTotalsData ?? ({} as UserTotalsType);
 
   const config = chartType === "application" ? appChartConfig : userChartConfig;
 
@@ -180,9 +179,9 @@ export const ChartWrapper = ({ eventId, className }: ChartContainerProps) => {
         />
         <SelectSimple
           value={timeRange}
-          onChangeAction={setTimeRange}
+          onChangeAction={(value) => setTimeRange(value as TimeRange)}
           placeholder="Last 3 months"
-          options={chartTimeOptions}
+          options={[...chartTimeOptions]}
           className="w-40"
         />
       </CardHeader>
@@ -262,7 +261,11 @@ export const ChartWrapper = ({ eventId, className }: ChartContainerProps) => {
             <div className="ml-3 flex h-full min-w-50 flex-col items-center justify-center gap-3 border-l-1.5 border-foreground/30 py-6 pl-6 text-center">
               <TotalsList
                 config={config}
-                totals={computeTotals(filteredData, config)}
+                totals={
+                  chartType === "application"
+                    ? computeTotals(appFilteredData, config)
+                    : userTotals
+                }
               />
             </div>
           </div>

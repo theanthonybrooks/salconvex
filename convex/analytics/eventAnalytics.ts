@@ -1,7 +1,9 @@
+import { subDays } from "date-fns";
+
 import { getAuthUserId } from "@convex-dev/auth/server";
-import { v } from "convex/values";
 import { mutation, query } from "~/convex/_generated/server";
 import { analyticsActionSchema, analyticsSrcSchema } from "~/convex/schema";
+import { v } from "convex/values";
 
 export const markEventAnalytics = mutation({
   args: {
@@ -50,21 +52,39 @@ export const markEventAnalytics = mutation({
   },
 });
 
+const timeRangeValidator = v.union(
+  v.literal("90"),
+  v.literal("30"),
+  v.literal("7"),
+);
+
 export const getEventAnalytics = query({
   args: {
     eventId: v.optional(v.id("events")),
+    timeRange: timeRangeValidator,
   },
   handler: async (ctx, args) => {
-    const { eventId } = args;
+    const { eventId, timeRange } = args;
     const userId = await getAuthUserId(ctx);
     if (!userId) return null;
+
+    const today = new Date();
+    const timeRangeDays = parseInt(timeRange, 10);
+    const adjustedDate = subDays(today, timeRangeDays).getTime();
 
     const interactions = eventId
       ? await ctx.db
           .query("eventAnalytics")
-          .withIndex("by_eventId_action", (q) => q.eq("eventId", eventId))
+          .withIndex("by_eventId", (q) =>
+            q.eq("eventId", eventId).gte("_creationTime", adjustedDate),
+          )
           .collect()
-      : await ctx.db.query("eventAnalytics").collect();
+      : await ctx.db
+          .query("eventAnalytics")
+          .withIndex("by_creation_time", (q) =>
+            q.gte("_creationTime", adjustedDate),
+          )
+          .collect();
 
     const totalsByDate = new Map<
       string,
@@ -106,21 +126,35 @@ export const getEventAnalytics = query({
   },
 });
 
-export const getEventUserAnalytics = query({
+export const getEventUserAnalytics1 = query({
   args: {
     eventId: v.optional(v.id("events")),
+    timeRange: timeRangeValidator,
   },
   handler: async (ctx, args) => {
-    const { eventId } = args;
+    console.log(args);
+    const { eventId, timeRange } = args;
     const userId = await getAuthUserId(ctx);
     if (!userId) return null;
 
+    const today = new Date();
+    const timeRangeDays = parseInt(timeRange, 10);
+    const adjustedDate = subDays(today, timeRangeDays).getTime();
+    console.log(adjustedDate);
+    console.log(timeRangeDays);
     const interactions = eventId
       ? await ctx.db
           .query("eventAnalytics")
-          .withIndex("by_eventId_action", (q) => q.eq("eventId", eventId))
+          .withIndex("by_eventId", (q) =>
+            q.eq("eventId", eventId).gte("_creationTime", adjustedDate),
+          )
           .collect()
-      : await ctx.db.query("eventAnalytics").collect();
+      : await ctx.db
+          .query("eventAnalytics")
+          .withIndex("by_creation_time", (q) =>
+            q.gte("_creationTime", adjustedDate),
+          )
+          .collect();
 
     // keep only one record per userId per day
     const uniqueInteractions = [
@@ -173,5 +207,110 @@ export const getEventUserAnalytics = query({
       .sort((a, b) => a.date.localeCompare(b.date));
 
     return appChartData;
+  },
+});
+
+export const getEventUserAnalytics = query({
+  args: {
+    eventId: v.optional(v.id("events")),
+    timeRange: timeRangeValidator,
+  },
+  handler: async (ctx, args) => {
+    const { eventId, timeRange } = args;
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return null;
+
+    const today = new Date();
+    const timeRangeDays = parseInt(timeRange, 10);
+    const adjustedDate = subDays(today, timeRangeDays).getTime();
+
+    const interactions = eventId
+      ? await ctx.db
+          .query("eventAnalytics")
+          .withIndex("by_eventId", (q) =>
+            q.eq("eventId", eventId).gte("_creationTime", adjustedDate),
+          )
+          .collect()
+      : await ctx.db
+          .query("eventAnalytics")
+          .withIndex("by_creation_time", (q) =>
+            q.gte("_creationTime", adjustedDate),
+          )
+          .collect();
+
+    // one record per userId per day
+    const uniqueInteractions = [
+      ...new Map(
+        interactions.map((i) => {
+          const day = new Date(i._creationTime).toDateString();
+          const key = i.userId
+            ? `${i.userId}-${day}`
+            : `${Math.random()}-${day}`;
+          return [key, i];
+        }),
+      ).values(),
+    ];
+
+    // per-day totals
+    const totalsByDateUsers = new Map<
+      string,
+      { guest: number; user: number; artist: number; withSub: number }
+    >();
+
+    for (const app of uniqueInteractions) {
+      const dateKey = new Date(app._creationTime).toISOString().split("T")[0];
+
+      const current = totalsByDateUsers.get(dateKey) ?? {
+        guest: 0,
+        user: 0,
+        artist: 0,
+        withSub: 0,
+      };
+
+      if (!app.userId) current.guest += 1;
+      else current.user += 1;
+
+      if (
+        app.userType === "artist-only" ||
+        app.userType === "artist-and-organizer"
+      ) {
+        current.artist += 1;
+      }
+
+      if (app.hasSub === true) current.withSub += 1;
+
+      totalsByDateUsers.set(dateKey, current);
+    }
+
+    const appChartData = Array.from(totalsByDateUsers.entries())
+      .map(([date, counts]) => ({
+        date,
+        ...counts,
+      }))
+      .sort((a, b) => a.date.localeCompare(b.date));
+
+    const overallTotals = uniqueInteractions.reduce(
+      (acc, app) => {
+        if (!app.userId) acc.guest += 1;
+        else acc.user += 1;
+
+        if (
+          app.userType === "artist-only" ||
+          app.userType === "artist-and-organizer"
+        ) {
+          acc.artist += 1;
+        }
+
+        if (app.hasSub === true) acc.withSub += 1;
+
+        return acc;
+      },
+      { guest: 0, user: 0, artist: 0, withSub: 0 },
+    );
+
+    return {
+      perDay: appChartData,
+      totals: overallTotals,
+    };
   },
 });
