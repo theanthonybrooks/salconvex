@@ -27,9 +27,13 @@ import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { useQueries } from "convex-helpers/react/cache/hooks";
 
 export const chartTimeOptions = [
-  { value: "90", label: "Last 3 months" },
-  { value: "30", label: "Last 30 days" },
   { value: "7", label: "Last 7 days" },
+  { value: "30", label: "Last 30 days" },
+  { value: "90", label: "Last 3 months" },
+  { value: "120", label: "Last 120 days" },
+  { value: "180", label: "Last 180 days" },
+  { value: "365", label: "Last 365 days" },
+  { value: "lastYear", label: "Last year" },
 ] as const;
 
 type TimeRange = (typeof chartTimeOptions)[number]["value"];
@@ -113,7 +117,7 @@ function TotalsList(props: {
 
 export const ChartWrapper = ({ eventId, className }: ChartContainerProps) => {
   const [chartType, setChartType] = useState<ChartType>("application");
-  const [timeRange, setTimeRange] = useState<TimeRange>("90");
+  const [timeRange, setTimeRange] = useState<TimeRange>("30");
 
   const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
 
