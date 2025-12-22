@@ -1,11 +1,5 @@
-import {
-  EventCategory,
-  EventFormat,
-  ProdFormat,
-  SubmissionFormState,
-} from "@/types/eventTypes";
-import { OpenCall, OpenCallApplication } from "@/types/openCallTypes";
-import { Organizer } from "@/types/organizer";
+import type { Organizer } from "@/types/organizer";
+import { EventFormat, ProdFormat } from "@/types/eventTypes";
 
 import slugify from "slugify";
 
@@ -296,7 +290,7 @@ export async function generateUniqueNameAndSlug(
 
   const existingSlug = await ctx.db
     .query("events")
-    .withIndex("by_slug", (q) => q.eq("slug", `${baseName}-${suffix}`))
+    .withIndex("by_slug_edition", (q) => q.eq("slug", `${baseName}-${suffix}`))
     .unique();
 
   if (!existingExact && !existingSlug) {
@@ -317,7 +311,7 @@ export async function generateUniqueNameAndSlug(
 
     const slugExists = await ctx.db
       .query("events")
-      .withIndex("by_slug", (q) => q.eq("slug", tryName))
+      .withIndex("by_slug_edition", (q) => q.eq("slug", tryName))
       .unique();
 
     if (!exists && !slugExists) {
@@ -818,7 +812,7 @@ export const checkEventNameExists = query({
     const eventSlug = slugify(args.name.trim(), { lower: true, strict: true });
     const existingEvents = await ctx.db
       .query("events")
-      .withIndex("by_slug", (q) => q.eq("slug", eventSlug))
+      .withIndex("by_slug_edition", (q) => q.eq("slug", eventSlug))
       .collect();
 
     for (const event of existingEvents) {
@@ -914,33 +908,29 @@ export const getEventBySlug = query({
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
-    const user = userId
-      ? await ctx.db
-          .query("users")
-          .withIndex("by_userId", (q) => q.eq("userId", userId))
-          .unique()
-      : null;
-    if (!user) return null;
-    // console.log(args.slug);
+    const user = userId ? await ctx.db.get(userId) : null;
+
     const event = await ctx.db
       .query("events")
-      .withIndex("by_slug", (q) => q.eq("slug", args.slug))
+      .withIndex("by_slug_edition", (q) => q.eq("slug", args.slug))
+      .order("desc")
       .first();
 
     // console.log(event);
 
     if (!event) throw new ConvexError("No event found");
 
-    const [organizer] = await Promise.all([ctx.db.get(event.mainOrgId)]);
+    const organizer = await ctx.db.get(event.mainOrgId);
+    if (!organizer) throw new ConvexError("Organizer not found");
     const userIsOrganizer = user?._id === organizer?.ownerId;
 
     return {
       event: {
         ...event,
         isUserOrg: userIsOrganizer,
-        state: event.state as SubmissionFormState,
-        category: event.category as EventCategory,
-        type: event.type?.slice(0, 2) ?? [],
+        state: event.state,
+        category: event.category,
+        type: event.type,
       },
       // openCall: openCall as OpenCall,
       organizer: organizer as Organizer,
@@ -953,24 +943,7 @@ export const getEventById = query({
     eventId: v.id("events"),
   },
   handler: async (ctx, args) => {
-    const event = await ctx.db.get(args.eventId);
-    if (!event) return null;
-    return event;
-  },
-});
-
-export const getEventBySlugAndEdition = query({
-  args: {
-    slug: v.string(),
-    edition: v.number(),
-  },
-  handler: async (ctx, args) => {
-    const events = await ctx.db
-      .query("events")
-      .withIndex("by_slug", (q) => q.eq("slug", args.slug))
-      .collect();
-
-    return events.find((e) => e.dates.edition === args.edition);
+    return await ctx.db.get(args.eventId);
   },
 });
 
@@ -984,25 +957,21 @@ export const getEventWithDetails = query({
     const user = userId ? await ctx.db.get(userId) : null;
     const isAdmin = user?.role?.includes("admin");
 
-    const events = await ctx.db
+    const event = await ctx.db
       .query("events")
-      .withIndex("by_slug", (q) => q.eq("slug", args.slug))
-      .collect();
-
-    const event = events.find((e) => e.dates.edition === args.edition);
-    const eventState = event?.state as SubmissionFormState;
-    const eventPublished = eventState === "published" || isAdmin;
-    const eventArchived = eventState === "archived";
+      .withIndex("by_slug_edition", (q) =>
+        q.eq("slug", args.slug).eq("dates.edition", args.edition),
+      )
+      .first();
 
     if (!event) throw new ConvexError("No event found");
 
-    const [openCalls, organizer] = await Promise.all([
-      ctx.db
-        .query("openCalls")
-        .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
-        .collect(),
-      ctx.db.get(event.mainOrgId),
-    ]);
+    const eventPublished = event.state === "published" || isAdmin;
+    const eventArchived = event.state === "archived";
+    const organizer = await ctx.db.get(event.mainOrgId);
+
+    if (!organizer || !organizer.contact)
+      throw new ConvexError("Organizer not found");
 
     const allowedEditor = user && organizer?.allowedEditors.includes(user._id);
 
@@ -1014,21 +983,16 @@ export const getEventWithDetails = query({
     )
       throw new ConvexError("You don't have permission to view this event");
 
-    const openCall = openCalls.find(
-      (e) => e.basicInfo.dates.edition === args.edition,
-    );
-
     const userIsOrganizer = user?._id === organizer?.ownerId;
 
     return {
       event: {
         ...event,
         isUserOrg: userIsOrganizer,
-        state: event.state as SubmissionFormState,
-        category: event.category as EventCategory,
+        state: event.state,
+        category: event.category,
         type: event.type?.slice(0, 2) ?? [],
       },
-      openCall: openCall as OpenCall,
       organizer: organizer as Organizer,
     };
   },
@@ -1084,30 +1048,34 @@ export const getEventWithOCDetails = query({
       subscription?.status === "active" ||
       subscription?.status === "trialing" ||
       isAdmin;
-    let application = null;
 
     const event = await ctx.db
       .query("events")
-      .withIndex("by_slug", (q) => q.eq("slug", slug))
-      .filter((q) => q.eq(q.field("dates.edition"), args.edition))
+      .withIndex("by_slug_edition", (q) =>
+        q.eq("slug", slug).eq("dates.edition", args.edition),
+      )
       .first();
 
     if (!event)
-      throw new ConvexError(
-        "Event not found: " + `${slug}/${edition}` + `- Source:${source}`,
-      );
+      throw new ConvexError({
+        code: "EVENT_NOT_FOUND",
+        message:
+          "Event not found: " + `${slug}/${edition}` + `- Source:${source}`,
+      });
 
     const organizer = await ctx.db.get(event.mainOrgId);
 
+    if (!organizer) throw new ConvexError("Organizer not found");
+
     const userIsOrganizer =
-      user?._id === organizer?.ownerId ||
-      Boolean(user && organizer?.allowedEditors.includes(user._id));
+      user?._id === organizer.ownerId ||
+      Boolean(user && organizer.allowedEditors.includes(user._id));
 
     const openCall = await ctx.db
       .query("openCalls")
-      .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
-      .filter((q) => q.eq(q.field("basicInfo.dates.edition"), edition))
-      // .filter((q) => q.eq(q.field("state"), "published"))
+      .withIndex("by_eventId_edition", (q) =>
+        q.eq("eventId", event._id).eq("basicInfo.dates.edition", edition),
+      )
       .filter((q) =>
         isAdmin || userIsOrganizer
           ? q.or(
@@ -1126,13 +1094,15 @@ export const getEventWithOCDetails = query({
 
       .first();
 
-    if (userId && openCall && activeSub) {
-      application = await ctx.db
-        .query("applications")
-        .withIndex("by_openCallId", (q) => q.eq("openCallId", openCall._id))
-        .filter((q) => q.eq(q.field("artistId"), userId))
-        .first();
-    }
+    const application =
+      userId && openCall && activeSub
+        ? await ctx.db
+            .query("applications")
+            .withIndex("by_openCallId_artistId", (q) =>
+              q.eq("openCallId", openCall._id).eq("artistId", userId),
+            )
+            .first()
+        : null;
 
     // const userIsOrganizer =
     //   user?.accountType?.includes("organizer") && userId === organizer?.ownerId;
@@ -1143,22 +1113,23 @@ export const getEventWithOCDetails = query({
     // console.log("user doesn't have permission to view this event");
     // console.log(source, openCall);
     if (source === "ocpage" && !openCall)
-      throw new ConvexError(
-        `Open Call not found for: slug: ${slug}, edition: ${edition}, eventId: ${event._id}`,
-      );
+      throw new ConvexError({
+        code: "OPEN_CALL_NOT_FOUND",
+        message: `Open Call not found for: slug: ${slug}, edition: ${edition}, eventId: ${event._id}`,
+      });
     if (!openCall) return null;
 
     return {
       event: {
         ...event,
         isUserOrg: userIsOrganizer,
-        state: event.state as SubmissionFormState,
-        category: event.category as EventCategory,
+        state: event.state,
+        category: event.category,
         type: event.type?.slice(0, 2) ?? [],
       },
-      openCall: openCall as OpenCall,
+      openCall,
       organizer: organizer as Organizer,
-      application: (application as OpenCallApplication) ?? null,
+      application,
     };
   },
 });
@@ -1394,6 +1365,10 @@ export const updateEventStatus = mutation({
       throw new Error("You don't have permission to approve events");
     const event = await ctx.db.get(args.eventId);
     if (!event) return null;
+    const openCall = await ctx.db
+      .query("openCalls")
+      .withIndex("by_eventId", (q) => q.eq("eventId", args.eventId))
+      .first();
 
     const oldDoc = event;
     await ctx.db.patch(event._id, {
@@ -1406,7 +1381,7 @@ export const updateEventStatus = mutation({
     if (event.category === "event") {
       await upsertNotification(ctx, {
         type: "newEvent",
-        redirectUrl: `/thelist/event/${event.slug}/${event.dates.edition}/call?tab=event`,
+        redirectUrl: `/thelist/event/${event.slug}/${event.dates.edition}${openCall ? "/call?tab=event" : ""}`,
         displayText: "New Event Added",
         description: event.name,
         eventId: event._id,
@@ -1437,6 +1412,10 @@ export const approveEvent = mutation({
       throw new Error("You don't have permission to approve events");
     const event = await ctx.db.get(args.eventId);
     if (!event) return null;
+    const openCall = await ctx.db
+      .query("openCalls")
+      .withIndex("by_eventId", (q) => q.eq("eventId", args.eventId))
+      .first();
 
     const eventState = event.state === "submitted" ? "published" : "published";
     const oldDoc = event;
@@ -1451,7 +1430,7 @@ export const approveEvent = mutation({
       await upsertNotification(ctx, {
         type: "newEvent",
         targetUserType: "artist",
-        redirectUrl: `/thelist/event/${event.slug}/${event.dates.edition}/call?tab=event`,
+        redirectUrl: `/thelist/event/${event.slug}/${event.dates.edition}${openCall ? "/call?tab=event" : ""}`,
         displayText: "New Event Published",
         description: event.name,
         eventId: event._id,
@@ -1484,7 +1463,10 @@ export const reactivateEvent = mutation({
 
     const event = await ctx.db.get(args.eventId);
     if (!event) return null;
-
+    const openCall = await ctx.db
+      .query("openCalls")
+      .withIndex("by_eventId", (q) => q.eq("eventId", args.eventId))
+      .first();
     const eventState =
       event.state === "archived" && isAdmin ? "published" : "submitted";
     const oldDoc = event;
@@ -1501,7 +1483,7 @@ export const reactivateEvent = mutation({
           type: "newEvent",
           displayText: "New Event Added",
           description: event.name,
-          redirectUrl: `/thelist/event/${event.slug}/${event.dates.edition}?tab=event`,
+          redirectUrl: `/thelist/event/${event.slug}/${event.dates.edition}${openCall ? "/call?tab=event" : ""}`,
           eventId: event._id,
           dedupeKey: `event-${event._id}-added`,
         });

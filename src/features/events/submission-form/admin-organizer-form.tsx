@@ -1620,7 +1620,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
               type: "newEvent",
               displayText: "New Event Added",
               description: `${eventData.name}`,
-              redirectUrl: `/thelist/event/${submissionUrl}/call?tab=event`,
+              redirectUrl: `/thelist/event/${submissionUrl}${openCallId ? "?tab=event" : ""}}`,
               dedupeKey: `event-${eventData._id}-added`,
               eventId: eventData._id,
             });

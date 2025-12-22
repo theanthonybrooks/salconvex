@@ -1,12 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
-import { api } from "~/convex/_generated/api";
-import { makeUseQueryWithStatus } from "convex-helpers/react";
-import { useQuery } from "convex-helpers/react/cache";
-import { useQueries } from "convex-helpers/react/cache/hooks";
-import { usePreloadedQuery } from "convex/react";
+import type { EventEditionResult } from "@/types/eventTypes";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { SalBackNavigation } from "@/features/events/components/sal-back-navigation";
@@ -14,7 +8,15 @@ import { EventCardDetailDesktop } from "@/features/events/event-detail/desktop/e
 import { EventCardDetailMobile } from "@/features/events/event-detail/mobile/event-card-detail-mobile";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 
-const EventEditionDetail = () => {
+import { api } from "~/convex/_generated/api";
+import { useQuery } from "convex-helpers/react/cache";
+import { usePreloadedQuery } from "convex/react";
+
+type EventDetailProps = {
+  data: EventEditionResult;
+};
+
+const EventEditionDetail = ({ data }: EventDetailProps) => {
   const { preloadedSubStatus, preloadedUserData } = useConvexPreload();
   const subData = usePreloadedQuery(preloadedSubStatus);
   const userData = usePreloadedQuery(preloadedUserData);
@@ -22,30 +24,10 @@ const EventEditionDetail = () => {
   const isAdmin = user?.role?.includes("admin") || false;
   const hasActiveSubscription =
     (subData?.hasActiveSubscription || isAdmin) ?? false;
-  const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
-
-  const router = useRouter();
-  const { slug, year } = useParams();
-  const slugValue = Array.isArray(slug) ? slug[0] : slug;
-
-  const {
-    data,
-    isError,
-    // error,
-  } = useQueryWithStatus(
-    api.events.event.getEventWithDetails,
-    slugValue ? { slug: slugValue, edition: Number(year) } : "skip",
-  );
 
   const artistData = useQuery(api.artists.artistActions.getArtistFull);
-
-  const isOwner = user?._id === data?.organizer?.ownerId;
-
-  useEffect(() => {
-    if (isError) {
-      router.push("/404");
-    }
-  }, [isError, router]);
+  const artist = artistData?.artist;
+  const isOwner = user?._id === data.organizer.ownerId;
 
   return (
     <>
@@ -76,12 +58,12 @@ const EventEditionDetail = () => {
         <>
           <EventCardDetailMobile
             data={data}
-            artist={artistData?.artist}
+            artist={artist}
             className="lg:hidden"
           />
           <EventCardDetailDesktop
             data={data}
-            artist={artistData?.artist}
+            artist={artist}
             className="hidden lg:block"
           />
         </>

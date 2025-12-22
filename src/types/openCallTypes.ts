@@ -2,9 +2,12 @@ import {
   openCallCategoryFields,
   openCallStatusValues,
 } from "@/constants/openCallConsts";
+
+import type { FunctionReturnType } from "convex/server";
 import { ArtistFull } from "@/types/artist";
-import { EnrichedEventData } from "@/types/eventTypes";
-import { Organizer } from "@/types/organizer";
+
+import type { api } from "~/convex/_generated/api";
+
 import { Doc, Id } from "~/convex/_generated/dataModel";
 import {
   CallFormatType,
@@ -15,6 +18,11 @@ import {
   RateUnitType,
   UserPrefsType,
 } from "~/convex/schema";
+
+type OpenCallDataResult = FunctionReturnType<
+  typeof api.events.event.getEventWithOCDetails
+>;
+export type OpenCallData = NonNullable<OpenCallDataResult>;
 
 export type CallFormat = CallFormatType;
 export type OpenCallState = OpenCallStateType;
@@ -35,12 +43,12 @@ export type openCallFileType = {
 export type OpenCall = Doc<"openCalls">;
 export type OpenCallApplication = Doc<"applications">;
 
-export interface OpenCallData {
-  event: EnrichedEventData;
-  openCall: OpenCall;
-  organizer: Organizer;
-  application?: OpenCallApplication | null;
-}
+// export interface OpenCallData {
+//   event: EnrichedEventData;
+//   openCall: OpenCall;
+//   organizer: Organizer;
+//   application?: OpenCallApplication | null;
+// }
 
 export interface OpenCallCardProps {
   data: OpenCallData;

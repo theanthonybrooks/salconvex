@@ -1,7 +1,8 @@
+import type { FunctionReturnType } from "convex/server";
 import { ArtistFull } from "@/types/artist";
 import { OpenCall, OpenCallStatus } from "@/types/openCallTypes";
-import { Organizer } from "@/types/organizer";
 
+import type { api } from "~/convex/_generated/api";
 import type { ApplicationStatus } from "~/convex/schema";
 
 import { Doc, Id } from "~/convex/_generated/dataModel";
@@ -31,13 +32,24 @@ export type EnrichedEventData = EventData & {
   hasActiveOpenCall?: boolean;
 };
 
+type EventEditionDataResult = FunctionReturnType<
+  typeof api.events.event.getEventWithDetails
+>;
+export type EventEditionResult = NonNullable<EventEditionDataResult>;
+
+type EventDataResult = FunctionReturnType<
+  typeof api.events.event.getEventBySlug
+>;
+
+export type EventBaseResult = NonNullable<EventDataResult>;
+
 // export type EventCardDetailProps = {
 //   data: { event: EnrichedEventData; openCall: OpenCall; organizer: Organizer };
 //   artist?: ArtistFull | null;
 // };
 
 export type EventCardProps = {
-  data: { event: EnrichedEventData; organizer: Organizer };
+  data: EventEditionResult;
   artist?: ArtistFull | null; //todo:make this required
   className?: string;
 };
