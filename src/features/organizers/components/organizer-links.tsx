@@ -105,6 +105,7 @@ export const OrganizerLinks = ({
                 key={key}
                 href={getLinkHref(key, value, orgName)}
                 className="size-6 hover:scale-110"
+                target="_blank"
               >
                 {icon}
               </a>
