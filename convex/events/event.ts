@@ -918,7 +918,11 @@ export const getEventBySlug = query({
 
     // console.log(event);
 
-    if (!event) throw new ConvexError("No event found");
+    if (!event)
+      throw new ConvexError({
+        code: "EVENT_NOT_FOUND",
+        message: `Event not found for: ${args.slug}`,
+      });
 
     const organizer = await ctx.db.get(event.mainOrgId);
     if (!organizer) throw new ConvexError("Organizer not found");
@@ -964,7 +968,11 @@ export const getEventWithDetails = query({
       )
       .first();
 
-    if (!event) throw new ConvexError("No event found");
+    if (!event)
+      throw new ConvexError({
+        code: "EVENT_NOT_FOUND",
+        message: `Event not found for: ${args.slug}/${args.edition}`,
+      });
 
     const eventPublished = event.state === "published" || isAdmin;
     const eventArchived = event.state === "archived";
