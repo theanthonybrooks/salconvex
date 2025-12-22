@@ -33,7 +33,9 @@ export const chartTimeOptions = [
 export const chartTypeOptions = [
   { value: "application", label: "Applications" },
   { value: "user", label: "Users" },
-];
+] as const;
+
+type ChartType = (typeof chartTypeOptions)[number]["value"];
 
 const userChartConfig = {
   guest: {
@@ -78,8 +80,30 @@ type ChartContainerProps = {
   className?: string;
 };
 
+type ConfigMap = Record<string, { label: string; color: string }>;
+
+function TotalsList(props: {
+  config: ConfigMap;
+  totals: Record<string, number>;
+}) {
+  const entries = Object.entries(props.config);
+
+  return (
+    <>
+      {entries.map(([k, meta]) => (
+        <div key={k} className="w-full rounded-md border p-2 text-center">
+          <p className="text-sm font-medium">{meta.label}</p>
+          <p className="text-lg font-semibold">
+            {(props.totals[k] ?? 0).toLocaleString()}
+          </p>
+        </div>
+      ))}
+    </>
+  );
+}
+
 export const ChartWrapper = ({ eventId, className }: ChartContainerProps) => {
-  const [chartType, setChartType] = useState("application");
+  const [chartType, setChartType] = useState<ChartType>("application");
   const [timeRange, setTimeRange] = useState("90d");
 
   const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
@@ -95,34 +119,44 @@ export const ChartWrapper = ({ eventId, className }: ChartContainerProps) => {
       chartType === "user" ? { eventId } : "skip",
     );
 
-  const data =
-    chartType === "application" ? (appChartData ?? []) : (userChartData ?? []);
-
   const loading =
     chartType === "application" ? appChartLoading : userChartLoading;
 
-  const filteredData = data.filter((item) => {
-    const date = new Date(item.date);
+  function filterByRange<T extends { date: string }>(
+    rows: T[],
+    timeRange: string,
+  ): T[] {
     const referenceDate = new Date();
-    let daysToSubtract = 90;
-    if (timeRange === "30d") {
-      daysToSubtract = 30;
-    } else if (timeRange === "7d") {
-      daysToSubtract = 7;
-    }
+    const daysToSubtract =
+      timeRange === "30d" ? 30 : timeRange === "7d" ? 7 : 90;
     const startDate = new Date(referenceDate);
     startDate.setDate(startDate.getDate() - daysToSubtract);
-    return date >= startDate;
-  });
+    return rows.filter((item) => new Date(item.date) >= startDate);
+  }
 
-  // if (loading || !filteredData.length) {
-  //   return <LoadingBalls numberOfBalls={6} scale={0.5} />;
-  // }
+  const appFilteredData = filterByRange(appChartData ?? [], timeRange);
+  const userFilteredData = filterByRange(userChartData ?? [], timeRange);
 
-  const config =
-    chartType === "application"
-      ? (appChartConfig as typeof appChartConfig)
-      : (userChartConfig as typeof userChartConfig);
+  const config = chartType === "application" ? appChartConfig : userChartConfig;
+
+  const filteredData =
+    chartType === "application" ? appFilteredData : userFilteredData;
+
+  function computeTotals<const C extends ConfigMap>(
+    data: Array<{ date: string } & Record<keyof C, number>>,
+    config: C,
+  ): Record<keyof C, number> {
+    const keys = Object.keys(config) as Array<keyof C>;
+    const out = {} as Record<keyof C, number>;
+
+    for (const k of keys) {
+      let sum = 0;
+      for (const row of data) sum += row[k];
+      out[k] = sum;
+    }
+
+    return out;
+  }
 
   return (
     <Card className={cn("pt-0", className)}>
@@ -139,9 +173,9 @@ export const ChartWrapper = ({ eventId, className }: ChartContainerProps) => {
         </div>
         <SelectSimple
           value={chartType}
-          onChangeAction={setChartType}
+          onChangeAction={(value) => setChartType(value as ChartType)}
           placeholder="Chart Type"
-          options={chartTypeOptions}
+          options={[...chartTypeOptions]}
           className="w-40"
         />
         <SelectSimple
@@ -152,10 +186,8 @@ export const ChartWrapper = ({ eventId, className }: ChartContainerProps) => {
           className="w-40"
         />
       </CardHeader>
-      <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
+      <CardContent className="p-0 px-2 sm:px-6">
         {loading ? (
-          // <LoadingBalls numberOfBalls={3} scale={1} />
-
           <span className="flex h-full min-h-60 w-full items-center justify-center">
             Loading Data...{" "}
           </span>
@@ -164,68 +196,76 @@ export const ChartWrapper = ({ eventId, className }: ChartContainerProps) => {
             No data found
           </span>
         ) : (
-          <ChartContainer config={config} className="aspect-auto h-60 w-full">
-            <AreaChart data={filteredData}>
-              <defs>
-                {Object.entries(config).map(([key, { color }]) => (
-                  <linearGradient
-                    key={key}
-                    id={`fill-${key}`}
-                    x1="0"
-                    y1="0"
-                    x2="0"
-                    y2="1"
-                  >
-                    <stop offset="5%" stopColor={color} stopOpacity={0.8} />
-                    <stop offset="95%" stopColor={color} stopOpacity={0.1} />
-                  </linearGradient>
-                ))}
-              </defs>
+          <div className="flex items-center justify-between gap-4">
+            <ChartContainer config={config} className="aspect-auto h-60 w-full">
+              <AreaChart data={filteredData}>
+                <defs>
+                  {Object.entries(config).map(([key, { color }]) => (
+                    <linearGradient
+                      key={key}
+                      id={`fill-${key}`}
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
+                      <stop offset="5%" stopColor={color} stopOpacity={0.8} />
+                      <stop offset="95%" stopColor={color} stopOpacity={0.1} />
+                    </linearGradient>
+                  ))}
+                </defs>
 
-              <CartesianGrid vertical={false} />
-              <XAxis
-                dataKey="date"
-                tickLine={false}
-                axisLine={false}
-                tickMargin={8}
-                minTickGap={32}
-                tickFormatter={(value) => {
-                  const date = new Date(value);
-                  return date.toLocaleDateString("en-US", {
-                    month: "short",
-                    day: "numeric",
-                  });
-                }}
-              />
-              <ChartTooltip
-                cursor={false}
-                content={
-                  <ChartTooltipContent
-                    labelFormatter={(value) => {
-                      return new Date(value).toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                      });
-                    }}
-                    indicator="dot"
-                  />
-                }
-              />
-
-              {Object.entries(config).map(([key, { color }]) => (
-                <Area
-                  key={key}
-                  dataKey={key}
-                  type="natural"
-                  fill={`url(#fill-${key})`}
-                  stroke={color}
-                  stackId="a"
+                <CartesianGrid vertical={false} />
+                <XAxis
+                  dataKey="date"
+                  tickLine={false}
+                  axisLine={false}
+                  tickMargin={8}
+                  minTickGap={32}
+                  tickFormatter={(value) => {
+                    const date = new Date(value);
+                    return date.toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                    });
+                  }}
                 />
-              ))}
+                <ChartTooltip
+                  cursor={false}
+                  content={
+                    <ChartTooltipContent
+                      labelFormatter={(value) => {
+                        return new Date(value).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                        });
+                      }}
+                      indicator="dot"
+                    />
+                  }
+                />
 
-              <ChartLegend content={<ChartLegendContent />} />
-            </AreaChart>
-          </ChartContainer>
+                {Object.entries(config).map(([key, { color }]) => (
+                  <Area
+                    key={key}
+                    dataKey={key}
+                    type="natural"
+                    fill={`url(#fill-${key})`}
+                    stroke={color}
+                    stackId="a"
+                  />
+                ))}
+
+                <ChartLegend content={<ChartLegendContent />} />
+              </AreaChart>
+            </ChartContainer>
+            <div className="ml-3 flex h-full min-w-50 flex-col items-center justify-center gap-3 border-l-1.5 border-foreground/30 py-6 pl-6 text-center">
+              <TotalsList
+                config={config}
+                totals={computeTotals(filteredData, config)}
+              />
+            </div>
+          </div>
         )}
       </CardContent>
     </Card>
