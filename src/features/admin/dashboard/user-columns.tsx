@@ -53,6 +53,7 @@ export const userColumnLabels: Record<string, string> = {
   role: "Role",
   source: "Source",
   organizationNames: "Organizations",
+  id: "User ID",
 };
 
 type UserResults = FunctionReturnType<typeof api.users.usersWithSubscriptions>;
@@ -623,6 +624,19 @@ export const userColumns: ColumnDef<UserResult>[] = [
     sortUndefined: "last",
 
     enableMultiSort: true,
+  },
+  {
+    accessorKey: "_id",
+    id: "id",
+    minSize: 40,
+    maxSize: 140,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="ID" />
+    ),
+    cell: ({ row }) => {
+      const { _id } = row.original;
+      return <p>{_id}</p>;
+    },
   },
   {
     id: "actions",

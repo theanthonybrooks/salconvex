@@ -354,7 +354,7 @@ export const runCEA = migrations.runner(
 export const runBFA = migrations.runner([
   internal.migrations.backfillEventsAggregate2,
 ]);
-
+export const runCOA = migrations.runner(internal.migrations.clearOCAggregate2);
 export const runBFOA = migrations.runner(
   internal.migrations.backfillOCAggregate2,
 );

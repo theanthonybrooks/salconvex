@@ -226,6 +226,7 @@ export function AdminDashboardTableWrapper({
               website: false,
               organizationNames: false,
               canFeature: false,
+              id: false,
             },
             mobile: {
               type: false,
@@ -233,6 +234,7 @@ export function AdminDashboardTableWrapper({
               role: false,
               lastEditedAt: false,
               dates_edition: false,
+              id: false,
             },
           }}
           defaultSort={[{ id: `createdAt`, desc: true }]}

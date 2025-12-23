@@ -168,6 +168,8 @@ export function DataTable<TData, TValue>({
     return filters;
   }, [searchParams, columns]);
 
+  console.log(defaultFiltersFromUrl, searchParams);
+
   const { isAdmin, isEditor } = adminActions ?? {};
 
   const [expanded, setExpanded] = useState<ExpandedState>({});
@@ -176,8 +178,8 @@ export function DataTable<TData, TValue>({
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
     defaultVisibility ?? {},
   );
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(() => {
-    // merge filters from URL and from props, with URL taking precedence
+
+  const mergedFilters = useMemo(() => {
     if (defaultFilters?.length) {
       const merged = [
         ...defaultFiltersFromUrl,
@@ -188,7 +190,10 @@ export function DataTable<TData, TValue>({
       return merged;
     }
     return defaultFiltersFromUrl;
-  });
+  }, [defaultFiltersFromUrl, defaultFilters]);
+
+  const [columnFilters, setColumnFilters] =
+    useState<ColumnFiltersState>(mergedFilters);
 
   const initialSort = useMemo<SortingState>(() => {
     return defaultSort ?? [];
@@ -337,6 +342,10 @@ export function DataTable<TData, TValue>({
   useEffect(() => {
     table.setPageSize(pageSize);
   }, [table, pageSize]);
+
+  useEffect(() => {
+    setColumnFilters(mergedFilters);
+  }, [mergedFilters]);
 
   return (
     <div className={cn("w-full space-y-4 pb-3", outerContainerClassName)}>

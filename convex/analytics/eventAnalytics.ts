@@ -199,7 +199,6 @@ export const getEventUserAnalytics1 = query({
           )
           .collect();
 
-    // keep only one record per userId per day
     const uniqueInteractions = [
       ...new Map(
         interactions.map((i) => {
