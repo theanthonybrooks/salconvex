@@ -131,6 +131,7 @@ export default async function RootLayout({
     <ConvexAuthNextjsServerProvider>
       <html
         lang="en"
+        translate="no"
         suppressHydrationWarning
         className={cn(isDashboard && "overflow-hidden")}
       >
@@ -139,6 +140,9 @@ export default async function RootLayout({
             rel="stylesheet"
             href="https://use.typekit.net/dck7qmb.css"
           ></link>
+          <meta name="googlebot" content="notranslate" />
+
+          <meta name="google" content="notranslate" />
           <meta
             name="google-site-verification"
             content="jXicA4CesSrJjuZE7VQjf8nlL0VIKXbLRSxWNuEiI3M"
