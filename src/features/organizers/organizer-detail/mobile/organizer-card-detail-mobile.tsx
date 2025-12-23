@@ -162,10 +162,7 @@ export const OrganizerCardDetailMobile = (props: OrganizerCardProps) => {
               <TabsTrigger
                 key={tab}
                 value={tab}
-                className={cn(
-                  "relative z-10 flex h-10 w-full items-center justify-center px-4 text-sm font-medium",
-                  activeTab === tab ? "text-black" : "text-muted-foreground",
-                )}
+                className={cn("relative z-10")}
               >
                 {hasMounted && activeTab === tab && (
                   <motion.div
