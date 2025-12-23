@@ -126,7 +126,6 @@ export default async function RootLayout({
     {},
     { token },
   );
-  console.log(deviceType);
 
   return (
     <ConvexAuthNextjsServerProvider>

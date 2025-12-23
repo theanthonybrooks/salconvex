@@ -640,10 +640,10 @@ export default function Pricing() {
   const bannedSub = subscription?.banned;
   const subInterval = subscription?.intervalNext ?? subscription?.interval;
 
-  const [urlAccountType, setUrlAccountType] = useState<AccountTypeBase | null>(
-    null,
-  );
-  const userAccountTypes = user?.accountType ?? urlAccountType ?? [];
+  // const [urlAccountType, setUrlAccountType] = useState<AccountTypeBase | null>(
+  //   null,
+  // );
+  const userAccountTypes = user?.accountType ?? [];
   const accountType = typeParam ?? user?.accountType[0] ?? "artist";
   const [isYearly, setIsYearly] = useState<boolean>(subInterval === "year");
   const [hasOpenCall, setHasOpenCall] = useState<boolean>(true);
@@ -658,34 +658,13 @@ export default function Pricing() {
   const orgAccountType = userAccountTypes.includes("organizer");
 
   useEffect(() => {
-    const hasSubmitParam = searchParams.has("submit");
-    const hash = window?.location?.hash;
-    const hasSubmitHash = hash === "#submit";
-
-    if (hasSubmitParam || hasSubmitHash) {
-      setSelectedAccountType("organizer");
-      setUrlAccountType("organizer");
+    const typeParam = searchParams.get("type");
+    if (typeParam) {
+      setSelectedAccountType(typeParam as AccountTypeBase);
     } else {
-      setUrlAccountType(null);
+      setSelectedAccountType("artist");
     }
   }, [searchParams]);
-
-  useEffect(() => {
-    if (user) return;
-    setSelectedAccountType("artist");
-    setIsYearly(false);
-  }, [user, subscription]);
-
-  // useEffect(() => {
-  //   if (!isArtist) return;
-  //   if (!hasSub) {
-  //     setIsYearly(false);
-  //   } else {
-  //     setIsYearly(subInterval === "year");
-  //   }
-  // }, [subInterval, hasSub, isArtist]);
-
-  // useEffect(() => setSelectedAccountType(accountType), [accountType]);
 
   const togglePricingPeriod = (value: string) =>
     setIsYearly(parseInt(value) === 1);
@@ -694,8 +673,6 @@ export default function Pricing() {
 
   const plans = useQuery(api.plans.getUserPlans, !bannedSub ? {} : "skip");
   const orgPlans = useQuery(api.plans.getOrgPlans, !bannedSub ? {} : "skip");
-
-  console.log(currency);
 
   if (bannedSub)
     return (
