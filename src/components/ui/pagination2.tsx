@@ -86,7 +86,7 @@ export const BasicPagination = ({
                   <p className={cn("mx-auto text-nowrap text-center")}>
                     Active Calls: {totalOpenCalls}
                   </p>
-                  {totalComingSoon && (
+                  {Boolean(totalComingSoon) && (
                     <p className={cn("mx-auto text-nowrap text-center")}>
                       Coming Soon: {totalComingSoon}
                     </p>
