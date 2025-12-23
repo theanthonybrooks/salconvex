@@ -70,7 +70,9 @@ export default convexAuthNextjsMiddleware(
     }
 
     if (isSubmitPage(request)) {
-      return NextResponse.redirect(new URL("/pricing?submit", request.url));
+      return NextResponse.redirect(
+        new URL("/pricing?type=organizer", request.url),
+      );
     }
 
     // if (isOpenCallPage(request) && !isAuthenticated) {
