@@ -1,6 +1,7 @@
 import type { FunctionReturnType } from "convex/server";
 
 import { useState } from "react";
+import { useIsMobile } from "@/hooks/use-media-query";
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 
 import {
@@ -116,6 +117,8 @@ function TotalsList(props: {
 }
 
 export const ChartWrapper = ({ eventId, className }: ChartContainerProps) => {
+  const isMobile = useIsMobile();
+  const [inView, setInView] = useState<"chart" | "stats">("chart");
   const [chartType, setChartType] = useState<ChartType>("application");
   const [timeRange, setTimeRange] = useState<TimeRange>("30");
 
@@ -200,78 +203,89 @@ export const ChartWrapper = ({ eventId, className }: ChartContainerProps) => {
           </span>
         ) : (
           <div className="flex items-center justify-between gap-4">
-            <ChartContainer config={config} className="aspect-auto h-60 w-full">
-              <AreaChart data={filteredData}>
-                <defs>
-                  {Object.entries(config).map(([key, { color }]) => (
-                    <linearGradient
-                      key={key}
-                      id={`fill-${key}`}
-                      x1="0"
-                      y1="0"
-                      x2="0"
-                      y2="1"
-                    >
-                      <stop offset="5%" stopColor={color} stopOpacity={0.8} />
-                      <stop offset="95%" stopColor={color} stopOpacity={0.1} />
-                    </linearGradient>
-                  ))}
-                </defs>
+            {((isMobile && inView === "chart") || !isMobile) && (
+              <ChartContainer
+                config={config}
+                className="aspect-auto h-60 w-full"
+              >
+                <AreaChart data={filteredData}>
+                  <defs>
+                    {Object.entries(config).map(([key, { color }]) => (
+                      <linearGradient
+                        key={key}
+                        id={`fill-${key}`}
+                        x1="0"
+                        y1="0"
+                        x2="0"
+                        y2="1"
+                      >
+                        <stop offset="5%" stopColor={color} stopOpacity={0.8} />
+                        <stop
+                          offset="95%"
+                          stopColor={color}
+                          stopOpacity={0.1}
+                        />
+                      </linearGradient>
+                    ))}
+                  </defs>
 
-                <CartesianGrid vertical={false} />
-                <XAxis
-                  dataKey="date"
-                  tickLine={false}
-                  axisLine={false}
-                  tickMargin={8}
-                  minTickGap={32}
-                  tickFormatter={(value) => {
-                    const date = new Date(value);
-                    return date.toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                    });
-                  }}
-                />
-                <ChartTooltip
-                  cursor={false}
-                  content={
-                    <ChartTooltipContent
-                      labelFormatter={(value) => {
-                        return new Date(value).toLocaleDateString("en-US", {
-                          month: "short",
-                          day: "numeric",
-                        });
-                      }}
-                      indicator="dot"
+                  <CartesianGrid vertical={false} />
+                  <XAxis
+                    dataKey="date"
+                    tickLine={false}
+                    axisLine={false}
+                    tickMargin={8}
+                    minTickGap={32}
+                    tickFormatter={(value) => {
+                      const date = new Date(value);
+                      return date.toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                      });
+                    }}
+                  />
+                  <ChartTooltip
+                    cursor={false}
+                    content={
+                      <ChartTooltipContent
+                        labelFormatter={(value) => {
+                          return new Date(value).toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "numeric",
+                          });
+                        }}
+                        indicator="dot"
+                      />
+                    }
+                  />
+
+                  {Object.entries(config).map(([key, { color }]) => (
+                    <Area
+                      key={key}
+                      dataKey={key}
+                      type="natural"
+                      fill={`url(#fill-${key})`}
+                      stroke={color}
+                      stackId="a"
                     />
+                  ))}
+
+                  <ChartLegend content={<ChartLegendContent />} />
+                </AreaChart>
+              </ChartContainer>
+            )}
+            {((isMobile && inView === "stats") || !isMobile) && (
+              <div className="ml-3 flex h-full min-w-50 flex-col items-center justify-center gap-3 border-l-1.5 border-foreground/30 py-6 pl-6 text-center">
+                <TotalsList
+                  config={config}
+                  totals={
+                    chartType === "application"
+                      ? computeTotals(appFilteredData, config)
+                      : userTotals
                   }
                 />
-
-                {Object.entries(config).map(([key, { color }]) => (
-                  <Area
-                    key={key}
-                    dataKey={key}
-                    type="natural"
-                    fill={`url(#fill-${key})`}
-                    stroke={color}
-                    stackId="a"
-                  />
-                ))}
-
-                <ChartLegend content={<ChartLegendContent />} />
-              </AreaChart>
-            </ChartContainer>
-            <div className="ml-3 flex h-full min-w-50 flex-col items-center justify-center gap-3 border-l-1.5 border-foreground/30 py-6 pl-6 text-center">
-              <TotalsList
-                config={config}
-                totals={
-                  chartType === "application"
-                    ? computeTotals(appFilteredData, config)
-                    : userTotals
-                }
-              />
-            </div>
+              </div>
+            )}
           </div>
         )}
       </CardContent>

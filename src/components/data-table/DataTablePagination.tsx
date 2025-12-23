@@ -1,3 +1,4 @@
+import { useIsMobile } from "@/hooks/use-media-query";
 import { Table } from "@tanstack/react-table";
 
 import {
@@ -24,6 +25,7 @@ interface DataTablePaginationProps<TData> {
 export function DataTablePagination<TData>({
   table,
 }: DataTablePaginationProps<TData>) {
+  const isMobile = useIsMobile();
   const totalResults = table.getFilteredRowModel().rows.length;
   const tablePageSize = table.getState().pagination.pageSize;
   const tablePageIndex = table.getState().pagination.pageIndex;
@@ -97,10 +99,11 @@ export function DataTablePagination<TData>({
           <Button
             variant="outline"
             className={cn(
-              "hidden size-8 max-h-8 p-0 lg:flex",
+              "hsm:max-h-8 idden p-0 sm:size-8 lg:flex",
               "disabled:border-foreground/50 disabled:opacity-30",
               // "sm:disabled:invisible",
             )}
+            size={isMobile ? "lg" : "sm"}
             onClick={() => table.setPageIndex(0)}
             disabled={!table.getCanPreviousPage()}
           >
@@ -110,10 +113,11 @@ export function DataTablePagination<TData>({
           <Button
             variant="outline"
             className={cn(
-              "h-8 max-h-8 w-10 p-0 px-4 sm:w-auto sm:p-2",
+              "w-full p-0 px-4 sm:size-8 sm:max-h-8 sm:w-auto sm:p-2",
               "disabled:border-foreground/50 disabled:opacity-30",
               // "sm:disabled:invisible",
             )}
+            size={isMobile ? "lg" : "sm"}
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
           >
@@ -124,9 +128,10 @@ export function DataTablePagination<TData>({
           <Button
             variant="outline"
             className={cn(
-              "h-8 max-h-8 w-10 p-0 px-4 sm:w-auto sm:p-2",
+              "w-full p-0 px-4 sm:size-8 sm:max-h-8 sm:w-auto sm:p-2",
               "disabled:border-foreground/50 disabled:opacity-30",
             )}
+            size={isMobile ? "lg" : "sm"}
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
           >
@@ -137,9 +142,10 @@ export function DataTablePagination<TData>({
           <Button
             variant="outline"
             className={cn(
-              "hidden size-8 max-h-8 p-0 lg:flex",
+              "hidden p-0 sm:size-8 sm:max-h-8 lg:flex",
               "disabled:border-foreground/50 disabled:opacity-30",
             )}
+            size={isMobile ? "lg" : "sm"}
             onClick={() => table.setPageIndex(table.getPageCount() - 1)}
             disabled={!table.getCanNextPage()}
           >
