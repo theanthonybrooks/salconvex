@@ -164,6 +164,7 @@ interface MultiSelectProps<T extends string>
    * Additional class names to apply custom styles to the multi-select component.
    * Optional, can be used to add custom styles.
    */
+  fontSize?: string;
   className?: string;
   badgeClassName?: string;
   textClassName?: string;
@@ -203,6 +204,7 @@ export const MultiSelect = forwardRef(
       condensed = false,
       placeholder = "Select options",
       showIcon = true,
+      fontSize,
       ...props
     }: Omit<MultiSelectProps<T>, "ref">,
     ref: Ref<HTMLButtonElement>,
@@ -370,6 +372,7 @@ export const MultiSelect = forwardRef(
               variant === "basic" ? "border-foreground" : "",
               className,
             )}
+            fontSize={fontSize}
           >
             {displayValues.length > 0 ? (
               <div
@@ -402,7 +405,11 @@ export const MultiSelect = forwardRef(
                             <IconComponent className="mr-2 size-4" />
                           )}
                           <p
-                            className={cn("text-sm font-normal", textClassName)}
+                            className={cn(
+                              "text-sm font-normal",
+                              textClassName,
+                              fontSize,
+                            )}
                           >
                             {abbreviated ? option?.abbr : option?.label}
                           </p>
@@ -511,6 +518,7 @@ export const MultiSelect = forwardRef(
                   className={cn(
                     "mx-3 text-sm font-normal text-foreground/50",
                     textClassName,
+                    fontSize,
                   )}
                 >
                   {placeholder}
@@ -577,7 +585,9 @@ export const MultiSelect = forwardRef(
                     >
                       <FaCheck className="size-3 translate-y-[1.1px]" />
                     </div>
-                    <span className="text-base sm:text-sm">(Select All)</span>
+                    <span className={cn("text-base sm:text-sm", fontSize)}>
+                      (Select All)
+                    </span>
                   </CommandItem>
                 )}
                 {options.some((o) => o.group) ? (
@@ -637,7 +647,9 @@ export const MultiSelect = forwardRef(
                                 (<DollarSign className="size-3" />)
                               </span>
                             )}
-                            <span className="text-base sm:text-sm">
+                            <span
+                              className={cn("text-base sm:text-sm", fontSize)}
+                            >
                               {abbreviated ? option?.abbr : option?.label}
                             </span>
                           </CommandItem>
@@ -684,7 +696,9 @@ export const MultiSelect = forwardRef(
                           {option.icon && (
                             <option.icon className="mr-2 size-4 text-foreground/50" />
                           )}
-                          <span className="text-base sm:text-sm">
+                          <span
+                            className={cn("text-base sm:text-sm", fontSize)}
+                          >
                             {abbreviated ? option?.abbr : option?.label}
                           </span>
                         </CommandItem>
@@ -701,6 +715,7 @@ export const MultiSelect = forwardRef(
                       <CommandItem
                         onSelect={handleClear}
                         className="flex-1 cursor-pointer justify-center"
+                        fontSize={fontSize}
                       >
                         Clear
                       </CommandItem>
@@ -718,6 +733,7 @@ export const MultiSelect = forwardRef(
                         setIsPopoverOpen(false);
                       }}
                       className="flex-1 cursor-pointer justify-center"
+                      fontSize={fontSize}
                     >
                       Update
                     </CommandItem>
@@ -725,6 +741,7 @@ export const MultiSelect = forwardRef(
                     <CommandItem
                       onSelect={() => setIsPopoverOpen(false)}
                       className="max-w-full flex-1 cursor-pointer justify-center"
+                      fontSize={fontSize}
                     >
                       Close
                     </CommandItem>

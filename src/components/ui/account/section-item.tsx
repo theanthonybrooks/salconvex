@@ -67,7 +67,7 @@ export const SectionItem = ({
               <p className="text-xs italic">(*{subTitle})</p>
             )}
           </Label>
-          {!isMobile && (
+          {!(isMobile && isToggle) && (
             <>
               {description && (
                 <p className="text-sm text-muted-foreground">{description}</p>
@@ -89,16 +89,18 @@ type SectionGroupProps = {
 
     sectionToggleValue?: boolean;
     separator?: boolean;
+    disabled?: boolean;
   };
 } & SectionItemProps;
 
 export const SectionGroup = (props: SectionGroupProps) => {
-  const { children, group, className, title, icon, ...rest } = props;
+  const { children, group, className, title, icon, fontSize, ...rest } = props;
   const {
     groupClassName,
     sectionToggleAction,
     sectionToggleValue,
     separator = true,
+    disabled,
   } = group ?? {};
   const [expanded, setExpanded] = useState(false);
   const isMobile = useIsMobile();
@@ -112,9 +114,11 @@ export const SectionGroup = (props: SectionGroupProps) => {
           className="flex items-center justify-between"
           onClick={() => setExpanded(!expanded)}
         >
-          <div className="flex items-center gap-x-2">
+          <div className="flex items-center gap-x-4">
             {Icon && <Icon className="size-5 shrink-0 text-muted-foreground" />}
-            <Label className="text-sm font-medium leading-none">{title}</Label>
+            <Label className={cn("text-sm font-medium leading-none", fontSize)}>
+              {title}
+            </Label>
           </div>
           <div className="flex h-9 items-center justify-center px-2">
             <ExpandedIcon className="size-5 shrink-0" />
@@ -124,6 +128,7 @@ export const SectionGroup = (props: SectionGroupProps) => {
         <SectionItem
           title={title}
           icon={icon}
+          fontSize={fontSize}
           {...rest}
           className={cn(className)}
         >
@@ -137,6 +142,7 @@ export const SectionGroup = (props: SectionGroupProps) => {
             </Button>
             {sectionToggleAction && (
               <Switch
+                disabled={disabled}
                 checked={sectionToggleValue}
                 onCheckedChange={sectionToggleAction}
               />

@@ -70,7 +70,7 @@ export const NotificationsSettings = () => {
   const isMobile = useIsMobile();
   const [pending, setPending] = useState(false);
   void pending;
-  const [verificationPending, setVerificationPending] =
+  const [verificationPendingSend, setVerificationPendingSend] =
     useState<boolean>(false);
   const [verificationSent, setVerificationSent] = useState<boolean>(false);
   const requestVerificationEmail = useMutation(
@@ -229,7 +229,7 @@ export const NotificationsSettings = () => {
   const handleRequestVerificationEmail = async () => {
     if (!newsletterData?.subId) return;
     try {
-      setVerificationPending(true);
+      setVerificationPendingSend(true);
       const result = await requestVerificationEmail({
         subId: newsletterData.subId,
       });
@@ -248,7 +248,7 @@ export const NotificationsSettings = () => {
       setTimeout(() => {
         setVerificationSent(false);
       }, 5000);
-      setVerificationPending(false);
+      setVerificationPendingSend(false);
     }
   };
   return (
@@ -268,6 +268,7 @@ export const NotificationsSettings = () => {
             icon={Bell}
             description="Receive notifications for new events, open calls, and other helpful updates"
             group={{
+              disabled: pending,
               sectionToggleAction: (value) => {
                 const defaultBase = {
                   events: true,
@@ -328,6 +329,7 @@ export const NotificationsSettings = () => {
             fontSize={fontSize}
           >
             <Switch
+            disabled={pending}
               checked={!!rawInAppNotifications}
               onCheckedChange={(value) => handleUpdateinAppNotifications(value)}
             />
@@ -339,6 +341,7 @@ export const NotificationsSettings = () => {
               icon={ScrollText}
               description="Notifications for new events, open calls, resources, and more"
               group={{
+                disabled: pending,
                 sectionToggleAction: (value) =>
                   handleUpdateinAppNotifications({
                     events: value,
@@ -359,6 +362,7 @@ export const NotificationsSettings = () => {
                 fontSize={fontSize}
               >
                 <Switch
+                  disabled={pending}
                   checked={inAppNotifications?.events ?? false}
                   onCheckedChange={(value) =>
                     handleUpdateinAppNotifications({ events: value })
@@ -377,6 +381,7 @@ export const NotificationsSettings = () => {
                 fontSize={fontSize}
               >
                 <Switch
+                  disabled={pending}
                   checked={
                     (minBananaUser && inAppNotifications?.openCalls) ?? false
                   }
@@ -393,6 +398,7 @@ export const NotificationsSettings = () => {
                 fontSize={fontSize}
               >
                 <Switch
+                  disabled={pending}
                   checked={inAppNotifications?.resources ?? false}
                   onCheckedChange={(value) =>
                     handleUpdateinAppNotifications({ resources: value })
@@ -411,6 +417,7 @@ export const NotificationsSettings = () => {
                   fontSize={fontSize}
                 >
                   <Switch
+                    disabled={pending}
                     checked={inAppNotifications?.account ?? false}
                     onCheckedChange={(value) =>
                       handleUpdateinAppNotifications({ account: value })
@@ -429,6 +436,7 @@ export const NotificationsSettings = () => {
                   description="Admin-only notifications
     "
                   group={{
+                    disabled: pending,
                     sectionToggleAction: (value) =>
                       handleUpdateinAppNotifications({
                         submissions: value,
@@ -454,6 +462,7 @@ export const NotificationsSettings = () => {
                     fontSize={fontSize}
                   >
                     <Switch
+                      disabled={pending}
                       checked={inAppNotifications?.submissions ?? false}
                       onCheckedChange={(value) =>
                         handleUpdateinAppNotifications({ submissions: value })
@@ -468,6 +477,7 @@ export const NotificationsSettings = () => {
                     fontSize={fontSize}
                   >
                     <Switch
+                      disabled={pending}
                       checked={inAppNotifications?.tasks ?? false}
                       onCheckedChange={(value) =>
                         handleUpdateinAppNotifications({ tasks: value })
@@ -482,6 +492,7 @@ export const NotificationsSettings = () => {
                     fontSize={fontSize}
                   >
                     <Switch
+                      disabled={pending}
                       checked={inAppNotifications?.users ?? false}
                       onCheckedChange={(value) =>
                         handleUpdateinAppNotifications({ users: value })
@@ -494,6 +505,7 @@ export const NotificationsSettings = () => {
                     icon={PiggyBank}
                     description="User subscription notifications"
                     group={{
+                      disabled: pending,
                       sectionToggleAction: (value) =>
                         handleUpdateinAppNotifications({
                           subscriptions: {
@@ -514,6 +526,7 @@ export const NotificationsSettings = () => {
                       fontSize={fontSize}
                     >
                       <Switch
+                        disabled={pending}
                         checked={
                           inAppNotifications?.subscriptions?.newSub ?? false
                         }
@@ -535,6 +548,7 @@ export const NotificationsSettings = () => {
                       fontSize={fontSize}
                     >
                       <Switch
+                        disabled={pending}
                         checked={
                           inAppNotifications?.subscriptions?.canceledSub ??
                           false
@@ -557,6 +571,7 @@ export const NotificationsSettings = () => {
                   icon={Newspaper}
                   description="Notifications for newsletter campaigns, audience, and more"
                   group={{
+                    disabled: pending,
                     sectionToggleAction: (value) =>
                       handleUpdateinAppNotifications({
                         newsletter: {
@@ -584,6 +599,7 @@ export const NotificationsSettings = () => {
                     icon={Table}
                     description="Newsletter Campaign notifications"
                     group={{
+                      disabled: pending,
                       sectionToggleAction: (value) =>
                         handleUpdateinAppNotifications({
                           newsletter: {
@@ -610,6 +626,7 @@ export const NotificationsSettings = () => {
                       fontSize={fontSize}
                     >
                       <Switch
+                        disabled={pending}
                         checked={
                           inAppNotifications?.newsletter?.campaign?.created ??
                           false
@@ -637,6 +654,7 @@ export const NotificationsSettings = () => {
                       fontSize={fontSize}
                     >
                       <Switch
+                        disabled={pending}
                         checked={
                           inAppNotifications?.newsletter?.campaign?.completed ??
                           false
@@ -664,6 +682,7 @@ export const NotificationsSettings = () => {
                       fontSize={fontSize}
                     >
                       <Switch
+                        disabled={pending}
                         checked={
                           inAppNotifications?.newsletter?.campaign?.failed ??
                           false
@@ -690,6 +709,7 @@ export const NotificationsSettings = () => {
                     icon={Users2}
                     description="Newsletter Audience notifications"
                     group={{
+                      disabled: pending,
                       sectionToggleAction: (value) =>
                         handleUpdateinAppNotifications({
                           newsletter: {
@@ -715,6 +735,7 @@ export const NotificationsSettings = () => {
                       fontSize={fontSize}
                     >
                       <Switch
+                        disabled={pending}
                         checked={
                           inAppNotifications?.newsletter?.audience
                             ?.subscribed ?? false
@@ -742,6 +763,7 @@ export const NotificationsSettings = () => {
                       fontSize={fontSize}
                     >
                       <Switch
+                        disabled={pending}
                         checked={
                           inAppNotifications?.newsletter?.audience
                             ?.unsubscribed ?? false
@@ -770,6 +792,7 @@ export const NotificationsSettings = () => {
                   description="Receive notifications for registrations and/or cancellations
 "
                   group={{
+                    disabled: pending,
                     sectionToggleAction: (value) =>
                       handleUpdateinAppNotifications({
                         onlineEvents: {
@@ -790,6 +813,7 @@ export const NotificationsSettings = () => {
                     fontSize={fontSize}
                   >
                     <Switch
+                      disabled={pending}
                       checked={
                         inAppNotifications?.onlineEvents?.registrations ?? false
                       }
@@ -811,6 +835,7 @@ export const NotificationsSettings = () => {
                     fontSize={fontSize}
                   >
                     <Switch
+                      disabled={pending}
                       checked={
                         inAppNotifications?.onlineEvents?.cancellations ?? false
                       }
@@ -832,6 +857,7 @@ export const NotificationsSettings = () => {
                   description="Receive notifications for social media post scheduling
 "
                   group={{
+                    disabled: pending,
                     sectionToggleAction: (value) =>
                       handleUpdateinAppNotifications({
                         social: {
@@ -852,6 +878,7 @@ export const NotificationsSettings = () => {
                     fontSize={fontSize}
                   >
                     <Switch
+                      disabled={pending}
                       checked={inAppNotifications?.social?.scheduled ?? false}
                       onCheckedChange={(value) =>
                         handleUpdateinAppNotifications({
@@ -871,6 +898,7 @@ export const NotificationsSettings = () => {
                     fontSize={fontSize}
                   >
                     <Switch
+                      disabled={pending}
                       checked={inAppNotifications?.social?.unscheduled ?? false}
                       onCheckedChange={(value) =>
                         handleUpdateinAppNotifications({
@@ -890,6 +918,7 @@ export const NotificationsSettings = () => {
                   description="Support Notifications
     "
                   group={{
+                    disabled: pending,
                     sectionToggleAction: (value) =>
                       handleUpdateinAppNotifications({
                         support: {
@@ -910,6 +939,7 @@ export const NotificationsSettings = () => {
                     fontSize={fontSize}
                   >
                     <Switch
+                      disabled={pending}
                       checked={
                         inAppNotifications?.support?.ticketCreated ?? false
                       }
@@ -931,6 +961,7 @@ export const NotificationsSettings = () => {
                     fontSize={fontSize}
                   >
                     <Switch
+                      disabled={pending}
                       checked={
                         inAppNotifications?.support?.ticketUpdated ?? false
                       }
@@ -958,6 +989,7 @@ export const NotificationsSettings = () => {
             fontSize={fontSize}
           >
             <Switch
+              disabled={pending}
               checked={!!userPref?.notifications?.general}
               onCheckedChange={(value) =>
                 handleUpdateNotifications("general", value)
@@ -974,6 +1006,7 @@ export const NotificationsSettings = () => {
             fontSize={fontSize}
           >
             <Switch
+              disabled={pending}
               checked={!!userPref?.notifications?.newsletter}
               onCheckedChange={(value) =>
                 handleUpdateNotifications("newsletter", value)
@@ -984,7 +1017,7 @@ export const NotificationsSettings = () => {
           {newsletterData?.verified === false && (
             <div
               className={cn(
-                "flex w-full items-center justify-center gap-2 rounded-lg border-1.5 bg-salYellowLt p-3",
+                "flex w-full flex-col items-center justify-center gap-2 rounded-lg border-1.5 bg-salYellowLt p-3 sm:flex-row",
               )}
             >
               <span className="font-semibold">
@@ -992,11 +1025,11 @@ export const NotificationsSettings = () => {
               </span>
               <Button
                 variant="outline"
-                className="min-w-25 px-2 !text-base font-bold"
-                size="sm"
+                className="w-full min-w-25 bg-card px-2 !text-base font-bold sm:w-auto"
+                size={isMobile ? "lg" : "sm"}
                 onClick={handleRequestVerificationEmail}
               >
-                {verificationPending ? (
+                {verificationPendingSend ? (
                   <LoaderCircle className="size-4 animate-spin" />
                 ) : verificationSent ? (
                   "Verification Sent!"
@@ -1063,14 +1096,15 @@ export const NotificationsSettings = () => {
                   placeholder="Select account type(s)"
                   variant="basic"
                   maxCount={2}
-                  shortResults={isMobile}
+                  condensed={isMobile}
                   fallbackValue={["general"]}
                   height={11}
                   hasSearch={false}
                   selectAll={false}
                   className={cn(
-                    "w-full max-w-60 border-1.5 border-foreground/20 sm:h-11 sm:max-w-[19rem]",
+                    "w-full border-1.5 border-foreground/20 sm:h-11 sm:max-w-[19rem]",
                   )}
+                  fontSize={fontSize}
                 />
               </SectionItem>
 
@@ -1097,7 +1131,7 @@ export const NotificationsSettings = () => {
                         )
                       }
                       placeholder="Select frequency"
-                      className="w-full max-w-60 border-1.5 border-foreground/20 bg-card placeholder:text-foreground sm:h-11 sm:max-w-40"
+                      className="w-full border-1.5 border-foreground/20 bg-card placeholder:text-foreground sm:h-11 sm:max-w-40"
                       center
                     />
                   </SectionItem>

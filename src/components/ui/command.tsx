@@ -115,13 +115,16 @@ CommandSeparator.displayName = CommandPrimitive.Separator.displayName;
 
 const CommandItem = React.forwardRef<
   React.ComponentRef<typeof CommandPrimitive.Item>,
-  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Item>
->(({ className, ...props }, ref) => (
+  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Item> & {
+    fontSize?: string;
+  }
+>(({ className, fontSize, ...props }, ref) => (
   <CommandPrimitive.Item
     ref={ref}
     className={cn(
       "outline-hidden relative flex select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm data-[disabled=true]:pointer-events-none data-[selected=true]:bg-salPinkLt data-[disabled=true]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
       className,
+      fontSize,
     )}
     {...props}
   />
