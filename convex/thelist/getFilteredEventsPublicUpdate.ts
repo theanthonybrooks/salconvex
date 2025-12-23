@@ -112,6 +112,7 @@ export const getFilteredEventsPublic = query({
     const subscription = userAccountData?.subscription ?? null;
     const userOrgIds = userAccountData?.userOrgs ?? [];
     let totalOpenCalls = 0;
+    let comingSoonCalls = 0;
 
     const view = viewType ?? "openCall";
 
@@ -783,6 +784,10 @@ export const getFilteredEventsPublic = query({
         (acc, e) => acc + (e.hasActiveOpenCall ? 1 : 0),
         0,
       );
+      comingSoonCalls = filtered.reduce(
+        (acc, e) => acc + (e.openCallStatus === "coming-soon" ? 1 : 0),
+        0,
+      );
     }
 
     let viewFiltered = sorted;
@@ -825,6 +830,7 @@ export const getFilteredEventsPublic = query({
       results: paginated,
       total: totalResults,
       totalOpenCalls,
+      comingSoonCalls,
       weekStartISO,
       weekEndISO,
       finishedLoading: true,

@@ -173,6 +173,7 @@ const ClientEventList = () => {
   const rawTotal = queryResult?.total;
   const total = rawTotal ?? 0;
   const totalOpen = queryResult?.totalOpenCalls;
+  const totalComingSoon = queryResult?.comingSoonCalls;
   const totalActive = queryResult?.totalActive;
   const totalArchived = queryResult?.totalArchived;
   // const isLoading = !queryResult;
@@ -424,6 +425,7 @@ const ClientEventList = () => {
               totalPages={totalPages}
               totalOpenCalls={totalOpen}
               totalActive={totalActive}
+              totalComingSoon={totalComingSoon}
               totalArchived={totalArchived}
               totalResults={totalResults}
               onPageChange={setPage}

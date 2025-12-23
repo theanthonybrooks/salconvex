@@ -22,6 +22,7 @@ interface BasicPaginationProps {
   totalResults: number;
   totalOpenCalls?: number;
   totalActive?: number;
+  totalComingSoon?: number;
   totalArchived?: number;
   bottomPag?: boolean;
   className?: string;
@@ -36,6 +37,7 @@ export const BasicPagination = ({
   totalPages,
   totalResults,
   totalOpenCalls,
+  totalComingSoon,
   totalActive,
   // totalArchived,
   bottomPag = false,
@@ -67,7 +69,7 @@ export const BasicPagination = ({
           animate={totalPages >= 1 && { opacity: 1 }}
           transition={{ duration: 0.2, ease: "easeInOut" }}
           className={cn(
-            "my-6 mb-14 flex w-full grid-cols-[30%_40%_30%] flex-col items-center justify-center gap-4 sm:mb-6 sm:grid sm:max-w-[min(70vw,1200px)] sm:gap-0",
+            "my-6 mb-14 flex w-full grid-cols-[30%_40%_30%] flex-col items-center justify-center gap-4 lg:mb-6 lg:grid lg:max-w-[min(70vw,1200px)] lg:gap-0",
             className,
             totalPages === 0 && "justify-center sm:flex",
           )}
@@ -80,9 +82,16 @@ export const BasicPagination = ({
                 </p>
               )}
               {showOCTotal && totalOpenCalls && (
-                <p className={cn("mx-auto text-nowrap text-center")}>
-                  Active Calls: {totalOpenCalls}
-                </p>
+                <div className="flex items-center gap-5">
+                  <p className={cn("mx-auto text-nowrap text-center")}>
+                    Active Calls: {totalOpenCalls}
+                  </p>
+                  {totalComingSoon && (
+                    <p className={cn("mx-auto text-nowrap text-center")}>
+                      Coming Soon: {totalComingSoon}
+                    </p>
+                  )}
+                </div>
               )}
               {viewType === "archive" && typeof totalActive === "number" && (
                 <p className={cn("mx-auto text-nowrap text-center")}>
