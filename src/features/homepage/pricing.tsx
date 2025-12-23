@@ -154,9 +154,7 @@ export const PricingSwitch = ({ onSwitchAction }: SwitchProps) => {
               value={opt.val}
               className={cn(
                 "relative z-10 flex h-10 w-full items-center justify-center px-4 text-sm font-medium",
-                activeTab === opt.val
-                  ? "font-bold text-black"
-                  : "text-foreground/80",
+                activeTab === opt.val ? "font-bold" : "text-foreground/80",
               )}
             >
               {hasMounted && activeTab === opt.val && (

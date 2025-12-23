@@ -96,11 +96,7 @@ export default function SettingsPage() {
           />
         ) : (
           <TabsList className="scrollable invis h-12 w-full max-w-full justify-around bg-white/80 md:w-auto md:justify-start">
-            <TabsTrigger
-              value="account"
-              className={cn("h-9 px-4", fontSize)}
-              border
-            >
+            <TabsTrigger value="account" className={cn("h-9", fontSize)} border>
               Account
             </TabsTrigger>
 
@@ -108,21 +104,21 @@ export default function SettingsPage() {
 
             <TabsTrigger
               value="appearance"
-              className={cn("h-9 px-4", fontSize)}
+              className={cn("h-9", fontSize)}
               border
             >
               Appearance
             </TabsTrigger>
             <TabsTrigger
               value="notifications"
-              className={cn("h-9 px-4", fontSize)}
+              className={cn("h-9", fontSize)}
               border
             >
               Notifications
             </TabsTrigger>
             <TabsTrigger
               value="security"
-              className={cn("h-9 px-4", fontSize)}
+              className={cn("h-9", fontSize)}
               border
             >
               Security

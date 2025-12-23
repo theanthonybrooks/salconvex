@@ -347,12 +347,7 @@ const ClientEventList = () => {
                   <TabsTrigger
                     key={opt.value}
                     value={opt.value}
-                    className={cn(
-                      "relative z-10 flex h-10 w-full items-center justify-center px-4 text-sm font-medium hover:font-bold",
-                      view === opt.value
-                        ? "font-bold text-black"
-                        : "text-foreground/80",
-                    )}
+                    className={cn("relative z-10")}
                   >
                     {view === opt.value && (
                       <motion.div

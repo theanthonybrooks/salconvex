@@ -31,7 +31,7 @@ const tabsTriggerVariants = cva(
     variants: {
       variant: {
         default:
-          "rounded-md px-3 py-1 transition-all duration-200 ease-in-out data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm",
+          "h-10 w-full rounded-md px-4 py-1 text-foreground/80 transition-all duration-200 ease-in-out data-[state=active]:bg-background data-[state=active]:font-bold data-[state=active]:text-foreground data-[state=active]:shadow-sm sm:hover:font-semibold",
         underline:
           "rounded-none border-foreground px-2 py-1 pb-2 data-[state=active]:border-b-2 data-[state=inactive]:opacity-50 data-[state=active]:shadow-none",
       },
