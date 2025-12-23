@@ -62,6 +62,8 @@ export function DataTableToolbar<TData>({
         )
       : [];
 
+  console.log(filters, filters.length);
+
   // const tableType = table.options.meta?.tableType;
 
   const minimalView = table.options.meta?.minimalView;
@@ -140,7 +142,7 @@ export function DataTableToolbar<TData>({
         forDashboard && "mx-auto",
       )}
     >
-      <div className="mx-auto flex w-full max-w-[80vw] flex-col items-center gap-3 sm:mx-0 sm:w-auto sm:flex-row">
+      <div className="mx-auto flex w-full max-w-[90vw] flex-col items-center gap-3 sm:mx-0 sm:w-auto sm:flex-row">
         <div className="flex w-full items-center gap-3">
           <Input
             placeholder="Search..."
@@ -161,7 +163,7 @@ export function DataTableToolbar<TData>({
             }}
             className="mx-auto h-12 w-full sm:h-10 sm:w-[150px] lg:w-[200px]"
           />
-          {isMobile && (
+          {isMobile && filters.length > 0 && (
             <Button
               variant="outline"
               className="flex size-12 items-center gap-2 border-foreground/30 p-0 px-2 hover:cursor-pointer hover:bg-white/70 active:scale-90"

@@ -142,7 +142,7 @@ export function AdminDashboardTableWrapper({
               adminActions={adminActions}
               tableType="events"
               pageType="dashboard"
-              className="mx-auto w-full max-w-[80dvw] overflow-x-auto sm:max-w-[90vw]"
+              className="mx-auto w-full max-w-[90dvw] overflow-x-auto"
               outerContainerClassName={cn("lg:hidden")}
               defaultSort={[{ id: `lastEditedAt`, desc: true }]}
             />

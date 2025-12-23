@@ -65,27 +65,25 @@ export default function SACToolbar() {
   return (
     <div className="">
       <div className="flex flex-col items-end gap-3 rounded-lg border-1.5 border-dashed border-foreground/20 bg-card/70 p-3 md:flex-row">
-        <div className="flex items-center gap-2">
-          <Button
-            variant="salWithShadowHidden"
-            onClick={handleFetchData}
-            disabled={status === "loading"}
-            className="!sm:h-10 w-full md:w-40"
-            type="button"
-          >
-            {hasResults ? (
-              pending ? (
-                "Loading..."
-              ) : (
-                "Load More Data"
-              )
-            ) : pending ? (
-              <LoaderCircle className="size-4 animate-spin" />
+        <Button
+          variant="salWithShadowHidden"
+          onClick={handleFetchData}
+          disabled={status === "loading"}
+          className="!sm:h-10 w-full md:w-40"
+          type="button"
+        >
+          {hasResults ? (
+            pending ? (
+              "Loading..."
             ) : (
-              "Load Current Data"
-            )}
-          </Button>
-        </div>
+              "Load More Data"
+            )
+          ) : pending ? (
+            <LoaderCircle className="size-4 animate-spin" />
+          ) : (
+            "Load Current Data"
+          )}
+        </Button>
         <Separator
           thickness={2}
           className="mx-2 hidden h-10 md:block"

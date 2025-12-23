@@ -115,7 +115,7 @@ export function ResponsiveDataTable<TData, TValue>({
 
       <div
         className={cn(
-          "mx-auto flex max-w-[80dvw] flex-col justify-center gap-4 py-7 sm:max-w-[90vw] lg:hidden",
+          "mx-auto flex max-w-[90dvw] flex-col justify-center gap-4 py-7 lg:hidden",
           mobileClassName,
         )}
       >
