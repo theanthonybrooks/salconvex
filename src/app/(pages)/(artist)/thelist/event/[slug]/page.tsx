@@ -1,16 +1,14 @@
-import type { EventBaseResult } from "@/types/eventTypes";
 import type { ParamsProps } from "@/types/nextTypes";
 
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import EventDetail from "@/app/(pages)/(artist)/thelist/components/EventPage";
 
-import { EventSkeleton } from "@/components/ui/skeleton";
 import { capitalize } from "@/helpers/utilsFns";
 
 import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
 import { api } from "~/convex/_generated/api";
-import { fetchQuery } from "convex/nextjs";
+import { fetchQuery, preloadQuery } from "convex/nextjs";
 
 export async function generateMetadata({
   params,
@@ -43,9 +41,9 @@ export async function generateMetadata({
 const EventPage = async ({ params }: ParamsProps) => {
   const token = await convexAuthNextjsToken();
   const { slug } = await params;
-  let data: EventBaseResult | null = null;
+  let preloaded;
   try {
-    data = await fetchQuery(
+    preloaded = await preloadQuery(
       api.events.event.getEventBySlug,
       {
         slug,
@@ -56,9 +54,7 @@ const EventPage = async ({ params }: ParamsProps) => {
     notFound();
   }
 
-  if (!data) return <EventSkeleton />;
-
-  return <EventDetail data={data} />;
+  return <EventDetail preloaded={preloaded} />;
 };
 
 export default EventPage;

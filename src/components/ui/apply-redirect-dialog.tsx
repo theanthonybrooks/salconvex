@@ -123,19 +123,6 @@ export const ApplyRedirectDialog = ({
     const webLink = format === "https";
 
     setPending(true);
-
-    // if (isEmail) {
-    //   window.location.href = finalAppUrl;
-
-    //   try {
-    //     await runPostApplyUpdates();
-    //   } finally {
-    //     setPending(false);
-    //     runAnalytics();
-    //   }
-
-    //   return;
-    // }
     let newTab: Window | null = null;
     if (webLink) {
       newTab = window.open("about:blank");

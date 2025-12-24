@@ -1,17 +1,14 @@
-import type { EventEditionResult } from "@/types/eventTypes";
 import type { ParamsYearProps } from "@/types/nextTypes";
 
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import EventEditionDetail from "@/app/(pages)/(artist)/thelist/components/EventEditionPage";
 
-import { EventSkeleton } from "@/components/ui/skeleton";
 import { capitalize } from "@/helpers/utilsFns";
 
 import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
 import { api } from "~/convex/_generated/api";
-import { fetchQuery } from "convex/nextjs";
-import { ConvexError } from "convex/values";
+import { fetchQuery, preloadQuery } from "convex/nextjs";
 
 export async function generateMetadata({
   params,
@@ -45,9 +42,9 @@ export async function generateMetadata({
 const EventPage = async ({ params }: ParamsYearProps) => {
   const token = await convexAuthNextjsToken();
   const { slug, year } = await params;
-  let data: EventEditionResult | null = null;
+  let preloaded;
   try {
-    data = await fetchQuery(
+    preloaded = await preloadQuery(
       api.events.event.getEventWithDetails,
       {
         slug,
@@ -55,15 +52,11 @@ const EventPage = async ({ params }: ParamsYearProps) => {
       },
       { token },
     );
-  } catch (error) {
-    if (error instanceof ConvexError) {
-      notFound();
-    }
+  } catch {
+    notFound();
   }
 
-  if (!data) return <EventSkeleton />;
-
-  return <EventEditionDetail data={data} />;
+  return <EventEditionDetail preloaded={preloaded} />;
 };
 
 export default EventPage;

@@ -1,7 +1,8 @@
 "use client";
 
-import type { OpenCallData } from "@/types/openCallTypes";
+import type { Preloaded } from "convex/react";
 
+import { EventSkeleton } from "@/components/ui/skeleton";
 import { SalBackNavigation } from "@/features/events/components/sal-back-navigation";
 import { OpenCallCardDetailDesktop } from "@/features/events/open-calls/desktop/opencall-card-detail-desktop";
 import { OpenCallCardDetailMobile } from "@/features/events/open-calls/mobile/opencall-card-detail-mobile";
@@ -12,10 +13,11 @@ import { useQuery } from "convex-helpers/react/cache";
 import { usePreloadedQuery } from "convex/react";
 
 type OpenCallDetailProps = {
-  data: OpenCallData;
+  preloaded: Preloaded<typeof api.events.event.getEventWithOCDetails>;
 };
 
-const OpenCallDetail = ({ data }: OpenCallDetailProps) => {
+const OpenCallDetail = ({ preloaded }: OpenCallDetailProps) => {
+  const data = usePreloadedQuery(preloaded);
   const { preloadedUserData, preloadedSubStatus } = useConvexPreload();
   const userData = usePreloadedQuery(preloadedUserData);
   const subData = usePreloadedQuery(preloadedSubStatus);
@@ -31,6 +33,8 @@ const OpenCallDetail = ({ data }: OpenCallDetailProps) => {
     Boolean(user && data?.organizer?.allowedEditors.includes(user._id));
 
   // console.log("isOwner: ", isOwner, data);
+
+  if (!data) return <EventSkeleton />;
 
   return (
     <>

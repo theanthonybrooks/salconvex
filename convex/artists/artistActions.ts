@@ -265,8 +265,9 @@ export const artistApplicationActions = mutation({
 
     const application = await ctx.db
       .query("applications")
-      .withIndex("by_openCallId", (q) => q.eq("openCallId", openCallId))
-      .filter((q) => q.eq(q.field("artistId"), userId))
+      .withIndex("by_openCallId_artistId", (q) =>
+        q.eq("openCallId", openCallId).eq("artistId", userId),
+      )
       .unique();
 
     if (hasApplied) {

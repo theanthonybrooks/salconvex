@@ -1,7 +1,8 @@
 "use client";
 
-import type { EventBaseResult } from "@/types/eventTypes";
+import type { Preloaded } from "convex/react";
 
+import { EventSkeleton } from "@/components/ui/skeleton";
 import { SalBackNavigation } from "@/features/events/components/sal-back-navigation";
 import { EventCardDetailDesktop } from "@/features/events/event-detail/desktop/event-card-detail-desktop";
 import { EventCardDetailMobile } from "@/features/events/event-detail/mobile/event-card-detail-mobile";
@@ -12,10 +13,11 @@ import { useQuery } from "convex-helpers/react/cache";
 import { usePreloadedQuery } from "convex/react";
 
 type EventDetailProps = {
-  data: EventBaseResult;
+  preloaded: Preloaded<typeof api.events.event.getEventBySlug>;
 };
 
-const EventDetail = ({ data }: EventDetailProps) => {
+const EventDetail = ({ preloaded }: EventDetailProps) => {
+  const data = usePreloadedQuery(preloaded);
   const { preloadedSubStatus, preloadedUserData } = useConvexPreload();
   const subData = usePreloadedQuery(preloadedSubStatus);
   const userData = usePreloadedQuery(preloadedUserData);
@@ -27,6 +29,8 @@ const EventDetail = ({ data }: EventDetailProps) => {
   const artistData = useQuery(api.artists.artistActions.getArtistFull);
   const artist = artistData?.artist;
   const isOwner = user?._id === data.organizer.ownerId;
+
+  if (!data) return <EventSkeleton />;
 
   return (
     <>

@@ -1,16 +1,14 @@
 import type { ParamsYearProps } from "@/types/nextTypes";
-import type { OpenCallData } from "@/types/openCallTypes";
 
 import { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import OpenCallDetail from "@/app/(pages)/(artist)/thelist/components/OpenCallPage";
 
-import { EventSkeleton } from "@/components/ui/skeleton";
 import { capitalize } from "@/helpers/utilsFns";
 
 import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
 import { api } from "~/convex/_generated/api";
-import { fetchQuery } from "convex/nextjs";
+import { fetchQuery, preloadQuery } from "convex/nextjs";
 import { ConvexError } from "convex/values";
 
 export async function generateMetadata({
@@ -46,10 +44,10 @@ export async function generateMetadata({
 const OpenCallPage = async ({ params }: ParamsYearProps) => {
   const token = await convexAuthNextjsToken();
   const { slug, year } = await params;
-  let data: OpenCallData | null = null;
+  let preloaded;
 
   try {
-    data = await fetchQuery(
+    preloaded = await preloadQuery(
       api.events.event.getEventWithOCDetails,
       {
         slug,
@@ -66,11 +64,10 @@ const OpenCallPage = async ({ params }: ParamsYearProps) => {
         notFound();
       }
     }
+    notFound();
   }
 
-  if (!data) return <EventSkeleton />;
-
-  return <OpenCallDetail data={data} />;
+  return <OpenCallDetail preloaded={preloaded} />;
 };
 
 export default OpenCallPage;

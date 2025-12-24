@@ -113,7 +113,7 @@ function TotalsList(props: {
           className="flex w-full items-center gap-2 rounded-md border p-2 pl-6 text-center"
         >
           <p className="text-sm font-medium">{meta.label}:</p>
-          <p className="text-lg font-semibold">
+          <p className="font-semibold">
             {(props.totals[k] ?? 0).toLocaleString()}
           </p>
         </div>
