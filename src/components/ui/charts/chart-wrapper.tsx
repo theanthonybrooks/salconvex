@@ -4,6 +4,9 @@ import { useState } from "react";
 import { useIsMobile } from "@/hooks/use-media-query";
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 
+import { ChartArea, Table } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -105,8 +108,11 @@ function TotalsList(props: {
   return (
     <>
       {entries.map(([k, meta]) => (
-        <div key={k} className="w-full rounded-md border p-2 text-center">
-          <p className="text-sm font-medium">{meta.label}</p>
+        <div
+          key={k}
+          className="flex w-full items-center gap-2 rounded-md border p-2 pl-6 text-center"
+        >
+          <p className="text-sm font-medium">{meta.label}:</p>
           <p className="text-lg font-semibold">
             {(props.totals[k] ?? 0).toLocaleString()}
           </p>
@@ -164,8 +170,10 @@ export const ChartWrapper = ({ eventId, className }: ChartContainerProps) => {
     return out;
   }
 
+  const Icon = inView === "chart" ? ChartArea : Table;
+
   return (
-    <Card className={cn("pt-0", className)}>
+    <Card className={cn("relative pt-0", className)}>
       <CardHeader className="flex items-center gap-2 space-y-0 border-b py-5 sm:flex-row">
         <div className="grid flex-1 gap-1">
           <CardTitle>
@@ -182,17 +190,17 @@ export const ChartWrapper = ({ eventId, className }: ChartContainerProps) => {
           onChangeAction={(value) => setChartType(value as ChartType)}
           placeholder="Chart Type"
           options={[...chartTypeOptions]}
-          className="w-40"
+          className="w-full sm:w-40"
         />
         <SelectSimple
           value={timeRange}
           onChangeAction={(value) => setTimeRange(value as TimeRange)}
           placeholder="Last 3 months"
           options={[...chartTimeOptions]}
-          className="w-40"
+          className="w-full sm:w-40"
         />
       </CardHeader>
-      <CardContent className="p-0 px-2 sm:px-6">
+      <CardContent className="p-0 px-4 py-4 sm:px-6 sm:py-0">
         {loading ? (
           <span className="flex h-full min-h-60 w-full items-center justify-center">
             Loading Data...{" "}
@@ -275,7 +283,7 @@ export const ChartWrapper = ({ eventId, className }: ChartContainerProps) => {
               </ChartContainer>
             )}
             {((isMobile && inView === "stats") || !isMobile) && (
-              <div className="ml-3 flex h-full min-w-50 flex-col items-center justify-center gap-3 border-l-1.5 border-foreground/30 py-6 pl-6 text-center">
+              <div className="flex h-full min-w-full flex-col items-center justify-center gap-3 border-foreground/30 py-6 text-center sm:ml-3 sm:min-w-50 sm:border-l-1.5 sm:pl-6">
                 <TotalsList
                   config={config}
                   totals={
@@ -289,6 +297,15 @@ export const ChartWrapper = ({ eventId, className }: ChartContainerProps) => {
           </div>
         )}
       </CardContent>
+      {isMobile && (
+        <Button
+          variant="icon"
+          onClick={() => setInView(inView === "chart" ? "stats" : "chart")}
+          className="absolute right-2.5 top-3 size-6 h-1"
+        >
+          <Icon className="size-6 shrink-0" />
+        </Button>
+      )}
     </Card>
   );
 };
