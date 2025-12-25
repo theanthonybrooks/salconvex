@@ -147,6 +147,7 @@ export const NotificationsDropdown = ({
   const fontSize = fontSizePref?.body;
 
   const totalPending = uniqueNotifications.length;
+  const totalNotifications = visibleUserNotifications.length;
 
   const handleClearNotifications = async (
     notificationId?: Id<"notifications">,
@@ -211,14 +212,16 @@ export const NotificationsDropdown = ({
           <DropdownMenuLabel className="!text-base font-semibold">
             Notifications
           </DropdownMenuLabel>
-          <SelectSimple
-            options={[...availableNotificationFilterOptions]}
-            value={notificationFilter}
-            onChangeAction={(value) =>
-              setNotificationFilter(value as ExtendedNotificationType)
-            }
-            className="!h-8 w-40 border bg-card"
-          />
+          {totalNotifications > 0 && (
+            <SelectSimple
+              options={[...availableNotificationFilterOptions]}
+              value={notificationFilter}
+              onChangeAction={(value) =>
+                setNotificationFilter(value as ExtendedNotificationType)
+              }
+              className="!h-8 w-40 border bg-card"
+            />
+          )}
         </div>
         <Tabs value={activeTab} onValueChange={handleTabChange}>
           <TabsList className="scrollable invis h-12 w-full max-w-full justify-around border-none p-0 md:justify-start">
