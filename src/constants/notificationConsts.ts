@@ -87,3 +87,13 @@ export const notificationTypeIconMap: Record<NotificationType, IconType> = {
   newApplication: Bell,
   general: Bell,
 };
+
+export const SUB_NOTIFICATION_TYPES = [
+  "newSubscription",
+  "canceledSubscription",
+] as const;
+
+export const SOCIAL_NOTIFICATION_TYPES = [
+  "newSocial",
+  "socialUpdated",
+] as const;

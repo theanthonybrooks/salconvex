@@ -1,6 +1,7 @@
 import { notificationTypeIconMap } from "@/constants/notificationConsts";
 import { returnNinetyNinePlus } from "@/constants/numberFns";
 
+import type { ExtendedNotificationType } from "@/helpers/notificationFns";
 import type { NotificationItemType } from "@/types/notificationTypes";
 import type { User } from "@/types/user";
 
@@ -80,16 +81,20 @@ export const NotificationsDropdown = ({
     { value: "newOpenCall", label: "Open Calls Only" },
   ] as const;
 
-  const availableNotificationFilterOptions =
-    hasActiveSubscription && userPlan >= 2
+  const adminNotificationFilterOptions = [
+    ...notificationFilterOptions,
+    { value: "subscription", label: "Subscriptions Only" },
+    { value: "socials", label: "Socials Only" },
+  ] as const;
+
+  const availableNotificationFilterOptions = isAdmin
+    ? adminNotificationFilterOptions
+    : hasActiveSubscription && userPlan >= 2
       ? notificationFilterOptions
       : notificationFilterOptions.filter((opt) => opt.value !== "newOpenCall");
 
-  type NotificationFilterOptions =
-    (typeof notificationFilterOptions)[number]["value"];
-
   const [notificationFilter, setNotificationFilter] =
-    useState<NotificationFilterOptions>("all");
+    useState<ExtendedNotificationType>("all");
 
   const adminNotifications = filterNotificationsByType(
     isAdmin
@@ -113,7 +118,10 @@ export const NotificationsDropdown = ({
 
   const visibleUserNotifications = userNotifications ?? [];
 
-  const userDismissedNotifications = [...(dismissedNotifications ?? [])];
+  const userDismissedNotifications = filterNotificationsByType(
+    [...(dismissedNotifications ?? [])],
+    notificationFilter,
+  );
 
   const sortByUpdatedAtDesc = (
     a: NotificationItemType,
@@ -207,9 +215,9 @@ export const NotificationsDropdown = ({
             options={[...availableNotificationFilterOptions]}
             value={notificationFilter}
             onChangeAction={(value) =>
-              setNotificationFilter(value as NotificationFilterOptions)
+              setNotificationFilter(value as ExtendedNotificationType)
             }
-            className="w-40 border bg-card sm:h-8"
+            className="!h-8 w-40 border bg-card"
           />
         </div>
         <Tabs value={activeTab} onValueChange={handleTabChange}>
