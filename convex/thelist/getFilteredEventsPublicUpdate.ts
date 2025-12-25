@@ -203,28 +203,26 @@ export const getFilteredEventsPublic = query({
             ctx.db
               .query("eventLookup")
               .withSearchIndex("search_by_name", (q) =>
-                q.search("eventName", searchTerm).eq("ocState", "published"),
+                q.search("eventName", searchTerm),
               )
               .take(20),
             ctx.db
               .query("eventLookup")
               .withSearchIndex("search_by_location", (q) =>
-                q.search("locationFull", searchTerm).eq("ocState", "published"),
+                q.search("locationFull", searchTerm),
               )
               .take(100),
 
             ctx.db
               .query("eventLookup")
               .withSearchIndex("search_by_orgName", (q) =>
-                q.search("orgName", searchTerm).eq("ocState", "published"),
+                q.search("orgName", searchTerm),
               )
               .take(20),
             ctx.db
               .query("eventLookup")
               .withIndex("by_countryAbbr_ocState", (q) =>
-                q
-                  .eq("countryAbbr", formattedCountryAbbr)
-                  .eq("ocState", "published"),
+                q.eq("countryAbbr", formattedCountryAbbr),
               )
               .take(100),
             ctx.db,
@@ -566,9 +564,6 @@ export const getFilteredEventsPublic = query({
       .map((r) => r.eventId)
       .filter(Boolean) as Id<"events">[];
 
-    // const orgNameMap = new Map(
-    //   lookupResults.map((r) => [r.mainOrgId, r.orgName]),
-    // );
     const orgMap = new Map(
       lookupResults
         .filter((r) => r.mainOrgId)
@@ -750,6 +745,7 @@ export const getFilteredEventsPublic = query({
         : enriched.filter((e) => {
             const oc = e.tabs.openCall;
             // if (!oc) return false;
+
             if (!oc) return !openCallFilterActive;
 
             const passesEligibility =
@@ -794,7 +790,8 @@ export const getFilteredEventsPublic = query({
     if (view === "event") {
       // viewFiltered = sorted.filter((e) => !e.openCall);
     } else if (view === "openCall") {
-      viewFiltered = sorted.filter((e) => e.tabs.openCall);
+      if (searchType === "all" && isAdmin) viewFiltered = sorted;
+      else viewFiltered = sorted.filter((e) => e.tabs.openCall);
     }
 
     if (view === "organizer") {

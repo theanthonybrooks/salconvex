@@ -113,44 +113,14 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
     setLocalValue(newValue);
   };
 
-  // const handleLinkPath = (
-  //   view: ViewOptions,
-  //   event: MergedEventPreviewData,
-  //   hasActiveSubscription: boolean,
-  // ) => {
-  //   const orgSlug = event.orgData?.orgSlug;
-  //   const orgView = view === "orgView";
-  //   const eventView = view === "event";
-  //   if (orgView) {
-  //     return `/thelist/organizer/${orgSlug}`;
-  //   } else if (eventView) {
-  //     return formatEventLink(
-  //       event,
-  //       hasActiveSubscription,
-  //       hasActiveSubscription && eventView,
-  //     );
-  //   }
-  // };
-
-  // const handleLinkClick = () => {
-  //   setOpen(false);
-  // };
-
   const groupedItems: Record<string, TheListFilterCommandItem[]> = {};
-  // useEffect(() => {
-  //   // if searchResults?.results?.length === 0 {
-  //   //   return;
-  //   // }
-  //   // console.log(searchResults, value);
-  // }, [searchResults, value]);
+
   // Location search
   if (
     Array.isArray(searchResults) &&
     search?.searchTerm !== "" &&
     searchType === "loc"
   ) {
-    // const { organizers = [], events = [] } = searchResults;
-
     groupedItems["Organizers"] = searchResults
       .filter((item, index, self) => {
         const id = item.orgData?.mainOrgId;

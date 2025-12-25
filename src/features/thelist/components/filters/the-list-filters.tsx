@@ -114,16 +114,18 @@ export const TheListFilters = <T extends TheListFilterCommandItem>({
   // const { preloadedSubStatus } = useConvexPreload();
   // const subData = usePreloadedQuery(preloadedSubStatus);
   // const { hasActiveSubscription } = subData ?? {};
-  const searchTypeRef = useRef(search?.searchType ?? "all");
+  const userType = user?.accountType;
+  const userRole = user?.role;
+  const isAdmin = userRole?.includes("admin") ?? false;
+  const searchTypeRef = useRef(
+    search?.searchType ?? (isAdmin ? "all" : "events"),
+  );
   const [open, setOpen] = useState(false);
   const [localValue, setLocalValue] = useState(search?.searchTerm ?? "");
 
   const [searchType, setSearchType] = useState<SearchType>(
-    search?.searchType ?? "all",
+    search?.searchType ?? (isAdmin ? "all" : "events"),
   );
-  const userType = user?.accountType;
-  const userRole = user?.role;
-  const isAdmin = userRole?.includes("admin") ?? false;
 
   const debouncedSearch = useMemo(
     () =>
@@ -134,7 +136,6 @@ export const TheListFilters = <T extends TheListFilterCommandItem>({
       }, 1000),
     [handleSearchChange],
   );
-  
 
   useEffect(() => {
     if (
@@ -158,7 +159,7 @@ export const TheListFilters = <T extends TheListFilterCommandItem>({
     setLocalValue("");
     if (view === "organizer") {
       setSearchType("orgs");
-    } else if (view === "event" || view === "archive") {
+    } else if (view === "event" || view === "archive" || !isAdmin) {
       setSearchType("events");
     } else {
       setSearchType("all");
