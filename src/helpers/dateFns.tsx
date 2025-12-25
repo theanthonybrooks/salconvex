@@ -250,7 +250,20 @@ export const formatOpenCallDeadlineForPost = (
 
   return ` ${day} ${month} ${year}`;
 };
+export const formatOpenCallStartDate = (
+  dateString: string,
+  timezone: string,
+) => {
+  const dt = DateTime.fromISO(dateString, { setZone: true }).setZone(timezone);
+  if (!dt.isValid) return;
 
+  const month = getFourCharMonthFromLuxon(dt);
+  const day = dt.day;
+  const ordinal = getOrdinalSuffix(day);
+  const year = dt.year;
+
+  return ` ${month} ${day}${ordinal}, ${year} - `;
+};
 export const formatOpenCallDeadline = (
   dateString: string,
   timezone: string,

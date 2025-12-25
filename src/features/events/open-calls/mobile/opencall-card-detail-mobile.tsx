@@ -322,7 +322,7 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
           defaultValue={activeTab}
           className="flex w-full flex-col justify-center"
         >
-          <TabsList className="scrollable justx invis relative flex h-12 w-full justify-around rounded-xl bg-white/60">
+          <TabsList className="scrollable justx invis relative flex h-12 w-full justify-around bg-white/60">
             {tabsList.map((tab) => (
               <TabsTrigger
                 key={tab}

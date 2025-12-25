@@ -24,7 +24,11 @@ import {
 import { getOpenCallStatus } from "@/features/events/open-calls/helpers/openCallStatus";
 import { hasId, OpenCallFilesTable } from "@/features/files/form-file-list";
 import { generateICSFile } from "@/helpers/addToCalendar";
-import { formatOpenCallDeadline, isValidIsoDate } from "@/helpers/dateFns";
+import {
+  formatOpenCallDeadline,
+  formatOpenCallStartDate,
+  isValidIsoDate,
+} from "@/helpers/dateFns";
 import { formatBudgetCurrency, formatRate } from "@/helpers/eventFns";
 import { getMimeTypeFromHref } from "@/helpers/fileFns";
 import { getFormattedLocationString } from "@/helpers/locationFns";
@@ -211,6 +215,14 @@ const OpenCallCard = ({
                     </span>
                     <br />{" "}
                     <span className="flex flex-col gap-x-2">
+                      {openCallStatus === "coming-soon" && (
+                        <>
+                          {formatOpenCallStartDate(
+                            ocStart || "",
+                            deadlineTimezone,
+                          )}
+                        </>
+                      )}
                       {formatOpenCallDeadline(
                         ocEnd || "",
                         deadlineTimezone,
@@ -536,6 +548,14 @@ const OpenCallCard = ({
                   </span>
                   <br />{" "}
                   <span className="flex items-center gap-x-2">
+                    {openCallStatus === "coming-soon" && (
+                      <>
+                        {formatOpenCallStartDate(
+                          ocStart || "",
+                          deadlineTimezone,
+                        )}
+                      </>
+                    )}
                     {formatOpenCallDeadline(
                       ocEnd || "",
                       deadlineTimezone,
