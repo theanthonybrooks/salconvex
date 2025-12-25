@@ -233,7 +233,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
 
       <Card
         className={cn(
-          "row-start-2 hidden w-full max-w-[350px] grid-cols-[75px_auto] gap-x-3 self-start rounded-3xl border-foreground/20 bg-white/50 p-3 first:mt-6 xl:sticky xl:top-24 xl:grid",
+          "row-start-2 hidden w-full max-w-[350px] grid-cols-[75px_minmax(0,1fr)] gap-x-3 self-start rounded-3xl border-foreground/20 bg-white/50 p-3 pt-5 first:mt-6 xl:sticky xl:top-24 xl:grid",
         )}
       >
         {appStatus !== null && !manualApplied && (
@@ -259,126 +259,126 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
             </span>
           </span>
         )}
-        <div className="col-span-full mb-4 grid w-full grid-cols-[75px_auto] gap-x-3 pt-2">
-          <div className="col-span-1 flex items-start justify-center">
-            <EventOrgLogo
-              imgSrc={eventLogo}
-              type="event"
-              className={cn(
-                appStatus === "accepted"
-                  ? "ring-4 ring-emerald-500 ring-offset-1"
-                  : appStatus === "rejected"
-                    ? "ring-4 ring-red-500 ring-offset-1"
-                    : appStatus === "pending"
-                      ? "ring-4 ring-foreground/20 ring-offset-1"
-                      : "",
-              )}
-            />
-          </div>
+        {/* <div className="col-span-full mb-4 grid w-full grid-cols-[75px_auto] gap-x-3 pt-2"> */}
+        <div className="col-span-1 flex items-start justify-center">
+          <EventOrgLogo
+            imgSrc={eventLogo}
+            type="event"
+            className={cn(
+              appStatus === "accepted"
+                ? "ring-4 ring-emerald-500 ring-offset-1"
+                : appStatus === "rejected"
+                  ? "ring-4 ring-red-500 ring-offset-1"
+                  : appStatus === "pending"
+                    ? "ring-4 ring-foreground/20 ring-offset-1"
+                    : "",
+            )}
+          />
+        </div>
 
-          <div className="col-start-2 row-start-1 flex items-center">
-            <p className="mb-1 max-w-[18ch] hyphens-auto text-balance break-words pr-1 text-base font-semibold capitalize">
-              {event?.name}
-            </p>
-          </div>
-          <div className="col-span-full row-start-2 flex flex-col justify-between gap-y-3 px-4 pt-4">
-            <div className="flex flex-col items-start gap-1">
-              <span className="flex items-baseline gap-1 font-semibold">
-                Location:
-                <TooltipSimple content="View on Map" side="top">
-                  <MapPin
-                    onClick={() => setActiveTab("event")}
-                    className="size-4 cursor-pointer transition-transform duration-150 hover:scale-105"
-                  />
-                </TooltipSimple>
-              </span>
-              <span className="inline-flex items-end gap-x-1 leading-[0.95rem]">
-                {locationString}
-              </span>
-            </div>
-            {event.dates.eventFormat !== "noEvent" && (
-              <div className="flex flex-col items-start gap-1">
-                <span className="space-x-1 font-semibold">
-                  {getEventCategoryLabel(eventCategory)} Dates:
-                </span>
-                <EventDates
-                  event={event}
-                  format="desktop"
-                  limit={0}
-                  type="event"
+        <div className="col-start-2 row-start-1 flex items-center">
+          <p className="mb-1 max-w-[18ch] hyphens-auto text-balance break-words pr-1 text-base font-semibold capitalize">
+            {event?.name}
+          </p>
+        </div>
+        <div className="col-span-full row-start-2 flex flex-col justify-between gap-y-3 px-4 pt-4">
+          <div className="flex flex-col items-start gap-1">
+            <span className="flex items-baseline gap-1 font-semibold">
+              Location:
+              <TooltipSimple content="View on Map" side="top">
+                <MapPin
+                  onClick={() => setActiveTab("event")}
+                  className="size-4 cursor-pointer transition-transform duration-150 hover:scale-105"
                 />
-              </div>
-            )}
-
-            {((eventCategory === "project" &&
-              event.dates.eventFormat === "noEvent") ||
-              (eventCategory === "event" && prodEnd)) && (
-              <div className="flex flex-col items-start gap-1">
-                <span className="space-x-1 font-semibold">
-                  Painting/Production Dates:
-                </span>
-                <EventDates
-                  event={event}
-                  format="desktop"
-                  limit={0}
-                  type="production"
-                />
-              </div>
-            )}
-            <p className="flex flex-col items-start gap-1">
-              <span className="font-semibold">Category:</span>
-              {getEventCategoryLabel(eventCategory)}
-            </p>
-            {eventType && eventCategory === "event" && (
-              <p className="flex flex-col items-start gap-1">
-                <span className="font-semibold">Type:</span>{" "}
-                {eventType.map((type) => getEventTypeLabel(type)).join(" | ")}
-              </p>
-            )}
-
-            {/* //todo: ensure that this is required in the submission form */}
-            {(event.about || event.blurb) && (
-              <Accordion type="multiple" defaultValue={["about"]}>
-                <AccordionItem value="about">
-                  <AccordionTrigger
-                    title="About:"
-                    className="pb-2"
-                    fontSize={fontSize}
-                  />
-                  <AccordionContent className="pb-3">
-                    {event.blurb ? (
-                      <p className={cn(fontSize)}>{event.blurb}</p>
-                    ) : (
-                      <RichTextDisplay
-                        html={event.about ?? ""}
-                        fontSize={fontSize}
-                        maxChars={250}
-                      />
-                    )}
-                    <button
-                      className="mt-2 w-full text-center text-sm underline underline-offset-2 hover:underline-offset-4 active:underline-offset-1"
-                      onClick={scrollToAbout}
-                    >
-                      Read more
-                    </button>
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
-            )}
+              </TooltipSimple>
+            </span>
+            <span className="inline-flex items-end gap-x-1 leading-[0.95rem]">
+              {locationString}
+            </span>
+          </div>
+          {event.dates.eventFormat !== "noEvent" && (
             <div className="flex flex-col items-start gap-1">
-              <span className="font-semibold">Organized by:</span>
-              <OrganizerLogoNameCard
-                setActiveTab={setActiveTab}
-                organizer={organizer}
-                abbr={true}
-                fontSize={fontSize}
+              <span className="space-x-1 font-semibold">
+                {getEventCategoryLabel(eventCategory)} Dates:
+              </span>
+              <EventDates
+                event={event}
+                format="desktop"
+                limit={0}
+                type="event"
               />
             </div>
-            <p className="flex items-center gap-1 text-xs">
-              Open call posted: {formatSingleDate(openCall._creationTime)}
+          )}
+
+          {((eventCategory === "project" &&
+            event.dates.eventFormat === "noEvent") ||
+            (eventCategory === "event" && prodEnd)) && (
+            <div className="flex flex-col items-start gap-1">
+              <span className="space-x-1 font-semibold">
+                Painting/Production Dates:
+              </span>
+              <EventDates
+                event={event}
+                format="desktop"
+                limit={0}
+                type="production"
+              />
+            </div>
+          )}
+          <p className="flex flex-col items-start gap-1">
+            <span className="font-semibold">Category:</span>
+            {getEventCategoryLabel(eventCategory)}
+          </p>
+          {eventType && eventCategory === "event" && (
+            <p className="flex flex-col items-start gap-1">
+              <span className="font-semibold">Type:</span>{" "}
+              {eventType.map((type) => getEventTypeLabel(type)).join(" | ")}
             </p>
+          )}
+
+          {/* //todo: ensure that this is required in the submission form */}
+          {(event.about || event.blurb) && (
+            <Accordion type="multiple" defaultValue={["about"]}>
+              <AccordionItem value="about">
+                <AccordionTrigger
+                  title="About:"
+                  className="pb-2"
+                  fontSize={fontSize}
+                />
+                <AccordionContent className="pb-3">
+                  {event.blurb ? (
+                    <p className={cn("break-words", fontSize)}>{event.blurb}</p>
+                  ) : (
+                    <RichTextDisplay
+                      html={event.about ?? ""}
+                      fontSize={fontSize}
+                      maxChars={250}
+                    />
+                  )}
+                  <button
+                    className="mt-2 w-full text-center text-sm underline underline-offset-2 hover:underline-offset-4 active:underline-offset-1"
+                    onClick={scrollToAbout}
+                  >
+                    Read more
+                  </button>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          )}
+          <div className="flex flex-col items-start gap-1">
+            <span className="font-semibold">Organized by:</span>
+            <OrganizerLogoNameCard
+              setActiveTab={setActiveTab}
+              organizer={organizer}
+              abbr={true}
+              fontSize={fontSize}
+            />
           </div>
+          <p className="flex items-center gap-1 text-xs">
+            Open call posted: {formatSingleDate(openCall._creationTime)}
+          </p>
         </div>
+        {/* </div> */}
 
         <div className="col-span-full flex w-full flex-col items-start justify-start gap-y-3 overflow-hidden">
           <Card className="flex w-full flex-col gap-y-2 rounded-xl border-foreground/20 bg-white/60 p-5">

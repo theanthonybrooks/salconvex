@@ -120,82 +120,81 @@ export const OrganizerCardDetailDesktop = (props: OrganizerCardProps) => {
 
       <Card
         className={cn(
-          "row-start-2 hidden w-full max-w-[350px] grid-cols-[75px_auto] gap-x-3 self-start rounded-3xl border-foreground/20 bg-white/50 p-3 first:mt-6 xl:sticky xl:top-24 xl:grid",
+          "row-start-2 hidden w-full max-w-[350px] grid-cols-[75px_minmax(0,1fr)] gap-x-3 self-start rounded-3xl border-foreground/20 bg-white/50 p-3 pt-5 first:mt-6 xl:sticky xl:top-24 xl:grid",
         )}
       >
-        <div className="col-span-full mb-4 grid w-full grid-cols-[75px_auto] gap-x-3 pt-2">
-          <div className="col-span-1 flex items-center justify-center">
-            <Image
-              src={orgLogo}
-              alt="Organizer Logo"
-              width={60}
-              height={60}
-              className={cn(
-                "size-[60px] rounded-full border-2 border-foreground",
-              )}
-            />
-          </div>
-
-          <div className="col-start-2 row-start-1 flex items-center">
-            <p className="mb-1 text-balance pr-1 text-base font-semibold capitalize">
-              {organizer?.name}
-            </p>
-          </div>
-          <div
+        <div className="col-span-1 flex items-center justify-center">
+          <Image
+            src={orgLogo}
+            alt="Organizer Logo"
+            width={60}
+            height={60}
             className={cn(
-              "col-span-full row-start-2 flex flex-col justify-between gap-y-3 px-4 pt-4",
-              fontSize,
+              "size-[60px] rounded-full border-2 border-foreground",
             )}
-          >
-            <p className="flex flex-col items-start gap-1">
-              <span className="flex items-baseline gap-1 font-semibold">
-                Location:
-                {/* <TooltipSimple content="View on Map" side="top">
+          />
+        </div>
+
+        <div className="col-start-2 row-start-1 flex items-center">
+          <p className="mb-1 text-balance pr-1 text-base font-semibold capitalize">
+            {organizer?.name}
+          </p>
+        </div>
+        <div
+          className={cn(
+            "col-span-full row-start-2 flex flex-col justify-between gap-y-3 px-4 pt-4",
+            fontSize,
+          )}
+        >
+          <p className="flex flex-col items-start gap-1">
+            <span className="flex items-baseline gap-1 font-semibold">
+              Location:
+              {/* <TooltipSimple content="View on Map" side="top">
                   <MapPin
                     onClick={() => setActiveTab("event")}
                     className="size-4 cursor-pointer transition-transform duration-150 hover:scale-105"
                   />
                 </TooltipSimple> */}
-              </span>
-              <span className="inline-flex items-end gap-x-1 leading-[0.95rem]">
-                {locationString}
+            </span>
+            <span className="inline-flex items-end gap-x-1 leading-[0.95rem]">
+              {locationString}
 
-                {/* <MapPin
+              {/* <MapPin
                   onClick={() => setActiveTab("event")}
                   className="size-5 cursor-pointer transition-transform duration-150 hover:scale-105"
                 /> */}
-              </span>
-            </p>
+            </span>
+          </p>
 
-            {/* //todo: ensure that this is required in the submission form */}
-            {organizer.about && (
-              <Accordion type="multiple" defaultValue={["about"]}>
-                <AccordionItem value="about">
-                  <AccordionTrigger
-                    title="About:"
-                    className="pb-2"
+          {/* //todo: ensure that this is required in the submission form */}
+          {organizer.about && (
+            <Accordion type="multiple" defaultValue={["about"]}>
+              <AccordionItem value="about">
+                <AccordionTrigger
+                  title="About:"
+                  className="pb-2"
+                  fontSize={fontSize}
+                />
+                <AccordionContent className="text-sm">
+                  <RichTextDisplay
+                    html={organizer.about}
+                    maxChars={200}
                     fontSize={fontSize}
                   />
-                  <AccordionContent className="text-sm">
-                    <RichTextDisplay
-                      html={organizer.about}
-                      maxChars={200}
-                      fontSize={fontSize}
-                    />
-                    {organizer.about?.length > 200 && (
-                      <button
-                        className="mt-2 w-full text-center text-sm underline underline-offset-2 hover:underline-offset-4 active:underline-offset-1"
-                        onClick={scrollToAbout}
-                      >
-                        Read more
-                      </button>
-                    )}
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
-            )}
-          </div>
+                  {organizer.about?.length > 200 && (
+                    <button
+                      className="mt-2 w-full text-center text-sm underline underline-offset-2 hover:underline-offset-4 active:underline-offset-1"
+                      onClick={scrollToAbout}
+                    >
+                      Read more
+                    </button>
+                  )}
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          )}
         </div>
+
         {isAdmin && (
           <>
             <Separator

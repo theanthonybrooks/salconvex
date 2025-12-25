@@ -4,7 +4,7 @@ import {
   freeEvents,
   paidEvents,
 } from "@/constants/eventConsts";
-import { CALL_TYPE_LABELS } from "@/constants/openCallConsts";
+import { CALL_TYPE_LABELS, validOCVals } from "@/constants/openCallConsts";
 import {
   baseHashtags,
   graffitiEventHashtags,
@@ -246,8 +246,9 @@ export const formatEventLink = (
   activeSub?: boolean,
   toEvent?: boolean,
 ) => {
-  const { slug, dates, hasOpenCall } = event;
-  return `/thelist/event/${slug}/${dates?.edition}/${hasOpenCall && activeSub ? "call" : ""}${activeSub && toEvent ? "?tab=event" : ""}`;
+  const { slug, dates, hasOpenCall: eventOpenCallStatus } = event;
+  const hasOpenCall = validOCVals.includes(eventOpenCallStatus);
+  return `/thelist/event/${slug}/${dates?.edition}/${hasOpenCall && activeSub ? "call" : ""}${activeSub && hasOpenCall && toEvent ? "?tab=event" : ""}`;
 };
 
 type OpenCallStatusProps = {

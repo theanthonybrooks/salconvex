@@ -8,7 +8,6 @@ import {
 } from "@/constants/filterConsts";
 
 import { useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
 import { Command } from "cmdk";
 import { AnimatePresence, motion } from "framer-motion";
 
@@ -65,7 +64,7 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
   // const searchType = search.searchType ?? "all";
   const eventView = view === "event";
   // const organizerView = view === "organizer";
-  const router = useRouter();
+  // const router = useRouter();
   const { preloadedSubStatus, preloadedUserData } = useConvexPreload();
   const subData = usePreloadedQuery(preloadedSubStatus);
   const { hasActiveSubscription } = subData ?? {};
@@ -560,90 +559,98 @@ export const TheListFilterDrawer = <T extends TheListFilterCommandItem>({
                         {groupItems.map((item, i) => {
                           return (
                             <Command.Item
+                              asChild
                               key={`${groupKey}-${item.path}-${i}`}
                               value={`${groupKey}-${item.path}`}
                               className={cn(
                                 "group flex cursor-pointer items-center rounded p-2 pl-5 text-foreground transition-colors hover:bg-stone-100 hover:text-stone-900 data-[selected='true']:bg-salYellow/40",
                                 baseFontSize,
                               )}
-                              onSelect={() => {
-                                router.push(item.path || "/thelist");
-                                setOpen(false);
-                              }}
+                              // onSelect={() => {
+                              //   router.push(item.path || "/thelist");
+                              //   setOpen(false);
+                              // }}
                             >
-                              {groupKey.startsWith("Events") ? (
-                                <div className="grid w-full grid-cols-[1fr_72px_auto_auto_1fr] items-center gap-2">
-                                  <span className="flex items-center gap-1 truncate text-wrap">
-                                    {item.name}
-                                  </span>
-                                  {item.ocStatus === 2 ? (
-                                    <FlairBadge className="mx-auto bg-green-500/20">
-                                      Open Call
-                                    </FlairBadge>
-                                  ) : (
-                                    <span />
-                                  )}
-                                  {item.edition ? (
-                                    <span
-                                      className={cn(
-                                        "text-center",
-                                        subFontColor,
-                                        baseFontSize,
-                                      )}
-                                    >
-                                      {item.edition}
+                              <Link
+                                variant="standard"
+                                href={item.path || "/thelist"}
+                              >
+                                {groupKey.startsWith("Events") ? (
+                                  <div className="grid w-full grid-cols-[1fr_72px_auto_auto_1fr] items-center gap-2">
+                                    <span className="flex items-center gap-1 truncate text-wrap">
+                                      {item.name}
                                     </span>
-                                  ) : (
-                                    <span />
-                                  )}
-
-                                  {item.category ? (
-                                    <span
-                                      className={cn(
-                                        "flex items-center gap-2 text-center",
-                                        subFontColor,
-                                        baseFontSize,
-                                      )}
-                                    >
-                                      |<p>{item.category}</p>
-                                    </span>
-                                  ) : null}
-
-                                  {item.orgName && view !== "openCall" && (
-                                    <span
-                                      className={cn(
-                                        "flex items-center gap-2 text-center",
-                                        subFontColor,
-                                        baseFontSize,
-                                      )}
-                                    >
-                                      <p>{item.orgName}</p>
-                                    </span>
-                                  )}
-                                  <span
-                                    className={cn(
-                                      "truncate text-right",
-                                      subFontColor,
-                                      baseFontSize,
+                                    {item.ocStatus === 2 ? (
+                                      <FlairBadge className="mx-auto bg-green-500/20">
+                                        Open Call
+                                      </FlairBadge>
+                                    ) : (
+                                      <span />
                                     )}
-                                  >
-                                    {item.meta}
-                                  </span>
-                                </div>
-                              ) : (
-                                <div className="flex w-full justify-between gap-2">
-                                  <span className="truncate">{item.name}</span>
-                                  <span
-                                    className={cn(
-                                      "truncate text-right",
-                                      subFontColor,
-                                      baseFontSize,
+                                    {item.edition ? (
+                                      <span
+                                        className={cn(
+                                          "text-center",
+                                          subFontColor,
+                                          baseFontSize,
+                                        )}
+                                      >
+                                        {item.edition}
+                                      </span>
+                                    ) : (
+                                      <span />
                                     )}
-                                  >
-                                    {item.meta}
-                                  </span>
-                                </div>
-                              )}
+
+                                    {item.category ? (
+                                      <span
+                                        className={cn(
+                                          "flex items-center gap-2 text-center",
+                                          subFontColor,
+                                          baseFontSize,
+                                        )}
+                                      >
+                                        |<p>{item.category}</p>
+                                      </span>
+                                    ) : null}
+
+                                    {item.orgName && view !== "openCall" && (
+                                      <span
+                                        className={cn(
+                                          "flex items-center gap-2 text-center",
+                                          subFontColor,
+                                          baseFontSize,
+                                        )}
+                                      >
+                                        <p>{item.orgName}</p>
+                                      </span>
+                                    )}
+                                    <span
+                                      className={cn(
+                                        "truncate text-right",
+                                        subFontColor,
+                                        baseFontSize,
+                                      )}
+                                    >
+                                      {item.meta}
+                                    </span>
+                                  </div>
+                                ) : (
+                                  <div className="flex w-full justify-between gap-2">
+                                    <span className="truncate">
+                                      {item.name}
+                                    </span>
+                                    <span
+                                      className={cn(
+                                        "truncate text-right",
+                                        subFontColor,
+                                        baseFontSize,
+                                      )}
+                                    >
+                                      {item.meta}
+                                    </span>
+                                  </div>
+                                )}
+                              </Link>
                             </Command.Item>
                           );
                         })}

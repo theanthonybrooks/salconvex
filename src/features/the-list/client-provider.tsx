@@ -80,9 +80,13 @@ export const EventListProvider = ({
   children: React.ReactNode;
 }) => {
   const searchParams = useSearchParams();
-  const { preloadedSubStatus } = useConvexPreload();
+  const { preloadedSubStatus, preloadedUserData } = useConvexPreload();
+  const userData = usePreloadedQuery(preloadedUserData);
   const subData = usePreloadedQuery(preloadedSubStatus);
   const { hasActiveSubscription } = subData ?? {};
+  const { user } = userData ?? {};
+  const isAdmin =
+    user?.role?.includes("admin") || user?.role?.includes("creator");
 
   const defaultFilters: Filters = useMemo(
     () => ({
@@ -126,9 +130,9 @@ export const EventListProvider = ({
   const defaultSearch = useMemo<SearchParams>(
     () => ({
       searchTerm: "",
-      searchType: "all",
+      searchType: isAdmin ? "all" : "events",
     }),
-    [],
+    [isAdmin],
   );
 
   const currentFilters: Filters = {
@@ -165,7 +169,8 @@ export const EventListProvider = ({
 
   const currentSearch: SearchParams = {
     searchTerm: searchParams.get("term") ?? "",
-    searchType: (searchParams.get("st") as SearchType) ?? "all",
+    searchType:
+      ((searchParams.get("st") as SearchType) ?? isAdmin) ? "all" : "events",
   };
 
   const [filters, setFilters] = useState<Filters>(currentFilters);
