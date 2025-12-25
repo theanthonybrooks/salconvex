@@ -23,6 +23,19 @@ function needsLowercase(value: string): boolean {
   return value !== value.toLowerCase();
 }
 
+export const addFalseSavedFieldToNotifications = migrations.define({
+  table: "notifications",
+  migrateOne: async (ctx, notification) => {
+    await ctx.db.patch(notification._id, {
+      saved: false,
+    });
+  },
+});
+
+export const runFASF = migrations.runner(
+  internal.migrations.addFalseSavedFieldToNotifications,
+);
+
 export const removeOpenCallNotificationsFromUsersWithoutSufficientPlan =
   migrations.define({
     table: "userPreferences",

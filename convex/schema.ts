@@ -107,6 +107,7 @@ const notificationsSchema = {
   type: notificationTypeValidator,
   dedupeKey: v.string(),
   dismissed: v.boolean(),
+  saved: v.optional(v.boolean()),
   userId: v.nullable(v.id("users")),
   eventId: v.optional(v.id("events")),
   importance: importanceValidator,
@@ -1915,6 +1916,7 @@ export default defineSchema({
       "dismissed",
       "updatedAt",
     ])
+    .index("by_userId_saved", ["userId", "saved"])
     .index("by_deadline", ["deadline"])
     .index("by_type", ["type"])
     .index("by_dedupeKey_userId_dismissed", [

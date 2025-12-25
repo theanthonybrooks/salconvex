@@ -136,6 +136,7 @@ export async function cloneNotificationForUser(
   ctx: MutationCtx,
   notification: Doc<"notifications">,
   userId: Id<"users">,
+  action: "archive" | "save" = "archive",
 ) {
   const existing = await ctx.db
     .query("notifications")
@@ -153,7 +154,8 @@ export async function cloneNotificationForUser(
   await ctx.db.insert("notifications", {
     ...rest,
     userId,
-    dismissed: true,
+    ...(action === "archive" && { dismissed: true }),
+    ...(action === "save" && { saved: true }),
   });
 }
 
@@ -205,7 +207,7 @@ export const clearNotificationsBatch = internalMutation({
   }),
   handler: async (ctx, args) => {
     const { cursor, numItems, mode, role, userId, userPlan } = args;
-
+    const oneMonthAgo = subMonths(new Date(), 1).getTime();
     const tableQuery: QueryInitializer<DataModel["notifications"]> =
       ctx.db.query("notifications");
 
@@ -225,12 +227,40 @@ export const clearNotificationsBatch = internalMutation({
       );
     }
 
+    const dismissedNotifications = await ctx.db
+      .query("notifications")
+      .withIndex("by_userId_dismissed_updatedAt", (q) =>
+        q
+          .eq("userId", userId)
+          .eq("dismissed", true)
+          .gte("updatedAt", oneMonthAgo),
+      )
+      .collect();
+    const dismissedDedupeKeys = new Set(
+      dismissedNotifications.map((n) => n.dedupeKey),
+    );
+    const savedNotifications = await ctx.db
+      .query("notifications")
+      .withIndex("by_userId_saved", (q) =>
+        q
+          .eq("userId", userId)
+          .eq("saved", true)
+          .gte("_creationTime", oneMonthAgo),
+      )
+      .collect();
+    const savedDedupeKeys = new Set(savedNotifications.map((n) => n.dedupeKey));
+
     const { page, isDone, continueCursor } = await indexedQuery.paginate({
       cursor,
       numItems,
     });
-
     for (const notification of page) {
+      if (
+        dismissedDedupeKeys.has(notification.dedupeKey) ||
+        savedDedupeKeys.has(notification.dedupeKey)
+      )
+        continue;
+
       if (
         mode === "role" &&
         userPlan !== undefined &&
@@ -244,11 +274,11 @@ export const clearNotificationsBatch = internalMutation({
             dismissed: true,
           });
         } else {
-          await cloneNotificationForUser(ctx, notification, userId);
+          await cloneNotificationForUser(ctx, notification, userId, "archive");
         }
       } else {
         if (!notification.userId) {
-          await cloneNotificationForUser(ctx, notification, userId);
+          await cloneNotificationForUser(ctx, notification, userId, "archive");
         }
       }
     }
@@ -342,9 +372,10 @@ export const clearNotifications = mutation({
       if (notification.userId) {
         await ctx.db.patch(notificationId, {
           dismissed: true,
+          saved: false,
         });
       } else {
-        await cloneNotificationForUser(ctx, notification, userId);
+        await cloneNotificationForUser(ctx, notification, userId, "archive");
       }
     } else {
       await ctx.scheduler.runAfter(
@@ -355,6 +386,32 @@ export const clearNotifications = mutation({
     }
 
     return null;
+  },
+});
+export const saveNotification = mutation({
+  args: {
+    notificationId: v.id("notifications"),
+  },
+  handler: async (ctx, args) => {
+    const { notificationId } = args;
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return { success: false, error: "Not authenticated" };
+    const user = await ctx.db.get(userId);
+    if (!user) return { success: false, error: "User not found" };
+
+    const notification = await ctx.db.get(notificationId);
+    if (!notification)
+      return { success: false, error: "Notification not found" };
+
+    if (notification.userId) {
+      await ctx.db.patch(notificationId, {
+        saved: notification.saved === true ? false : true,
+      });
+    } else {
+      await cloneNotificationForUser(ctx, notification, userId, "save");
+    }
+
+    return { success: true };
   },
 });
 export const getNotifications = query({
@@ -395,6 +452,7 @@ export const getNotifications = query({
                   .eq("targetRole", role)
                   .eq("userId", null)
                   .eq("dismissed", false)
+
                   .gte("updatedAt", oneMonthAgo),
               )
               .order("desc")
@@ -521,6 +579,7 @@ export async function upsertNotification(
       dedupeKey: outputDedupeKey,
       deadline: notification.deadline ?? oneWeekFromToday,
       dismissed: false,
+      saved: false,
       updatedAt: Date.now(),
     });
   }
@@ -556,7 +615,6 @@ export const createNotification = mutation({
       redirectUrl,
       dedupeKey,
     } = args;
-    console.log(displayText);
     await upsertNotification(ctx, {
       type,
       userId,

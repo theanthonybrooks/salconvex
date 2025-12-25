@@ -8,7 +8,7 @@ import type { User } from "@/types/user";
 import React, { useState } from "react";
 import { useIsMobile } from "@/hooks/use-media-query";
 
-import { Archive, ArchiveRestore, Bell } from "lucide-react";
+import { Archive, ArchiveRestore, Bell, SaveIcon, SaveOff } from "lucide-react";
 
 import type { Id } from "~/convex/_generated/dataModel";
 import type { UserPrefsType } from "~/convex/schema";
@@ -143,6 +143,9 @@ export const NotificationsDropdown = ({
   const clearNotifications = useMutation(
     api.general.notifications.clearNotifications,
   );
+  const saveNotification = useMutation(
+    api.general.notifications.saveNotification,
+  );
   const fontSizePref = getUserFontSizePref(userPref?.fontSize);
   const fontSize = fontSizePref?.body;
 
@@ -160,6 +163,17 @@ export const NotificationsDropdown = ({
       // setOptimisticallyClearedAt(null);
     }
   };
+
+  const handleSaveNotification = async (
+    notificationId: Id<"notifications">,
+  ) => {
+    try {
+      await saveNotification({ notificationId });
+    } catch (error) {
+      console.error("Failed to save notification:", error);
+    }
+  };
+
   const handleTabChange = (value: string) => {
     setActiveTab(value);
   };
@@ -212,7 +226,7 @@ export const NotificationsDropdown = ({
           <DropdownMenuLabel className="!text-base font-semibold">
             Notifications
           </DropdownMenuLabel>
-          {totalNotifications > 0 && (
+          {(totalNotifications > 0 || activeTab === "archive") && (
             <SelectSimple
               options={[...availableNotificationFilterOptions]}
               value={notificationFilter}
@@ -295,6 +309,7 @@ export const NotificationsDropdown = ({
                     key={notification._id}
                     notification={notification}
                     handleClearNotifications={handleClearNotifications}
+                    handleSaveNotification={handleSaveNotification}
                     user={user}
                     className={cn(i % 2 !== 0 && "bg-muted-foreground/5")}
                   />
@@ -317,6 +332,7 @@ export const NotificationsDropdown = ({
                       key={notification._id}
                       notification={notification}
                       handleClearNotifications={handleClearNotifications}
+                      handleSaveNotification={handleSaveNotification}
                       user={user}
                       className={cn(i % 2 !== 0 && "bg-muted-foreground/5")}
                     />
@@ -340,6 +356,7 @@ export const NotificationsDropdown = ({
                       key={notification._id}
                       notification={notification}
                       handleClearNotifications={handleClearNotifications}
+                      handleSaveNotification={handleSaveNotification}
                       user={user}
                       className={cn(i % 2 !== 0 && "bg-muted-foreground/5")}
                     />
@@ -432,6 +449,7 @@ export const NotificationsDropdown = ({
 const NotificationDropdownItem = ({
   notification,
   handleClearNotifications,
+  handleSaveNotification,
   archived,
   user,
   className,
@@ -439,6 +457,7 @@ const NotificationDropdownItem = ({
   user: User;
   notification: NotificationItemType;
   handleClearNotifications: (notificationId?: Id<"notifications">) => void;
+  handleSaveNotification?: (notificationId: Id<"notifications">) => void;
   archived?: boolean;
   className?: string;
 }) => {
@@ -457,7 +476,7 @@ const NotificationDropdownItem = ({
     // userId,
     // targetRole,
     // targetUserType,
-    // dedupeKey,
+    saved,
     redirectUrl,
     eventId,
     importance,
@@ -512,6 +531,7 @@ const NotificationDropdownItem = ({
         "group w-full",
         !archived && importance === "high" && "bg-salPinkLt/70",
         className,
+        saved && "bg-salYellowLtHover",
       )}
       asChild
     >
@@ -542,28 +562,53 @@ const NotificationDropdownItem = ({
           </div>
         </div>
 
-        <TooltipSimple
-          content={archived ? "Unarchive" : "Archive"}
-          className="z-top"
-          disabled={isMobile}
-        >
-          <div
-            className={cn(
-              "flex h-9 items-center justify-center px-3 opacity-100 transition-opacity duration-200 ease-in-out hover:scale-[1.025] active:scale-975 group-hover:opacity-100 sm:opacity-0",
-            )}
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              if (archived) {
-                unarchive({ notificationId: id });
-              } else {
-                handleClearNotifications(id);
-              }
-            }}
+        <div className="flex flex-col justify-between">
+          <TooltipSimple
+            content={archived ? "Unarchive" : "Archive"}
+            className="z-top"
+            disabled={isMobile}
           >
-            {archived ? <ArchiveRestore size={16} /> : <Archive size={16} />}
-          </div>
-        </TooltipSimple>
+            <div
+              className={cn(
+                "flex h-9 items-center justify-center px-3 opacity-100 transition-opacity duration-200 ease-in-out hover:scale-[1.025] active:scale-975 group-hover:opacity-100 sm:opacity-0",
+              )}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (archived) {
+                  unarchive({ notificationId: id });
+                } else {
+                  handleClearNotifications(id);
+                }
+              }}
+            >
+              {archived ? <ArchiveRestore size={16} /> : <Archive size={16} />}
+            </div>
+          </TooltipSimple>
+          {handleSaveNotification && (
+            <TooltipSimple
+              content={saved ? "Saved" : "Save"}
+              className="z-top"
+              disabled={isMobile}
+              side="bottom"
+            >
+              <div
+                className={cn(
+                  "flex h-9 items-center justify-center px-3 opacity-100 transition-opacity duration-200 ease-in-out hover:scale-[1.025] active:scale-975 group-hover:opacity-100 sm:opacity-0",
+                  saved && "sm:opacity-100",
+                )}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+
+                  handleSaveNotification(id);
+                }}
+              >
+                {saved ? <SaveOff size={16} /> : <SaveIcon size={16} />}
+              </div>
+            </TooltipSimple>
+          )}
+        </div>
       </Link>
     </DropdownMenuItem>
   );
