@@ -710,6 +710,8 @@ export const subscriptionStoreWebhook = mutation({
         break;
 
       case "customer.subscription.deleted":
+        const cancellationReason = baseObject.cancellation_details.reason;
+        const paymentFailed = cancellationReason === "payment_failed";
         if (newsletterSub) {
           await updateUserNewsletter(ctx, {
             userId: userData?._id as Id<"users">,
@@ -728,8 +730,7 @@ export const subscriptionStoreWebhook = mutation({
             canceledAt: baseObject.canceled_at
               ? new Date(baseObject.canceled_at * 1000).getTime()
               : undefined,
-            customerCancellationReason:
-              baseObject.cancellation_details.reason ?? undefined,
+            customerCancellationReason: cancellationReason ?? undefined,
             customerCancellationComment:
               baseObject.cancellation_details.comment ?? undefined,
             customerCancellationFeedback:
@@ -758,7 +759,7 @@ export const subscriptionStoreWebhook = mutation({
             userId: userData._id,
             importance: "high",
             redirectUrl: `/dashboard/billing`,
-            displayText: "Your subscription was cancelled",
+            displayText: `Your subscription was cancelled ${paymentFailed ? " due to payment failure" : ""}`,
             dedupeKey: `user-${userData._id}-subscription-cancelled`,
           });
           await upsertNotification(ctx, {
@@ -766,7 +767,7 @@ export const subscriptionStoreWebhook = mutation({
             targetRole: "admin",
             redirectUrl: `/dashboard/admin/users?id=${userData._id}`,
             displayText: "User subscription cancelled",
-            description: `${userData.name} cancelled their subscription`,
+            description: `${userData.name}${paymentFailed ? "'s subscription was cancelled due to payment failure" : " cancelled their subscription"}`,
             dedupeKey: `user-${userData._id}-cancelled`,
           });
         }

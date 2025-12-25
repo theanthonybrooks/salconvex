@@ -1,37 +1,16 @@
+import { notificationTypeIconMap } from "@/constants/notificationConsts";
 import { returnNinetyNinePlus } from "@/constants/numberFns";
 
+import type { NotificationItemType } from "@/types/notificationTypes";
 import type { User } from "@/types/user";
-import type { FunctionReturnType } from "convex/server";
-import type { IconType } from "react-icons";
 
 import React, { useState } from "react";
 import { useIsMobile } from "@/hooks/use-media-query";
 
-import { FaMobileAlt } from "react-icons/fa";
-import {
-  Archive,
-  ArchiveRestore,
-  Bell,
-  Calendar,
-  CalendarCheck,
-  CircleAlert,
-  CircleFadingPlus,
-  InfoIcon,
-  ListTodo,
-  MailCheck,
-  MailMinus,
-  MailPlus,
-  Mails,
-  MailWarning,
-  Megaphone,
-  MessageSquareMore,
-  PaintRoller,
-  UserMinus,
-  UserPlus,
-} from "lucide-react";
+import { Archive, ArchiveRestore, Bell } from "lucide-react";
 
 import type { Id } from "~/convex/_generated/dataModel";
-import type { NotificationType, UserPrefsType } from "~/convex/schema";
+import type { UserPrefsType } from "~/convex/schema";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/components/ui/custom-link";
 import {
@@ -43,9 +22,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { SelectSimple } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TooltipSimple } from "@/components/ui/tooltip";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
+import { filterNotificationsByType } from "@/helpers/notificationFns";
 import { getUserFontSizePref } from "@/helpers/stylingFns";
 import { cn } from "@/helpers/utilsFns";
 
@@ -64,12 +45,6 @@ type NotificationsDropdownProps = {
   userPref?: UserPrefsType;
 };
 
-type NotificationItemsType = FunctionReturnType<
-  typeof api.general.notifications.getNotifications
->;
-type NotificationItemType =
-  NonNullable<NotificationItemsType>["userNotifications"][number];
-
 export const NotificationsDropdown = ({
   setTooltipDisabled,
   tooltipDisabled,
@@ -78,6 +53,11 @@ export const NotificationsDropdown = ({
   user,
   userPref,
 }: NotificationsDropdownProps) => {
+  const { preloadedSubStatus } = useConvexPreload();
+  const subData = usePreloadedQuery(preloadedSubStatus);
+  const { hasActiveSubscription, subPlan } = subData ?? {};
+  const userPlan = subPlan ?? 0;
+  // const userPlan = 1;
   const [open, setOpen] = useState(false);
   // const [pending, setPending] = useState(false);
 
@@ -94,16 +74,42 @@ export const NotificationsDropdown = ({
     user ? {} : "skip",
   );
   const { userNotifications, dismissedNotifications } = notificationsData ?? {};
+  const notificationFilterOptions = [
+    { value: "all", label: "All" },
+    { value: "newEvent", label: "Events Only" },
+    { value: "newOpenCall", label: "Open Calls Only" },
+  ] as const;
 
-  const adminNotifications = isAdmin
-    ? (userNotifications?.filter((n) => n.targetRole === "admin") ?? [])
-    : [];
-  const artistNotifications = isArtist
-    ? (userNotifications?.filter((n) => n.targetUserType === "artist") ?? [])
-    : [];
-  const organizerNotifications = isOrganizer
-    ? (userNotifications?.filter((n) => n.targetUserType === "organizer") ?? [])
-    : [];
+  const availableNotificationFilterOptions =
+    hasActiveSubscription && userPlan >= 2
+      ? notificationFilterOptions
+      : notificationFilterOptions.filter((opt) => opt.value !== "newOpenCall");
+
+  type NotificationFilterOptions =
+    (typeof notificationFilterOptions)[number]["value"];
+
+  const [notificationFilter, setNotificationFilter] =
+    useState<NotificationFilterOptions>("all");
+
+  const adminNotifications = filterNotificationsByType(
+    isAdmin
+      ? (userNotifications?.filter((n) => n.targetRole === "admin") ?? [])
+      : [],
+    notificationFilter,
+  );
+  const artistNotifications = filterNotificationsByType(
+    isArtist
+      ? (userNotifications?.filter((n) => n.targetUserType === "artist") ?? [])
+      : [],
+    notificationFilter,
+  );
+  const organizerNotifications = filterNotificationsByType(
+    isOrganizer
+      ? (userNotifications?.filter((n) => n.targetUserType === "organizer") ??
+          [])
+      : [],
+    notificationFilter,
+  );
 
   const visibleUserNotifications = userNotifications ?? [];
 
@@ -114,9 +120,12 @@ export const NotificationsDropdown = ({
     b: NotificationItemType,
   ) => b.updatedAt - a.updatedAt;
 
-  const uniqueNotifications = Array.from(
-    new Map(visibleUserNotifications.map((n) => [n._id, n])).values(),
-  ).sort(sortByUpdatedAtDesc);
+  const uniqueNotifications = filterNotificationsByType(
+    Array.from(
+      new Map(visibleUserNotifications.map((n) => [n._id, n])).values(),
+    ).sort(sortByUpdatedAtDesc),
+    notificationFilter,
+  );
 
   const hasUnreadNotifications = uniqueNotifications.length > 0;
   const hasAdminNotifications = adminNotifications.length > 0;
@@ -190,9 +199,19 @@ export const NotificationsDropdown = ({
         align="end"
         alignOffset={-10}
       >
-        <DropdownMenuLabel className="!text-base font-semibold">
-          Notifications
-        </DropdownMenuLabel>
+        <div className="flex items-center justify-between gap-2 py-3 pr-1">
+          <DropdownMenuLabel className="!text-base font-semibold">
+            Notifications
+          </DropdownMenuLabel>
+          <SelectSimple
+            options={[...availableNotificationFilterOptions]}
+            value={notificationFilter}
+            onChangeAction={(value) =>
+              setNotificationFilter(value as NotificationFilterOptions)
+            }
+            className="w-40 border bg-card sm:h-8"
+          />
+        </div>
         <Tabs value={activeTab} onValueChange={handleTabChange}>
           <TabsList className="scrollable invis h-12 w-full max-w-full justify-around border-none p-0 md:justify-start">
             <TabsTrigger
@@ -448,41 +467,6 @@ const NotificationDropdownItem = ({
     hour: "numeric",
     minute: "2-digit",
   });
-
-  const notificationTypeIconMap: Record<NotificationType, IconType> = {
-    newEvent: Calendar,
-    newOpenCall: Megaphone,
-    newResource: Bell,
-    //
-    account: InfoIcon,
-    newSubmission: CircleFadingPlus,
-    newTaskAssignment: ListTodo,
-    newUser: UserPlus,
-    newSac: PaintRoller,
-    newSubscription: UserPlus,
-    canceledSubscription: UserMinus,
-    //
-    newOERegistration: UserPlus,
-    newOECancellation: UserMinus,
-    //
-    newSupport: CircleAlert,
-    supportUpdated: CircleAlert,
-    //
-    newSocial: FaMobileAlt,
-    socialUpdated: CalendarCheck,
-    //
-    campaignCreated: Mails,
-    campaignCompleted: MailCheck,
-    campaignFailed: MailWarning,
-    audienceSubscribed: MailPlus,
-    audienceUnsubscribed: MailMinus,
-    //
-    newMessage: MessageSquareMore,
-    newFollow: Bell,
-    newResponse: Bell,
-    newApplication: Bell,
-    general: Bell,
-  };
 
   const Icon = notificationTypeIconMap[type];
   const formatUrlBySubscription = () => {
