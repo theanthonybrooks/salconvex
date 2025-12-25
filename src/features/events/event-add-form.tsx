@@ -640,7 +640,7 @@ export const EventOCForm = ({
         targetRole: "admin",
         importance: "high",
         redirectUrl: `/thelist/event/${submissionUrl}`,
-        displayText: "New Event Submission",
+        displayText: `New ${openCallId ? "Open Call" : getEventCategoryLabel(eventCategory, true)} Submission`,
         description: `${eventData.name}`,
         dedupeKey: openCallId
           ? `oc-${openCallId}-submitted`
@@ -817,15 +817,15 @@ export const EventOCForm = ({
 
       const result = schema.safeParse(currentValues);
 
-      // if (isAdmin) {
-      console.log("safeParse result: ", result);
-      // }
+      if (isAdmin) {
+        console.log("safeParse result: ", result);
+      }
 
       if (!result.success) {
         const issues = result.error.issues;
-        // if (isAdmin) {
-        console.log("issues: ", issues);
-        // }
+        if (isAdmin) {
+          console.log("issues: ", issues);
+        }
 
         issues.forEach((issue) => {
           const path = issue.path.join(".") as Path<EventOCFormValues>;
@@ -1700,21 +1700,24 @@ export const EventOCForm = ({
                 deadline: ocEndTime ?? undefined,
                 displayText: futureOpenCall
                   ? "New Open Call Coming Soon"
-                  : "New Open Call Added",
+                  : `${alreadyApproved ? "Open Call Updated" : "New Open Call Added"}`,
                 description: `${eventData.name}`,
                 redirectUrl: `/thelist/event/${submissionUrl}`,
-                dedupeKey: `oc-${openCallId}-published`,
+                dedupeKey: `oc-${openCallId}-${alreadyApproved ? "updated" : "published"}`,
                 eventId: eventData._id,
               });
             }
           }
-          if (eventData?.category === "event") {
+          if (
+            eventData?.category === "event" &&
+            editedSections.includes("event")
+          ) {
             await createNotification({
               type: "newEvent",
-              displayText: "New Event Added",
+              displayText: `${alreadyApproved ? "Event Updated" : "New Event Added"}`,
               description: `${eventData.name}`,
               redirectUrl: `/thelist/event/${submissionUrl}${openCallId ? "?tab=event" : ""}}`,
-              dedupeKey: `event-${eventData._id}-added`,
+              dedupeKey: `event-${eventData._id}-${alreadyApproved ? "updated" : "added"}`,
               eventId: eventData._id,
             });
           }
@@ -1754,6 +1757,7 @@ export const EventOCForm = ({
       }
     },
     [
+      alreadyApproved,
       openCallEnd,
       openCallStart,
       handleDraftUpdate,
@@ -1774,6 +1778,8 @@ export const EventOCForm = ({
       openCallData,
       normalizedCurrentDocs,
       updateOpenCall,
+      editedSections,
+      hasUserEditedEventSteps,
       hasUserEditedStep0,
       hasUserEditedStep4,
       hasUserEditedStep5,
@@ -1785,7 +1791,6 @@ export const EventOCForm = ({
       unregister,
       reset,
       activeStep,
-      hasUserEditedEventSteps,
       eventData,
       eventLinks,
       updateOrg,
@@ -2209,7 +2214,6 @@ export const EventOCForm = ({
   }, [orgData, activeStep, setActiveStep]);
 
   const saveAndClose = useCallback(async () => {
-    console.log("saving and closing");
     await handleSave(true, false, true);
     setShouldClose(false);
     setOpen(false);

@@ -390,6 +390,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   const hasUserEditedEventSteps = JSON.stringify(
     dirtyFields?.event ?? {},
   ).includes("true");
+
   const hasUserEditedForm = !!(
     hasUserEditedEventSteps ||
     hasUserEditedStep0 ||
@@ -570,7 +571,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
         targetRole: "admin",
         importance: "high",
         redirectUrl: `/thelist/event/${submissionUrl}`,
-        displayText: "New Event Submission",
+        displayText: `New ${openCallId ? "Open Call" : getEventCategoryLabel(eventCategory, true)} Submission`,
         description: `${eventData.name}`,
         dedupeKey: openCallId
           ? `oc-${openCallId}-submitted`
@@ -1599,6 +1600,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
             const ocStartTime = openCallStart ? openCallStart.getTime() : 0;
             const futureOpenCall = ocStartTime > now;
             const validType = ongoingOCVals.includes(eventData.hasOpenCall);
+
             if ((ocEndTime && ocEndTime > now) || validType) {
               await createNotification({
                 type: "newOpenCall",
@@ -1607,21 +1609,24 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
                 deadline: ocEndTime ?? undefined,
                 displayText: futureOpenCall
                   ? "New Open Call Coming Soon"
-                  : "New Open Call Added",
+                  : `${alreadyApproved ? "Open Call Updated" : "New Open Call Added"}`,
                 description: `${eventData.name}`,
                 redirectUrl: `/thelist/event/${submissionUrl}`,
-                dedupeKey: `oc-${openCallId}-published`,
+                dedupeKey: `oc-${openCallId}-${alreadyApproved ? "updated" : "published"}`,
                 eventId: eventData._id,
               });
             }
           }
-          if (eventData?.category === "event") {
+          if (
+            eventData?.category === "event" &&
+            editedSections.includes("event")
+          ) {
             await createNotification({
               type: "newEvent",
-              displayText: "New Event Added",
+              displayText: `${alreadyApproved ? "Event Updated" : "New Event Added"}`,
               description: `${eventData.name}`,
               redirectUrl: `/thelist/event/${submissionUrl}${openCallId ? "?tab=event" : ""}}`,
-              dedupeKey: `event-${eventData._id}-added`,
+              dedupeKey: `event-${eventData._id}-${alreadyApproved ? "updated" : "added"}`,
               eventId: eventData._id,
             });
           }
@@ -1654,6 +1659,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
       }
     },
     [
+      alreadyApproved,
       savedCount,
       steps.length,
       submissionUrl,
@@ -1681,8 +1687,9 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
       reset,
       unregister,
       activeStep,
-      hasUserEditedEventSteps,
       hasUserEditedStep0,
+      editedSections,
+      hasUserEditedEventSteps,
       hasUserEditedStep4,
       hasUserEditedStep5,
       eventData,

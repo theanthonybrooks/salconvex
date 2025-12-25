@@ -551,7 +551,7 @@ export const createNotification = mutation({
       redirectUrl,
       dedupeKey,
     } = args;
-    console.log(deadline);
+    console.log(displayText);
     await upsertNotification(ctx, {
       type,
       userId,

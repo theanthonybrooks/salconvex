@@ -684,9 +684,9 @@ export const changeOCStatus = mutation({
           targetUserType: "artist",
           minPlan: 2,
           redirectUrl: `/thelist/event/${prevEvent.slug}/${prevEvent.dates.edition}/call`,
-          displayText: "New Open Call Added",
+          displayText: approvedBy ? `Open Call Updated` : `New Open Call Added`,
           description: `${prevEvent.name}`,
-          dedupeKey: `oc-${oc._id}-published`,
+          dedupeKey: `oc-${oc._id}-${approvedBy ? "updated" : "published"}`,
           eventId: prevEvent._id,
         });
         if (prevEvent.category === "event") {
@@ -695,7 +695,7 @@ export const changeOCStatus = mutation({
             displayText: "New Event Added",
             description: `${prevEvent.name}`,
             redirectUrl: `/thelist/event/${prevEvent.slug}/${prevEvent.dates.edition}`,
-            dedupeKey: `event-${prevEvent._id}-added`,
+            dedupeKey: `event-${prevEvent._id}-${approvedBy ? "updated" : "added"}`,
             eventId: prevEvent._id,
           });
         }
@@ -782,26 +782,3 @@ export const getOpenCallAppLink = query({
     return openCall.requirements?.applicationLink;
   },
 });
-
-// export const createOpenCallNotification = mutation({
-//   args: {
-//     mode: v.union(v.literal("publish"), v.literal("submit")),
-//     eventSlug: v.string(),
-//     edition: v.number(),
-//     openCallId: v.id("openCalls"),
-//   },
-//   handler: async (ctx, args) => {
-//     const { mode, eventSlug, edition, openCallId } = args;
-//     await upsertNotification(ctx, {
-//       type: "newOpenCall",
-//       userId: null,
-//       targetRole: "all",
-//       targetUserType: "artist",
-//       importance: "medium",
-//       minPlan: 2,
-//       redirectUrl: `/thelist/event/${eventSlug}/${edition}/call`,
-//       displayText: "New Open Call Added",
-//       dedupeKey: `oc-${openCallId}-added`,
-//     });
-//   },
-// });
