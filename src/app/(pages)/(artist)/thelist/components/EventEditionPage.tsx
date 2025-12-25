@@ -30,8 +30,6 @@ const EventEditionDetail = ({ preloaded }: EventDetailProps) => {
   const artist = artistData?.artist;
   const isOwner = user?._id === data.organizer.ownerId;
 
-  if (!data) return <EventSkeleton />;
-
   return (
     <>
       <SalBackNavigation
@@ -41,16 +39,22 @@ const EventEditionDetail = ({ preloaded }: EventDetailProps) => {
         isOwner={isOwner}
       />
 
-      <EventCardDetailMobile
-        data={data}
-        artist={artist}
-        className="lg:hidden"
-      />
-      <EventCardDetailDesktop
-        data={data}
-        artist={artist}
-        className="hidden lg:block"
-      />
+      {!data ? (
+        <EventSkeleton />
+      ) : (
+        <>
+          <EventCardDetailMobile
+            data={data}
+            artist={artist}
+            className="lg:hidden"
+          />
+          <EventCardDetailDesktop
+            data={data}
+            artist={artist}
+            className="hidden lg:block"
+          />
+        </>
+      )}
     </>
   );
 };

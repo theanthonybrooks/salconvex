@@ -857,14 +857,17 @@ export const getOrganizerBySlug = query({
 
     // console.log(organizer);
 
-    if (!organizer)
-      throw new ConvexError(`No organizer found for ${args.slug}`);
+    if (!organizer || (!userIsOrganizer && !organizer.isComplete))
+      throw new ConvexError({
+        code: "ORGANIZATION_NOT_FOUND",
+        message: `No organizer found for ${args.slug}`,
+      });
 
-    if (organizer.isComplete === false) {
-      if (userIsOrganizer) {
-        throw new ConvexError(`Organizer is not complete for ${args.slug}`);
-      }
-      throw new ConvexError(`No organizer found for ${args.slug}`);
+    if (!organizer.isComplete) {
+      throw new ConvexError({
+        code: "INCOMPLETE_ORGANIZER",
+        message: `Organizer is not complete for ${args.slug}`,
+      });
     }
     const [publishedEvents, archivedEvents] = await Promise.all([
       ctx.db

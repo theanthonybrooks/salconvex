@@ -18,7 +18,7 @@ const linkVariants = cva(
         subtle: "text-muted-foreground hover:text-foreground",
         subtleUnderline:
           "text-muted-foreground decoration-foreground underline-offset-2 hover:text-foreground hover:underline",
-        bold: "font-semibold underline hover:underline-offset-2",
+        bold: "font-semibold underline underline-offset-2 hover:underline-offset-1",
         standard: "",
       },
     },

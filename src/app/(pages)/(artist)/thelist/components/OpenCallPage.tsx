@@ -32,10 +32,6 @@ const OpenCallDetail = ({ preloaded }: OpenCallDetailProps) => {
     user?._id === data?.organizer?.ownerId ||
     Boolean(user && data?.organizer?.allowedEditors.includes(user._id));
 
-  // console.log("isOwner: ", isOwner, data);
-
-  if (!data) return <EventSkeleton />;
-
   return (
     <>
       <SalBackNavigation
@@ -44,19 +40,24 @@ const OpenCallDetail = ({ preloaded }: OpenCallDetailProps) => {
         isOwner={isOwner}
         activeSub={hasActiveSubscription}
       />
-
-      <OpenCallCardDetailMobile
-        data={data}
-        artist={artistData?.artist}
-        className="lg:hidden"
-        userPref={userPref}
-      />
-      <OpenCallCardDetailDesktop
-        data={data}
-        artist={artistData?.artist}
-        className="hidden lg:block"
-        userPref={userPref}
-      />
+      {!data ? (
+        <EventSkeleton />
+      ) : (
+        <>
+          <OpenCallCardDetailMobile
+            data={data}
+            artist={artistData?.artist}
+            className="lg:hidden"
+            userPref={userPref}
+          />
+          <OpenCallCardDetailDesktop
+            data={data}
+            artist={artistData?.artist}
+            className="hidden lg:block"
+            userPref={userPref}
+          />
+        </>
+      )}
     </>
     // </OpenCallDetailWrapper>
   );

@@ -59,13 +59,6 @@ export const OrganizerCardDetailDesktop = (props: OrganizerCardProps) => {
     //  links
   } = organizer;
 
-  // const { bookmarked, hidden } = artist?.listActions?.find(
-  //   (la) => la.eventId === event._id,
-  // ) ?? {
-  //   bookmarked: false,
-  //   hidden: false,
-  // };
-
   const groupedEvents = events?.reduce(
     (acc, event) => {
       const edition = event.dates.edition;

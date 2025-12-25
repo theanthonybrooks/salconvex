@@ -60,7 +60,6 @@ const OpenCallPage = async ({ params }: ParamsYearProps) => {
     if (error instanceof ConvexError) {
       const errorCode = (error.data as { code?: string }).code;
       if (errorCode === "OPEN_CALL_NOT_FOUND") {
-        console.log("redirecting");
         redirect(`/thelist/event/${slug}/${year}`);
       } else {
         notFound();

@@ -1,4 +1,3 @@
-import { ArtistFull } from "@/types/artist";
 import { EventData } from "@/types/eventTypes";
 
 import type { LinksType, OrgLocation, PrimaryContact } from "~/convex/schema";
@@ -96,7 +95,6 @@ export type OrgEventData = EventData & {
 
 export interface OrganizerCardProps {
   data: { events: EventData[] | null; organizer: Organizer };
-  artist?: ArtistFull | null; //todo:make this required
   className?: string;
 }
 
