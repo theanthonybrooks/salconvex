@@ -183,7 +183,9 @@ export const unarchiveNotification = mutation({
         dismissed: false,
       });
     } else {
-      const userNotifications = notifications.filter((n) => n.userId);
+      const userNotifications = notifications.filter(
+        (n) => n.userId === userId,
+      );
 
       for (const userNotification of userNotifications) {
         await ctx.db.delete("notifications", userNotification._id);

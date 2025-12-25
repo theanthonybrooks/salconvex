@@ -290,12 +290,13 @@ export const NotificationsDropdown = ({
           <TabsContent value="all" className="scrollable mini max-h-[50dvh]">
             {uniqueNotifications.length > 0 ? (
               <DropdownMenuGroup>
-                {uniqueNotifications.map((notification) => (
+                {uniqueNotifications.map((notification, i) => (
                   <NotificationDropdownItem
                     key={notification._id}
                     notification={notification}
                     handleClearNotifications={handleClearNotifications}
                     user={user}
+                    className={cn(i % 2 !== 0 && "bg-muted-foreground/5")}
                   />
                 ))}
               </DropdownMenuGroup>
@@ -311,12 +312,13 @@ export const NotificationsDropdown = ({
             >
               {hasAdminNotifications ? (
                 <DropdownMenuGroup>
-                  {adminNotifications.map((notification) => (
+                  {adminNotifications.map((notification, i) => (
                     <NotificationDropdownItem
                       key={notification._id}
                       notification={notification}
                       handleClearNotifications={handleClearNotifications}
                       user={user}
+                      className={cn(i % 2 !== 0 && "bg-muted-foreground/5")}
                     />
                   ))}
                 </DropdownMenuGroup>
@@ -333,12 +335,13 @@ export const NotificationsDropdown = ({
             >
               {hasArtistNotifications ? (
                 <DropdownMenuGroup>
-                  {artistNotifications.map((notification) => (
+                  {artistNotifications.map((notification, i) => (
                     <NotificationDropdownItem
                       key={notification._id}
                       notification={notification}
                       handleClearNotifications={handleClearNotifications}
                       user={user}
+                      className={cn(i % 2 !== 0 && "bg-muted-foreground/5")}
                     />
                   ))}
                 </DropdownMenuGroup>
@@ -354,12 +357,13 @@ export const NotificationsDropdown = ({
             >
               {hasOrganizerNotifications ? (
                 <DropdownMenuGroup>
-                  {organizerNotifications.map((notification) => (
+                  {organizerNotifications.map((notification, i) => (
                     <NotificationDropdownItem
                       key={notification._id}
                       notification={notification}
                       handleClearNotifications={handleClearNotifications}
                       user={user}
+                      className={cn(i % 2 !== 0 && "bg-muted-foreground/5")}
                     />
                   ))}
                 </DropdownMenuGroup>
@@ -374,12 +378,13 @@ export const NotificationsDropdown = ({
           >
             <DropdownMenuGroup>
               {userDismissedNotifications.length > 0 ? (
-                userDismissedNotifications.map((notification) => (
+                userDismissedNotifications.map((notification, i) => (
                   <NotificationDropdownItem
                     key={notification._id}
                     notification={notification}
                     handleClearNotifications={handleClearNotifications}
                     user={user}
+                    className={cn(i % 2 !== 0 && "bg-muted-foreground/5")}
                     archived
                   />
                 ))
@@ -429,11 +434,13 @@ const NotificationDropdownItem = ({
   handleClearNotifications,
   archived,
   user,
+  className,
 }: {
   user: User;
   notification: NotificationItemType;
   handleClearNotifications: (notificationId?: Id<"notifications">) => void;
   archived?: boolean;
+  className?: string;
 }) => {
   // const router = useRouter();
   const { preloadedSubStatus } = useConvexPreload();
@@ -504,6 +511,7 @@ const NotificationDropdownItem = ({
       className={cn(
         "group w-full",
         !archived && importance === "high" && "bg-salPinkLt/70",
+        className,
       )}
       asChild
     >

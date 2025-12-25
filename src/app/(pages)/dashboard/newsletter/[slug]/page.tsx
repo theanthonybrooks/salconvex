@@ -13,22 +13,9 @@ export default async function AdminPage({ params }: ParamsProps) {
 
   const token = await convexAuthNextjsToken();
   if (!token) redirect("/auth/sign-in");
-  const subscription = await fetchQuery(
-    api.subscriptions.getUserSubscription,
-    {},
-    { token },
-  );
+
   const isAdmin = await fetchQuery(api.users.isAdmin, {}, { token });
-
-  const subStatus = subscription?.status;
-  // console.log(isAdmin);
-  // if (!isAdmin) {
-  //   if (!subStatus || subStatus === "canceled") {
-  //     redirect("/dashboard/settings");
-  //   }
-
-  //   redirect("/dashboard");
-  // }
+  if (!isAdmin) redirect("/dashboard");
 
   switch (slug) {
     case "audience":

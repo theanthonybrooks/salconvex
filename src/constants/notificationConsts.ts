@@ -97,4 +97,5 @@ export const SUB_NOTIFICATION_TYPES = [
 export const SOCIAL_NOTIFICATION_TYPES = [
   "newSocial",
   "socialUpdated",
+  "socialReminder",
 ] as const;
