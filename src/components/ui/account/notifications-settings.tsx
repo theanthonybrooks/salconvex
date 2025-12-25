@@ -301,6 +301,7 @@ export const NotificationsSettings = () => {
                           social: {
                             scheduled: true,
                             unscheduled: true,
+                            reminder: true,
                           },
                           newsletter: {
                             campaign: {
@@ -863,6 +864,7 @@ export const NotificationsSettings = () => {
                         social: {
                           scheduled: value,
                           unscheduled: value,
+                          reminder: value,
                         },
                       }),
                     sectionToggleValue: hasAnyTrueValue(
@@ -905,6 +907,26 @@ export const NotificationsSettings = () => {
                           social: {
                             ...inAppNotifications?.social,
                             unscheduled: value,
+                          },
+                        })
+                      }
+                    />
+                  </SectionItem>
+                  <SectionItem
+                    icon={Bell}
+                    title="Post Reminders"
+                    description="Receive notifications on days with scheduled posts"
+                    type="toggle"
+                    fontSize={fontSize}
+                  >
+                    <Switch
+                      disabled={pending}
+                      checked={inAppNotifications?.social?.reminder ?? false}
+                      onCheckedChange={(value) =>
+                        handleUpdateinAppNotifications({
+                          social: {
+                            ...inAppNotifications?.social,
+                            reminder: value,
                           },
                         })
                       }

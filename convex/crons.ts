@@ -48,6 +48,12 @@ crons.interval(
   internal.newsletter.campaign.processScheduledCampaigns,
 );
 
+crons.daily(
+  "remind admins of upcoming social posts",
+  { hourUTC: 6, minuteUTC: 0 }, // Run daily  UTC (-1 from Berlin)
+  internal.events.socials.sendSocialReminderNotification,
+);
+
 // crons.hourly(
 //   "Delete unconfirmed users",
 //   { minuteUTC: 0 }, // Run hourly  UTC (-1 from Berlin)

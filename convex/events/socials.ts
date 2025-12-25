@@ -1,6 +1,8 @@
+import { endOfToday, startOfToday, subHours } from "date-fns";
+
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { internal } from "~/convex/_generated/api";
-import { mutation, query } from "~/convex/_generated/server";
+import { internalMutation, mutation, query } from "~/convex/_generated/server";
 import { upsertNotification } from "~/convex/general/notifications";
 import { v } from "convex/values";
 
@@ -173,5 +175,34 @@ export const getNumberOfQueuedEvents = query({
     const numberOfQueuedEvents = socialsEvents.length ?? 0;
 
     return { success: true, data: numberOfQueuedEvents, error: null };
+  },
+});
+
+export const sendSocialReminderNotification = internalMutation({
+  args: {},
+  handler: async (ctx) => {
+    const startOfDay = subHours(startOfToday(), 1);
+    const endOfDay = subHours(endOfToday(), 1);
+
+    const socialPostResults = await ctx.db
+      .query("events")
+      .withIndex("by_posted_postPlannedDate", (q) =>
+        q
+          .eq("posted", "toPost")
+          .gte("postPlannedDate", startOfDay.getTime())
+          .lte("postPlannedDate", endOfDay.getTime()),
+      )
+      .collect();
+
+    if (!socialPostResults || socialPostResults.length === 0) return;
+    await upsertNotification(ctx, {
+      type: "socialReminder",
+      targetRole: "admin",
+      importance: "high",
+      redirectUrl: `/dashboard/admin/socials?id=${socialPostResults[0]._id}`,
+      displayText: "Post Reminder",
+      description: `${socialPostResults[0].name}${socialPostResults.length > 1 ? `+ ${socialPostResults.length - 1} more` : ""} scheduled today`,
+      dedupeKey: `social-${socialPostResults[0]._id}-reminder`,
+    });
   },
 });

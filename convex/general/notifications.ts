@@ -95,6 +95,9 @@ export function isNotificationEnabled(
     case "socialUpdated":
       enabled = prefs.social?.scheduled ?? false;
       break;
+    case "socialReminder":
+      enabled = prefs.social?.reminder ?? false;
+      break;
 
     // newsletter
     case "campaignCreated":

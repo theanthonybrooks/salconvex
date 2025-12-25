@@ -74,6 +74,7 @@ export const notificationTypeIconMap: Record<NotificationType, IconType> = {
   //
   newSocial: FaMobileAlt,
   socialUpdated: CalendarCheck,
+  socialReminder: Bell,
   //
   campaignCreated: Mails,
   campaignCompleted: MailCheck,

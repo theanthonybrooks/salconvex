@@ -78,6 +78,7 @@ export const notificationTypeValidator = v.union(
   //social
   v.literal("newSocial"),
   v.literal("socialUpdated"),
+  v.literal("socialReminder"),
   //newsletter
   v.literal("campaignCreated"),
   v.literal("campaignCompleted"),
@@ -153,6 +154,7 @@ export const inAppNotificationValidator = v.object({
     v.object({
       scheduled: v.optional(v.boolean()),
       unscheduled: v.optional(v.boolean()),
+      reminder: v.optional(v.boolean()),
     }),
   ),
   newsletter: v.optional(
