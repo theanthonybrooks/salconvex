@@ -81,7 +81,7 @@ export const BasicPagination = ({
                   Results: {totalResults}
                 </p>
               )}
-              {showOCTotal && totalOpenCalls && (
+              {showOCTotal && Boolean(totalOpenCalls) && (
                 <div className="flex items-center gap-5">
                   <p className={cn("mx-auto text-nowrap text-center")}>
                     Active Calls: {totalOpenCalls}

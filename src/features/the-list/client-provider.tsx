@@ -170,7 +170,7 @@ export const EventListProvider = ({
   const currentSearch: SearchParams = {
     searchTerm: searchParams.get("term") ?? "",
     searchType:
-      ((searchParams.get("st") as SearchType) ?? isAdmin) ? "all" : "events",
+      (searchParams.get("st") as SearchType) ?? (isAdmin ? "all" : "events"),
   };
 
   const [filters, setFilters] = useState<Filters>(currentFilters);
@@ -227,7 +227,12 @@ export const EventListProvider = ({
           setParamIfNotDefault(params, "term", search.searchTerm, "");
 
           if (search.searchTerm) {
-            setParamIfNotDefault(params, "st", search.searchType, "all");
+            setParamIfNotDefault(
+              params,
+              "st",
+              search.searchType,
+              isAdmin ? "all" : "events",
+            );
           } else {
             params.delete("st");
           }
@@ -241,7 +246,7 @@ export const EventListProvider = ({
         },
         0,
       ),
-    [defaultSort.sortBy],
+    [defaultSort.sortBy, isAdmin],
   );
 
   useEffect(() => {
