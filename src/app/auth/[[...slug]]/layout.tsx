@@ -1,8 +1,10 @@
+import type { ReactNode } from "react";
+
 import React from "react";
 
-interface AuthLayoutProps {
-  children?: React.ReactNode;
-}
+type AuthLayoutProps = {
+  children?: ReactNode;
+};
 
 // Extend React.FC with a static "theme" property
 interface PageWithTheme extends React.FC<AuthLayoutProps> {
