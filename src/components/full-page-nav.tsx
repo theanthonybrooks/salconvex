@@ -372,7 +372,7 @@ const FullPageNav = ({
           />
         </div>
       </div>
-      ref
+
       <AnimatePresence>
         {/* //---------------------- Block/Flex? (Mobile) Layout ---------------------- */}
 
