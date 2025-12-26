@@ -175,13 +175,6 @@ const EventCardPreview = ({
   //Todo: Add functionality that provides info for upcoming open calls as well. Maybe.
   // const isUpcoming =  basicInfo && budget && eligibility && openCallStatus === "coming-soon"
 
-  // const userCurrency = userPref?.currency ?? ""
-
-  // const linkPath =
-  //   !publicView || publicPreview || isUserOrg
-  //     ? `/thelist/event/${slug}/${event.dates.edition}${openCallStatus ? "/call" : ""}${openCallStatus === "ended" ? "?tab=event" : null}`
-  //     : "/pricing?type=artist";
-
   const linkPath = formatEventLink(
     event,
     hasValidSub || (publicPreview && !eventView) || isUserOrg,
@@ -199,7 +192,7 @@ const EventCardPreview = ({
 
   const onBookmark = async () => {
     if (publicView) {
-      router.push("/pricing?type=artist");
+      router.push("/pricing");
     } else {
       const newBookmarkState = !isBookmarkedOptimistic;
       setIsBookmarkedOptimistic(newBookmarkState);
@@ -225,7 +218,7 @@ const EventCardPreview = ({
 
   const onHide = async () => {
     if (publicView) {
-      router.push("/pricing?type=artist");
+      router.push("/pricing");
     } else {
       toggleListAction({ hidden: !hidden });
       try {
@@ -278,7 +271,7 @@ const EventCardPreview = ({
               });
             }
             if (!publicPreview && !hasValidSub && !eventView) {
-              router.push("/pricing?type=artist");
+              router.push("/pricing");
             } else {
               router.push(linkPath);
             }
@@ -597,7 +590,7 @@ const EventCardPreview = ({
                   });
                 }
                 if (!publicPreview && !hasValidSub && !eventView) {
-                  router.push("/pricing?type=artist");
+                  router.push("/pricing");
                 } else {
                   router.push(linkPath);
                 }

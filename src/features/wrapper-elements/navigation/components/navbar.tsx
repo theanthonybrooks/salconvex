@@ -508,26 +508,32 @@ export default function NavBar() {
                   </NavigationMenuList>
                 </NavigationMenu>
 
-                {filteredNavbarLinks.map((link) => (
-                  <Button
-                    asChild
-                    key={link.title}
-                    className={cn(
-                      "border-2 border-transparent bg-transparent font-semibold text-foreground hover:border-foreground/70 hover:bg-card/20",
-                    )}
-                    variant={link.isIcon ? "icon" : "default"}
-                    size={link.isIcon ? "icon" : "default"}
-                  >
-                    <Link
-                      href={link.href}
-                      prefetch={true}
-                      className="!text-base"
-                      variant="standard"
+                {filteredNavbarLinks.map((link) => {
+                  const activeLink =
+                    link.href.includes(currentPage) && currentPage !== "";
+                  return (
+                    <Button
+                      asChild
+                      key={link.title}
+                      className={cn(
+                        "border-2 border-transparent bg-transparent font-semibold text-foreground hover:border-foreground/70 hover:bg-card/20",
+                        activeLink &&
+                          "border-foreground/50 hover:border-foreground/70",
+                      )}
+                      variant={link.isIcon ? "icon" : "default"}
+                      size={link.isIcon ? "icon" : "default"}
                     >
-                      {link.isIcon ? link.icon : link.title}
-                    </Link>
-                  </Button>
-                ))}
+                      <Link
+                        href={link.href}
+                        prefetch={true}
+                        className="!text-base"
+                        variant="standard"
+                      >
+                        {link.isIcon ? link.icon : link.title}
+                      </Link>
+                    </Button>
+                  );
+                })}
               </motion.div>
 
               {!user && (
@@ -650,9 +656,6 @@ export const ListItem = React.forwardRef<
           {...props}
         >
           <div className="text-base font-medium leading-none">{title}</div>
-          {/* <p className="line-clamp-2 text-sm leading-snug text-foreground">
-            {children}
-          </p> */}
         </Link>
       </NavigationMenuLink>
     </div>

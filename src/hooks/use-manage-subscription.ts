@@ -1,11 +1,13 @@
-import { getSubscriptionStatusVals } from "@/helpers/subscriptionFns";
-import { getExternalRedirectHtml } from "@/utils/loading-page-html";
-import { useAction } from "convex/react";
-import { ConvexError } from "convex/values";
 import { useRouter } from "next/navigation";
+import { getExternalRedirectHtml } from "@/utils/loading-page-html";
 import { toast } from "react-toastify";
+
+import { getSubscriptionStatusVals } from "@/helpers/subscriptionFns";
+
 import { api } from "~/convex/_generated/api";
 import { UserSubscriptionType } from "~/convex/schema";
+import { useAction } from "convex/react";
+import { ConvexError } from "convex/values";
 
 export type ManageSubscriptionArgs = {
   subscription?: UserSubscriptionType | null;
@@ -32,7 +34,7 @@ export function useManageSubscription({
     let newTab: Window | null | undefined;
 
     if (currentlyCanceled && type === "existing") {
-      router.push("/pricing?type=artist");
+      router.push("/pricing");
       return;
     }
 

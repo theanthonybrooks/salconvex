@@ -35,7 +35,7 @@ export default async function OrganizerPage({
     !user?.accountType?.includes("organizer")
   ) {
     if (!subStatus || subStatus === "canceled") {
-      redirect("/pricing?type=artist");
+      redirect("/submit");
     }
     redirect("/dashboard");
   }

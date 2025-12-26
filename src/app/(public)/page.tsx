@@ -32,7 +32,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
-import Pricing from "@/features/homepage/pricing";
+import { PricingWrapper } from "@/features/homepage/pricingWrapper";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { cn } from "@/helpers/utilsFns";
 
@@ -486,7 +486,7 @@ export default function Home() {
               events.{" "}
             </p>
           </div>
-          {!hasActiveSubscription && <Pricing />}
+          {!hasActiveSubscription && <PricingWrapper page="other" />}
         </div>
       </section>
 

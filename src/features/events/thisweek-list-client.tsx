@@ -17,7 +17,7 @@ import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import EventCardPreview from "@/features/events/event-card-preview";
 import { getGroupKeyFromEvent } from "@/features/events/helpers/groupHeadings";
-import Pricing from "@/features/homepage/pricing";
+import { PricingWrapper } from "@/features/homepage/pricingWrapper";
 // import { format } from "date-fns"
 // import { MergedEventPreviewData } from "@/types/event";
 
@@ -254,7 +254,7 @@ const ClientThisWeekList = (
 
           {hasResults ? (
             groupedEvents.map((group, index) => {
-              const isEndedGroup = !!group.title.parts?.year;
+              const isEndedGroup = !!group.title.isEnded;
 
               const isFirstEnded =
                 isEndedGroup &&
@@ -349,7 +349,7 @@ const ClientThisWeekList = (
                   if (subStatus?.subStatus === "past_due") {
                     router.push("/dashboard/billing");
                   } else {
-                    router.push("/pricing?type=artist");
+                    router.push("/pricing");
                   }
                 }}
               >
@@ -363,7 +363,7 @@ const ClientThisWeekList = (
               </p>
             </div>
           </div>
-          <Pricing />
+          <PricingWrapper page="other" />
         </div>
       )}
     </>

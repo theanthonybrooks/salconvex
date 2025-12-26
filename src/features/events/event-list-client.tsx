@@ -20,7 +20,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import EventCardPreview from "@/features/events/event-card-preview";
 import { EventFilters } from "@/features/events/event-list-filters";
 import { getGroupKeyFromEvent } from "@/features/events/helpers/groupHeadings";
-import Pricing from "@/features/homepage/pricing";
+import { PricingWrapper } from "@/features/homepage/pricingWrapper";
 import { useEventListContext } from "@/features/the-list/client-provider";
 import { useArtistPreload } from "@/features/wrapper-elements/artist-preload-context";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
@@ -643,7 +643,7 @@ const ClientEventList = () => {
             <br />
             All plans have a two week free trial that you can cancel at any time
           </h2>
-          <Pricing />
+          <PricingWrapper page="other" />
         </div>
       )}
     </>
@@ -683,7 +683,7 @@ const PublicHeader = ({
             if (subStatus === "past_due") {
               router.push("/dashboard/billing");
             } else {
-              router.push("/pricing?type=artist");
+              router.push("/pricing");
             }
           }}
         >

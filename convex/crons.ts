@@ -50,47 +50,8 @@ crons.interval(
 
 crons.daily(
   "remind admins of upcoming social posts",
-  { hourUTC: 6, minuteUTC: 0 }, // Run daily  UTC (-1 from Berlin)
+  { hourUTC: 6, minuteUTC: 0 }, // Run daily  UTC
   internal.events.socials.sendSocialReminderNotification,
 );
-
-// crons.hourly(
-//   "Delete unconfirmed users",
-//   { minuteUTC: 0 }, // Run hourly  UTC (-1 from Berlin)
-//   internal.users.deleteUnconfirmedUsers,
-// );
-// crons.hourly(
-//   "Delete unconfirmed users (15)",
-//   { minuteUTC: 15 }, // Run hourly  UTC (-1 from Berlin)
-//   internal.users.deleteUnconfirmedUsers,
-// );
-// crons.hourly(
-//   "Delete unconfirmed users (30)",
-//   { minuteUTC: 30 }, // Run hourly  UTC (-1 from Berlin)
-//   internal.users.deleteUnconfirmedUsers,
-// );
-// crons.hourly(
-//   "Delete unconfirmed users (45)",
-//   { minuteUTC: 45 }, // Run hourly  UTC (-1 from Berlin)
-//   internal.users.deleteUnconfirmedUsers,
-// );
-
-// crons.hourly(
-//   "archive expired open calls",
-//   { minuteUTC: 0 },
-//   internal.openCalls.openCall.archiveExpiredOpenCalls,
-// );
-
-// crons.hourly(
-//   "archive expired open calls (30)",
-//   { minuteUTC: 30 },
-//   internal.openCalls.openCall.archiveExpiredOpenCalls,
-// );
-
-// crons.hourly(
-//   "delete orphaned user passwords",
-//   { minuteUTC: 0 },
-//   internal.users.deleteOrphanedUserPw,
-// );
 
 export default crons;

@@ -1,10 +1,12 @@
 import { CancelReasonLabels, FeedbackLabels } from "@/constants/stripe";
 import { intervalToLetter, userPlans } from "@/constants/subscriptions";
-import { getExternalRedirectHtml } from "@/utils/loading-page-html";
-import { ConvexError } from "convex/values";
+
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
+import { getExternalRedirectHtml } from "@/utils/loading-page-html";
 import { toast } from "react-toastify";
+
 import { UserSubscriptionType } from "~/convex/schema";
+import { ConvexError } from "convex/values";
 
 export function formatSubscriptionLabel(planName: string, interval: string) {
   if (!userPlans[planName]) return "";
@@ -197,7 +199,7 @@ export async function handleManageSubscription({
   }
 
   if (currentlyCanceled) {
-    router.push("/pricing?type=artist");
+    router.push("/pricing");
     return;
   }
 

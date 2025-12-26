@@ -55,7 +55,7 @@ export default async function DashboardLayout({
   if (!user) redirect("/auth/sign-in");
   const isAdmin = user.role.includes("admin") || user.role.includes("creator");
 
-  if (!subStatus && !isAdmin) redirect("/pricing?type=artist");
+  if (!subStatus && !isAdmin) redirect("/pricing");
 
   return <DashboardWrapper>{children}</DashboardWrapper>;
 }

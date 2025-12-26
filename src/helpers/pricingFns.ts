@@ -1,4 +1,4 @@
-import type { UserCurrenciesType } from "@/features/homepage/pricing";
+import type { UserCurrenciesType } from "@/features/homepage/userPricing";
 
 import type { StripeIntervalPricesType } from "~/convex/schema";
 

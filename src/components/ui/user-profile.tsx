@@ -312,7 +312,7 @@ export function UserProfile({
                 asChild
               >
                 <Link
-                  href="/pricing?type=artist"
+                  href="/pricing"
                   className="underline-offset-2 hover:cursor-pointer hover:underline"
                 >
                   <PiPiggyBank className="mr-2 size-4" />

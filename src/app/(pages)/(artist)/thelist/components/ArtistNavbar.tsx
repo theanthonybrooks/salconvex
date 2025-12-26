@@ -210,7 +210,7 @@ export default function TheListNavBar() {
           {user === null && (
             <>
               <Link
-                href="/pricing?type=artist"
+                href="/pricing"
                 prefetch={true}
                 className="hidden px-8 font-bold lg:flex"
               >

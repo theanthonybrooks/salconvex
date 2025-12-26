@@ -100,7 +100,7 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
 
   const onBookmark = async () => {
     if (!hasActiveSubscription) {
-      router.push("/pricing?type=artist");
+      router.push("/pricing");
     } else {
       if (!isAdmin && !bookmarked && !isUserOrg) {
         updateEventAnalytics({
@@ -120,7 +120,7 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
 
   const onHide = async () => {
     if (!hasActiveSubscription) {
-      router.push("/pricing?type=artist");
+      router.push("/pricing");
     } else {
       if (!isAdmin && !hidden && !isUserOrg) {
         updateEventAnalytics({

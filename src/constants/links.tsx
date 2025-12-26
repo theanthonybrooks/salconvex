@@ -677,7 +677,7 @@ export const linktreeLinks: LinktreeProps[] = [
   {
     label: "Become a member",
     icon: Heart,
-    path: "/pricing?type=artist",
+    path: "/pricing",
     group: "Membership",
     type: "becomeMember",
   },

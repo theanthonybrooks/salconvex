@@ -298,7 +298,7 @@ const FullPageNav = ({
   const [activeCategory, setActiveCategory] = useState<string | null>(
     mainMenuItems.find((section) =>
       section.items.some((item) => item.path === pathname),
-    )?.title || "The List",
+    )?.title || null,
   );
   const activeMenuItems = mainMenuItems.find(
     (section) => section.title === activeCategory,
@@ -306,25 +306,12 @@ const FullPageNav = ({
 
   const isPricingPage = pathname.startsWith("/pricing");
 
-  const [currentPage, setCurrentPage] = useState<Location | null>(null);
-  // console.log(currentPage);
-  useEffect(() => {
-    setCurrentPage(window.location);
-  }, []);
-
   useEffect(() => {
     if (isOpen === "open") {
       setFreshOpen(true);
       document.body.classList.add("no-scroll");
-      setActiveCategory(
-        () =>
-          mainMenuItems.find((section) =>
-            section.items.some((item) => item.path === pathname),
-          )?.title || "The List",
-      );
     } else {
       document.body.classList.remove("no-scroll");
-      setActiveCategory("");
       setFreshOpen(false);
     }
     return () => {
@@ -348,7 +335,6 @@ const FullPageNav = ({
           className="absolute right-0 top-0 h-dvh w-screen origin-top-right bg-foreground/20 backdrop-blur-md"
         />
       </AnimatePresence>
-
       {/* Menu Button + Theme Toggle*/}
       <div
         className={cn(
@@ -385,30 +371,9 @@ const FullPageNav = ({
             setState={setIsOpen}
           />
         </div>
-        {/* <Button
-          variant="salWithShadowHidden"
-          onClick={() =>
-            setIsOpen(
-              isOpen === "initial"
-                ? "open"
-                : isOpen === "open"
-                  ? "closed"
-                  : "open",
-            )
-          }
-          className={cn(
-            "w-[6em] bg-background font-bold",
-            isOpen === "open" ? "bg-salPink" : "bg-background",
-          )}
-        >
-          {isOpen === "open" ? "CLOSE" : "MENU"}
-        </Button> */}
       </div>
-
-      {/* /~ Fullscreen Menu Overlay ~/ */}
+      ref
       <AnimatePresence>
-        {/* Expanding content */}
-
         {/* //---------------------- Block/Flex? (Mobile) Layout ---------------------- */}
 
         <motion.div
@@ -505,7 +470,6 @@ const FullPageNav = ({
                 )}
               >
                 {mainMenuItems.map((section) => {
-                  // console.log(mainMenuItems, "section: ", section);
                   const isExpanded =
                     activeCategory === section.title && !freshOpen;
                   const filteredItems = section.items.filter((item) => {
@@ -628,17 +592,6 @@ const FullPageNav = ({
                 })}
               </ul>
 
-              {/* <div
-                className={cn(
-                  "font-foreground m-x-auto w-full border-b-2 border-foreground px-9 py-5 text-center font-tanker text-[4rem] lowercase",
-                )}
-              >
-                <Link onClick={onHandleLinkClick} href={"/submit"}>
-                  <p className="focus:underline focus:decoration-[5px] focus:underline-offset-4 active:scale-95 active:underline active:decoration-[5px] active:underline-offset-4">
-                    Submit
-                  </p>
-                </Link>
-              </div> */}
               <Unauthenticated>
                 {!isPricingPage && (
                   <div
@@ -803,7 +756,6 @@ const FullPageNav = ({
                           });
 
                           if (filteredItems.length === 0) return null;
-
                           return (
                             <li
                               key={`${section.title}-desktopCat`}
@@ -814,7 +766,6 @@ const FullPageNav = ({
                                 className={cn(
                                   "cursor-pointer transition-transform duration-300 ease-in-out hover:translate-x-3 active:scale-95",
                                   activeCategory === section.title &&
-                                    !currentPage?.search?.includes("?submit") &&
                                     "text-white stroked wshadow",
 
                                   // activeCategory === section.title &&
@@ -838,8 +789,8 @@ const FullPageNav = ({
                             <p
                               className={cn(
                                 "cursor-pointer transition-transform duration-300 ease-in-out hover:translate-x-3 active:scale-95",
-                                currentPage?.pathname?.includes("/pricing") &&
-                                  !currentPage.search?.includes("?submit") &&
+                                pathname?.includes("/pricing") &&
+                                  !activeCategory &&
                                   "text-white stroked wshadow",
                               )}
                             >
@@ -851,7 +802,8 @@ const FullPageNav = ({
                           <p
                             className={cn(
                               "cursor-pointer transition-transform duration-300 ease-in-out hover:translate-x-3 active:scale-95",
-                              currentPage?.search?.includes("?submit") &&
+                              pathname?.includes("/submit") &&
+                                !activeCategory &&
                                 "text-white stroked wshadow",
                             )}
                           >

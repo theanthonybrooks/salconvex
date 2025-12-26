@@ -13,7 +13,7 @@ const BOT_UA_REGEX =
 
 const isAuthPage = createRouteMatcher(["/auth/:path*"]);
 const isDashboardPage = createRouteMatcher(["/dashboard/:path*"]);
-const isSubmitPage = createRouteMatcher(["/submit"]);
+// const isSubmitPage = createRouteMatcher(["/submit"]);
 // const isOpenCallPage = createRouteMatcher([
 //   "/thelist/event/:slug/:year/call",
 //   "/thelist/event/:slug/:year/call/:path*",
@@ -67,12 +67,6 @@ export default convexAuthNextjsMiddleware(
       if (isDashboardPage(request)) {
         return NextResponse.redirect(new URL("/auth/sign-in", request.url));
       }
-    }
-
-    if (isSubmitPage(request)) {
-      return NextResponse.redirect(
-        new URL("/pricing?type=organizer", request.url),
-      );
     }
 
     // if (isOpenCallPage(request) && !isAuthenticated) {

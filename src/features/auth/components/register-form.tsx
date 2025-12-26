@@ -300,15 +300,11 @@ const RegisterForm = ({ switchFlow }: RegisterFormProps) => {
 
           if (callBackSrc && callBackSrc === "newUser") {
             sessionStorage.removeItem("src");
-            router.replace(
-              `/pricing?type=${isOrganizerType ? "organizer" : "artist"}`,
-            );
+            router.replace(`${isOrganizerType ? "/submit" : "/pricing"}`);
           } else if (prevSalPage) {
             router.replace(prevSalPage);
           } else {
-            router.replace(
-              `/pricing?type=${isOrganizerType ? "organizer" : "artist"}`,
-            );
+            router.replace(`${isOrganizerType ? "/submit" : "/pricing"}`);
           }
         }
       } catch (error) {

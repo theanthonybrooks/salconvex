@@ -1,4 +1,5 @@
 import { format } from "date-fns";
+
 import { FaExclamationTriangle } from "react-icons/fa";
 
 import { Link } from "@/components/ui/custom-link";
@@ -77,7 +78,7 @@ export const CanceledBanner = ({
               Your membership has been canceled.{" "}
               <Link
                 className="underline underline-offset-2"
-                href="/pricing?type=artist"
+                href="/pricing"
                 fontSize={fontSize}
               >
                 Select a plan

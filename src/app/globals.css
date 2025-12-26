@@ -535,12 +535,6 @@ a {
   }
 }
 
-.price-card-cont {
-  &:not(:last-of-type) {
-    margin-bottom: 5em;
-  }
-}
-
 .scrollbar-hide {
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
