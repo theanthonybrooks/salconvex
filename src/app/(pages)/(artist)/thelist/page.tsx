@@ -5,8 +5,10 @@ import { EventListProvider } from "@/features/the-list/client-provider";
 
 export const metadata: Metadata = {
   title: "The List",
-  description: "See the latest mural open calls and public art opportunities.",
   robots: "index, follow",
+  description:
+    "Regularly updated list with the latest rfp, rfq, eoi, and street art calls from around the world. Bookmark your favorite calls, follow organizers, and get notified when new calls are posted.",
+
   openGraph: {
     title: "The List | The Street Art List",
     description:

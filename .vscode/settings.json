@@ -45,7 +45,8 @@
     "Zod",
     "User",
     "Nextjs",
-    "Organizations"
+    "Organizations",
+    "SEO"
   ],
   "typescript.tsdk": "node_modules\\typescript\\lib",
   "python.analysis.autoImportCompletions": true,

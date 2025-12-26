@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: "This Week",
   robots: "index, follow",
   description:
-    "See the latest mural open calls and public art opportunities ending this week.",
+    "See what street art and mural opportunities are ending in the next week and ensure you don't miss out on any great opportunities. Coming soon with a newsletter to get notified of open call deadlines, straight to your inbox.",
   openGraph: {
     title: "This Week | The Street Art List",
     description:
