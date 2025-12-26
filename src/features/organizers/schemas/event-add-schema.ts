@@ -265,7 +265,6 @@ export const eventSchema = eventBase.superRefine((data, ctx) => {
     (!prodDates?.[0]?.end || prodDates[0].end === "");
   if (data.name?.trim()) {
     const trimmed = data.name.trim();
-
     if (trimmed.length > 0 && trimmed.length < 3) {
       ctx.addIssue({
         code: "custom",
@@ -285,6 +284,13 @@ export const eventSchema = eventBase.superRefine((data, ctx) => {
       ctx.addIssue({
         code: "custom",
         message: "No quotes or semicolons allowed in name",
+        path: ["name"],
+      });
+    }
+    if (trimmed.includes("http") || trimmed.includes(".com/")) {
+      ctx.addIssue({
+        code: "custom",
+        message: "Name should not include http(s) links",
         path: ["name"],
       });
     }

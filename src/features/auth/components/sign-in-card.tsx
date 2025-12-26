@@ -78,12 +78,7 @@ const SignInCard = ({ switchFlow, forgotPasswordHandler }: SignInCardProps) => {
   const [callBackSrc, setCallBackSrc] = useState<string | null>(null);
   const [prevSalPage, setPrevSalPage] = useState<string | null>(null);
 
-  // const callBackSrc = sessionStorage.getItem("src");
-  // const prevSalPage = sessionStorage.getItem("previousSalPage");
   const isNewUser = callBackSrc === "newUser";
-  // const callBackSrc = sessionStorage.getItem("src");
-  // const prevSalPage = sessionStorage.getItem("previousSalPage");
-
   const handlePasswordSignIn = async (values: LoginFormValues) => {
     setPending(true);
     setError("");

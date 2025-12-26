@@ -24,9 +24,9 @@ const INDEXABLE_ROUTES = new Set([
   "/pricing",
   "/submit",
   "/about",
+  "/faq",
   // "/map",
   // "/calendar",
-  "/faq",
 ]);
 
 export async function generateMetadata(): Promise<Metadata> {

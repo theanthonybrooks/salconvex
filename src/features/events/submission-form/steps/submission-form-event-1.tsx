@@ -200,6 +200,7 @@ const SubmissionFormEventStep1 = ({
       ]);
     }
   };
+  console.log(errors, dirtyFields);
 
   return (
     <div
@@ -326,9 +327,7 @@ const SubmissionFormEventStep1 = ({
                       onChange={field.onChange}
                       className={cn(
                         "border bg-card !text-base sm:h-[50px]",
-                        errors.event?.name &&
-                          dirtyFields.event?.name &&
-                          "invalid-field",
+                        errors.event?.name && "invalid-field",
                       )}
                       isAdmin={isAdmin}
                     />
@@ -463,7 +462,7 @@ const SubmissionFormEventStep1 = ({
 
                     <div className="mx-auto mb-3 flex w-full flex-col gap-2 sm:mb-0 lg:min-w-[300px] lg:max-w-md">
                       <Label htmlFor="event.name" className="sr-only">
-                        {getEventCategoryLabel(category, true)} About
+                        {getEventCategoryLabel(category, true)} Blurb
                       </Label>
                       <Controller
                         name="event.blurb"
