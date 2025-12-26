@@ -46,13 +46,19 @@ export async function generateMetadata(): Promise<Metadata> {
       "Discover global mural and street art open calls, public art RFQs, RFPs, and EOIs. The Street Art List connects artists and organizers worldwide.";
   }
 
+  if (pathname === "/submit") {
+    title = "Submit a Call | The Street Art List";
+    description =
+      "Submit a call to the global community of street artists, muralists, graffiti artists, and more. Ensure that your call reaches the right people and isn't lost in a sea of unrelated art calls.";
+  }
+
   return {
     title,
     description,
     robots: isIndexable ? "index, follow" : "noindex, follow",
     openGraph: {
       title: meta.externalTitle || meta.title || "The Street Art List",
-      description: meta.description || DEFAULT_DESCRIPTION,
+      description: description || meta.description || DEFAULT_DESCRIPTION,
       url: meta.openGraph?.url || siteUrl[0],
       type: meta.openGraph?.type || "website",
       images: meta.images || DEFAULT_IMAGES,
@@ -60,7 +66,7 @@ export async function generateMetadata(): Promise<Metadata> {
     twitter: {
       card: meta.twitter?.card || "summary_large_image",
       title: meta.externalTitle || meta.title || "The Street Art List",
-      description: meta.description || DEFAULT_DESCRIPTION,
+      description: description || meta.description || DEFAULT_DESCRIPTION,
       images: meta.images || DEFAULT_IMAGES,
     },
     icons: DEFAULT_ICON,
