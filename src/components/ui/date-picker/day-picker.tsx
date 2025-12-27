@@ -72,8 +72,7 @@ export function DateTimePickerField({
   disabled,
   timeZone,
 }: DayPickerProps) {
-  const isMobile = useIsMobile();
-  const isTablet = useIsMobile(1080);
+  const isMobile = useIsMobile(1080);
   const [open, setOpen] = useState(false);
 
   const [hasChanges, setHasChanges] = useState(false);
@@ -185,7 +184,7 @@ export function DateTimePickerField({
   const formattedDisplay = initialDate
     ? withTime
       ? timeZone
-        ? isTablet
+        ? isMobile
           ? formatInTimeZone(initialDate, timeZone, "MMM d, yy @ h:mm a")
           : formatInTimeZone(initialDate, timeZone, "MMM d, yy @ h:mm a (zzz)")
         : format(initialDate, "MMM d, yy @ h:mm a ")
@@ -256,7 +255,7 @@ export function DateTimePickerField({
         <DialogDescription className="sr-only">
           Select date and time
         </DialogDescription>
-        <div className="flex flex-col items-center justify-center gap-6 pt-5 sm:max-w-sm lg:max-w-lg lg:flex-row lg:items-end">
+        <div className="flex flex-col items-center justify-center gap-6 pt-5 sm:max-w-sm tablet:max-w-lg tablet:flex-row tablet:items-end">
           <DayPicker
             mode="single"
             selected={date}
@@ -308,13 +307,13 @@ export function DateTimePickerField({
             </>
           )}
         </div>
-        <DialogFooter className="flex w-full flex-row gap-3 px-4 pt-3 sm:max-w-sm sm:justify-center lg:max-w-lg lg:items-end">
+        <DialogFooter className="flex w-full flex-row gap-3 px-4 pt-3 sm:max-w-sm sm:justify-center tablet:max-w-lg tablet:items-end">
           <Button
             disabled={pending}
             variant="salWithShadowHidden"
             type="button"
             onClick={handleCancel}
-            className="w-40 lg:w-40"
+            className="w-40"
           >
             Cancel
           </Button>
