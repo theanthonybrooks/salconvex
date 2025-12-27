@@ -280,6 +280,7 @@ export const EventOCForm = ({
 
   const [savedCount, setSavedCount] = useState(0);
   const [pending, setPending] = useState(false);
+  const [isStepPending, setIsStepPending] = useState(false);
 
   const hasExistingOrg =
     typeof existingOrg === "object" && existingOrg !== null;
@@ -308,6 +309,7 @@ export const EventOCForm = ({
   //
   //
   // #region ------------- Refs --------------
+  const stepLockRef = useRef(false);
   const prevIssues = useRef<string | null>(null);
   const prevErrorJson = useRef<string>("{}");
   const lastChangedRef = useRef<number | null>(null);
@@ -534,6 +536,18 @@ export const EventOCForm = ({
   //   setActiveStep(0);
   // };
 
+  const withStepLock = async (fn: () => Promise<void>) => {
+    if (stepLockRef.current) return;
+    stepLockRef.current = true;
+    setIsStepPending(true);
+    try {
+      await fn();
+    } finally {
+      stepLockRef.current = false;
+      setIsStepPending(false);
+    }
+  };
+
   const handleDraftUpdate = useCallback(async () => {
     try {
       const bothEdited =
@@ -659,65 +673,69 @@ export const EventOCForm = ({
     }
   };
   const handleNextStep = async () => {
-    const isStepValid = handleCheckSchema();
-    if (!isStepValid) return;
-    if (hasUserEditedForm) {
-      // console.log("hasUserEditedForm 440");
-      await handleSave();
-    }
-    handleFirstStep();
-    // console.log("savedCount: ", savedCount);
-    if (savedCount > 0 && activeStep === steps.length - 1) {
-      handleDraftUpdate();
-    }
-    if (activeStep === 5) {
-      try {
-        const convertedSubmissionCost = await getOcPricing(
-          projectBudgetAmt,
-          projectCurrency,
-        );
-        setSubmissionCost(convertedSubmissionCost);
-      } catch (error) {
-        console.error("Failed to convert submission cost:", error);
-        throw new Error("submission_cost_conversion_failed");
+    await withStepLock(async () => {
+      const isStepValid = handleCheckSchema();
+      if (!isStepValid) return;
+      if (hasUserEditedForm) {
+        // console.log("hasUserEditedForm 440");
+        await handleSave();
       }
-    }
-    if (activeStep === 3) {
-      if (!hasOpenCall) {
-        unregister("openCall");
-        setActiveStep((prev) => prev + 3);
-        setValue("event.state", eventData?.state ?? "draft");
+      handleFirstStep();
+      // console.log("savedCount: ", savedCount);
+      if (savedCount > 0 && activeStep === steps.length - 1) {
+        handleDraftUpdate();
+      }
+      if (activeStep === 5) {
+        try {
+          const convertedSubmissionCost = await getOcPricing(
+            projectBudgetAmt,
+            projectCurrency,
+          );
+          setSubmissionCost(convertedSubmissionCost);
+        } catch (error) {
+          console.error("Failed to convert submission cost:", error);
+          throw new Error("submission_cost_conversion_failed");
+        }
+      }
+      if (activeStep === 3) {
+        if (!hasOpenCall) {
+          unregister("openCall");
+          setActiveStep((prev) => prev + 3);
+          setValue("event.state", eventData?.state ?? "draft");
+        } else {
+          if (!openCallId) {
+            const openCallResult = await createNewOpenCall({
+              orgId: orgData._id as Id<"organizations">,
+              eventId: eventData._id as Id<"events">,
+              edition: eventData.dates.edition,
+            });
+
+            setOpenCallId(openCallResult);
+          }
+          if (eventEdition !== ocEdition) {
+            setValue("openCall.basicInfo.dates.edition", eventEdition);
+          }
+
+          setActiveStep((prev) => prev + 1);
+        }
       } else {
-        if (!openCallId) {
-          const openCallResult = await createNewOpenCall({
-            orgId: orgData._id as Id<"organizations">,
-            eventId: eventData._id as Id<"events">,
-            edition: eventData.dates.edition,
-          });
-
-          setOpenCallId(openCallResult);
-        }
-        if (eventEdition !== ocEdition) {
-          setValue("openCall.basicInfo.dates.edition", eventEdition);
-        }
-
         setActiveStep((prev) => prev + 1);
       }
-    } else {
-      setActiveStep((prev) => prev + 1);
-    }
+    });
   };
 
   const handleBackStep = async () => {
-    const isStepValid = handleCheckSchema(false);
-    if (!isStepValid) {
-      setShowBackConfirm(true);
-      return;
-    }
-    if (hasUserEditedForm) {
-      await handleSave();
-    }
-    proceedBackStep();
+    await withStepLock(async () => {
+      const isStepValid = handleCheckSchema(false);
+      if (!isStepValid) {
+        setShowBackConfirm(true);
+        return;
+      }
+      if (hasUserEditedForm) {
+        await handleSave();
+      }
+      proceedBackStep();
+    });
   };
 
   const proceedBackStep = () => {
@@ -1682,7 +1700,10 @@ export const EventOCForm = ({
         }
       } finally {
         if (latestSaveId.current === saveId) {
-          setPending(false);
+          // setPending(false);
+          setTimeout(() => {
+            setPending(false);
+          }, 1000);
         }
         if (isAdmin && publish) {
           showToast("success", "Published!");
@@ -2279,7 +2300,7 @@ export const EventOCForm = ({
         onPublish={() => handleSave(true, true)}
         lastSaved={lastSavedDate}
         disabled={!isValid || pending || (finalStep && !userAcceptedTerms)}
-        pending={pending}
+        pending={pending || isStepPending}
         formTouched={
           hasUserEditedForm || savedCount > 0 || !alreadyApproved || unpublished
         }

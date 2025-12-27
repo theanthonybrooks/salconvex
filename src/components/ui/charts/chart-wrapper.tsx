@@ -301,7 +301,7 @@ export const ChartWrapper = ({ eventId, className }: ChartContainerProps) => {
         <Button
           variant="icon"
           onClick={() => setInView(inView === "chart" ? "stats" : "chart")}
-          className="absolute right-2.5 top-3 size-6 h-1"
+          className="absolute right-2.5 top-3 size-6 h-1 sm:hidden"
         >
           <Icon className="size-6 shrink-0" />
         </Button>
