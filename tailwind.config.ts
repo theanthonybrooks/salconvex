@@ -26,6 +26,7 @@ export default {
         ramaC: ["rama-gothic-c", ...fontFamily.sans],
       },
       screens: {
+        marge: "1023px",
         lg: "1025px",
         tablet: "1080px",
 

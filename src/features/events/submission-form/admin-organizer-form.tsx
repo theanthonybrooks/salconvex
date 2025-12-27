@@ -2152,8 +2152,8 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
         steps={steps}
         skipped={skipped}
         className={cn(
-          "mx-auto w-[90dvw] px-4 pb-4 lg:w-[min(1500px,calc(100dvw-18rem))] xl:px-8",
-          isSidebarCollapsed && "lg:w-[min(1500px,calc(95dvw-60px))]",
+          "marge:w-[min(1500px,calc(100dvw-18rem))] mx-auto w-[90dvw] px-4 pb-4 xl:px-8",
+          isSidebarCollapsed && "marge:w-[min(1500px,calc(95dvw-60px))]",
         )}
         finalLabel={alreadyPaid || alreadyApproved ? "Update" : "Submit"}
         onFinalSubmit={handleSubmit(() => onSubmit())}
@@ -2237,6 +2237,8 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
                 canNameEvent={canNameEvent}
                 existingEvent={existingEvent}
                 formType={formType}
+                dashboardView={true}
+                isSidebarCollapsed={isSidebarCollapsed}
               />
             )}
 

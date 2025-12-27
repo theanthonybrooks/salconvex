@@ -10,8 +10,8 @@ import {
 import { EventCategory } from "@/types/eventTypes";
 import { User } from "@/types/user";
 
-import { useEffect, useRef, useState } from "react";
 import { useIsMobile } from "@/hooks/use-media-query";
+import { useEffect, useRef, useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 
 import { HiArrowTurnLeftDown } from "react-icons/hi2";
@@ -32,11 +32,11 @@ import { EventOCFormValues } from "@/features/events/event-add-form";
 import { getEventCategoryLabel } from "@/helpers/eventFns";
 import { cn } from "@/helpers/utilsFns";
 
-import { api } from "~/convex/_generated/api";
-import { Doc } from "~/convex/_generated/dataModel";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { useQueries } from "convex-helpers/react/cache/hooks";
 import { ConvexError } from "convex/values";
+import { api } from "~/convex/_generated/api";
+import { Doc } from "~/convex/_generated/dataModel";
 
 interface SubmissionFormEventStep1Props {
   user: User | undefined;
@@ -47,6 +47,8 @@ interface SubmissionFormEventStep1Props {
   categoryEvent: boolean;
   canNameEvent: boolean;
   formType: number;
+  dashboardView?: boolean;
+  isSidebarCollapsed?: boolean;
 }
 
 const SubmissionFormEventStep1 = ({
@@ -58,8 +60,11 @@ const SubmissionFormEventStep1 = ({
   categoryEvent,
   canNameEvent,
   formType,
+  dashboardView,
+  isSidebarCollapsed,
 }: SubmissionFormEventStep1Props) => {
   const isTablet = useIsMobile(1300);
+  const isIpad = useIsMobile(1366);
   const {
     control,
     watch,
@@ -280,7 +285,10 @@ const SubmissionFormEventStep1 = ({
                     )}
                     badgeClassName="py-2 lg:py-2 lg:text-sm bg-card"
                     textClassName="text-base"
-                    condensed={isTablet}
+                    condensed={
+                      isTablet ||
+                      (isIpad && dashboardView && !isSidebarCollapsed)
+                    }
                     options={[...eventTypeOptions]}
                     onValueChange={(value) => {
                       field.onChange(value);
