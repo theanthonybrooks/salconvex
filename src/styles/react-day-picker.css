@@ -127,6 +127,7 @@
 
 .rdp-day_button:disabled {
   cursor: revert;
+  pointer-events: none;
 }
 
 .rdp-caption_label {

@@ -1,3 +1,4 @@
+import { addYears } from "date-fns";
 import { useDayPicker } from "react-day-picker";
 
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
@@ -18,21 +19,29 @@ export function CustomDropdownNav({ minDate }: { minDate?: number }) {
   const { goToMonth, months, nextMonth, previousMonth, dayPickerProps } =
     useDayPicker();
   const min = minDate ? new Date(minDate) : null;
+
   const today = new Date();
+
   const thisYear = today.getFullYear();
   const thisMonth = today.getMonth();
-  const minYear = min?.getFullYear() ?? new Date().getFullYear() - 1;
+  const minYear = min?.getFullYear() ?? new Date().getFullYear();
   const { startMonth, endMonth } = dayPickerProps;
   const displayMonth = months[0]?.date ?? new Date();
   const year = displayMonth.getFullYear();
+  const endYear =
+    endMonth?.getFullYear() ?? addYears(new Date(), 5).getFullYear();
   const month = displayMonth.getMonth();
-
+  const todayDisabled =
+    (startMonth && today < startMonth) || (endMonth && today > endMonth);
   const isToday = year === thisYear && month === thisMonth;
 
   const monthNames = Array.from({ length: 12 }, (_, i) =>
     new Date(0, i).toLocaleString("default", { month: "long" }),
   );
-  const yearRange = Array.from({ length: 5 }, (_, i) => minYear + i);
+  const yearRange = Array.from(
+    { length: endYear - minYear + 1 },
+    (_, i) => minYear + i,
+  );
 
   const isMonthDisabled = (y: number, m: number) => {
     const testDate = new Date(y, m);
@@ -50,6 +59,10 @@ export function CustomDropdownNav({ minDate }: { minDate?: number }) {
     }
     return false;
   };
+
+  const availableMonths = monthNames
+    .map((m, i) => ({ name: m, index: i }))
+    .filter(({ index }) => !isMonthDisabled(year, index));
 
   return (
     <div className="richard my-5 flex w-full items-center justify-between gap-2 py-2">
@@ -70,25 +83,24 @@ export function CustomDropdownNav({ minDate }: { minDate?: number }) {
             const m = parseInt(val, 10);
             if (!isMonthDisabled(year, m)) goToMonth(new Date(year, m));
           }}
+          disabled={availableMonths.length === 1}
         >
           <SelectTrigger className="w-[110px] text-base sm:text-sm">
             <SelectValue>{monthNames[month]}</SelectValue>
           </SelectTrigger>
           <SelectContent className="max-h-72">
-            {monthNames
-              .map((m, i) => ({ name: m, index: i }))
-              .filter(({ index }) => !isMonthDisabled(year, index))
-              .map(({ name, index }) => (
-                <SelectItem key={index} value={index.toString()}>
-                  {name}
-                </SelectItem>
-              ))}
+            {availableMonths.map(({ name, index }) => (
+              <SelectItem key={index} value={index.toString()}>
+                {name}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
 
         <Select
           value={year.toString()}
           onValueChange={(val) => goToMonth(new Date(parseInt(val, 10), month))}
+          disabled={yearRange.length === 1}
         >
           <SelectTrigger className="w-[90px] text-base sm:text-sm">
             <SelectValue>{year}</SelectValue>
@@ -106,11 +118,9 @@ export function CustomDropdownNav({ minDate }: { minDate?: number }) {
       <TooltipSimple content="Go to today" side="top" disabled={isToday}>
         <Button
           variant="ghost"
-          disabled={isToday}
+          disabled={isToday || todayDisabled}
           type="button"
-          onClick={() =>
-            goToMonth(new Date(minDate ? new Date(minDate) : new Date()))
-          }
+          onClick={() => goToMonth(today)}
           className={cn(
             "h-auto p-1 hover:text-foreground/80 disabled:opacity-20 sm:h-auto",
           )}

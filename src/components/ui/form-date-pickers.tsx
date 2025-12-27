@@ -1,6 +1,8 @@
 import { EventCategory } from "@/types/eventTypes";
 
 import { useEffect, useRef, useState } from "react";
+import { addDays, startOfDay, subYears } from "date-fns";
+import { fromZonedTime } from "date-fns-tz";
 import { motion } from "framer-motion";
 import {
   Controller,
@@ -18,6 +20,7 @@ import {
   CustomDatePicker,
   CustomDatePickerProps,
 } from "@/components/ui/date-picker/date-picker";
+import { DateTimePickerField } from "@/components/ui/date-picker/day-picker";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -28,13 +31,7 @@ import {
 } from "@/components/ui/select";
 import { EventOCFormValues } from "@/features/events/event-add-form";
 import { eventBase } from "@/features/organizers/schemas/event-add-schema";
-import {
-  fromSeason,
-  toDateString,
-  toSeason,
-  toYear,
-  toYearMonth,
-} from "@/helpers/dateFns";
+import { fromSeason, toSeason, toYear, toYearMonth } from "@/helpers/dateFns";
 import { getEventCategoryLabel } from "@/helpers/eventFns";
 import { cn } from "@/helpers/utilsFns";
 
@@ -77,6 +74,11 @@ export const FormDatePicker = <T extends EventOCFormValues>({
 
   const data = watch(watchPath) as z.infer<typeof eventBase.shape.dates>;
   const eventData = watch("event");
+  const organizer = watch("organization");
+  const orgTimezone =
+    organizer?.location?.timezone ??
+    Intl.DateTimeFormat().resolvedOptions().timeZone;
+
   const edition = eventData?.dates?.edition;
   // console.log(eventData?.dates);
   const eventFormat = eventData?.dates?.eventFormat;
@@ -264,7 +266,7 @@ export const FormDatePicker = <T extends EventOCFormValues>({
   return (
     <div
       className={cn(
-        "mx-auto flex w-full flex-col gap-2 lg:w-full lg:min-w-[300px] lg:max-w-md",
+        "mx-auto flex w-full flex-col gap-2 p-0.5 lg:w-full lg:min-w-[300px] lg:max-w-md",
         className,
       )}
     >
@@ -341,7 +343,7 @@ export const FormDatePicker = <T extends EventOCFormValues>({
         formatValue !== "ongoing" &&
         formatValue !== "sameAsEvent" &&
         formatValue !== "noEvent" && (
-          <div className="mx-auto flex max-h-52 w-full flex-col gap-2 overflow-y-auto lg:min-w-[300px] lg:max-w-md">
+          <div className="scrollable mini mx-auto flex max-h-52 w-full flex-col gap-2 overflow-y-auto overflow-x-visible p-0.5 lg:min-w-[300px] lg:max-w-md">
             <Label htmlFor="event.dates.eventDates" className="sr-only">
               {type.charAt(0).toUpperCase() + type.slice(1)} Dates
             </Label>
@@ -383,11 +385,6 @@ export const FormDatePicker = <T extends EventOCFormValues>({
                             stiffness: 300,
                             damping: 20,
                           }}
-                          // variants={{
-                          //   rest: { opacity: 0, x: -10 },
-                          //   hover: { opacity: 1, x: 10 },
-                          // }}
-                          // transition={{ duration: 0.2 }}
                           aria-label="Remove date range"
                         >
                           <FaTrashCan className="size-4" />
@@ -398,35 +395,56 @@ export const FormDatePicker = <T extends EventOCFormValues>({
                           `${nameBase}.${formatKey}.${index}.start` as Path<T>
                         }
                         control={control}
-                        render={({ field }) => (
-                          <CustomDatePicker
-                            isAdmin={isAdmin}
-                            pickerType="dates"
-                            value={
-                              watchedSetStart as CustomDatePickerProps["value"]
-                            }
-                            onChange={(date) =>
-                              field.onChange(toDateString(date))
-                            }
-                            className="w-full rounded border bg-card p-2 text-center"
-                            placeholder={
-                              noProdStart ? "(Flexible/Open)" : undefined
-                            }
-                            disabled={noProdStart}
-                            inputClassName={cn(
-                              "h-12",
-                              isFieldInvalid(
-                                `${nameBase}.${formatKey}.${index}.start`,
-                              ) && "invalid-field",
-                            )}
-                            minDate={prevEndDate}
-                            maxDate={
-                              watch(
-                                `${nameBase}.${formatKey}.${index}.end` as Path<T>,
-                              ) as string | undefined
-                            }
-                          />
-                        )}
+                        render={({ field }) => {
+                          const fiveYearsAgo = subYears(new Date(), 5);
+                          const minDate =
+                            isAdmin && !prevEndDate
+                              ? startOfDay(fiveYearsAgo).getTime()
+                              : prevEndDate
+                                ? startOfDay(addDays(prevEndDate, 1)).getTime()
+                                : undefined;
+                          const rawEnd = watch(
+                            `${nameBase}.${formatKey}.${index}.end` as Path<T>,
+                          ) as string | undefined;
+
+                          const maxDate =
+                            rawEnd !== undefined
+                              ? Date.parse(rawEnd)
+                              : undefined;
+
+                          return (
+                            <DateTimePickerField
+                              value={
+                                watchedSetStart
+                                  ? Date.parse(watchedSetStart as string)
+                                  : undefined
+                              }
+                              onChange={(date) => {
+                                if (!date) return;
+                                field.onChange(
+                                  fromZonedTime(
+                                    date,
+                                    orgTimezone,
+                                  ).toISOString(),
+                                );
+                              }}
+                              disabled={noProdStart}
+                              label={
+                                noProdStart ? "(Flexible/Open)" : undefined
+                              }
+                              inputClassName={cn(
+                                "h-12 border-foreground bg-card hover:bg-salYellow/20 sm:h-11",
+                                isFieldInvalid(
+                                  `${nameBase}.${formatKey}.${index}.start`,
+                                ) && "invalid-field",
+                              )}
+                              minDate={minDate}
+                              maxDate={maxDate}
+                              withTime={false}
+                              timeZone={orgTimezone}
+                            />
+                          );
+                        }}
                       />
                       -
                       <Controller
@@ -434,31 +452,45 @@ export const FormDatePicker = <T extends EventOCFormValues>({
                           `${nameBase}.${formatKey}.${index}.end` as Path<T>
                         }
                         control={control}
-                        render={({ field }) => (
-                          <CustomDatePicker
-                            isAdmin={isAdmin}
-                            pickerType="dates"
-                            value={
-                              watchedSetEnd as CustomDatePickerProps["value"]
-                            }
-                            onChange={(date) =>
-                              field.onChange(toDateString(date))
-                            }
-                            className="w-full rounded border bg-card p-2 text-center"
-                            inputClassName={cn(
-                              "h-12",
-                              isFieldInvalid(
-                                `${nameBase}.${formatKey}.${index}.end`,
-                              ) && "invalid-field",
-                            )}
-                            minDate={getSequentialMinDate(
-                              watch,
-                              nameBase,
-                              formatKey,
-                              index,
-                            )}
-                          />
-                        )}
+                        render={({ field }) => {
+                          const sequentialMin = getSequentialMinDate(
+                            watch,
+                            nameBase,
+                            formatKey,
+                            index,
+                          );
+                          const adjustedMin = sequentialMin
+                            ? startOfDay(addDays(sequentialMin, 1)).getTime()
+                            : undefined;
+
+                          return (
+                            <DateTimePickerField
+                              value={
+                                watchedSetEnd
+                                  ? Date.parse(watchedSetEnd as string)
+                                  : undefined
+                              }
+                              onChange={(date) => {
+                                if (!date) return;
+                                field.onChange(
+                                  fromZonedTime(
+                                    date,
+                                    orgTimezone,
+                                  ).toISOString(),
+                                );
+                              }}
+                              inputClassName={cn(
+                                "h-12 border-foreground bg-card hover:bg-salYellow/20 sm:h-11",
+                                isFieldInvalid(
+                                  `${nameBase}.${formatKey}.${index}.start`,
+                                ) && "invalid-field",
+                              )}
+                              minDate={adjustedMin}
+                              withTime={false}
+                              timeZone={orgTimezone}
+                            />
+                          );
+                        }}
                       />
                     </div>
                   );

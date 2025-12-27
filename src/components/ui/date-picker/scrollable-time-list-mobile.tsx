@@ -1,15 +1,19 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { endOfDay, startOfDay } from "date-fns";
 
 import { ChevronDown, ChevronUp } from "lucide-react";
 
 import { Separator } from "@/components/ui/separator";
+import { sameDate } from "@/helpers/dateFns";
 import { cn } from "@/helpers/utilsFns";
 
 interface MobileTimePickerProps {
   date?: Date;
   minDate?: number;
+  maxDate?: number;
+
   timeStr: string;
   onChange: (timeStr: string) => void;
 }
@@ -25,49 +29,155 @@ function parseTimeStr(str: string) {
 
 export function MobileTimePicker({
   minDate,
+  maxDate,
   date,
   timeStr,
   onChange,
 }: MobileTimePickerProps) {
   const min = minDate ? new Date(minDate) : null;
+  const max = maxDate ? new Date(maxDate) : null;
+  const pickerDate = date ?? null;
+  const disabled =
+    (min && pickerDate && endOfDay(pickerDate) < min) ||
+    (max && pickerDate && startOfDay(pickerDate) > max);
+
+  const minApplies = sameDate(pickerDate, min);
+  const maxApplies = sameDate(pickerDate, max);
 
   const minHour24 = min?.getHours() ?? 0;
   const minMinute = min?.getMinutes() ?? 0;
+  const maxHour24 = max?.getHours() ?? 0;
+  const maxMinute = max?.getMinutes() ?? 0;
 
-  const minPeriod = minHour24 >= 12 ? "PM" : "AM";
-  const minHour12 = ((minHour24 + 11) % 12) + 1;
+  // const minPeriod = minHour24 >= 12 ? "PM" : "AM";
+  // const minHour12 = ((minHour24 + 11) % 12) + 1;
+  // const maxPeriod = maxHour24 >= 12 ? "PM" : "AM";
+  // const maxHour12 = ((maxHour24 + 11) % 12) + 1;
+  const maxPeriod = maxApplies && maxHour24 < 12 ? "AM" : "PM";
+  const maxHour12 = maxApplies ? ((maxHour24 + 11) % 12) + 1 : 12;
+  const minPeriod = minApplies && minHour24 >= 12 ? "PM" : "AM";
+  const minHour12 = minApplies
+    ? ((minHour24 + 11) % 12) + 1
+    : maxHour12 === 12 && maxPeriod === "AM"
+      ? 12
+      : 0;
 
+  // console.log({ minHour12, minMinute, minPeriod });
+  // console.log({ maxHour12, maxMinute, maxPeriod });
+  // console.log("max24: ", maxHour24, "max24 min: ", max?.getMinutes());
+  // console.log("min24: ", minHour24, "min24 min: ", min?.getMinutes());
   const { hour12, minute, period } = parseTimeStr(timeStr);
 
   const hours = Array.from({ length: 12 }, (_, i) => (i + 1).toString());
   const minutes = Array.from({ length: 60 }, (_, i) =>
     i.toString().padStart(2, "0"),
   );
-  const shouldIgnoreMin =
-    date &&
-    min &&
-    new Date(date).setHours(0, 0, 0, 0) > new Date(min).setHours(0, 0, 0, 0);
 
-  const filteredPeriods = useMemo(
-    () => (minPeriod === "AM" || shouldIgnoreMin ? ["AM", "PM"] : ["PM"]),
-    [minPeriod, shouldIgnoreMin],
-  );
+  // const filteredPeriods = useMemo(
+  //   () => (minPeriod === "AM" || shouldIgnoreMin ? ["AM", "PM"] : ["PM"]),
+  //   [minPeriod, shouldIgnoreMin],
+  // );
+  const filteredPeriods = useMemo(() => {
+    let periods: string[] = ["AM", "PM"];
 
-  const filteredHours =
-    period === minPeriod && !shouldIgnoreMin
-      ? hours
-          .filter((h) => parseInt(h, 10) >= minHour12)
-          .filter((h) =>
-            !filteredPeriods.includes("AM") && minHour24 >= 13
-              ? h !== "12"
-              : true,
-          )
-      : hours;
+    if (minApplies && minPeriod === "PM") {
+      periods = ["PM"];
+    }
 
-  const filteredMinutes =
-    period === minPeriod && parseInt(hour12) === minHour12 && !shouldIgnoreMin
-      ? minutes.filter((m) => parseInt(m, 10) >= minMinute)
-      : minutes;
+    if (maxApplies && maxPeriod === "AM") {
+      periods = ["AM"];
+    }
+
+    return periods;
+  }, [minApplies, maxApplies, minPeriod, maxPeriod]);
+
+  // const filteredHours =
+  //   period === minPeriod && !shouldIgnoreMin
+  //     ? hours
+  //         .filter((h) => parseInt(h, 10) >= minHour12)
+  //         .filter((h) =>
+  //           !filteredPeriods.includes("AM") && minHour24 >= 13
+  //             ? h !== "12"
+  //             : true,
+  //         )
+  //     : hours;
+  const filteredHours = useMemo(() => {
+    let h = hours;
+
+    // ----- MIN BOUNDARY -----
+    if (minApplies && period === minPeriod) {
+      h = h
+        .filter((x) => parseInt(x, 10) >= minHour12)
+        .filter((x) =>
+          !filteredPeriods.includes("AM") && minHour24 >= 13
+            ? x !== "12"
+            : true,
+        );
+    }
+
+    // ----- MAX BOUNDARY -----
+    if (maxApplies && period === maxPeriod) {
+      h = h
+        .filter((x) => parseInt(x, 10) <= maxHour12)
+        .filter((x) =>
+          !filteredPeriods.includes("PM") && maxHour24 < 12 ? x !== "12" : true,
+        );
+    }
+
+    return h;
+  }, [
+    hours,
+    period,
+    minApplies,
+    maxApplies,
+    minPeriod,
+    maxPeriod,
+    minHour12,
+    maxHour12,
+    minHour24,
+    maxHour24,
+    filteredPeriods,
+  ]);
+
+  // const filteredMinutes =
+  //   period === minPeriod && parseInt(hour12) === minHour12 && !shouldIgnoreMin
+  //     ? minutes.filter((m) => parseInt(m, 10) >= minMinute)
+  //     : minutes;
+  const filteredMinutes = useMemo(() => {
+    let m = minutes;
+
+    if (
+      minApplies &&
+      period === minPeriod &&
+      parseInt(hour12, 10) === minHour12
+    ) {
+      m = m.filter((x) => parseInt(x, 10) >= minMinute);
+    }
+
+    if (
+      maxApplies &&
+      period === maxPeriod &&
+      parseInt(hour12, 10) === maxHour12
+    ) {
+      m = m.filter((x) => parseInt(x, 10) <= maxMinute);
+    }
+
+    return m;
+  }, [
+    minutes,
+    period,
+    hour12,
+    minApplies,
+    maxApplies,
+    minPeriod,
+    maxPeriod,
+    minHour12,
+    maxHour12,
+    minMinute,
+    maxMinute,
+  ]);
+
+  // console.log({ filteredHours, filteredMinutes, filteredPeriods });
 
   const updateTime = (h: string, m: string, p: string) => {
     const timeString = `${h}:${m} ${p}`;
@@ -101,7 +211,12 @@ export function MobileTimePicker({
   ]);
 
   return (
-    <div className="relative flex h-30 w-full max-w-[80dvw] items-center justify-center gap-2 overflow-hidden rounded-xl border-1.5 bg-card p-2">
+    <div
+      className={cn(
+        "relative flex h-30 w-full max-w-[80dvw] items-center justify-center gap-2 overflow-hidden rounded-xl border-1.5 bg-card p-2",
+        disabled && "pointer-events-none opacity-30",
+      )}
+    >
       <div className="pointer-events-none absolute left-0 right-0 top-0 z-999 flex h-8 items-start justify-around bg-gradient-to-b from-card to-transparent"></div>
       <Dial
         items={filteredHours}

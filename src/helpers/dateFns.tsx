@@ -623,3 +623,19 @@ export function DateWrapper({ rawTerm }: { rawTerm: string }) {
     />
   );
 }
+
+export const sameDate = (a: Date | null, b: Date | null) => {
+  if (!a || !b) return false;
+  const aDay = a.getDate();
+  const aMonth = a.getMonth();
+  const bDay = b.getDate();
+  const bMonth = b.getMonth();
+  const aYear = a.getFullYear();
+  const bYear = b.getFullYear();
+
+  if (aYear === bYear) {
+    return aMonth === bMonth && aDay === bDay;
+  }
+
+  return false;
+};

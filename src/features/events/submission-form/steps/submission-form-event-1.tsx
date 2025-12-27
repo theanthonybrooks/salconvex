@@ -200,7 +200,6 @@ const SubmissionFormEventStep1 = ({
       ]);
     }
   };
-  console.log(errors, dirtyFields);
 
   return (
     <div
@@ -366,7 +365,7 @@ const SubmissionFormEventStep1 = ({
             </div>
             {nameValidTrigger && (
               <>
-                <span className="col-start-2 ml-2 hidden items-center gap-2 text-sm italic text-muted-foreground lg:flex">
+                <span className="col-start-2 ml-2 hidden items-center justify-center gap-2 text-sm italic text-muted-foreground lg:flex">
                   <HiArrowTurnLeftDown className="size-4 shrink-0" />
                   <p>
                     {getEventCategoryLabel(category, true)} Location (if

@@ -83,6 +83,7 @@ export const AdminSocialTimePicker = ({
     api.events.socials.updateSocialPostPlannedDate,
   );
   const today = startOfDay(new Date()).getTime();
+  // const today = new Date().getTime();
 
   const handleDateSelect = (d: number | undefined) => {
     try {
@@ -95,6 +96,8 @@ export const AdminSocialTimePicker = ({
     }
   };
 
+  // console.log(new Date(today));
+  // console.log(addHours(new Date(), 2));
   return (
     <DateTimePickerField
       value={plannedDate}
@@ -103,6 +106,8 @@ export const AdminSocialTimePicker = ({
       }}
       label="Select Date"
       minDate={today}
+      // maxDate={addMinutes(new Date(), 205).getTime()}
+      // withTime={true}
       withTime={false}
       inputClassName="border-transparent hover:border-foreground/40 text-sm"
     />

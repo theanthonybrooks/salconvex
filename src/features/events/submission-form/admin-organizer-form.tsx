@@ -2150,7 +2150,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
         onBackStep={handleBackStep}
         steps={steps}
         skipped={skipped}
-        className="mx-auto w-[min(1200px,90vw)] px-4 pb-4 xl:px-8"
+        className="mx-auto w-[90dvw] px-4 pb-4 lg:w-[min(1500px,calc(100dvw-18rem))] xl:px-8"
         finalLabel={alreadyPaid || alreadyApproved ? "Update" : "Submit"}
         onFinalSubmit={handleSubmit(() => onSubmit())}
         onViewEvent={() => router.push(eventLink)}

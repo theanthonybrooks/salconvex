@@ -168,7 +168,7 @@ export function DataTable<TData, TValue>({
     return filters;
   }, [searchParams, columns]);
 
-  console.log(defaultFiltersFromUrl, searchParams);
+  // console.log(defaultFiltersFromUrl, searchParams);
 
   const { isAdmin, isEditor } = adminActions ?? {};
 

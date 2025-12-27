@@ -23,7 +23,6 @@ import { Country } from "world-countries";
 import { ArrowRight } from "lucide-react";
 
 import { Link } from "@/components/ui/custom-link";
-import { OcCustomDatePicker } from "@/components/ui/date-picker/oc-date-picker";
 import { DebouncedControllerInput } from "@/components/ui/debounced-form-input";
 import { DebouncedControllerNumInput } from "@/components/ui/debounced-form-num-input";
 import { Label } from "@/components/ui/label";
@@ -50,7 +49,10 @@ import { cn } from "@/helpers/utilsFns";
 
 import "filepond/dist/filepond.min.css";
 
-import { DateTime } from "luxon";
+import { addDays, startOfDay, subYears } from "date-fns";
+import { fromZonedTime, toZonedTime } from "date-fns-tz";
+
+import { DateTimePickerField } from "@/components/ui/date-picker/day-picker";
 
 import { Id } from "~/convex/_generated/dataModel";
 
@@ -150,16 +152,30 @@ const SubmissionFormOC1 = ({
   // const today = new Date();
   // const minDate = ocStart && new Date(ocStart) >= today ? ocStart : today;
   // const todayDay = DateTime.now().setZone(orgTimezone).startOf("day");
-  const todayDay = DateTime.now().setZone(orgTimezone);
-  const startDay = ocStart
-    ? DateTime.fromISO(ocStart, { setZone: true }).setZone(orgTimezone)
+  // const todayDay = DateTime.now().setZone(orgTimezone);
+  // const startDay = ocStart
+  //   ? DateTime.fromISO(ocStart, { setZone: true }).setZone(orgTimezone)
+  //   : null;
+  // const minDT =
+  //   startDay && (startDay >= todayDay || !isAdmin)
+  //     ? startDay.plus({ days: 1 })
+  //     : todayDay;
+  // const minDate = minDT.toJSDate().getTime();
+
+  const todayZoned = toZonedTime(new Date(), orgTimezone);
+
+  const startZoned = ocStart
+    ? toZonedTime(new Date(ocStart), orgTimezone)
     : null;
+  // console.log(startZoned, todayZoned);
+
   const minDT =
-    startDay && (startDay >= todayDay || !isAdmin)
-      ? startDay.plus({ days: 1 })
-      : todayDay;
-  const minDate = minDT.toISO();
-  // console.log(minDate);
+    startZoned && (startZoned >= todayZoned || !isAdmin)
+      ? addDays(startZoned, 1)
+      : todayZoned;
+  const minDate = minDT.getTime();
+
+  // console.log(minDT);
   // const minDate =
   //   ocStart && DateTime.fromISO(ocStart) >= today
   //     ? DateTime.fromISO(ocStart).plus({ days: 1 }).toISO()
@@ -617,19 +633,33 @@ const SubmissionFormOC1 = ({
                   <Controller
                     name="openCall.basicInfo.dates.ocStart"
                     control={control}
-                    render={({ field }) => (
-                      <OcCustomDatePicker
-                        disabled={pastEvent}
-                        value={field.value}
-                        onChange={field.onChange}
-                        pickerType="start"
-                        className="hansel min-h-12"
-                        placeholder="Start Date"
-                        orgTimezone={orgTimezone}
-                        showTimeZone={false}
-                        isAdmin={isAdmin}
-                      />
-                    )}
+                    render={({ field }) => {
+                      const twoYearsAgo = subYears(new Date(), 2);
+
+                      const minStartDate = isAdmin
+                        ? startOfDay(twoYearsAgo).getTime()
+                        : undefined;
+                      return (
+                        <DateTimePickerField
+                          disabled={pastEvent}
+                          value={
+                            field.value ? Date.parse(field.value) : undefined
+                          }
+                          onChange={(date) => {
+                            if (!date) return;
+                            field.onChange(
+                              fromZonedTime(date, orgTimezone).toISOString(),
+                            );
+                          }}
+                          label="Start Date"
+                          minDate={minStartDate}
+                          withTime={false}
+                          timeZone={orgTimezone}
+                          inputClassName="bg-card h-12 border-foreground bg-card hover:bg-salYellow/20 sm:h-11"
+                          triggerClassName="w-auto"
+                        />
+                      );
+                    }}
                   />
 
                   <div className="hidden items-center justify-center px-2 sm:flex">
@@ -642,17 +672,21 @@ const SubmissionFormOC1 = ({
                     name="openCall.basicInfo.dates.ocEnd"
                     control={control}
                     render={({ field }) => (
-                      <OcCustomDatePicker
+                      <DateTimePickerField
                         disabled={pastEvent || !ocStart}
-                        value={field.value}
-                        onChange={field.onChange}
-                        pickerType="end"
-                        className="gretel min-h-12"
+                        value={
+                          field.value ? Date.parse(field.value) : undefined
+                        }
+                        onChange={(date) => {
+                          if (!date) return;
+                          field.onChange(
+                            fromZonedTime(date, orgTimezone).toISOString(),
+                          );
+                        }}
+                        label="Select Deadline"
                         minDate={minDate}
-                        ocEnd={ocEnd}
-                        orgTimezone={orgTimezone}
-                        placeholder="Select Deadline"
-                        isAdmin={isAdmin}
+                        timeZone={orgTimezone}
+                        inputClassName="bg-card h-12 border-foreground bg-card hover:bg-salYellow/20 sm:h-11"
                       />
                     )}
                   />

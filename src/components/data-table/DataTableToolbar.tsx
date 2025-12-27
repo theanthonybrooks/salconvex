@@ -62,7 +62,7 @@ export function DataTableToolbar<TData>({
         )
       : [];
 
-  console.log(filters, filters.length);
+  // console.log(filters, filters.length);
 
   // const tableType = table.options.meta?.tableType;
 

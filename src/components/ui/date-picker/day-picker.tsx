@@ -1,6 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
 import { useIsMobile } from "@/hooks/use-media-query";
-import { format } from "date-fns";
+import {
+  addYears,
+  endOfYear,
+  format,
+  isBefore,
+  isSameDay,
+  startOfDay,
+  subHours,
+} from "date-fns";
+import { formatInTimeZone } from "date-fns-tz";
 import { DayPicker } from "react-day-picker";
 import { toast } from "react-toastify";
 
@@ -20,6 +29,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { sameDate } from "@/helpers/dateFns";
 import { cn } from "@/helpers/utilsFns";
 
 type DayPickerProps = {
@@ -27,8 +37,12 @@ type DayPickerProps = {
   onChange: (date: number | undefined) => void;
   label?: string;
   minDate?: number;
+  maxDate?: number;
   withTime?: boolean;
   inputClassName?: string;
+  triggerClassName?: string;
+  disabled?: boolean;
+  timeZone?: string;
 };
 
 function generateTimeOptions(): string[] {
@@ -49,57 +63,47 @@ function generateTimeOptions(): string[] {
 export function DateTimePickerField({
   value: initialValue,
   onChange,
-  label = "Select date and time",
+  label,
   minDate,
+  maxDate,
   withTime = true,
   inputClassName,
+  triggerClassName,
+  disabled,
+  timeZone,
 }: DayPickerProps) {
   const isMobile = useIsMobile();
+  const isTablet = useIsMobile(1080);
   const [open, setOpen] = useState(false);
 
   const [hasChanges, setHasChanges] = useState(false);
   const [pending, setPending] = useState(false);
 
-  const initialDate = initialValue
-    ? new Date(new Date(initialValue).setSeconds(0, 0))
-    : undefined;
+  const initialDate = initialValue ? new Date(initialValue) : undefined;
+  const initialTime = getInitialTime(initialDate);
   const [date, setDate] = useState<Date | undefined>(initialDate);
-  const [timeStr, setTimeStr] = useState<string>(() => {
-    if (!initialDate) return "12:00 AM";
-    let h = initialDate.getHours();
-    const m = initialDate.getMinutes();
-    const suffix = h < 12 ? "AM" : "PM";
-    h = ((h + 11) % 12) + 1;
-    return `${h}:${m.toString().padStart(2, "0")} ${suffix}`;
-  });
+  const [timeStr, setTimeStr] = useState<string>(initialTime);
 
   const timeOptions = useMemo(() => generateTimeOptions(), []);
-  const startMonth = minDate ? new Date(minDate) : new Date();
-  const thisYear = new Date().getFullYear();
-  const inFiveYears = thisYear + 5;
+  const startMonth = minDate ? new Date(minDate) : subHours(new Date(), 1);
+
+  const endMonth = maxDate
+    ? new Date(maxDate)
+    : addYears(endOfYear(new Date()), 5);
+
+  //
+  //
+  //
+  //
+  // #region ------------- Handlers --------------
+
   const handleDateSelect = (d: Date | undefined) => {
     if (!d) {
       setDate(undefined);
-      // onChange(undefined);
       return;
     }
 
-    const match = timeStr.split(/[:\s]/);
-    if (!match) return;
-    const [hourStr, minuteStr, period] = match;
-    let h = parseInt(hourStr, 10);
-    const m = parseInt(minuteStr, 10);
-    if (period.toUpperCase() === "PM" && h < 12) h += 12;
-    if (period.toUpperCase() === "AM" && h === 12) h = 0;
-
-    const updated = new Date(date ?? d);
-    updated.setFullYear(d.getFullYear(), d.getMonth(), d.getDate());
-    // updated.setHours(h);
-    // updated.setMinutes(m);
-    updated.setHours(h, m, 0, 0);
-
-    setDate(updated);
-    // onChange(updated.getTime());
+    setDate(startOfDay(d));
     setHasChanges(true);
   };
 
@@ -107,7 +111,6 @@ export function DateTimePickerField({
     if (!date) return;
     setTimeStr(time);
     setHasChanges(true);
-    // onChange(updated.getTime());
   };
 
   const handleClose = () => {
@@ -120,16 +123,7 @@ export function DateTimePickerField({
 
   const handleCancel = () => {
     setDate(initialDate);
-    let timeString = timeStr;
-    if (initialDate) {
-      let h = initialDate.getHours();
-      const m = initialDate.getMinutes();
-      const suffix = h < 12 ? "AM" : "PM";
-      h = ((h + 11) % 12) + 1;
-      timeString = `${h}:${m.toString().padStart(2, "0")} ${suffix}`;
-    } else {
-      timeString = "12:00 AM";
-    }
+    const timeString = getInitialTime(initialDate);
     setTimeStr(timeString);
     handleClose();
   };
@@ -146,8 +140,6 @@ export function DateTimePickerField({
 
       const updated = new Date(date);
       if (withTime) {
-        // updated.setHs(h);
-        // updated.setMinutes(minute);
         updated.setHours(h, m, 0, 0);
       } else {
         updated.setHours(0, 0, 0, 0);
@@ -155,13 +147,21 @@ export function DateTimePickerField({
 
       if (minDate) {
         const min = new Date(minDate);
-        const sameDay =
-          updated.getFullYear() === min.getFullYear() &&
-          updated.getMonth() === min.getMonth() &&
-          updated.getDate() === min.getDate();
-        if (sameDay && updated.getTime() < min.getTime())
+
+        const selected = startOfDay(updated);
+        const minDay = startOfDay(min);
+        if (isBefore(selected, minDay))
           throw new Error("Choose a later date (cannot be in the past)");
+        if (isSameDay(updated, min) && updated < min) {
+          throw new Error("Choose a later time");
+        }
+      } else if (maxDate) {
+        const max = new Date(maxDate);
+        const sameDay = sameDate(updated, max);
+        if (sameDay && updated.getTime() > max.getTime())
+          throw new Error("Choose a date before the max date");
       }
+
       onChange(updated.getTime());
       handleClose();
     } catch (err) {
@@ -172,23 +172,44 @@ export function DateTimePickerField({
     }
   };
 
+  // #endregion
+
   useEffect(() => {
-    if (initialValue) {
-      const newDate = new Date(initialValue);
-      setDate(newDate);
-      let h = newDate.getHours();
-      const m = newDate.getMinutes();
+    if (!open) return;
+
+    if (initialTime) {
+      setTimeStr(initialTime);
+    }
+  }, [initialTime, open]);
+
+  const formattedDisplay = initialDate
+    ? withTime
+      ? timeZone
+        ? isTablet
+          ? formatInTimeZone(initialDate, timeZone, "MMM d, yy @ h:mm a")
+          : formatInTimeZone(initialDate, timeZone, "MMM d, yy @ h:mm a (zzz)")
+        : format(initialDate, "MMM d, yy @ h:mm a ")
+      : timeZone
+        ? formatInTimeZone(initialDate, timeZone, "MMM d, yyyy")
+        : format(initialDate, "MMM d, yyyy")
+    : "";
+
+  function getInitialTime(initialDate: Date | undefined): string {
+    if (!initialDate) return "12:00 AM";
+    if (!timeZone) {
+      let h = initialDate.getHours();
+      const m = initialDate.getMinutes();
       const suffix = h < 12 ? "AM" : "PM";
       h = ((h + 11) % 12) + 1;
-      setTimeStr(`${h}:${m.toString().padStart(2, "0")} ${suffix}`);
-    }
-  }, [initialValue]);
 
-  const formattedDisplay = date
-    ? withTime
-      ? format(date, "MMM d, yy @ h:mm a")
-      : format(date, "MMM d, yyyy")
-    : "";
+      return `${h}:${m.toString().padStart(2, "0")} ${suffix}`;
+    } else {
+      return formatInTimeZone(initialDate, timeZone, "h:mm a");
+    }
+  }
+
+  const outputLabel =
+    (label ?? withTime) ? "Select date and time" : "Select date";
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -196,12 +217,13 @@ export function DateTimePickerField({
         <DialogTitle>Select Date and Time</DialogTitle>
       </DialogHeader>
 
-      <DialogTrigger asChild>
-        <div className="relative w-full">
+      <DialogTrigger asChild role="button">
+        <div className={cn("relative w-full", triggerClassName)}>
           <Input
+            disabled={disabled}
             readOnly
-            value={formattedDisplay}
-            placeholder={label}
+            value={open ? "Selecting..." : formattedDisplay}
+            placeholder={outputLabel}
             className={cn(
               "cursor-pointer bg-transparent text-center",
               inputClassName,
@@ -242,8 +264,12 @@ export function DateTimePickerField({
             defaultMonth={date ?? new Date()}
             captionLayout="dropdown"
             startMonth={startMonth}
-            endMonth={new Date(inFiveYears, 0)}
-            disabled={{ before: new Date(minDate ?? 0) }}
+            endMonth={endMonth}
+            disabled={{
+              before: startMonth,
+              after: endMonth,
+            }}
+            timeZone={timeZone}
             required
             hideNavigation
             components={{
@@ -262,6 +288,11 @@ export function DateTimePickerField({
                   handleTimeSelect={handleTimeSelect}
                   date={date}
                   minDate={minDate}
+                  maxDate={maxDate}
+                  disabled={
+                    Boolean(minDate && date && date < new Date(minDate)) ||
+                    Boolean(maxDate && date && date > new Date(maxDate))
+                  }
                 />
               )}
 
@@ -270,6 +301,7 @@ export function DateTimePickerField({
                   date={date}
                   timeStr={timeStr}
                   minDate={minDate}
+                  maxDate={maxDate}
                   onChange={handleTimeSelect}
                 />
               )}

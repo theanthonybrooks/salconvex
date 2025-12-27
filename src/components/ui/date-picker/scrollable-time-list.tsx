@@ -4,6 +4,7 @@ import { motion, useMotionValueEvent, useScroll } from "framer-motion";
 import { ChevronDown, ChevronUp } from "lucide-react";
 
 import { Separator } from "@/components/ui/separator";
+import { sameDate } from "@/helpers/dateFns";
 import { cn } from "@/helpers/utilsFns";
 
 interface ScrollableTimeListProps {
@@ -12,6 +13,8 @@ interface ScrollableTimeListProps {
   handleTimeSelect: (time: string) => void;
   date?: Date;
   minDate?: number;
+  maxDate?: number;
+  disabled?: boolean;
 }
 
 export function ScrollableTimeList({
@@ -20,6 +23,8 @@ export function ScrollableTimeList({
   handleTimeSelect,
   date,
   minDate,
+  maxDate,
+  disabled,
 }: ScrollableTimeListProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [canScrollUp, setCanScrollUp] = useState(false);
@@ -33,10 +38,11 @@ export function ScrollableTimeList({
     setCanScrollUp(latest > 0.02);
     setCanScrollDown(latest < 0.98);
   });
+  const baseDate = date ?? new Date();
 
   return (
-    <div className="relative h-80 w-fit overflow-hidden rounded-xl border-1.5">
-      {canScrollUp && isScrollable && (
+    <div className="relative h-80 w-fit min-w-25 overflow-hidden rounded-xl border-1.5">
+      {canScrollUp && isScrollable && !disabled && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -48,31 +54,45 @@ export function ScrollableTimeList({
       )}
       <motion.div
         ref={ref}
-        className="scrollable mini invis flex h-full max-h-[inherit] w-fit flex-col items-center p-3 text-sm"
+        className={cn(
+          "mini invis flex h-full max-h-[inherit] w-fit flex-col items-center p-3 text-sm",
+          !disabled && "scrollable",
+        )}
       >
         {timeOptions.map((t, i) => {
           const isFirst = i === 0;
           const isSelected = t === timeStr;
           let isDisabled = false;
+          const candidate = new Date(baseDate);
 
-          if (minDate && date) {
-            const min = new Date(minDate);
-            const sameDay =
-              date.getFullYear() === min.getFullYear() &&
-              date.getMonth() === min.getMonth() &&
-              date.getDate() === min.getDate();
+          if (date) {
+            const min = minDate ? new Date(minDate) : null;
+            const max = maxDate ? new Date(maxDate) : null;
+            const sameMin = sameDate(date, min);
+            const sameMax = sameDate(date, max);
 
-            if (sameDay) {
+            if (sameMin && min) {
               const [hourStr, minuteStr, period] = t.split(/[:\s]/);
               let hour = parseInt(hourStr);
               const minute = parseInt(minuteStr);
               if (period === "PM" && hour < 12) hour += 12;
               if (period === "AM" && hour === 12) hour = 0;
 
-              const candidate = new Date(date);
-              candidate.setHours(hour);
-              candidate.setMinutes(minute);
-              if (candidate.getTime() < min.getTime()) {
+              candidate.setHours(hour, minute, 0, 0);
+              if (candidate < min) {
+                isDisabled = true;
+              }
+            }
+            if (sameMax && max) {
+              const [hourStr, minuteStr, period] = t.split(/[:\s]/);
+              let hour = parseInt(hourStr);
+              const minute = parseInt(minuteStr);
+              if (period === "PM" && hour < 12) hour += 12;
+              if (period === "AM" && hour === 12) hour = 0;
+              const optionMinutes = hour * 60 + minute;
+
+              const maxMinutes = max.getHours() * 60 + max.getMinutes();
+              if (optionMinutes > maxMinutes) {
                 isDisabled = true;
               }
             }
@@ -90,6 +110,7 @@ export function ScrollableTimeList({
                     ? "selected-time border-1.5 border-foreground bg-salPinkLt font-medium"
                     : "hover:bg-salPinkLtHover",
                   isDisabled && "pointer-events-none hidden opacity-20",
+                  // disabled && "pointer-events-none opacity-30",
                 )}
               >
                 {t}
@@ -99,7 +120,7 @@ export function ScrollableTimeList({
           );
         })}
       </motion.div>
-      {canScrollDown && isScrollable && (
+      {canScrollDown && isScrollable && !disabled && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
