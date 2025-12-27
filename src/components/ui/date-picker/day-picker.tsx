@@ -225,7 +225,7 @@ export function DateTimePickerField({
             value={open ? "Selecting..." : formattedDisplay}
             placeholder={outputLabel}
             className={cn(
-              "cursor-pointer bg-transparent text-center",
+              "cursor-pointer border-gray-300 bg-card text-center",
               inputClassName,
             )}
           />

@@ -109,7 +109,7 @@ export const AdminSocialTimePicker = ({
       // maxDate={addMinutes(new Date(), 205).getTime()}
       // withTime={true}
       withTime={false}
-      inputClassName="border-transparent hover:border-foreground/40 text-sm"
+      inputClassName="border-transparent bg-transparent hover:border-foreground/40 text-sm"
     />
   );
 };
