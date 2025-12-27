@@ -48,6 +48,7 @@ import { eventWithOCSchema } from "@/features/organizers/schemas/event-add-schem
 import { toSeason, toYearMonth } from "@/helpers/dateFns";
 import { getEventCategoryLabel } from "@/helpers/eventFns";
 import { getOcPricing } from "@/helpers/pricingFns";
+import { cn } from "@/helpers/utilsFns";
 import { handleFileUrl, handleOrgFileUrl } from "@/lib/fileUploadFns";
 import { showToast } from "@/lib/toast";
 import { useUserInfo } from "@/providers/user-info-provider";
@@ -2150,7 +2151,10 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
         onBackStep={handleBackStep}
         steps={steps}
         skipped={skipped}
-        className="mx-auto w-[90dvw] px-4 pb-4 lg:w-[min(1500px,calc(100dvw-18rem))] xl:px-8"
+        className={cn(
+          "mx-auto w-[90dvw] px-4 pb-4 lg:w-[min(1500px,calc(100dvw-18rem))] xl:px-8",
+          isSidebarCollapsed && "lg:w-[min(1500px,calc(95dvw-60px))]",
+        )}
         finalLabel={alreadyPaid || alreadyApproved ? "Update" : "Submit"}
         onFinalSubmit={handleSubmit(() => onSubmit())}
         onViewEvent={() => router.push(eventLink)}

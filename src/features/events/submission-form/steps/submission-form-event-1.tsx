@@ -11,6 +11,7 @@ import { EventCategory } from "@/types/eventTypes";
 import { User } from "@/types/user";
 
 import { useEffect, useRef, useState } from "react";
+import { useIsMobile } from "@/hooks/use-media-query";
 import { Controller, useFormContext } from "react-hook-form";
 
 import { HiArrowTurnLeftDown } from "react-icons/hi2";
@@ -58,6 +59,7 @@ const SubmissionFormEventStep1 = ({
   canNameEvent,
   formType,
 }: SubmissionFormEventStep1Props) => {
+  const isTablet = useIsMobile(1300);
   const {
     control,
     watch,
@@ -278,7 +280,7 @@ const SubmissionFormEventStep1 = ({
                     )}
                     badgeClassName="py-2 lg:py-2 lg:text-sm bg-card"
                     textClassName="text-base"
-                    condensed={isMobile}
+                    condensed={isTablet}
                     options={[...eventTypeOptions]}
                     onValueChange={(value) => {
                       field.onChange(value);
@@ -288,6 +290,7 @@ const SubmissionFormEventStep1 = ({
                     placeholder="Select up to 2 event types"
                     variant="basic"
                     maxCount={1}
+                    // compact={isTablet && !isMobile}
                     limit={2}
                     height={10}
                     shiftOffset={-10}

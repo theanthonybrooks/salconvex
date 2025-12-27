@@ -237,7 +237,7 @@ export function DateTimePickerField({
         zIndex="z-[33]"
         className={cn(
           "flex flex-col items-center justify-center gap-6 bg-card px-4 pt-5 sm:max-w-sm",
-          withTime && "sm:max-w-lg",
+          withTime && "lg:max-w-lg",
         )}
         onOpenAutoFocus={() => {
           requestAnimationFrame(() => {
@@ -256,7 +256,7 @@ export function DateTimePickerField({
         <DialogDescription className="sr-only">
           Select date and time
         </DialogDescription>
-        <div className="flex flex-col items-center justify-center gap-6 pt-5 sm:max-w-lg md:flex-row md:items-end">
+        <div className="flex flex-col items-center justify-center gap-6 pt-5 sm:max-w-sm lg:max-w-lg lg:flex-row lg:items-end">
           <DayPicker
             mode="single"
             selected={date}
@@ -308,12 +308,13 @@ export function DateTimePickerField({
             </>
           )}
         </div>
-        <DialogFooter className="flex w-full flex-row gap-3 px-4 pt-3 sm:max-w-lg md:items-end">
+        <DialogFooter className="flex w-full flex-row gap-3 px-4 pt-3 sm:max-w-sm sm:justify-center lg:max-w-lg lg:items-end">
           <Button
             disabled={pending}
             variant="salWithShadowHidden"
             type="button"
             onClick={handleCancel}
+            className="w-40 lg:w-40"
           >
             Cancel
           </Button>
@@ -322,7 +323,7 @@ export function DateTimePickerField({
             variant={hasChanges ? "salWithShadowYlw" : "salWithShadowHiddenYlw"}
             type="button"
             onClick={handleConfirm}
-            className="w-full md:max-w-40"
+            className="w-full"
           >
             {pending ? (
               <LoaderCircle className="size-4 animate-spin" />
