@@ -161,7 +161,7 @@ const SubmissionFormOC1 = ({
   //     ? startDay.plus({ days: 1 })
   //     : todayDay;
   // const minDate = minDT.toJSDate().getTime();
-
+  const twoYearsAgo = subYears(new Date(), 2);
   const todayZoned = toZonedTime(new Date(), orgTimezone);
 
   const startZoned = ocStart
@@ -172,7 +172,9 @@ const SubmissionFormOC1 = ({
   const minDT =
     startZoned && (startZoned >= todayZoned || !isAdmin)
       ? addDays(startZoned, 1)
-      : todayZoned;
+      : isAdmin
+        ? (startZoned ?? twoYearsAgo)
+        : todayZoned;
   const minDate = minDT.getTime();
 
   // console.log(minDT);
@@ -634,8 +636,6 @@ const SubmissionFormOC1 = ({
                     name="openCall.basicInfo.dates.ocStart"
                     control={control}
                     render={({ field }) => {
-                      const twoYearsAgo = subYears(new Date(), 2);
-
                       const minStartDate = isAdmin
                         ? startOfDay(twoYearsAgo).getTime()
                         : undefined;
