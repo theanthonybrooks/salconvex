@@ -202,7 +202,7 @@ export default function MapComponent({
                   key={`${p.latitude}-${p.longitude}-${i}`}
                   latitude={p.latitude}
                   longitude={p.longitude}
-                  label={p.label}
+                  label={`${p.label} (${p.meta?.edition})`}
                   meta={p.meta}
                   type={mapType === "full" ? "worldMap" : "event"}
                   activeSub={hasActiveSubscription || isAdmin}
@@ -262,7 +262,7 @@ export default function MapComponent({
                     key={`${p.latitude}-${p.longitude}-${i}`}
                     latitude={p.latitude}
                     longitude={p.longitude}
-                    label={p.label}
+                    label={`${p.label} (${p.meta?.edition})`}
                     meta={p.meta}
                     type={mapType === "full" ? "worldMap" : "event"}
                     activeSub={hasActiveSubscription || isAdmin}

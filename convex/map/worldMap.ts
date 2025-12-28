@@ -7,6 +7,32 @@ export const worldMapFiltersSchema = v.object({
   continent: v.optional(v.string()),
   city: v.optional(v.string()),
   state: v.optional(v.string()),
+  edition: v.optional(v.number()),
+});
+
+export const getAvailableEditions = query({
+  handler: async (ctx) => {
+    // const {country, continent, city, state} = args.filters;
+    const events = await ctx.db
+      .query("events")
+      .withIndex("by_approvedAt", (q) => q.gt("approvedAt", 0))
+      .filter((q) =>
+        q.and(
+          q.neq(q.field("state"), "draft"),
+          q.neq(q.field("state"), "editing"),
+        ),
+      )
+      .collect();
+
+    //   const countryMatch = event.location.country === country;
+    //   const continentMatch = event.location.continent === continent;
+    //   const cityMatch = event.location.city === city;
+    //   const stateMatch = event.location.state === state;
+
+    // return countryMatch && continentMatch
+    const editions = events.map((event) => event.dates.edition);
+    return Array.from(new Set(editions));
+  },
 });
 
 export const getWorldMapData = query({
@@ -27,6 +53,7 @@ export const getWorldMapData = query({
     const continent = filters.continent;
     const city = filters.city;
     const state = filters.state;
+    const edition = filters.edition;
 
     // const query = ctx.db
     //     .query("events")
@@ -76,7 +103,14 @@ export const getWorldMapData = query({
           .collect()
       : [];
     const joinedEvents = [...events, ...archivedEvents];
-    const eventData = joinedEvents.map((event) => {
+    let filteredEvents = joinedEvents;
+
+    if (edition) {
+      filteredEvents = filteredEvents.filter(
+        (event) => event.dates.edition === edition,
+      );
+    }
+    const eventData = filteredEvents.map((event) => {
       const coords = event.location?.coordinates;
 
       return {

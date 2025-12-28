@@ -639,3 +639,25 @@ export const sameDate = (a: Date | null, b: Date | null) => {
 
   return false;
 };
+
+export const getYearOptions = (
+  startYear: number,
+  endYear: number,
+): { value: string; label: string }[] => {
+  const options = [];
+  for (let i = startYear; i <= endYear; i++) {
+    options.push({ value: i.toString(), label: i.toString() });
+  }
+  return options;
+};
+
+export const getYearOptionsFromArray = (
+  years: number[],
+): { value: string; label: string }[] => {
+  const sortedYears = years.sort((a, b) => a - b);
+  const options = [];
+  for (let i = 0; i < sortedYears.length; i++) {
+    options.push({ value: years[i].toString(), label: years[i].toString() });
+  }
+  return options;
+};

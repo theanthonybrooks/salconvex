@@ -9,8 +9,10 @@ import { Plus, X } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { SelectSimple } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { LazyMap } from "@/features/wrapper-elements/map/lazy-map";
+import { getYearOptions, getYearOptionsFromArray } from "@/helpers/dateFns";
 import { cn } from "@/helpers/utilsFns";
 
 import { api } from "~/convex/_generated/api";
@@ -23,12 +25,26 @@ export default function WorldMapComponent() {
   useEffect(() => {
     sessionStorage.setItem("previousSalPage", "/map");
   }, []);
+  const [edition, setEdition] = useState<number | null>(null);
+  const thisYear = new Date().getFullYear();
 
   const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
   const { data: mapData } = useQueryWithStatus(
     api.map.worldMap.getWorldMapData,
-    { filters: {} },
+    {
+      filters: {
+        edition: edition ?? undefined,
+      },
+    },
   );
+  const { data: availableEditions } = useQueryWithStatus(
+    api.map.worldMap.getAvailableEditions,
+    {},
+  );
+
+  const yearOptions = availableEditions
+    ? getYearOptionsFromArray(availableEditions)
+    : getYearOptions(thisYear - 2, thisYear);
 
   const searchTerm = search.trim().toLowerCase();
 
@@ -40,6 +56,7 @@ export default function WorldMapComponent() {
     );
   }
   const numResults = filteredMapData?.length ?? 0;
+  const disabledClass = "pointer-events-none opacity-30";
 
   return (
     <div className="mt-8 flex h-full w-full flex-1 flex-col items-center justify-center gap-8 px-4">
@@ -76,11 +93,24 @@ export default function WorldMapComponent() {
 
             {/* <p className="px-3 pb-2 text-xl font-bold">Filters</p> */}
             <Separator className="mb-4" thickness={2} />
-            <div className="pointer-events-none flex flex-col gap-y-2 px-4 opacity-30">
-              <section className="flex items-center justify-between">
-                <p className="text-sm">Category</p> <Plus className="size-4" />
+            <div className="flex flex-col gap-y-2 px-4">
+              <section className="flex flex-col gap-1 py-1">
+                <Label className="text-sm" htmlFor="edition">
+                  Edition
+                </Label>
+                <SelectSimple
+                  options={yearOptions}
+                  value={edition ? String(edition) : ""}
+                  onChangeAction={(value) => setEdition(Number(value))}
+                  placeholder="--Select Edition--"
+                  hasReset
+                />
               </section>
-              <div className="flex flex-col gap-y-2">
+              <div className={cn(disabledClass, "flex flex-col gap-y-2")}>
+                <section className="flex items-center justify-between">
+                  <p className="text-sm">Category</p>{" "}
+                  <Plus className="size-4" />
+                </section>
                 <section className="flex items-center justify-between">
                   <p className="text-sm">Event Type</p>{" "}
                   <Plus className="size-4" />

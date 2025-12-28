@@ -194,7 +194,7 @@ export function DateTimePickerField({
     : "";
 
   function getInitialTime(initialDate: Date | undefined): string {
-    if (!initialDate) return "12:00 AM";
+    if (!initialDate) return "11:59 PM";
     if (!timeZone) {
       let h = initialDate.getHours();
       const m = initialDate.getMinutes();

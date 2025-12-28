@@ -420,6 +420,7 @@ export const getNotifications = query({
     if (!userId) return null;
     const user = await ctx.db.get(userId);
     if (!user) return null;
+    const isAdmin = user?.role?.includes("admin");
     const userPrefs = await ctx.db
       .query("userPreferences")
       .withIndex("by_userId", (q) => q.eq("userId", userId))
@@ -466,7 +467,7 @@ export const getNotifications = query({
             q.eq("userId", userId).eq("dismissed", true),
           )
           .order("desc")
-          .take(50),
+          .take(250),
       ]);
 
     const roleNotifications = roleResults.flat();
@@ -653,11 +654,11 @@ export const archivePastNotificationsBatch = internalMutation({
     numItems: v.number(),
   },
   handler: async (ctx, args) => {
-    const now = Date.now();
+    const timestamp = new Date(Date.now()).setMinutes(0, 0, 0);
 
     const page = await ctx.db
       .query("notifications")
-      .withIndex("by_deadline", (q) => q.lte("deadline", now))
+      .withIndex("by_deadline", (q) => q.lte("deadline", timestamp))
       .paginate({
         cursor: args.cursor,
         numItems: args.numItems,

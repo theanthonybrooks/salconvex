@@ -696,7 +696,8 @@ const orgInviteSchema = {
 };
 
 //TODO: Make another table that joins the events and open calls. Will act as a quick lookup for totals.
-
+//TODO: Add some booleans or a ranked number flag to the table to indicate whether it's public or not. The current state isn't usable as I can't reference it in an index.
+//TODO: Make a lookup table of the event editions that are currently used. This will be used to filter the editions in the map and elsewhere.
 export const eventSchema = {
   adminNote: v.optional(v.string()),
   //todo: use a lookup table for the organizers (I think?) Probably also for associated organizations for the cases where multiple orgs are associated with an event.
@@ -1521,6 +1522,7 @@ export default defineSchema({
     .index("by_slug", ["slug"])
     .index("by_slug_edition", ["slug", "dates.edition"])
     .index("by_slug_and_organizerId", ["slug", "organizerId"])
+    .index("by_approvedAt", ["approvedAt"])
     .index("by_posted", ["posted"])
     .index("by_posted_postPlannedDate", ["posted", "postPlannedDate"])
     .index("by_organizerId", ["organizerId"])
