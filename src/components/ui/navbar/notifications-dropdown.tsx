@@ -251,7 +251,7 @@ export const NotificationsDropdown = ({
               variant="underline"
               className={cn(
                 "min-w-20",
-                isUser && !isBoth && "w-full max-w-full",
+                !isBoth && "w-full max-w-full",
                 fontSize,
               )}
             >
@@ -274,7 +274,7 @@ export const NotificationsDropdown = ({
                 variant="underline"
                 className={cn(
                   "min-w-20 max-w-30",
-                  isUser && !isBoth && "w-full max-w-full",
+                  !isBoth && "w-full max-w-full",
                   fontSize,
                 )}
               >
@@ -288,7 +288,7 @@ export const NotificationsDropdown = ({
                 className={cn(
                   "min-w-25",
                   isUser && isOrganizer && "w-full",
-                  isUser && !isBoth && "w-full max-w-full",
+                  !isBoth && "w-full max-w-full",
                   fontSize,
                 )}
               >
