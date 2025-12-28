@@ -71,7 +71,7 @@ export const EventCard = ({
                   <LazyMap
                     latitude={latitude}
                     longitude={longitude}
-                    label={event.name}
+                    label={`${event.name} (${event.dates.edition})`}
                     locationType={getLocationType(location)}
                     className={cn(
                       "z-0 mb-4 h-[200px] w-full overflow-hidden rounded-xl",
@@ -151,7 +151,7 @@ export const EventCard = ({
                   setFullScreenAction={setViewFull}
                   latitude={latitude}
                   longitude={longitude}
-                  label={event.name}
+                  label={`${event.name} (${event.dates.edition})`}
                   locationType={getLocationType(location)}
                   // hasDirections={true}
                   className={
