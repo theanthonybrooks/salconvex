@@ -43,19 +43,12 @@ export const EventCard = ({
   aboutRef,
 }: EventCardProps) => {
   const [viewFull, setViewFull] = useState(false);
-  const {
-    category: eventCategory,
-    // type: eventType,
-    location,
-    dates,
-    // slug,
-  } = event;
+  const { category: eventCategory, location, dates } = event;
 
   const latitude = location.coordinates?.latitude ?? 0;
   const longitude = location.coordinates?.longitude ?? 0;
   const isMobile = format === "mobile";
   const { prodDates } = dates;
-  // const prodStart = prodDates?.[0]?.start;
   const prodEnd = prodDates?.[0]?.end;
 
   return (
@@ -153,7 +146,6 @@ export const EventCard = ({
                   longitude={longitude}
                   label={`${event.name} (${event.dates.edition})`}
                   locationType={getLocationType(location)}
-                  // hasDirections={true}
                   className={
                     "z-0 mb-4 h-[400px] w-full overflow-hidden rounded-xl"
                   }
