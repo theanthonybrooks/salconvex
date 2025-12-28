@@ -602,13 +602,18 @@ export const openCallStep2Schema = z
   })
   .superRefine((data, ctx) => {
     // const allInclusive = data.openCall.compensation.budget.allInclusive;
+    const restrictedCurrencies = ["USD", "EUR", "GBP", "CAD", "AUD", "CHF"];
+    const budgetCurrency = data.openCall.compensation.budget.currency;
     const unknownBudget = data.openCall.compensation.budget.unknownBudget;
     const hasBudget = data.openCall.compensation.budget.hasBudget;
     const budgetRate = data.openCall.compensation.budget.rate;
     const budgetUnit = data.openCall.compensation.budget.unit;
     const budgetMin = data.openCall.compensation.budget.min;
     const budgetMax = data.openCall.compensation.budget.max;
-    const budgetLg = typeof budgetMax === "number" && budgetMax > 1000;
+    const budgetLg =
+      typeof budgetMax === "number" &&
+      budgetMax > 1000 &&
+      restrictedCurrencies.includes(budgetCurrency);
     const missingBudget =
       hasBudget &&
       typeof budgetMin === "number" &&
