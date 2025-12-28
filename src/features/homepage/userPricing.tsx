@@ -3,7 +3,6 @@
 import type { PricingProps } from "@/features/pricing/components/pricingComponents";
 
 import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 
 import { Link } from "@/components/ui/custom-link";
@@ -18,7 +17,6 @@ import { getPrice } from "@/helpers/pricingFns";
 import { cn } from "@/helpers/utilsFns";
 
 import { api } from "~/convex/_generated/api";
-import { AccountTypeBase } from "~/convex/schema";
 import { usePreloadedQuery, useQuery } from "convex/react";
 
 type SwitchProps = {
@@ -84,8 +82,7 @@ export const PricingSwitch = ({ onSwitchAction }: SwitchProps) => {
 
 export default function UserPricing({ currency }: PricingProps) {
   // useScrollToTopOnMount();
-  const searchParams = useSearchParams();
-  const typeParam = searchParams.get("type") as AccountTypeBase;
+
   const { preloadedSubStatus, preloadedUserData } = useConvexPreload();
   const subData = usePreloadedQuery(preloadedSubStatus);
   const userData = usePreloadedQuery(preloadedUserData);
@@ -98,22 +95,7 @@ export default function UserPricing({ currency }: PricingProps) {
 
   const bannedSub = subscription?.banned;
   const subInterval = subscription?.intervalNext ?? subscription?.interval;
-
-  // const [urlAccountType, setUrlAccountType] = useState<AccountTypeBase | null>(
-  //   null,
-  // );
-  const accountType = typeParam ?? user?.accountType[0] ?? "artist";
   const [isYearly, setIsYearly] = useState<boolean>(subInterval === "year");
-  const [selectedAccountType, setSelectedAccountType] = useState(accountType);
-
-  useEffect(() => {
-    const typeParam = searchParams.get("type");
-    if (typeParam) {
-      setSelectedAccountType(typeParam as AccountTypeBase);
-    } else {
-      setSelectedAccountType("artist");
-    }
-  }, [searchParams]);
 
   const togglePricingPeriod = (value: string) =>
     setIsYearly(parseInt(value) === 1);
@@ -197,7 +179,7 @@ export default function UserPricing({ currency }: PricingProps) {
                   planKey={key}
                   {...rest}
                   isYearly={isYearly}
-                  accountType={selectedAccountType}
+                  accountType="artist"
                   stripePriceId={stripePriceId}
                   stripeProductId={plan.stripeProductId}
                   hadTrial={hadTrial}
