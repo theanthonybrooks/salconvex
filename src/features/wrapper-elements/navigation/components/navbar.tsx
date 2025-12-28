@@ -39,6 +39,8 @@ import { cn } from "@/helpers/utilsFns";
 
 import { AccountTypeBase } from "~/convex/schema";
 import { usePreloadedQuery } from "convex/react";
+import logoRound from "/public/logotransparency.png";
+import logoText from "/public/saltext.png";
 
 export default function NavBar() {
   const isMobile = useIsMobile();
@@ -261,7 +263,7 @@ export default function NavBar() {
 
           {!isMobile && (
             <>
-              {/* Desktop Logo & Navigation */}
+              {/* Desktop Logo & Text */}
               <motion.div
                 id="logo-text-container"
                 className="box-border hidden h-15 items-center gap-2 overflow-hidden rounded-full border-2 border-foreground p-[5px] lg:flex"
@@ -282,7 +284,7 @@ export default function NavBar() {
                   className="flex items-center gap-2 overflow-hidden"
                 >
                   <Image
-                    src="/logotransparency.png"
+                    src={logoRound}
                     alt="The Street Art List"
                     width={46}
                     height={46}
@@ -310,7 +312,7 @@ export default function NavBar() {
                     className="shrink-0 whitespace-nowrap"
                   >
                     <Image
-                      src="/saltext.png"
+                      src={logoText}
                       alt="The Street Art List"
                       width={0}
                       height={0}
@@ -326,21 +328,24 @@ export default function NavBar() {
                 initial={{
                   backgroundColor: homePage ? "hsl(var(--card))" : "",
                   padding: homePage ? "0.25em 1.25em" : "0",
-                  height: homePage ? "60px" : "",
+                  // height: homePage ? "60px" : "",
                   border: homePage ? "2px solid hsl(var(--foreground))" : "",
                 }}
                 animate={{
                   backgroundColor:
                     homePage && !isScrolled ? "hsl(var(--card))" : "",
-                  padding: homePage && !isScrolled ? "0.25em 1.25em" : "0",
-                  height: homePage && !isScrolled ? "60px" : "",
+                  // padding: homePage && !isScrolled ? "0.25em 1.25em" : "0",
+                  // height: homePage && !isScrolled ? "60px" : "",
                   border:
                     homePage && !isScrolled
                       ? "2px solid hsl(var(--foreground))"
                       : "",
                 }}
                 transition={{ duration: 0.3, ease: "easeOut" }}
-                className="z-0 hidden items-center justify-center gap-2 rounded-full lg:flex"
+                className={cn(
+                  "z-0 hidden items-center justify-center gap-2 rounded-full lg:flex",
+                  homePage && "h-15 px-5",
+                )}
               >
                 <NavigationMenu delayDuration={Infinity}>
                   <NavigationMenuList className="gap-2">

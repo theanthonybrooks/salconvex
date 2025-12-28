@@ -18,6 +18,8 @@ import { Search } from "@/features/Sidebar/Search";
 
 import { UserPrefsType } from "~/convex/schema";
 import { Unauthenticated } from "convex/react";
+import logoText from "/public/saltext.png";
+import logoRoundSvg from "/public/sitelogo.svg";
 
 interface NavBarProps {
   userId: string | undefined;
@@ -68,7 +70,7 @@ export default function DashboardNavBar({
                     transition={{ duration: 0.4, ease: "easeInOut" }}
                   >
                     <Image
-                      src="/sitelogo.svg"
+                      src={logoRoundSvg}
                       alt="The Street Art List"
                       width={40}
                       height={40}
@@ -77,7 +79,7 @@ export default function DashboardNavBar({
                     />
                   </motion.div>
                   <Image
-                    src="/saltext.png"
+                    src={logoText}
                     alt="The Street Art List"
                     width={175}
                     height={80}

@@ -1,11 +1,11 @@
 import type { CookiePref } from "@/types/user";
 
 import { useState } from "react";
-import { useManageSubscription } from "@/hooks/use-manage-subscription";
 
 import { Cookie, MailPlus, Shield } from "lucide-react";
 
 import type { UserPrefsType } from "~/convex/schema";
+import { SubDialog } from "@/components/ui/account/manage-sub-dialog";
 import { SectionItem } from "@/components/ui/account/section-item";
 import {
   AlertDialog,
@@ -75,7 +75,7 @@ export const SecuritySettings = () => {
   const deleteSessions = useMutation(api.users.deleteSessions);
   const DeleteAccount = useMutation(api.users.deleteAccount);
 
-  const handleManageSubscription = useManageSubscription({ subscription });
+  // const handleManageSubscription = useManageSubscription({ subscription });
   const handleUpdateUserPrefs = async (
     update: Partial<UserPrefsType>,
     options?: { title?: string },
@@ -325,14 +325,15 @@ export const SecuritySettings = () => {
                 </AlertDialogContent>
               </AlertDialog>
             ) : (
-              <Button
-                type="button"
-                variant="destructive"
-                className="w-full min-w-[150px] font-bold sm:w-auto"
-                onClick={() => handleManageSubscription()}
-              >
-                Cancel Membership
-              </Button>
+              <SubDialog>
+                <Button
+                  type="button"
+                  variant="destructive"
+                  className="w-full min-w-[150px] font-bold sm:w-auto"
+                >
+                  Cancel Membership
+                </Button>
+              </SubDialog>
             )}
           </SectionItem>
         </CardContent>

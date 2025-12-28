@@ -45,7 +45,6 @@ export default function BillingPage() {
   const { discount, interval } = baseDetails ?? {};
   const [promoCode, setPromoCode] = useState("");
   const [promoAttempts, setPromoAttempts] = useState(0);
-  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
 
   const handleManageSubscription = useManageSubscription({ subscription });
 
@@ -160,12 +159,7 @@ export default function BillingPage() {
             )}
             {hasActiveSubscription && (
               <>
-                <SubDialog
-                  dialog={{
-                    open: cancelDialogOpen,
-                    setOpen: setCancelDialogOpen,
-                  }}
-                >
+                <SubDialog>
                   <Button
                     className="mt-3 w-full max-w-lg"
                     type="button"

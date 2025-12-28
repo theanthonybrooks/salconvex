@@ -34,6 +34,7 @@ import { autoHttps, formatHandleInput } from "@/helpers/linkFns";
 import { sortedGroupedCountries } from "@/helpers/locationFns";
 import { getUserFontSizePref } from "@/helpers/stylingFns";
 import { cn } from "@/helpers/utilsFns";
+import { showToast } from "@/lib/toast";
 
 import { api } from "~/convex/_generated/api";
 import { Id } from "~/convex/_generated/dataModel";
@@ -267,9 +268,10 @@ export const ArtistProfileForm = ({
           canFeature: data.canFeature,
         });
         if (hasCurrentSub) {
-          toast.success("Successfully updated profile!");
+          showToast("success", "Successfully updated profile!");
         } else {
-          toast.success(
+          showToast(
+            "success",
             "Successfully created profile! Opening Stripe in new tab...",
           );
         }
@@ -281,22 +283,16 @@ export const ArtistProfileForm = ({
         if (!hasCurrentSub) {
           onClick();
         } else {
-          // console.log("handleManageSubscription");
-          // handleManageSubscription();
           router.push("/dashboard/billing");
         }
       }, 2000);
     } catch (error) {
       console.error("Failed to submit form:", error);
-      toast.error("Failed to submit form");
+      showToast("error", "Failed to submit form");
     } finally {
       setPending(false);
-      setTimeout(() => toast.dismiss(), 2000);
     }
   };
-
-  // console.log(watch("residence"));
-  // console.log(watch("location"));
 
   return (
     <Form {...form}>

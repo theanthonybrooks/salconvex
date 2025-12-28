@@ -43,16 +43,16 @@ import { api } from "~/convex/_generated/api";
 import { useAction, usePreloadedQuery } from "convex/react";
 
 type ManageSubDialogProps = {
-  dialog: {
-    open: boolean;
-    setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  };
+  // dialog: {
+  //   open: boolean;
+  //   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  // };
   children: React.ReactNode;
   onSubmit?: () => void;
 };
 
 export const SubDialog = ({
-  dialog,
+  // dialog,
   children,
   onSubmit,
 }: ManageSubDialogProps) => {
@@ -66,7 +66,7 @@ export const SubDialog = ({
   const subDetails = getSubscriptionStatusVals(subscription);
   const { status, cancelDetails } = subDetails ?? {};
 
-  const { open, setOpen } = dialog;
+  const [open, setOpen] = useState(false);
   const [error, setError] = useState<string>("");
 
   const [pending, setPending] = useState(false);
@@ -247,7 +247,7 @@ export const SubDialog = ({
                         setOpen(false);
                       }}
                       type="button"
-                      disabled={!formState?.isValid || pending}
+                      disabled={pending}
                     >
                       Cancel
                     </Button>

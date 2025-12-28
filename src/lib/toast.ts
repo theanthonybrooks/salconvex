@@ -6,6 +6,7 @@ const defaultOptions: ToastOptions = {
   autoClose: 2000,
   pauseOnHover: false,
   hideProgressBar: true,
+  draggablePercent: 60,
 };
 
 export function showToast(

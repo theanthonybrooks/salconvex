@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { UpdateArtistSchema, UpdateArtistSchemaValues } from "@/schemas/artist";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
-import { toast } from "react-toastify";
 import { Country } from "world-countries";
 import { z } from "zod";
 
@@ -31,6 +30,7 @@ import { autoHttps, formatHandleInput } from "@/helpers/linkFns";
 import { sortedGroupedCountries } from "@/helpers/locationFns";
 import { getUserFontSizePref } from "@/helpers/stylingFns";
 import { cn } from "@/helpers/utilsFns";
+import { showToast } from "@/lib/toast";
 
 import { api } from "~/convex/_generated/api";
 import {
@@ -139,7 +139,7 @@ export const ArtistProfileForm = ({ type }: ArtistProfileFormProps) => {
     if (artistNationality.length === 0 && data?.artistResidency?.country) {
       artistNationality.push(data.artistResidency.country);
     } else if (artistNationality.length === 0) {
-      toast.error("Please select at least one nationality");
+      showToast("error", "Please select at least one nationality");
       return;
     }
     const artistLocation = data?.artistResidency?.location;
@@ -187,10 +187,10 @@ export const ArtistProfileForm = ({ type }: ArtistProfileFormProps) => {
 
       reset();
 
-      toast.success("Successfully updated artist info!");
+      showToast("success", "Successfully updated artist info!");
     } catch (error) {
       console.error("Failed to submit form:", error);
-      toast.error("Failed to submit form");
+      showToast("error", "Failed to submit form");
     } finally {
       setPending(false);
     }

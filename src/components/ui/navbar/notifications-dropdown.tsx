@@ -8,7 +8,14 @@ import type { User } from "@/types/user";
 import React, { useState } from "react";
 import { useIsMobile } from "@/hooks/use-media-query";
 
-import { Archive, ArchiveRestore, Bell, SaveIcon, SaveOff } from "lucide-react";
+import {
+  Archive,
+  ArchiveRestore,
+  Bell,
+  Inbox,
+  SaveIcon,
+  SaveOff,
+} from "lucide-react";
 
 import type { Id } from "~/convex/_generated/dataModel";
 import type { UserPrefsType } from "~/convex/schema";
@@ -615,9 +622,12 @@ const NotificationDropdownItem = ({
 };
 
 const EmptyNotifications = ({ type }: { type?: string }) => (
-  <p className="w-full py-3 text-center text-sm text-muted-foreground">
-    No {type ?? "new"} notifications
-  </p>
+  <div className="flex w-full flex-col items-center justify-center gap-3 py-3">
+    <Inbox className="size-5 shrink-0 rounded-full text-foreground/30 ring-1.5 ring-foreground/30 ring-offset-4" />
+    <p className="w-full py-1 text-center text-sm text-muted-foreground">
+      No {type ?? "new"} notifications
+    </p>
+  </div>
 );
 
 const NotificationCount = ({ count }: { count: number }) => {
