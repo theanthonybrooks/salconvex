@@ -1737,7 +1737,7 @@ export const EventOCForm = ({
               type: "newEvent",
               displayText: `${alreadyApproved ? "Event Updated" : "New Event Added"}`,
               description: `${eventData.name}`,
-              redirectUrl: `/thelist/event/${submissionUrl}${openCallId ? "?tab=event" : ""}}`,
+              redirectUrl: `/thelist/event/${submissionUrl}${openCallId ? "?tab=event" : ""}`,
               dedupeKey: `event-${eventData._id}-${alreadyApproved ? "updated" : "added"}`,
               eventId: eventData._id,
             });

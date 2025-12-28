@@ -1643,7 +1643,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
               type: "newEvent",
               displayText: `${alreadyApproved ? "Event Updated" : "New Event Added"}`,
               description: `${eventData.name}`,
-              redirectUrl: `/thelist/event/${submissionUrl}${openCallId ? "?tab=event" : ""}}`,
+              redirectUrl: `/thelist/event/${submissionUrl}${openCallId ? "?tab=event" : ""}`,
               dedupeKey: `event-${eventData._id}-${alreadyApproved ? "updated" : "added"}`,
               eventId: eventData._id,
             });
@@ -2170,7 +2170,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
         steps={steps}
         skipped={skipped}
         className={cn(
-          "marge:w-[min(1500px,calc(100dvw-18rem))] mx-auto w-[90dvw] px-4 pb-4 xl:px-8",
+          "mx-auto w-[90dvw] px-4 pb-4 marge:w-[min(1500px,calc(100dvw-18rem))] xl:px-8",
           isSidebarCollapsed && "marge:w-[min(1500px,calc(95dvw-60px))]",
         )}
         finalLabel={alreadyPaid || alreadyApproved ? "Update" : "Submit"}
