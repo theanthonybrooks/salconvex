@@ -460,7 +460,7 @@ export const FormDatePicker = <T extends EventOCFormValues>({
                             index,
                           );
                           const adjustedMin = sequentialMin
-                            ? startOfDay(addDays(sequentialMin, 1)).getTime()
+                            ? startOfDay(sequentialMin).getTime()
                             : undefined;
 
                           return (
