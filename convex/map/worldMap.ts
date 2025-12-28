@@ -117,6 +117,7 @@ export const getWorldMapData = query({
         latitude: coords?.latitude ?? 0,
         longitude: coords?.longitude ?? 0,
         label: event.name,
+        edition: event.dates.edition,
         meta: {
           category: event.category,
           eventType: event.type,
@@ -124,7 +125,6 @@ export const getWorldMapData = query({
           hasOpenCall: activeSub ? event.hasOpenCall : "False",
           logo: event.logo,
           description: event.blurb ?? event.about,
-          edition: event.dates.edition,
           state: event.state,
           //todo: include the country, continent, and fullLocation, plus for activeSubs, display a checkbox that toggles the archived state events (and also non-event category projects). Ability
         },

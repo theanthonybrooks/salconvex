@@ -712,6 +712,10 @@ button:active {
   scale: 0 !important;
 }
 
+.leaflet-container a.leaflet-popup-close-button {
+  right: 2px;
+}
+
 .leaflet-custom-marker-wrapper {
   position: relative;
   display: flex;

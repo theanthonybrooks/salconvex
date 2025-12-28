@@ -62,9 +62,14 @@ export const EventCard = ({
 
                 <AccordionContent>
                   <LazyMap
-                    latitude={latitude}
-                    longitude={longitude}
-                    label={`${event.name} (${event.dates.edition})`}
+                    points={[
+                      {
+                        latitude,
+                        longitude,
+                        label: event.name,
+                        edition: event.dates.edition,
+                      },
+                    ]}
                     locationType={getLocationType(location)}
                     className={cn(
                       "z-0 mb-4 h-[200px] w-full overflow-hidden rounded-xl",
@@ -140,11 +145,16 @@ export const EventCard = ({
 
               <AccordionContent className={cn(fontSize)}>
                 <LazyMap
+                  points={[
+                    {
+                      latitude,
+                      longitude,
+                      label: event.name,
+                      edition: event.dates.edition,
+                    },
+                  ]}
                   fullScreen={viewFull}
                   setFullScreenAction={setViewFull}
-                  latitude={latitude}
-                  longitude={longitude}
-                  label={`${event.name} (${event.dates.edition})`}
                   locationType={getLocationType(location)}
                   className={
                     "z-0 mb-4 h-[400px] w-full overflow-hidden rounded-xl"

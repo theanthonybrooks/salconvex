@@ -33,6 +33,7 @@ export default function LeafletMapIcon({
   latitude,
   longitude,
   label,
+  edition,
   meta,
   iconSize = 30,
   // iconColor = "#E53E3E",
@@ -70,7 +71,7 @@ export default function LeafletMapIcon({
     type === "worldMap" && meta
       ? formatEventLink(
           {
-            dates: { edition: meta.edition },
+            dates: { edition },
             slug: meta.slug,
             hasOpenCall: meta.hasOpenCall,
           },

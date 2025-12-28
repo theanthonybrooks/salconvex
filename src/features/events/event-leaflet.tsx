@@ -14,7 +14,6 @@ import { useMemo, useState } from "react";
 import L from "leaflet";
 import { MapContainer, TileLayer } from "react-leaflet";
 
-import { FaMapLocationDot } from "react-icons/fa6";
 import { FiMaximize2, FiMinimize2 } from "react-icons/fi";
 
 import type { EventStateType, HasOpenCallType } from "~/convex/schema";
@@ -33,7 +32,8 @@ import { usePreloadedQuery } from "convex/react";
 export type MapPoint = {
   latitude: number;
   longitude: number;
-  label?: string;
+  edition: number;
+  label: string;
   meta?: {
     category: EventCategory;
     eventType?: EventType[];
@@ -41,7 +41,7 @@ export type MapPoint = {
     hasOpenCall: HasOpenCallType;
     logo: string;
     description?: string;
-    edition: number;
+
     state: EventStateType;
   };
 };
@@ -56,9 +56,6 @@ export type LocationType =
   | "unknown"
   | "full";
 export type MapComponentProps = {
-  latitude?: number;
-  longitude?: number;
-  label?: string;
   points?: MapPoint[];
   locationType?: LocationType;
   className?: string;
@@ -75,14 +72,10 @@ interface ClusterLike {
 }
 
 export default function MapComponent({
-  latitude,
-  longitude,
-  label,
   points,
   locationType,
   className,
   containerClassName,
-  hasDirections = false,
   mapType = "event",
   fullScreen,
   setFullScreenAction,
@@ -94,14 +87,7 @@ export default function MapComponent({
   const { hasActiveSubscription } = subData ?? {};
 
   const [overlay, setOverlay] = useState(true);
-
-  // Determine all points (whether single or multiple)
-  const allPoints: MapPoint[] = useMemo(() => {
-    if (points && points.length > 0) return points;
-    if (latitude !== undefined && longitude !== undefined)
-      return [{ latitude, longitude, label }];
-    return [];
-  }, [points, latitude, longitude, label]);
+  const allPoints = useMemo(() => points ?? [], [points]);
 
   // Determine map center — average of all points or fallback to single
   const center = useMemo(() => {
@@ -202,7 +188,8 @@ export default function MapComponent({
                   key={`${p.latitude}-${p.longitude}-${i}`}
                   latitude={p.latitude}
                   longitude={p.longitude}
-                  label={`${p.label} (${p.meta?.edition})`}
+                  edition={p.edition}
+                  label={`${p.label} (${p.edition})`}
                   meta={p.meta}
                   type={mapType === "full" ? "worldMap" : "event"}
                   activeSub={hasActiveSubscription || isAdmin}
@@ -262,7 +249,8 @@ export default function MapComponent({
                     key={`${p.latitude}-${p.longitude}-${i}`}
                     latitude={p.latitude}
                     longitude={p.longitude}
-                    label={`${p.label} (${p.meta?.edition})`}
+                    edition={p.edition}
+                    label={`${p.label} (${p.edition})`}
                     meta={p.meta}
                     type={mapType === "full" ? "worldMap" : "event"}
                     activeSub={hasActiveSubscription || isAdmin}
@@ -272,16 +260,6 @@ export default function MapComponent({
             </MapContainer>
           </DialogContent>
         </Dialog>
-
-        {hasDirections && (
-          <a
-            href={`https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`}
-            className="flex items-center justify-center gap-x-1 text-sm font-medium underline-offset-2 hover:underline"
-          >
-            Get directions
-            <FaMapLocationDot className="size-5 md:size-4" />
-          </a>
-        )}
       </div>
     </div>
   );

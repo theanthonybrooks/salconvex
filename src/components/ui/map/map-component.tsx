@@ -144,7 +144,6 @@ export default function WorldMapComponent() {
         <section className="w-full">
           <LazyMap
             points={filteredMapData ?? []}
-            label={"test"}
             className={cn(
               "z-0 mx-auto h-[calc(95dvh-100px)] w-full max-w-[90dvw] overflow-hidden border-l-1.5",
             )}
