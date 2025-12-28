@@ -33,7 +33,11 @@ export const DataTableEventEdition = ({
   const currentEdition = event.dates.edition;
   const eventId = event._id;
   const currentYear = new Date().getFullYear();
-  const years = Array.from({ length: 10 }, (_, i) => currentYear - 3 + i);
+  const twentyTwentyDiff = currentYear - 2020;
+  const years = Array.from(
+    { length: 3 + twentyTwentyDiff },
+    (_, i) => currentYear - twentyTwentyDiff + i,
+  );
 
   const handleChange = async (newValue: string) => {
     const newEdition = parseInt(newValue, 10);

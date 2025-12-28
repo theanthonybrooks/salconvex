@@ -164,8 +164,8 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
       <SalBackNavigation
         format="desktop"
         user={user}
-        activeSub={hasActiveSubscription}
         isOwner={isUserOrg || isAdmin}
+        orgId={event.mainOrgId}
       />
       <Card
         className={cn(

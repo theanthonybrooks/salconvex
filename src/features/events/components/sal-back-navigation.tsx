@@ -1,16 +1,20 @@
+import { User } from "@/types/user";
+
 import { useRouter } from "next/navigation";
 import { useSalBackNavigation } from "@/hooks/use-back-navigation";
-import { User } from "@/types/user";
+
 import { IoIosArrowRoundBack } from "react-icons/io";
 
+import type { Id } from "~/convex/_generated/dataModel";
 import { cn } from "@/helpers/utilsFns";
 
 interface SalBackNavigationProps {
   className?: string;
   format: "desktop" | "mobile";
   user: User | null;
-  activeSub?: boolean;
-  isOwner?: boolean;
+  // activeSub?: boolean;
+  isOwner: boolean;
+  orgId?: Id<"organizations">;
 }
 
 export const SalBackNavigation = ({
@@ -19,6 +23,7 @@ export const SalBackNavigation = ({
   user,
   // activeSub,
   isOwner,
+  orgId,
 }: SalBackNavigationProps) => {
   const router = useRouter();
   const desktopMode = format === "desktop";
@@ -52,7 +57,11 @@ export const SalBackNavigation = ({
             <>
               <p>|</p>
               <div
-                onClick={() => router.push("/dashboard/organizer/events")}
+                onClick={() =>
+                  router.push(
+                    `/dashboard/organizer${orgId ? `?orgId=${orgId}` : ""}`,
+                  )
+                }
                 className={cn(
                   "col-start-1 row-span-1 mx-auto flex w-max cursor-pointer items-center justify-start gap-x-2 py-6 underline-offset-2 hover:underline active:scale-95",
                   className,

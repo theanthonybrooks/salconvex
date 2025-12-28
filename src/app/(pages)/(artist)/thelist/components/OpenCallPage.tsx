@@ -18,13 +18,11 @@ type OpenCallDetailProps = {
 
 const OpenCallDetail = ({ preloaded }: OpenCallDetailProps) => {
   const data = usePreloadedQuery(preloaded);
-  const { preloadedUserData, preloadedSubStatus } = useConvexPreload();
+  const { preloadedUserData } = useConvexPreload();
   const userData = usePreloadedQuery(preloadedUserData);
-  const subData = usePreloadedQuery(preloadedSubStatus);
+
   const user = userData?.user ?? null;
-  const isAdmin = user?.role?.includes("admin") || false;
-  const hasActiveSubscription =
-    (subData?.hasActiveSubscription || isAdmin) ?? false;
+
   const userPref = userData?.userPref ?? null;
 
   const artistData = useQuery(api.artists.artistActions.getArtistFull);
@@ -38,7 +36,8 @@ const OpenCallDetail = ({ preloaded }: OpenCallDetailProps) => {
         format="mobile"
         user={user}
         isOwner={isOwner}
-        activeSub={hasActiveSubscription}
+        orgId={data?.organizer?._id}
+        // activeSub={hasActiveSubscription}
       />
       {!data ? (
         <EventSkeleton />

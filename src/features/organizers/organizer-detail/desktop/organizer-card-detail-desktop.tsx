@@ -107,8 +107,8 @@ export const OrganizerCardDetailDesktop = (props: OrganizerCardProps) => {
       <SalBackNavigation
         format="desktop"
         user={user}
-        activeSub={hasActiveSubscription}
         isOwner={isOwner}
+        orgId={data?.organizer?._id}
       />
 
       <Card

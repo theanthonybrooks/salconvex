@@ -17,13 +17,9 @@ type OrganizerDetailProps = {
 
 const OrganizerDetail = ({ preloaded }: OrganizerDetailProps) => {
   const data = usePreloadedQuery(preloaded);
-  const { preloadedSubStatus, preloadedUserData } = useConvexPreload();
-  const subData = usePreloadedQuery(preloadedSubStatus);
+  const { preloadedUserData } = useConvexPreload();
   const userData = usePreloadedQuery(preloadedUserData);
   const user = userData?.user ?? null;
-  const isAdmin = user?.role?.includes("admin") || false;
-  const hasActiveSubscription =
-    (subData?.hasActiveSubscription || isAdmin) ?? false;
 
   // const artistData = useQuery(api.artists.artistActions.getArtistFull);
   const isOwner = user?._id === data?.organizer?.ownerId;
@@ -33,8 +29,8 @@ const OrganizerDetail = ({ preloaded }: OrganizerDetailProps) => {
       <SalBackNavigation
         format="mobile"
         user={user}
-        activeSub={hasActiveSubscription}
         isOwner={isOwner}
+        orgId={data?.organizer?._id}
       />
 
       {!data ? (

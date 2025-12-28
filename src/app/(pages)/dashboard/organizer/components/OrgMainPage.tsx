@@ -4,6 +4,7 @@ import type { ColumnDef } from "@tanstack/react-table";
 
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
+import { useRouter, useSearchParams } from "next/navigation";
 import { OrgInfo } from "@/app/(pages)/dashboard/organizer/components/OrgInfo";
 import { StaffPage } from "@/app/(pages)/dashboard/organizer/components/StaffPage";
 import { useIsMobile } from "@/hooks/use-media-query";
@@ -29,12 +30,16 @@ import { usePreloadedQuery } from "convex/react";
 
 export const OrgMainPage = () => {
   const isMobile = useIsMobile();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  const orgId = searchParams.get("orgId") as Id<"organizations"> | null;
   const { preloadedUserData } = useConvexPreload();
   const userData = usePreloadedQuery(preloadedUserData);
   const [activeTab, setActiveTab] = useState("orgInfo");
   const { user, userPref } = userData ?? {};
   const [selectedOrg, setSelectedOrg] = useState<Id<"organizations"> | null>(
-    null,
+    orgId ?? null,
   );
   const isAdmin = user?.role?.includes("admin");
   // const isAdmin = false;
@@ -75,12 +80,20 @@ export const OrgMainPage = () => {
   };
 
   useEffect(() => {
-    if (userOrgs.length > 0 && !selectedOrg) {
-      setSelectedOrg(userOrgs[0]._id);
-    }
-  }, [userOrgs, selectedOrg]);
+    if (userOrgs.length === 0) return;
 
-  // console.log(selectedOrg);
+    const isValidSelection =
+      selectedOrg && userOrgs.some((org) => org._id === selectedOrg);
+
+    if (!isValidSelection) {
+      setSelectedOrg(userOrgs[0]._id);
+      return;
+    }
+
+    if (searchParams.get("orgId")) {
+      router.replace("/dashboard/organizer", { scroll: false });
+    }
+  }, [userOrgs, selectedOrg, searchParams, router]);
 
   const currentOrg = userOrgs.find((org) => org._id === selectedOrg);
   const isOrgOwner = currentOrg?.ownerId === user?._id;

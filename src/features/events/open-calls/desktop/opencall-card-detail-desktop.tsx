@@ -227,8 +227,8 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
       <SalBackNavigation
         format="desktop"
         user={user}
-        activeSub={hasActiveSubscription}
         isOwner={isUserOrg || isAdmin}
+        orgId={event.mainOrgId}
       />
 
       <Card
