@@ -113,6 +113,7 @@ export const verifyNewsletterSubscription = mutation({
     } else {
       await ctx.db.patch(newsletterSub._id, {
         verified: true,
+        newsletter: true,
       });
       await ctx.scheduler.runAfter(
         0,
@@ -287,7 +288,7 @@ export const subscribeToNewsletter = mutation({
       userId: user?._id ?? null,
       firstName,
       email,
-      newsletter: true,
+      newsletter: false,
       type: ["general"],
       frequency: "monthly",
       timesAttempted: 1,
