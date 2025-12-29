@@ -1373,10 +1373,6 @@ export const updateEventStatus = mutation({
       throw new Error("You don't have permission to approve events");
     const event = await ctx.db.get(args.eventId);
     if (!event) return null;
-    const openCall = await ctx.db
-      .query("openCalls")
-      .withIndex("by_eventId", (q) => q.eq("eventId", args.eventId))
-      .first();
 
     const oldDoc = event;
     await ctx.db.patch(event._id, {
@@ -1386,16 +1382,6 @@ export const updateEventStatus = mutation({
       approvedBy: userId,
       approvedAt: Date.now(),
     });
-    if (event.category === "event") {
-      await upsertNotification(ctx, {
-        type: "newEvent",
-        redirectUrl: `/thelist/event/${event.slug}/${event.dates.edition}${openCall ? "/call?tab=event" : ""}`,
-        displayText: "New Event Added",
-        description: event.name,
-        eventId: event._id,
-        dedupeKey: `event-${event._id}-added`,
-      });
-    }
 
     const newDoc = await ctx.db.get(event._id);
     if (newDoc) await eventsAggregate.replaceOrInsert(ctx, oldDoc, newDoc);
@@ -1439,7 +1425,7 @@ export const approveEvent = mutation({
         type: "newEvent",
         targetUserType: "artist",
         redirectUrl: `/thelist/event/${event.slug}/${event.dates.edition}${openCall ? "/call?tab=event" : ""}`,
-        displayText: "New Event Published",
+        displayText: "New Event Added",
         description: event.name,
         eventId: event._id,
         dedupeKey: `event-${event._id}-added`,

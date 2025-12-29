@@ -10,8 +10,9 @@ import {
 import { EventCategory } from "@/types/eventTypes";
 import { User } from "@/types/user";
 
-import { useIsMobile } from "@/hooks/use-media-query";
 import { useEffect, useRef, useState } from "react";
+import { useIsMobile } from "@/hooks/use-media-query";
+import { lowerCase } from "lodash";
 import { Controller, useFormContext } from "react-hook-form";
 
 import { HiArrowTurnLeftDown } from "react-icons/hi2";
@@ -32,11 +33,11 @@ import { EventOCFormValues } from "@/features/events/event-add-form";
 import { getEventCategoryLabel } from "@/helpers/eventFns";
 import { cn } from "@/helpers/utilsFns";
 
+import { api } from "~/convex/_generated/api";
+import { Doc } from "~/convex/_generated/dataModel";
 import { makeUseQueryWithStatus } from "convex-helpers/react";
 import { useQueries } from "convex-helpers/react/cache/hooks";
 import { ConvexError } from "convex/values";
-import { api } from "~/convex/_generated/api";
-import { Doc } from "~/convex/_generated/dataModel";
 
 interface SubmissionFormEventStep1Props {
   user: User | undefined;
@@ -65,6 +66,7 @@ const SubmissionFormEventStep1 = ({
 }: SubmissionFormEventStep1Props) => {
   const isTablet = useIsMobile(1300);
   const isIpad = useIsMobile(1366);
+  const isAdmin = user?.role?.includes("admin") || false;
   const {
     control,
     watch,
@@ -86,6 +88,8 @@ const SubmissionFormEventStep1 = ({
 
   const eventEdition = eventData?.dates?.edition;
   const eventState = eventData?.state;
+  const eventBlurb = eventData?.blurb;
+
   const archivedEvent = eventState === "archived";
   // console.log(eventData);
 
@@ -122,16 +126,15 @@ const SubmissionFormEventStep1 = ({
       : "skip",
   );
 
-  // console.log(eventNameError);
   // #endregion
 
-  // console.log(eventNameValid);
   const nameValidTrigger = eventNameValid || (!comboChanged && hasEventName);
 
   const eventNameIsDirty = dirtyFields.event?.name ?? false;
   const hasEventLocation =
     (dirtyFields.event?.location || eventData?.location?.full !== undefined) &&
     nameValidTrigger;
+  const hasBlurb = (eventBlurb && eventBlurb.trim().length >= 10) || isAdmin;
   const isOngoing = eventData?.dates?.eventFormat === "ongoing";
   const eventDatesFormat = eventData?.dates?.eventFormat;
   const hasEventFormat = Boolean(eventData?.dates?.eventFormat);
@@ -142,8 +145,15 @@ const SubmissionFormEventStep1 = ({
   const noEvent = noEventCategories.includes(category ?? "");
   const noProd = noProdCategories.includes(category ?? "");
   const hasProd = hasProductionCategories.includes(category) && !isOngoing;
-  // const prodOnly = prodOnlyCategories.includes(category ?? "");
   const singleProdDate = prodDates?.length === 1;
+  const validProdSection =
+    Boolean(prodDatesFormat) &&
+    prodDates &&
+    !(
+      prodDates.length === 1 &&
+      prodDates[0].start === "" &&
+      prodDates[0].end === ""
+    );
 
   const eventDateFormatRequired = !!(
     hasEventFormat &&
@@ -160,7 +170,7 @@ const SubmissionFormEventStep1 = ({
   const blankEventDates =
     eventDates?.[0]?.start === "" || eventDates?.[0]?.end === "";
   const orgData = watch("organization");
-  const isAdmin = user?.role?.includes("admin") || false;
+
   const eventOnly = formType === 1;
 
   useEffect(() => {
@@ -356,7 +366,11 @@ const SubmissionFormEventStep1 = ({
                       min={2000}
                       max={3000}
                       onChange={(e) => field.onChange(Number(e.target.value))}
-                      value={field.value ?? currentYear}
+                      value={
+                        (field.value ?? currentYear === 2025)
+                          ? 2026
+                          : currentYear
+                      }
                       className={cn(
                         "h-12 w-25 border border-foreground bg-card !text-base sm:h-[50px]",
                         errors.event?.dates?.edition && "invalid-field",
@@ -483,7 +497,7 @@ const SubmissionFormEventStep1 = ({
                             maxLength={250}
                             required={!isAdmin}
                             className="max-h-30 min-h-12"
-                            placeholder="Short blurb about your project/event... Limit 250 characters (required) "
+                            placeholder={`Short blurb about your ${lowerCase(getEventCategoryLabel(category, true))} - used in previews and social media posts... Limit 250 characters (required)`}
                           />
                         )}
                       />
@@ -501,7 +515,7 @@ const SubmissionFormEventStep1 = ({
                             tabIndex={0}
                             value={field.value ?? ""}
                             onChange={field.onChange}
-                            placeholder="Full details about your project/event... "
+                            placeholder={`Full details about your ${lowerCase(getEventCategoryLabel(category, true))}...`}
                             charLimit={5000}
                             noList={true}
                             formInputPreview
@@ -517,7 +531,7 @@ const SubmissionFormEventStep1 = ({
           </>
         )}
       </div>
-      {hasEventLocation && (
+      {hasEventLocation && hasBlurb && (
         <>
           <Separator
             thickness={2}
@@ -540,7 +554,7 @@ const SubmissionFormEventStep1 = ({
                     Step {categoryEvent && !eventOnly ? 7 : 6}:{" "}
                   </p>
                   <p className="lg:text-xs">
-                    {getEventCategoryLabel(category, true)} Dates
+                    {lowerCase(getEventCategoryLabel(category, true))} Dates
                   </p>
                 </div>
 
@@ -624,7 +638,7 @@ const SubmissionFormEventStep1 = ({
                   )}
                 </>
               )}
-            {hasEventFormat && (
+            {hasEventFormat && (validProdSection || noProd || isOngoing) && (
               <>
                 <div className="input-section h-full">
                   <p className="min-w-max font-bold lg:text-xl">
