@@ -90,7 +90,10 @@ export function CustomDropdownNav({ minDate }: { minDate?: number }) {
           }}
           disabled={availableMonths.length === 1}
         >
-          <SelectTrigger className="w-[110px] text-base sm:text-sm">
+          <SelectTrigger
+            className="w-[110px] text-base sm:text-sm"
+            onMouseDown={(e) => e.preventDefault()}
+          >
             <SelectValue>{monthNames[month]}</SelectValue>
           </SelectTrigger>
           <SelectContent className="max-h-72">
@@ -107,7 +110,10 @@ export function CustomDropdownNav({ minDate }: { minDate?: number }) {
           onValueChange={(val) => goToMonth(new Date(parseInt(val, 10), month))}
           disabled={yearRange.length === 1}
         >
-          <SelectTrigger className="w-[90px] text-base sm:text-sm">
+          <SelectTrigger
+            className="w-[90px] text-base sm:text-sm"
+            onMouseDown={(e) => e.preventDefault()}
+          >
             <SelectValue>{year}</SelectValue>
           </SelectTrigger>
           <SelectContent className="max-h-72">
