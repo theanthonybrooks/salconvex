@@ -217,7 +217,10 @@ export function DateTimePickerField({
       </DialogHeader>
 
       <DialogTrigger asChild role="button">
-        <div className={cn("relative w-full", triggerClassName)}>
+        <div
+          className={cn("relative w-full", triggerClassName)}
+          onClick={(e) => e.stopPropagation()}
+        >
           <Input
             disabled={disabled}
             readOnly
@@ -251,6 +254,7 @@ export function DateTimePickerField({
             }
           });
         }}
+        onClick={(e) => e.stopPropagation()}
       >
         <DialogDescription className="sr-only">
           Select date and time
