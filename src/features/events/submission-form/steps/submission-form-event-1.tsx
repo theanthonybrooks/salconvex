@@ -366,10 +366,7 @@ const SubmissionFormEventStep1 = ({
                       min={2000}
                       max={3000}
                       onChange={(e) => field.onChange(Number(e.target.value))}
-                      value={
-                        field.value ??
-                        (currentYear === 2025 ? 2026 : currentYear)
-                      }
+                      value={field.value ?? currentYear}
                       className={cn(
                         "h-12 w-25 border border-foreground bg-card !text-base sm:h-[50px]",
                         errors.event?.dates?.edition && "invalid-field",

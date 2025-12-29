@@ -65,7 +65,12 @@ export function CustomDropdownNav({ minDate }: { minDate?: number }) {
     .filter(({ index }) => !isMonthDisabled(year, index));
 
   return (
-    <div className="richard my-5 flex w-full items-center justify-between gap-2 py-2">
+    <div
+      className="richard my-5 flex w-full items-center justify-between gap-2 py-2"
+      onPointerDown={(e) => e.stopPropagation()}
+      onMouseDown={(e) => e.stopPropagation()}
+      onClick={(e) => e.stopPropagation()}
+    >
       <Button
         variant="ghost"
         type="button"

@@ -219,6 +219,8 @@ export function DateTimePickerField({
       <DialogTrigger asChild role="button">
         <div
           className={cn("relative w-full", triggerClassName)}
+          onPointerDown={(e) => e.stopPropagation()}
+          onMouseDown={(e) => e.stopPropagation()}
           onClick={(e) => e.stopPropagation()}
         >
           <Input
@@ -241,6 +243,9 @@ export function DateTimePickerField({
           "flex flex-col items-center justify-center gap-6 bg-card px-4 pt-5 sm:max-w-sm",
           withTime && "lg:max-w-lg",
         )}
+        onPointerDown={(e) => e.stopPropagation()}
+        onMouseDown={(e) => e.stopPropagation()}
+        onClick={(e) => e.stopPropagation()}
         onOpenAutoFocus={() => {
           requestAnimationFrame(() => {
             const selectedButton = document.querySelector(
@@ -254,7 +259,6 @@ export function DateTimePickerField({
             }
           });
         }}
-        onClick={(e) => e.stopPropagation()}
       >
         <DialogDescription className="sr-only">
           Select date and time

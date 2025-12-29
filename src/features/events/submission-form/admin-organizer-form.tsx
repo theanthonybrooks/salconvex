@@ -703,6 +703,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
   };
 
   const handleFirstStep = () => {
+    const currentYear = new Date().getFullYear();
     if (activeStep === 0 && !hasUserEditedForm && furthestStep === 0) {
       const locationFromEvent = existingEvent?.location?.full
         ? existingEvent?.location?.sameAsOrganizer
@@ -752,7 +753,7 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
             category: eventData.category ?? "event",
 
             dates: {
-              edition: new Date().getFullYear(),
+              edition: currentYear === 2025 ? 2026 : currentYear,
               noProdStart: false,
             },
             links: {
@@ -2069,13 +2070,13 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
       if (!hasNoEventDates) return;
     }
 
-    const otherFormats = [
-      "noEvent",
-      "setDates",
-      "monthRange",
-      "yearRange",
-      "seasonRange",
-    ];
+    // const otherFormats = [
+    //   "noEvent",
+    //   "setDates",
+    //   "monthRange",
+    //   "yearRange",
+    //   "seasonRange",
+    // ];
 
     if (!eventDatesFormat) return;
     // if (!hasNoEventDatesEdition) return;
@@ -2114,9 +2115,13 @@ export const AdminEventForm = ({ user }: AdminEventOCFormProps) => {
         },
       ]);
     }
-    if (otherFormats.includes(eventDatesFormat)) {
-      setValue("event.dates.edition", new Date().getFullYear());
-    }
+    // if (otherFormats.includes(eventDatesFormat)) {
+    //   const currentYear = new Date().getFullYear();
+    //   setValue(
+    //     "event.dates.edition",
+    //     currentYear === 2025 ? 2026 : currentYear,
+    //   );
+    // }
   }, [eventDatesFormat, setValue, hasNoEventDates]);
 
   useEffect(() => {

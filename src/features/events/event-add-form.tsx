@@ -762,6 +762,7 @@ export const EventOCForm = ({
   };
 
   const handleFirstStep = () => {
+    const currentYear = new Date().getFullYear();
     if (activeStep === 0 && !hasUserEditedStep0 && furthestStep === 0) {
       const locationFromEvent = existingEvent?.location?.full
         ? existingEvent?.location?.sameAsOrganizer
@@ -811,7 +812,7 @@ export const EventOCForm = ({
             category: !eventOnly ? eventData.category : "event",
 
             dates: {
-              edition: new Date().getFullYear(),
+              edition: currentYear === 2025 ? 2026 : currentYear,
               noProdStart: false,
             },
             links: {
@@ -2172,13 +2173,13 @@ export const EventOCForm = ({
       if (!hasNoEventDates) return;
     }
 
-    const otherFormats = [
-      "noEvent",
-      "setDates",
-      "monthRange",
-      "yearRange",
-      "seasonRange",
-    ];
+    // const otherFormats = [
+    //   "noEvent",
+    //   "setDates",
+    //   "monthRange",
+    //   "yearRange",
+    //   "seasonRange",
+    // ];
 
     if (
       eventDatesFormat === "noEvent" ||
@@ -2215,9 +2216,13 @@ export const EventOCForm = ({
         },
       ]);
     }
-    if (otherFormats.includes(eventDatesFormat)) {
-      setValue("event.dates.edition", new Date().getFullYear());
-    }
+    // if (otherFormats.includes(eventDatesFormat)) {
+    //   const currentYear = new Date().getFullYear();
+    //   setValue(
+    //     "event.dates.edition",
+    //     currentYear === 2025 ? 2026 : currentYear,
+    //   );
+    // }
   }, [eventDatesFormat, setValue, hasNoEventDates]);
 
   useEffect(() => {
