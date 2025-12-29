@@ -374,34 +374,7 @@ export const TABLE_FILTERS: TableFilterConfig = {
       ],
     },
   ],
-  newsletter: [
-    {
-      columnId: "active",
-      title: "Active",
-      options: [
-        { value: true, label: "Active" },
-        { value: false, label: "Inactive" },
-      ],
-    },
-    {
-      columnId: "userPlan",
-      title: "Plan",
-      options: [
-        { value: "0", label: "None" },
-        { value: "1", label: "Original" },
-        { value: "2", label: "Banana" },
-        { value: "3", label: "Fat Cap" },
-      ],
-    },
-    {
-      columnId: "userType",
-      title: "User Type",
-      options: [
-        { icon: User, value: "user", label: "User" },
-        { icon: Ghost, value: "guest", label: "Guest" },
-      ],
-    },
-  ],
+  newsletter: [],
   support: [
     { columnId: "status", title: "Status", options: [...ticketStatusOptions] },
     {
@@ -525,6 +498,33 @@ export const TABLE_FILTERS: TableFilterConfig = {
       options: editionOptions,
     },
   ],
-  audience: [],
+  audience: [
+    {
+      columnId: "active",
+      title: "Active",
+      options: [
+        { value: true, label: "Active" },
+        { value: false, label: "Inactive" },
+      ],
+    },
+    {
+      columnId: "userPlan",
+      title: "Plan",
+      options: [
+        { value: "0", label: "None" },
+        { value: "1", label: "Original" },
+        { value: "2", label: "Banana" },
+        { value: "3", label: "Fat Cap" },
+      ],
+    },
+    {
+      columnId: "userType",
+      title: "User Type",
+      options: [
+        { icon: User, value: "user", label: "User" },
+        { icon: Ghost, value: "guest", label: "Guest" },
+      ],
+    },
+  ],
   campaigns: [],
 };
