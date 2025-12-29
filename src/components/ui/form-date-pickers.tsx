@@ -1,6 +1,7 @@
 import { EventCategory } from "@/types/eventTypes";
 
 import React, { useEffect, useRef, useState } from "react";
+import { addDays, startOfDay, subYears } from "date-fns";
 import { fromZonedTime } from "date-fns-tz";
 import { motion } from "framer-motion";
 import {
@@ -63,14 +64,20 @@ type DateFieldProps<K extends DateArrayKey, F extends DateFieldKey> = {
   timeZone: string;
   minDate?: number;
   maxDate?: number;
+  label?: string;
+  disabled?: boolean;
+  className?: string;
 };
 
 function DateField<K extends DateArrayKey, F extends DateFieldKey>({
   control,
   name,
+  label,
+  disabled,
   timeZone,
   minDate,
   maxDate,
+  className,
 }: DateFieldProps<K, F>) {
   const { field } = useController({
     name,
@@ -84,9 +91,12 @@ function DateField<K extends DateArrayKey, F extends DateFieldKey>({
         if (!date) return;
         field.onChange(fromZonedTime(date, timeZone).toISOString());
       }}
+      label={label}
+      disabled={disabled}
       minDate={minDate}
       maxDate={maxDate}
       timeZone={timeZone}
+      inputClassName={className}
       withTime={false}
     />
   );
@@ -397,12 +407,14 @@ export const FormDatePicker = <T extends EventOCFormValues>({
                           `${nameBase}.${formatKey}.${index - 1}.end` as Path<T>,
                         ) as string | undefined)
                       : undefined;
-                  const watchedSetStart = watch(
-                    `${nameBase}.${formatKey}.${index}.start` as Path<T>,
-                  );
+                  // const watchedSetStart = watch(
+                  //   `${nameBase}.${formatKey}.${index}.start` as Path<T>,
+                  // ) as string | undefined;
                   const watchedSetEnd = watch(
                     `${nameBase}.${formatKey}.${index}.end` as Path<T>,
-                  );
+                  ) as string | undefined;
+                  const fiveYearsAgo = subYears(new Date(), 5);
+
                   return (
                     <div
                       key={field.id}
@@ -433,118 +445,48 @@ export const FormDatePicker = <T extends EventOCFormValues>({
                       <MemoDateField
                         control={control}
                         name={`event.dates.${formatKey}.${index}.start`}
+                        disabled={noProdStart}
+                        label={noProdStart ? "(Flexible/Open)" : undefined}
                         timeZone={orgTimezone}
-                        // minDate={minDate}
-                        // maxDate={maxDate}
+                        minDate={
+                          isAdmin && !prevEndDate
+                            ? startOfDay(fiveYearsAgo).getTime()
+                            : prevEndDate
+                              ? startOfDay(addDays(prevEndDate, 1)).getTime()
+                              : undefined
+                        }
+                        maxDate={
+                          watchedSetEnd ? Date.parse(watchedSetEnd) : undefined
+                        }
+                        className={cn(
+                          "h-12 border-foreground bg-card hover:bg-salYellow/20 sm:h-11",
+                          isFieldInvalid(
+                            `${nameBase}.${formatKey}.${index}.start`,
+                          ) && "invalid-field",
+                        )}
                       />
-                      {/* <Controller
-                        name={
-                          `${nameBase}.${formatKey}.${index}.start` as Path<T>
-                        }
-                        control={control}
-                        render={({ field }) => {
-                          const fiveYearsAgo = subYears(new Date(), 5);
-                          const minDate =
-                            isAdmin && !prevEndDate
-                              ? startOfDay(fiveYearsAgo).getTime()
-                              : prevEndDate
-                                ? startOfDay(addDays(prevEndDate, 1)).getTime()
-                                : undefined;
-                          const rawEnd = watch(
-                            `${nameBase}.${formatKey}.${index}.end` as Path<T>,
-                          ) as string | undefined;
-
-                          const maxDate =
-                            rawEnd !== undefined
-                              ? Date.parse(rawEnd)
-                              : undefined;
-
-                          return (
-                            <DateTimePickerField
-                              value={
-                                watchedSetStart
-                                  ? Date.parse(watchedSetStart as string)
-                                  : undefined
-                              }
-                              onChange={(date) => {
-                                if (!date) return;
-                                field.onChange(
-                                  fromZonedTime(
-                                    date,
-                                    orgTimezone,
-                                  ).toISOString(),
-                                );
-                              }}
-                              disabled={noProdStart}
-                              label={
-                                noProdStart ? "(Flexible/Open)" : undefined
-                              }
-                              inputClassName={cn(
-                                "h-12 border-foreground bg-card hover:bg-salYellow/20 sm:h-11",
-                                isFieldInvalid(
-                                  `${nameBase}.${formatKey}.${index}.start`,
-                                ) && "invalid-field",
-                              )}
-                              minDate={minDate}
-                              maxDate={maxDate}
-                              withTime={false}
-                              timeZone={orgTimezone}
-                            />
-                          );
-                        }}
-                      /> */}
                       -
-                      {/* <Controller
-                        name={
-                          `${nameBase}.${formatKey}.${index}.end` as Path<T>
-                        }
+                      <MemoDateField
                         control={control}
-                        render={({ field }) => {
+                        name={`event.dates.${formatKey}.${index}.end`}
+                        timeZone={orgTimezone}
+                        minDate={(() => {
                           const sequentialMin = getSequentialMinDate(
                             watch,
                             nameBase,
                             formatKey,
                             index,
                           );
-                          const adjustedMin = sequentialMin
+                          return sequentialMin
                             ? startOfDay(sequentialMin).getTime()
                             : undefined;
-
-                          return (
-                            <DateTimePickerField
-                              value={
-                                watchedSetEnd
-                                  ? Date.parse(watchedSetEnd as string)
-                                  : undefined
-                              }
-                              onChange={(date) => {
-                                if (!date) return;
-                                field.onChange(
-                                  fromZonedTime(
-                                    date,
-                                    orgTimezone,
-                                  ).toISOString(),
-                                );
-                              }}
-                              inputClassName={cn(
-                                "h-12 border-foreground bg-card hover:bg-salYellow/20 sm:h-11",
-                                isFieldInvalid(
-                                  `${nameBase}.${formatKey}.${index}.start`,
-                                ) && "invalid-field",
-                              )}
-                              minDate={adjustedMin}
-                              withTime={false}
-                              timeZone={orgTimezone}
-                            />
-                          );
-                        }}
-                      /> */}
-                      <MemoDateField
-                        control={control}
-                        name={`event.dates.${formatKey}.${index}.end`}
-                        timeZone={orgTimezone}
-                        // minDate={minDate}
-                        // maxDate={maxDate}
+                        })()}
+                        className={cn(
+                          "h-12 border-foreground bg-card hover:bg-salYellow/20 sm:h-11",
+                          isFieldInvalid(
+                            `${nameBase}.${formatKey}.${index}.end`,
+                          ) && "invalid-field",
+                        )}
                       />
                     </div>
                   );
@@ -559,7 +501,6 @@ export const FormDatePicker = <T extends EventOCFormValues>({
                     )}
                   >
                     Add More Dates +
-                    {/* {!noProdStart && canAddMore && "Add More Dates +"} */}
                   </button>
                 )}
               </>

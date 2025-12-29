@@ -72,6 +72,7 @@ export function DateTimePickerField({
   disabled,
   timeZone,
 }: DayPickerProps) {
+  console.log(disabled, label);
   const isMobile = useIsMobile(1080);
   const [open, setOpen] = useState(false);
 
@@ -208,7 +209,7 @@ export function DateTimePickerField({
   }
 
   const outputLabel =
-    (label ?? withTime) ? "Select date and time" : "Select date";
+    label ?? (withTime ? "Select date and time" : "Select date");
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
