@@ -303,7 +303,7 @@ const SubmissionFormEventStep1 = ({
                     onValueChange={(value) => {
                       field.onChange(value);
                     }}
-                    defaultValue={field.value ?? []}
+                    value={field.value ?? []}
                     shortResults={isMobile}
                     placeholder="Select up to 2 event types"
                     variant="basic"

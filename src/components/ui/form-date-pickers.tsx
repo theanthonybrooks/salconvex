@@ -324,7 +324,6 @@ export const FormDatePicker = <T extends EventOCFormValues>({
         {title}
       </Label>
       <Controller
-        // name="event.dates.eventFormat"
         key={`${nameBase}.${formatField}` as Path<T>}
         name={`${nameBase}.${formatField}` as Path<T>}
         control={control}
@@ -334,7 +333,7 @@ export const FormDatePicker = <T extends EventOCFormValues>({
               onValueChange={(value: EventCategory) => {
                 field.onChange(value);
               }}
-              defaultValue={String(field.value ?? "")}
+              value={String(field.value) ?? ""}
             >
               <SelectTrigger className="h-12 w-full border bg-card text-center text-base placeholder:text-muted-foreground/30 sm:h-[50px]">
                 <SelectValue
