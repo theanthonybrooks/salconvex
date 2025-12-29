@@ -23,6 +23,19 @@ function needsLowercase(value: string): boolean {
   return value !== value.toLowerCase();
 }
 
+export const convertNewsletterStatusToString = migrations.define({
+  table: "newsletter",
+  migrateOne: async (ctx, newsletter) => {
+    await ctx.db.patch(newsletter._id, {
+      newsletter: newsletter.newsletter ? "active" : "inactive",
+    });
+  },
+});
+
+export const runCNS = migrations.runner(
+  internal.migrations.convertNewsletterStatusToString,
+);
+
 export const addFalseSavedFieldToNotifications = migrations.define({
   table: "notifications",
   migrateOne: async (ctx, notification) => {

@@ -204,7 +204,7 @@ const NewsletterPage = () => {
       const emailValue = subEmail ?? user?.email;
       if (!emailValue) throw new Error("No email found");
       const result = await unsubscribe({
-        newsletter: false,
+        newsletter: "inactive",
         email: emailValue,
       });
       if (result?.canceled) {
@@ -233,7 +233,7 @@ const NewsletterPage = () => {
     try {
       await updateNewsletterSubscription({
         email: subEmail ?? user?.email ?? "",
-        newsletter: true,
+        newsletter: "active",
         frequency: values.frequency ?? "monthly",
         type: values.type ?? ["general"],
         userPlan,

@@ -50,7 +50,7 @@ export function NewsletterTableWrapper({ page }: TableWrapperProps) {
             description="View newsletter subscribers & their preferences"
             extraToolbar={<NewsletterToolbar />}
             data={audienceData?.subscribers ?? []}
-            defaultFilters={[{ id: `active`, value: ["true"] }]}
+            defaultFilters={[{ id: `active`, value: ["active"] }]}
             defaultSort={[{ id: `createdAt`, desc: true }]}
             columns={audienceColumns}
             tableType="audience"

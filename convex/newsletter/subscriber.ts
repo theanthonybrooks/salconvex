@@ -14,6 +14,7 @@ import {
 } from "~/convex/_generated/server";
 import {
   newsletterFrequencyValidator,
+  newsletterStatusValidator,
   newsletterTypeValidator,
 } from "~/convex/schema";
 import { ConvexError, v } from "convex/values";
@@ -113,7 +114,7 @@ export const verifyNewsletterSubscription = mutation({
     } else {
       await ctx.db.patch(newsletterSub._id, {
         verified: true,
-        newsletter: true,
+        newsletter: "active",
       });
       await ctx.scheduler.runAfter(
         0,
@@ -225,7 +226,7 @@ export const subscribeToNewsletter = mutation({
     if (newsletterSubscription) {
       console.log(newsletterSubscription, email);
       const verified = newsletterSubscription.verified;
-      const wasCanceled = newsletterSubscription.newsletter === false;
+      const wasCanceled = newsletterSubscription.newsletter === "inactive";
       if (newsletterSubscription.timesAttempted > 3) {
         return {
           status: `too_many_attempts ${verified ? "is_verified" : "unverified"}`,
@@ -242,8 +243,8 @@ export const subscribeToNewsletter = mutation({
         userPlan,
         firstName,
         frequency: newsletterSubscription.frequency ?? "monthly",
-        newsletter: true,
-        verified: false,
+        newsletter: newsletterSubscription.verified ? "active" : "pending",
+        verified: newsletterSubscription.verified,
         ...(wasCanceled && { email }),
       });
       if (userPrefs?.notifications) {
@@ -288,7 +289,7 @@ export const subscribeToNewsletter = mutation({
       userId: user?._id ?? null,
       firstName,
       email,
-      newsletter: false,
+      newsletter: "pending",
       type: ["general"],
       frequency: "monthly",
       timesAttempted: 1,
@@ -353,7 +354,8 @@ export const getNewsletterSubscribers = query({
 export const updateNewsletterStatus = mutation({
   args: {
     email: v.string(),
-    newsletter: v.boolean(),
+    // newsletter: v.boolean(),
+    newsletter: newsletterStatusValidator,
     frequency: v.optional(v.union(v.literal("monthly"), v.literal("weekly"))),
     type: v.optional(
       v.array(v.union(v.literal("openCall"), v.literal("general"))),
@@ -364,7 +366,7 @@ export const updateNewsletterStatus = mutation({
   handler: async (ctx, args) => {
     const { email, newsletter, frequency, type, userPlan, updateEmail } = args;
 
-    const wasCanceled = newsletter === false;
+    const wasCanceled = newsletter === "inactive";
 
     const userId = await getAuthUserId(ctx);
 
@@ -473,7 +475,7 @@ export const getAudience = query({
     let query = ctx.db
       .query("newsletter")
       .withIndex("by_active_plan", (q) =>
-        q.eq("newsletter", true).gte("userPlan", plan),
+        q.eq("newsletter", "active").gte("userPlan", plan),
       );
     if (frequency !== "all") {
       query = query.filter((f) =>

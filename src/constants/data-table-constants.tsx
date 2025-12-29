@@ -503,8 +503,9 @@ export const TABLE_FILTERS: TableFilterConfig = {
       columnId: "active",
       title: "Active",
       options: [
-        { value: true, label: "Active" },
-        { value: false, label: "Inactive" },
+        { value: "active", label: "Active" },
+        { value: "inactive", label: "Inactive" },
+        { value: "pending", label: "Pending" },
       ],
     },
     {

@@ -17,7 +17,7 @@ import RecentLoginEmail, {
 
 import { Resend as ResendComponent } from "@convex-dev/resend";
 import { api, components, internal } from "~/convex/_generated/api";
-import schema from "~/convex/schema";
+import schema, { newsletterStatusValidator } from "~/convex/schema";
 import { doc } from "convex-helpers/validators";
 import { ConvexError, v } from "convex/values";
 import { action, internalAction } from "../_generated/server";
@@ -411,7 +411,7 @@ export const sendNewsletterConfirmationEmail = internalAction({
 
 export const sendNewsletterUpdateConfirmation = action({
   args: {
-    newsletter: v.boolean(),
+    newsletter: newsletterStatusValidator,
     frequency: v.optional(v.union(v.literal("monthly"), v.literal("weekly"))),
     type: v.optional(
       v.array(v.union(v.literal("openCall"), v.literal("general"))),

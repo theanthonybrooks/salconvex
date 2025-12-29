@@ -35,7 +35,7 @@ import {
   Users2,
 } from "lucide-react";
 
-import type { InAppNotificationsType } from "~/convex/schema";
+import type { InAppNotificationsType, NewsletterStatusType } from "~/convex/schema";
 import { MultiSelect } from "@/components/multi-select";
 import {
   SectionGroup,
@@ -170,7 +170,7 @@ export const NotificationsSettings = () => {
           );
         } else {
           await unsubscribeFromNewsletter({
-            newsletter: false,
+            newsletter: "inactive",
             email: user.email,
           });
           showToast(
@@ -202,7 +202,7 @@ export const NotificationsSettings = () => {
     try {
       const values = {
         email: newsletterData?.email ?? user?.email ?? "",
-        newsletter: true,
+        newsletter: "active" as NewsletterStatusType,
         ...(handlerType === "frequency" && {
           frequency: value as NewsletterFrequency,
         }),

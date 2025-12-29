@@ -974,11 +974,21 @@ export const newsletterFrequencyValidator = v.union(
   v.literal("monthly"),
   v.literal("weekly"),
 );
+
+export const newsletterStatusValidator = v.union(
+  v.literal("active"),
+  v.literal("inactive"),
+  v.literal("pending"),
+  v.boolean(),
+);
+
+export type NewsletterStatusType = Infer<typeof newsletterStatusValidator>;
 export const newsletterSchema = {
   userId: v.union(v.id("users"), v.null()),
   firstName: v.string(),
   email: v.string(),
-  newsletter: v.boolean(),
+  // newsletter: v.boolean(),
+  newsletter: newsletterStatusValidator,
   type: v.array(newsletterTypeValidator),
 
   frequency: newsletterFrequencyValidator,

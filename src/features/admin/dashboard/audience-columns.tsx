@@ -13,6 +13,7 @@ import { FaEnvelope } from "react-icons/fa6";
 import {
   BadgeIcon,
   CheckCircle2,
+  CircleDashed,
   LucideClipboardCopy,
   MoreHorizontal,
   TestTube,
@@ -113,11 +114,13 @@ export const audienceColumns: ColumnDef<NewsletterSubscriber>[] = [
       <DataTableColumnHeader column={column} title="Active" />
     ),
     cell: ({ row }) => {
-      const { active } = row.original;
+      const { active: status } = row.original;
       return (
         <div className="flex justify-center">
-          {active ? (
+          {status === "active" ? (
             <CheckCircle2 className="size-4 text-emerald-600" />
+          ) : status === "pending" ? (
+            <CircleDashed className="size-4" />
           ) : (
             <X className="size-4 text-red-500" />
           )}
@@ -127,7 +130,7 @@ export const audienceColumns: ColumnDef<NewsletterSubscriber>[] = [
     filterFn: (row, columnId, filterValue) => {
       if (!Array.isArray(filterValue)) return true;
       const value = row.getValue(columnId);
-      return filterValue.includes(String(value));
+      return filterValue.includes(value);
     },
   },
   {

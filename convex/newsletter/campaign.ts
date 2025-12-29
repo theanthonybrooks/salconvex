@@ -148,7 +148,7 @@ export const populateCampaignAudienceBatch = internalMutation({
     let q = ctx.db
       .query("newsletter")
       .withIndex("by_active_plan", (idx) =>
-        idx.eq("newsletter", true).gte("userPlan", userPlan),
+        idx.eq("newsletter", "active").gte("userPlan", userPlan),
       );
 
     if (frequency !== "all") {
