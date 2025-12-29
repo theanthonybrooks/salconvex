@@ -84,7 +84,6 @@ const NewsletterPage = () => {
   const fontSizePref = getUserFontSizePref(userPref?.fontSize);
   const fontSize = fontSizePref?.body;
 
-  // UI-related State
   const [pending, setPending] = useState(false);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
@@ -135,21 +134,6 @@ const NewsletterPage = () => {
     //   type: newsletterSub?.type ?? ["general"],
     // },
     defaultValues: async () => {
-      // let result = {
-      //   frequency: "monthly" as NewsletterFrequency,
-      //   type: ["general"] as NewsletterType[],
-      // };
-      // if (userId) {
-      //   result = await convex.query(
-      //     api.newsletter.subscriber.getNewsletterStatus,
-      //     { userId },
-      //   );
-      // } else if (subscriberId) {
-      //   result = await convex.query(
-      //     api.newsletter.subscriber.getNewsletterStatus,
-      //     { subscriberId },
-      //   );
-      // }
       return {
         frequency: frequency ?? "monthly",
         type: type ?? ["general"],
@@ -162,7 +146,7 @@ const NewsletterPage = () => {
 
   const {
     handleSubmit: handleUpdateSubmit,
-    // watch: watchUpdate,
+    watch: watchUpdate,
     // getFieldState: getFieldStateUpdate,
     formState: {
       isValid: isValidUpdate,
@@ -171,7 +155,7 @@ const NewsletterPage = () => {
     },
   } = subUpdateform;
 
-  const currentType = subUpdateform.getValues("type");
+  const currentType = watchUpdate("type");
 
   const subStatusActive = subStatus === "active";
   const subStatusPending = subStatus === "pending";
@@ -538,32 +522,35 @@ const NewsletterPage = () => {
                                 )}
                               />
 
-                              <FormField
-                                control={subUpdateform.control}
-                                name="frequency"
-                                render={({ field }) => (
-                                  <FormItem>
-                                    <FormLabel>
-                                      How often would you like to receive
-                                      newsletters?
-                                    </FormLabel>
-                                    <FormControl>
-                                      <SelectSimple
-                                        disabled={!currentType?.length}
-                                        options={[
-                                          ...newsletterFrequencyOptions,
-                                        ]}
-                                        value={field.value ?? ""}
-                                        onChangeAction={field.onChange}
-                                        placeholder="Select frequency"
-                                        className="w-full bg-card placeholder:text-foreground sm:h-11"
-                                        itemClassName="justify-center"
-                                      />
-                                    </FormControl>
-                                    <FormMessage />
-                                  </FormItem>
+                              {currentType &&
+                                currentType.includes("openCall") && (
+                                  <FormField
+                                    control={subUpdateform.control}
+                                    name="frequency"
+                                    render={({ field }) => (
+                                      <FormItem>
+                                        <FormLabel>
+                                          How often would you like to receive
+                                          newsletters?
+                                        </FormLabel>
+                                        <FormControl>
+                                          <SelectSimple
+                                            disabled={!currentType?.length}
+                                            options={[
+                                              ...newsletterFrequencyOptions,
+                                            ]}
+                                            value={field.value ?? ""}
+                                            onChangeAction={field.onChange}
+                                            placeholder="Select frequency"
+                                            className="w-full bg-card placeholder:text-foreground sm:h-11"
+                                            itemClassName="justify-center"
+                                          />
+                                        </FormControl>
+                                        <FormMessage />
+                                      </FormItem>
+                                    )}
+                                  />
                                 )}
-                              />
                               {emailDifferent && (
                                 <div
                                   className={cn(

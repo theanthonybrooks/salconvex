@@ -44,11 +44,17 @@ export default function Footer({ className }: { className?: string }) {
   const isNewsletterPage = pathname === "/newsletter";
   const { preloadedUserData } = useConvexPreload();
   const userData = usePreloadedQuery(preloadedUserData);
-  const { userPref } = userData || {};
-  const { fontSize: userFontSize, notifications } = userPref || {};
-  const newsletterSub = notifications?.newsletter ?? false;
+  const { userPref, userId } = userData || {};
+  const { fontSize: userFontSize } = userPref || {};
   const fontSizePref = getUserFontSizePref(userFontSize);
   const fontSize = fontSizePref?.body;
+  const newsletterData = useQuery(
+    api.newsletter.subscriber.getNewsletterStatus,
+    userId ? { userId } : "skip",
+  );
+  const newsletterSub = newsletterData?.success ?? false;
+  const newsletterVerified = newsletterData?.verified ?? false;
+
   const form = useForm<NewsletterFormValues>({
     resolver: zodResolver(newsletterSignupSchema),
     defaultValues: {
@@ -232,9 +238,11 @@ export default function Footer({ className }: { className?: string }) {
                     className={cn(isNewsletterPage && "pointer-events-none")}
                     variant="standard"
                   >
-                    {isNewsletterPage
-                      ? "You're already subscribed!"
-                      : "View Newsletter Preferences"}
+                    {newsletterVerified
+                      ? isNewsletterPage
+                        ? "You're already subscribed!"
+                        : "View Newsletter Preferences"
+                      : "Verify your email address"}
                   </Link>
                 </Button>
               ) : (

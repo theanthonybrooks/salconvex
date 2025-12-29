@@ -193,7 +193,6 @@ const userPrefsBaseValues = {
   fontSize: v.optional(fontSizeValidator),
   notifications: v.optional(
     v.object({
-      newsletter: v.optional(v.boolean()),
       general: v.optional(v.boolean()),
       applications: v.optional(v.boolean()),
       inAppNotifications: inAppNotificationValidator,
@@ -996,7 +995,7 @@ export const newsletterSchema = {
   lastAttempt: v.number(),
   verified: v.optional(v.boolean()),
   tester: v.optional(v.boolean()),
-  lastUpdatedBy: v.optional(v.id("users")),
+  lastUpdatedBy: v.optional(v.union(v.id("users"), v.string())),
   lastUpdatedAt: v.optional(v.number()),
 };
 
@@ -1868,7 +1867,6 @@ export default defineSchema({
 
   userPreferences: defineTable(userPrefsFull)
     .index("by_notifications_general", ["notifications.general"])
-    .index("by_notifications_newsletter", ["notifications.newsletter"])
     .index("by_notifications_applications", ["notifications.applications"])
     .index("by_lastUpdated", ["lastUpdated"])
     .index("by_userId", ["userId"]),

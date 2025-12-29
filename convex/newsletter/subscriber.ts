@@ -159,15 +159,6 @@ export const deleteSubscription = mutation({
           .unique()
       : null;
 
-    if (userPreferences?.notifications?.newsletter) {
-      await ctx.db.patch(userPreferences._id, {
-        notifications: {
-          ...userPreferences.notifications,
-          newsletter: false,
-        },
-      });
-    }
-
     await ctx.db.delete(subscriber._id);
   },
 });
@@ -247,14 +238,6 @@ export const subscribeToNewsletter = mutation({
         verified: newsletterSubscription.verified,
         ...(wasCanceled && { email }),
       });
-      if (userPrefs?.notifications) {
-        await ctx.db.patch(userPrefs._id, {
-          notifications: {
-            ...userPrefs.notifications,
-            newsletter: true,
-          },
-        });
-      }
 
       if (wasCanceled || !verified) {
         await ctx.scheduler.runAfter(
@@ -297,14 +280,7 @@ export const subscribeToNewsletter = mutation({
       userPlan,
       verified: false,
     });
-    if (userPrefs?.notifications) {
-      await ctx.db.patch(userPrefs._id, {
-        notifications: {
-          ...userPrefs.notifications,
-          newsletter: true,
-        },
-      });
-    }
+
     await ctx.scheduler.runAfter(
       0,
       internal.actions.newsletter.sendNewsletterVerificationLink,
@@ -354,7 +330,6 @@ export const getNewsletterSubscribers = query({
 export const updateNewsletterStatus = mutation({
   args: {
     email: v.string(),
-    // newsletter: v.boolean(),
     newsletter: newsletterStatusValidator,
     frequency: v.optional(v.union(v.literal("monthly"), v.literal("weekly"))),
     type: v.optional(
@@ -394,7 +369,9 @@ export const updateNewsletterStatus = mutation({
       await ctx.db.patch(newsletterSubscription._id, {
         newsletter,
         timesAttempted: 0,
-        lastAttempt: Date.now(),
+        // lastAttempt: Date.now(),
+        lastUpdatedAt: Date.now(),
+        lastUpdatedBy: userId ?? email,
         frequency: effectiveFrequency,
         ...(email && updateEmail && { email }),
         ...(type && { type }),
