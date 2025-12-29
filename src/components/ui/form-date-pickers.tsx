@@ -1,13 +1,14 @@
 import { EventCategory } from "@/types/eventTypes";
 
-import { useEffect, useRef, useState } from "react";
-import { addDays, startOfDay, subYears } from "date-fns";
+import React, { useEffect, useRef, useState } from "react";
 import { fromZonedTime } from "date-fns-tz";
 import { motion } from "framer-motion";
 import {
+  Control,
   Controller,
   get,
   Path,
+  useController,
   useFieldArray,
   useFormContext,
   useWatch,
@@ -43,6 +44,55 @@ interface FormDatePickerProps<T> {
   type: "event" | "production" | "openCall" | "other";
   watchPath: Path<T>;
 }
+
+type EventDateRange = {
+  start?: string;
+  end?: string;
+};
+type DateArrayKey = "eventDates" | "prodDates";
+type DateFieldKey = "start" | "end";
+
+type DateFieldPath<
+  K extends DateArrayKey,
+  F extends DateFieldKey,
+> = `event.dates.${K}.${number}.${F}`;
+
+type DateFieldProps<K extends DateArrayKey, F extends DateFieldKey> = {
+  control: Control<EventOCFormValues>;
+  name: DateFieldPath<K, F>;
+  timeZone: string;
+  minDate?: number;
+  maxDate?: number;
+};
+
+function DateField<K extends DateArrayKey, F extends DateFieldKey>({
+  control,
+  name,
+  timeZone,
+  minDate,
+  maxDate,
+}: DateFieldProps<K, F>) {
+  const { field } = useController({
+    name,
+    control,
+  });
+
+  return (
+    <DateTimePickerField
+      value={field.value ? Date.parse(field.value) : undefined}
+      onChange={(date) => {
+        if (!date) return;
+        field.onChange(fromZonedTime(date, timeZone).toISOString());
+      }}
+      minDate={minDate}
+      maxDate={maxDate}
+      timeZone={timeZone}
+      withTime={false}
+    />
+  );
+}
+
+const MemoDateField = React.memo(DateField) as typeof DateField;
 
 export const FormDatePicker = <T extends EventOCFormValues>({
   isAdmin,
@@ -97,7 +147,7 @@ export const FormDatePicker = <T extends EventOCFormValues>({
   const formatDatesValue = data?.[formatKey];
 
   const formatDatesArray = watch(`${nameBase}.${formatKey}` as Path<T>) as
-    | { start?: string; end?: string }[]
+    | EventDateRange[]
     | undefined;
   const formatValue = watch(`${nameBase}.${formatField}` as Path<T>);
   // const isSetDates = formatValue === "setDates";
@@ -237,19 +287,9 @@ export const FormDatePicker = <T extends EventOCFormValues>({
     const hasNoFields = fields.length === 0;
 
     if (isSetDates && hasNoFields) {
-      console.log("appending");
       append({ start: "", end: "" });
     }
   }, [formatValue, fields.length, append]);
-
-  // useEffect(() => {
-  //   if (formatValue === "sameAsEvent") {
-  //     setValue("event.dates.prodDates", eventDates, {
-  //       shouldValidate: true,
-  //       shouldDirty: true,
-  //     });
-  //   }
-  // }, [formatValue, setValue, eventDates]);
 
   const prodFormat = useWatch({ name: "event.dates.prodFormat" });
   const eventDatess = useWatch({ name: "event.dates.eventDates" });
@@ -390,7 +430,14 @@ export const FormDatePicker = <T extends EventOCFormValues>({
                           <FaTrashCan className="size-4" />
                         </motion.button>
                       )}
-                      <Controller
+                      <MemoDateField
+                        control={control}
+                        name={`event.dates.${formatKey}.${index}.start`}
+                        timeZone={orgTimezone}
+                        // minDate={minDate}
+                        // maxDate={maxDate}
+                      />
+                      {/* <Controller
                         name={
                           `${nameBase}.${formatKey}.${index}.start` as Path<T>
                         }
@@ -445,9 +492,9 @@ export const FormDatePicker = <T extends EventOCFormValues>({
                             />
                           );
                         }}
-                      />
+                      /> */}
                       -
-                      <Controller
+                      {/* <Controller
                         name={
                           `${nameBase}.${formatKey}.${index}.end` as Path<T>
                         }
@@ -491,6 +538,13 @@ export const FormDatePicker = <T extends EventOCFormValues>({
                             />
                           );
                         }}
+                      /> */}
+                      <MemoDateField
+                        control={control}
+                        name={`event.dates.${formatKey}.${index}.end`}
+                        timeZone={orgTimezone}
+                        // minDate={minDate}
+                        // maxDate={maxDate}
                       />
                     </div>
                   );

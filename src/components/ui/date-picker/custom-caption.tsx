@@ -1,8 +1,8 @@
 import { addYears } from "date-fns";
 import { useDayPicker } from "react-day-picker";
 
-import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 import { CalendarClock } from "lucide-react";
+import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -67,9 +67,7 @@ export function CustomDropdownNav({ minDate }: { minDate?: number }) {
   return (
     <div
       className="richard my-5 flex w-full items-center justify-between gap-2 py-2"
-      onPointerDown={(e) => e.stopPropagation()}
-      onMouseDown={(e) => e.stopPropagation()}
-      onClick={(e) => e.stopPropagation()}
+   
     >
       <Button
         variant="ghost"
