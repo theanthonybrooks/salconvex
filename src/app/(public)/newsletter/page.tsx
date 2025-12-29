@@ -173,11 +173,12 @@ const NewsletterPage = () => {
 
   const currentType = subUpdateform.getValues("type");
 
-  const subStatusActive = Boolean(subStatus);
+  const subStatusActive = subStatus === "active";
+  const subStatusPending = subStatus === "pending";
 
   const emailDifferent = subEmail !== user?.email;
   const noActiveSubscription = !subStatusActive;
-  const activeSubscription = subStatusActive && verified;
+  const activeSubscription = subStatusActive && verified !== false;
 
   // const errorMessage = (() => {
   //   const userError = newsletterSubError instanceof ConvexError;
@@ -344,7 +345,7 @@ const NewsletterPage = () => {
   return (
     <div className="mx-auto my-12 flex h-full w-full max-w-[1300px] flex-col items-center justify-center gap-4">
       <div className="flex h-full w-full flex-col items-center gap-x-2 px-6 md:px-8">
-        {subStatusActive && !verified && (
+        {subStatusPending && !verified && (
           <div
             className={cn(
               "mb-10 flex items-center gap-2 rounded-lg border-1.5 p-6",
@@ -352,335 +353,338 @@ const NewsletterPage = () => {
           >
             <IoAlert className="size-10 shrink-0" />
             <p>
-              We&apos;re updating the newsletter <br /> Please{" "}
+              Please{" "}
               <span
                 className="cursor-pointer font-bold underline decoration-2 underline-offset-2 hover:underline-offset-1 active:underline-offset-0"
                 onClick={handleRequestVerificationEmail}
               >
-                verify your email address.
+                verify your email address
               </span>
+              <br />
+              to receive the newsletter.
             </p>
           </div>
         )}
-        <section
-          className={cn("mx-auto flex max-w-[90vw] flex-col gap-3 md:max-w-md")}
-        >
-          <p className="w-full text-xl font-medium text-foreground">
-            {user
-              ? "Update your newsletter preferences"
-              : "Manage your newsletter subscription"}
-          </p>
-          <span className="text-sm text-foreground">
-            {activeSubscription ? (
-              userPlan > 1 ? (
-                "Select your desired frequency and newsletter type(s)."
-              ) : null
-            ) : !user ? (
-              "Sign in or enter your email in the field below"
-            ) : (subscriberId || newsletterSubPending) && !success ? (
-              <span className="flex w-full items-center justify-center gap-1">
-                Loading... <LoaderCircle className="size-4 animate-spin" />
-              </span>
-            ) : !verified && subStatusActive ? (
-              <p>
-                Please <span>verify your email address</span> to receive the
-                newsletter.
-              </p>
-            ) : (
-              "You don't have a newsletter subscription. Fill out the form at the bottom of the page to subscribe."
+        {!subStatusPending && (
+          <section
+            className={cn(
+              "mx-auto flex max-w-[90vw] flex-col gap-3 md:max-w-md",
             )}
-          </span>
-          {!user && noActiveSubscription && (
-            <Form {...subSearchForm}>
-              <form
-                className="mb-2 flex w-full max-w-sm flex-col gap-4"
-                onSubmit={handleSearchSubmit(handleSearchSubscription)}
-              >
-                <>
-                  <FormField
-                    control={subSearchForm.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email</FormLabel>
+          >
+            <p className="w-full text-xl font-medium text-foreground">
+              {user
+                ? "Update your newsletter preferences"
+                : "Manage your newsletter subscription"}
+            </p>
+            <span className="text-sm text-foreground">
+              {activeSubscription ? (
+                userPlan > 1 ? (
+                  "Select your desired frequency and newsletter type(s)."
+                ) : null
+              ) : !user ? (
+                "Sign in or enter your email in the field below"
+              ) : (subscriberId || newsletterSubPending) && !success ? (
+                <span className="flex w-full items-center justify-center gap-1">
+                  Loading... <LoaderCircle className="size-4 animate-spin" />
+                </span>
+              ) : (
+                "You don't have a newsletter subscription. Fill out the form at the bottom of the page to subscribe."
+              )}
+            </span>
+            {!user && noActiveSubscription && (
+              <Form {...subSearchForm}>
+                <form
+                  className="mb-2 flex w-full max-w-sm flex-col gap-4"
+                  onSubmit={handleSearchSubmit(handleSearchSubscription)}
+                >
+                  <>
+                    <FormField
+                      control={subSearchForm.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Email</FormLabel>
 
-                        <FormControl>
-                          <Input
-                            {...field}
-                            type="email"
-                            placeholder="ex. email@mail.com"
-                            className={cn("w-full border-foreground bg-card")}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              type="email"
+                              placeholder="ex. email@mail.com"
+                              className={cn("w-full border-foreground bg-card")}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </>
+
+                  <Button
+                    variant={
+                      isValidSearch ? "salWithShadow" : "salWithShadowHidden"
+                    }
+                    type="submit"
+                    size="lg"
+                    className="w-full bg-white py-6 text-base focus-visible:bg-salPinkLt sm:py-0 md:bg-salYellow"
+                    disabled={pending || !isValidSearch}
+                    fontSize={fontSize}
+                  >
+                    {pending || subscriberId ? (
+                      <span className="flex items-center gap-1">
+                        Checking for subscription...
+                        <LoaderCircle className="size-4 animate-spin" />
+                      </span>
+                    ) : (
+                      "Load Subscription"
                     )}
-                  />
-                </>
+                  </Button>
+                </form>
+              </Form>
+            )}
+            {success && !pending && (
+              <FormSuccess
+                message={success}
+                className="text-success mx-auto w-full py-6 text-center"
+              />
+            )}
+            {error && !success && !pending && (
+              <FormError
+                message={error}
+                className="mx-auto text-center text-red-700"
+              />
+            )}
+            {subStatusActive && (
+              <div className={cn("flex w-full max-w-sm flex-col gap-4")}>
+                {verified !== false && (
+                  <>
+                    {userId ? (
+                      <>
+                        {userPlan > 1 ? (
+                          <Form {...subUpdateform}>
+                            <form
+                              ref={subUpdateRef}
+                              className="flex w-full max-w-sm flex-col gap-4"
+                              onSubmit={handleUpdateSubmit(
+                                handleUpdateSubscription,
+                              )}
+                            >
+                              <FormField
+                                control={subUpdateform.control}
+                                name="type"
+                                render={({ field }) => (
+                                  <FormItem emptyError>
+                                    <fieldset className="mb-5 flex flex-col gap-3">
+                                      <legend className="mb-4 text-sm font-medium">
+                                        Which newsletter(s) would you like to
+                                        receive?
+                                      </legend>
+
+                                      <div className="flex items-center space-x-2">
+                                        <Checkbox
+                                          id="newsletter-openCall"
+                                          checked={field.value?.includes(
+                                            "openCall",
+                                          )}
+                                          onCheckedChange={(checked) => {
+                                            const current = field.value ?? [];
+                                            if (checked) {
+                                              field.onChange([
+                                                ...current,
+                                                "openCall",
+                                              ]);
+                                            } else {
+                                              field.onChange(
+                                                current.filter(
+                                                  (t) => t !== "openCall",
+                                                ),
+                                              );
+                                            }
+                                          }}
+                                        />
+                                        <Label htmlFor="newsletter-openCall">
+                                          Open Calls
+                                        </Label>
+                                      </div>
+
+                                      <div className="flex items-center space-x-2">
+                                        <Checkbox
+                                          id="newsletter-general"
+                                          checked={field.value?.includes(
+                                            "general",
+                                          )}
+                                          onCheckedChange={(checked) => {
+                                            const current = field.value ?? [];
+                                            if (checked) {
+                                              field.onChange([
+                                                ...current,
+                                                "general",
+                                              ]);
+                                            } else {
+                                              field.onChange(
+                                                current.filter(
+                                                  (t) => t !== "general",
+                                                ),
+                                              );
+                                            }
+                                          }}
+                                        />
+                                        <Label htmlFor="newsletter-general">
+                                          General Updates
+                                        </Label>
+                                      </div>
+                                    </fieldset>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+
+                              <FormField
+                                control={subUpdateform.control}
+                                name="frequency"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>
+                                      How often would you like to receive
+                                      newsletters?
+                                    </FormLabel>
+                                    <FormControl>
+                                      <SelectSimple
+                                        disabled={!currentType?.length}
+                                        options={[
+                                          ...newsletterFrequencyOptions,
+                                        ]}
+                                        value={field.value ?? ""}
+                                        onChangeAction={field.onChange}
+                                        placeholder="Select frequency"
+                                        className="w-full bg-card placeholder:text-foreground sm:h-11"
+                                        itemClassName="justify-center"
+                                      />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                              {emailDifferent && (
+                                <div
+                                  className={cn(
+                                    "mt-4 rounded border-1.5 border-foreground bg-card/20 p-6",
+                                  )}
+                                >
+                                  <FormField
+                                    control={subUpdateform.control}
+                                    name="updateEmail"
+                                    render={({ field }) => (
+                                      <FormItem>
+                                        <fieldset className="mb-2 flex flex-col gap-3">
+                                          <legend className="mb-4 text-sm font-medium">
+                                            Your newsletter sub email is
+                                            different from your account email.
+                                            Would you like to update your
+                                            newsletter subscription with your
+                                            account email?
+                                          </legend>
+
+                                          <div className="flex items-center space-x-2">
+                                            <FormControl>
+                                              <Checkbox
+                                                id="newsletter-update-email"
+                                                checked={field.value ?? false}
+                                                onCheckedChange={(checked) =>
+                                                  field.onChange(!!checked)
+                                                }
+                                              />
+                                            </FormControl>
+                                            <Label
+                                              htmlFor="newsletter-update-email"
+                                              className="text-sm font-medium text-foreground"
+                                            >
+                                              Yes, update my subscription to
+                                              match!
+                                            </Label>
+                                          </div>
+                                        </fieldset>
+                                        <FormMessage />
+                                      </FormItem>
+                                    )}
+                                  />
+                                </div>
+                              )}
+
+                              <Button
+                                disabled={
+                                  pending || !isValidUpdate || !isDirtyUpdate
+                                }
+                                variant={
+                                  isValidUpdate && isDirtyUpdate && !pending
+                                    ? "salWithShadow"
+                                    : "salWithShadowHidden"
+                                }
+                                fontSize={fontSize}
+                              >
+                                {pending ? (
+                                  <LoaderCircle className="size-4 animate-spin" />
+                                ) : (
+                                  " Update preferences"
+                                )}
+                              </Button>
+                            </form>
+                          </Form>
+                        ) : (
+                          <span className="mb-2 flex flex-col gap-2 text-sm italic text-foreground">
+                            <p>
+                              There currently aren&apos;t any additional options
+                              for free newsletters.
+                            </p>
+                            <p>
+                              Sign up for a Banana or Fatcap membership if you
+                              want more (especially those related to open calls)
+                            </p>
+
+                            <Link href="/pricing">
+                              <Button
+                                variant="salWithShadow"
+                                className="mt-4 w-full"
+                                fontSize={fontSize}
+                              >
+                                Choose a membership{" "}
+                              </Button>
+                            </Link>
+                          </span>
+                        )}
+                      </>
+                    ) : (
+                      <p className={fontSize}>
+                        You can change your full preferences by signing in.
+                      </p>
+                    )}
+                  </>
+                )}
+
+                <p className="my-4 flex items-center gap-x-3 text-sm text-foreground before:h-[1px] before:flex-1 before:bg-foreground after:h-[1px] after:flex-1 after:bg-foreground">
+                  or
+                </p>
+                <p className={fontSize}>
+                  If you&apos;d like to take a break from receiving newsletters,
+                  you can unsubscribe below.
+                </p>
 
                 <Button
-                  variant={
-                    isValidSearch ? "salWithShadow" : "salWithShadowHidden"
-                  }
-                  type="submit"
-                  size="lg"
-                  className="w-full bg-white py-6 text-base focus-visible:bg-salPinkLt sm:py-0 md:bg-salYellow"
-                  disabled={pending || !isValidSearch}
+                  disabled={pending}
+                  variant="salWithShadowHiddenPink"
+                  onClick={() => {
+                    handleUnsubscribe();
+                  }}
+                  className="group bg-salPinkLt"
                   fontSize={fontSize}
                 >
-                  {pending || subscriberId ? (
-                    <span className="flex items-center gap-1">
-                      Checking for subscription...
-                      <LoaderCircle className="size-4 animate-spin" />
-                    </span>
+                  {pending ? (
+                    <LoaderCircle className="size-4 animate-spin" />
                   ) : (
-                    "Load Subscription"
-                  )}
-                </Button>
-              </form>
-            </Form>
-          )}
-          {success && !pending && (
-            <FormSuccess
-              message={success}
-              className="text-success mx-auto w-full py-6 text-center"
-            />
-          )}
-          {error && !success && !pending && (
-            <FormError
-              message={error}
-              className="mx-auto text-center text-red-700"
-            />
-          )}
-          {subStatusActive && (
-            <div className={cn("flex w-full max-w-sm flex-col gap-4")}>
-              {verified && (
-                <>
-                  {userId ? (
                     <>
-                      {userPlan > 1 ? (
-                        <Form {...subUpdateform}>
-                          <form
-                            ref={subUpdateRef}
-                            className="flex w-full max-w-sm flex-col gap-4"
-                            onSubmit={handleUpdateSubmit(
-                              handleUpdateSubscription,
-                            )}
-                          >
-                            <FormField
-                              control={subUpdateform.control}
-                              name="type"
-                              render={({ field }) => (
-                                <FormItem emptyError>
-                                  <fieldset className="mb-5 flex flex-col gap-3">
-                                    <legend className="mb-4 text-sm font-medium">
-                                      Which newsletter(s) would you like to
-                                      receive?
-                                    </legend>
-
-                                    <div className="flex items-center space-x-2">
-                                      <Checkbox
-                                        id="newsletter-openCall"
-                                        checked={field.value?.includes(
-                                          "openCall",
-                                        )}
-                                        onCheckedChange={(checked) => {
-                                          const current = field.value ?? [];
-                                          if (checked) {
-                                            field.onChange([
-                                              ...current,
-                                              "openCall",
-                                            ]);
-                                          } else {
-                                            field.onChange(
-                                              current.filter(
-                                                (t) => t !== "openCall",
-                                              ),
-                                            );
-                                          }
-                                        }}
-                                      />
-                                      <Label htmlFor="newsletter-openCall">
-                                        Open Calls
-                                      </Label>
-                                    </div>
-
-                                    <div className="flex items-center space-x-2">
-                                      <Checkbox
-                                        id="newsletter-general"
-                                        checked={field.value?.includes(
-                                          "general",
-                                        )}
-                                        onCheckedChange={(checked) => {
-                                          const current = field.value ?? [];
-                                          if (checked) {
-                                            field.onChange([
-                                              ...current,
-                                              "general",
-                                            ]);
-                                          } else {
-                                            field.onChange(
-                                              current.filter(
-                                                (t) => t !== "general",
-                                              ),
-                                            );
-                                          }
-                                        }}
-                                      />
-                                      <Label htmlFor="newsletter-general">
-                                        General Updates
-                                      </Label>
-                                    </div>
-                                  </fieldset>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-
-                            <FormField
-                              control={subUpdateform.control}
-                              name="frequency"
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormLabel>
-                                    How often would you like to receive
-                                    newsletters?
-                                  </FormLabel>
-                                  <FormControl>
-                                    <SelectSimple
-                                      disabled={!currentType?.length}
-                                      options={[...newsletterFrequencyOptions]}
-                                      value={field.value ?? ""}
-                                      onChangeAction={field.onChange}
-                                      placeholder="Select frequency"
-                                      className="w-full bg-card placeholder:text-foreground sm:h-11"
-                                      itemClassName="justify-center"
-                                    />
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-                            {emailDifferent && (
-                              <div
-                                className={cn(
-                                  "mt-4 rounded border-1.5 border-foreground bg-card/20 p-6",
-                                )}
-                              >
-                                <FormField
-                                  control={subUpdateform.control}
-                                  name="updateEmail"
-                                  render={({ field }) => (
-                                    <FormItem>
-                                      <fieldset className="mb-2 flex flex-col gap-3">
-                                        <legend className="mb-4 text-sm font-medium">
-                                          Your newsletter sub email is different
-                                          from your account email. Would you
-                                          like to update your newsletter
-                                          subscription with your account email?
-                                        </legend>
-
-                                        <div className="flex items-center space-x-2">
-                                          <FormControl>
-                                            <Checkbox
-                                              id="newsletter-update-email"
-                                              checked={field.value ?? false}
-                                              onCheckedChange={(checked) =>
-                                                field.onChange(!!checked)
-                                              }
-                                            />
-                                          </FormControl>
-                                          <Label
-                                            htmlFor="newsletter-update-email"
-                                            className="text-sm font-medium text-foreground"
-                                          >
-                                            Yes, update my subscription to
-                                            match!
-                                          </Label>
-                                        </div>
-                                      </fieldset>
-                                      <FormMessage />
-                                    </FormItem>
-                                  )}
-                                />
-                              </div>
-                            )}
-
-                            <Button
-                              disabled={
-                                pending || !isValidUpdate || !isDirtyUpdate
-                              }
-                              variant={
-                                isValidUpdate && isDirtyUpdate && !pending
-                                  ? "salWithShadow"
-                                  : "salWithShadowHidden"
-                              }
-                              fontSize={fontSize}
-                            >
-                              {pending ? (
-                                <LoaderCircle className="size-4 animate-spin" />
-                              ) : (
-                                " Update preferences"
-                              )}
-                            </Button>
-                          </form>
-                        </Form>
-                      ) : (
-                        <span className="mb-2 flex flex-col gap-2 text-sm italic text-foreground">
-                          <p>
-                            There currently aren&apos;t any additional options
-                            for free newsletters.
-                          </p>
-                          <p>
-                            Sign up for a Banana or Fatcap membership if you
-                            want more (especially those related to open calls)
-                          </p>
-
-                          <Link href="/pricing">
-                            <Button
-                              variant="salWithShadow"
-                              className="mt-4 w-full"
-                              fontSize={fontSize}
-                            >
-                              Choose a membership{" "}
-                            </Button>
-                          </Link>
-                        </span>
-                      )}
-                    </>
-                  ) : (
-                    <p className={fontSize}>
-                      You can change your full preferences by signing in.
-                    </p>
-                  )}
-                </>
-              )}
-
-              <p className="my-4 flex items-center gap-x-3 text-sm text-foreground before:h-[1px] before:flex-1 before:bg-foreground after:h-[1px] after:flex-1 after:bg-foreground">
-                or
-              </p>
-              <p className={fontSize}>
-                If you&apos;d like to take a break from receiving newsletters,
-                you can unsubscribe below.
-              </p>
-
-              <Button
-                disabled={pending}
-                variant="salWithShadowHiddenPink"
-                onClick={() => {
-                  handleUnsubscribe();
-                }}
-                className="group bg-salPinkLt"
-                fontSize={fontSize}
-              >
-                {pending ? (
-                  <LoaderCircle className="size-4 animate-spin" />
-                ) : (
-                  <>
-                    {/* Default text */}
-                    {/* <span className="block group-hover:hidden"> */}
-                    Unsubscribe from all newsletters
-                    {/*          </span>
+                      {/* Default text */}
+                      {/* <span className="block group-hover:hidden"> */}
+                      Unsubscribe from all newsletters
+                      {/*          </span>
                     /~ Hover text ~/
                     <span className="hidden items-center gap-x-1 group-hover:flex group-active:hidden">
                       Really?
@@ -689,12 +693,13 @@ const NewsletterPage = () => {
                     <span className="hidden group-hover:hidden group-active:block">
                       Ok bye!
                     </span>*/}
-                  </>
-                )}
-              </Button>
-            </div>
-          )}
-        </section>
+                    </>
+                  )}
+                </Button>
+              </div>
+            )}
+          </section>
+        )}
       </div>
     </div>
   );

@@ -979,7 +979,6 @@ export const newsletterStatusValidator = v.union(
   v.literal("active"),
   v.literal("inactive"),
   v.literal("pending"),
-  v.boolean(),
 );
 
 export type NewsletterStatusType = Infer<typeof newsletterStatusValidator>;

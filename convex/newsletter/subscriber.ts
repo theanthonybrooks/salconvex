@@ -438,9 +438,12 @@ export const getNewsletterStatus = query({
           : null;
 
     console.log("newsletterSubscription", newsletterSubscription);
-    if (!newsletterSubscription?.newsletter) {
+    if (
+      newsletterSubscription?.newsletter === "inactive" ||
+      !newsletterSubscription
+    ) {
       return {
-        newsletter: false,
+        success: false,
         status: "no_subscription_found",
         ...defaultValues,
       };
@@ -448,6 +451,8 @@ export const getNewsletterStatus = query({
 
     if (newsletterSubscription) {
       return {
+        success: true,
+        status: "success",
         subId: newsletterSubscription._id,
         verified: newsletterSubscription.verified,
         newsletter: newsletterSubscription.newsletter,
@@ -458,7 +463,10 @@ export const getNewsletterStatus = query({
       };
     }
 
-    throw new ConvexError("No newsletter subscription found: " + email);
+    throw new ConvexError({
+      code: "no_subscription_found",
+      message: "No newsletter subscription found: " + email,
+    });
   },
 });
 

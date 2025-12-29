@@ -35,7 +35,10 @@ import {
   Users2,
 } from "lucide-react";
 
-import type { InAppNotificationsType, NewsletterStatusType } from "~/convex/schema";
+import type {
+  InAppNotificationsType,
+  NewsletterStatusType,
+} from "~/convex/schema";
 import { MultiSelect } from "@/components/multi-select";
 import {
   SectionGroup,
@@ -118,9 +121,12 @@ export const NotificationsSettings = () => {
         }
       : "skip",
   );
+  const validNewsletterStatuses = ["active", "pending"];
 
   const signedUpForNewsletter =
-    (userPref?.notifications?.newsletter && newsletterData?.verified) ?? false;
+    validNewsletterStatuses.includes(
+      newsletterData?.newsletter ?? "inactive",
+    ) && newsletterData?.verified !== false;
 
   const handleUpdateinAppNotifications = async (
     value: InAppNotificationsType,
@@ -157,7 +163,6 @@ export const NotificationsSettings = () => {
         [type]: value,
       };
 
-      await updateUserNotifications({ ...updated });
       if (type === "newsletter") {
         if (value) {
           await subscribeToNewsletter({
@@ -179,6 +184,7 @@ export const NotificationsSettings = () => {
           );
         }
       } else {
+        await updateUserNotifications({ ...updated });
         showToast("success", "Successfully updated notification preferences!");
       }
     } catch (error) {
@@ -1029,14 +1035,14 @@ export const NotificationsSettings = () => {
           >
             <Switch
               disabled={pending}
-              checked={!!userPref?.notifications?.newsletter}
+              checked={newsletterData?.success ?? false}
               onCheckedChange={(value) =>
                 handleUpdateNotifications("newsletter", value)
               }
             />
           </SectionItem>
 
-          {newsletterData?.verified === false && (
+          {!!newsletterData?.success && !newsletterData?.verified && (
             <div
               className={cn(
                 "flex w-full flex-col items-center justify-center gap-2 rounded-lg border-1.5 bg-salYellowLt p-3 sm:flex-row",
