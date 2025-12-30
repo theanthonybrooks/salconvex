@@ -12,6 +12,7 @@ import { useEffect, useState } from "react";
 
 import { Plus, X } from "lucide-react";
 
+import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -80,7 +81,7 @@ export default function WorldMapComponent() {
 
       <div
         className={cn(
-          "flex w-full grid-cols-[20%_minmax(0,1fr)] flex-col overflow-hidden rounded border-1.5 xl:grid",
+          "flex h-dvh w-full grid-cols-[20%_minmax(0,1fr)] flex-col overflow-hidden rounded border-1.5 xl:grid",
         )}
       >
         <div className="flex w-full flex-col justify-between gap-y-4 bg-card/70 p-3">
@@ -158,17 +159,30 @@ export default function WorldMapComponent() {
               Coming soon!
             </p>
           </div>
-          <p className="text-sm">
-            Shoutout to @creagiovane and his @sticker_pasteup_fest_world_map for
-            taking the time to gather all of the sticker and paste-up events
-          </p>
+          <Card className="rounded-lg border-foreground/20 bg-card/50 p-4 text-sm">
+            <p className="inline">
+              Shoutout to{" "}
+              <a href="https://instagram.com/creagiovane" target="_blank">
+                @creagiovane
+              </a>{" "}
+              and his{" "}
+              <a
+                href="https://instagram.com/sticker_pasteup_fest_world_map"
+                target="_blank"
+              >
+                map
+              </a>{" "}
+              for taking the time to gather all of the sticker and paste-up
+              events
+            </p>
+          </Card>
         </div>
 
         <section className="w-full">
           <LazyMap
             points={filteredMapData ?? []}
             className={cn(
-              "z-0 mx-auto h-[calc(95dvh-60px)] w-full overflow-hidden border-l-1.5",
+              "z-0 mx-auto h-dvh w-full overflow-hidden border-l-1.5",
             )}
             locationType="full"
             fullScreen={fullScreen}
