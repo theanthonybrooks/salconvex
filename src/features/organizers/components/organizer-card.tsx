@@ -1,7 +1,9 @@
-import { RefObject } from "react";
 import { Organizer } from "@/types/organizer";
-import { TiArrowRight } from "react-icons/ti";
+
+import { RefObject } from "react";
 import slugify from "slugify";
+
+import { TiArrowRight } from "react-icons/ti";
 
 import { Card } from "@/components/ui/card";
 import { OrganizerLinks } from "@/features/organizers/components/organizer-links";
@@ -77,7 +79,7 @@ export const OrganizerCard = ({
       ) : (
         <Card
           className={cn(
-            "grid w-full max-w-full grid-cols-2 space-y-6 divide-x-2 divide-dotted divide-foreground/20 overflow-hidden rounded-xl border-2 border-dotted border-foreground/20 bg-white/30 p-5",
+            "grid w-full max-w-full grid-cols-2 space-y-6 divide-x-2 divide-dotted divide-foreground/20 overflow-hidden rounded-lg border-2 border-dotted border-foreground/20 bg-white/30 p-5",
             fontSize,
           )}
           ref={aboutRef}
