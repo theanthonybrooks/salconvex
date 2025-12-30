@@ -43,11 +43,6 @@ type EventDataResult = FunctionReturnType<
 
 export type EventBaseResult = NonNullable<EventDataResult>;
 
-// export type EventCardDetailProps = {
-//   data: { event: EnrichedEventData; openCall: OpenCall; organizer: Organizer };
-//   artist?: ArtistFull | null;
-// };
-
 export type EventBaseProps = {
   userPref: UserPrefsType | null;
   artist?: ArtistFull | null;

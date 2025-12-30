@@ -2,6 +2,12 @@
 
 "use client";
 
+import { select_continents } from "@/constants/locationConsts";
+
+import type { EventCategory } from "@/types/eventTypes";
+import type { Continents } from "@/types/thelist";
+import { EventType } from "@/types/eventTypes";
+
 import { useEffect, useState } from "react";
 
 import { Plus, X } from "lucide-react";
@@ -26,7 +32,12 @@ export default function WorldMapComponent() {
     sessionStorage.setItem("previousSalPage", "/map");
   }, []);
   const [edition, setEdition] = useState<number | null>(null);
+  const [category, setCategory] = useState<EventCategory | null>(null);
+  const [eventType, setEventType] = useState<EventType[] | null>(null);
+  const [continent, setContinent] = useState<Continents | null>(null);
   const thisYear = new Date().getFullYear();
+  void setCategory;
+  void setEventType;
 
   const useQueryWithStatus = makeUseQueryWithStatus(useQueries);
   const { data: mapData } = useQueryWithStatus(
@@ -34,6 +45,9 @@ export default function WorldMapComponent() {
     {
       filters: {
         edition: edition ?? undefined,
+        category: category ?? undefined,
+        type: eventType ?? undefined,
+        continent: continent ?? undefined,
       },
     },
   );
@@ -59,8 +73,8 @@ export default function WorldMapComponent() {
   const disabledClass = "pointer-events-none opacity-30";
 
   return (
-    <div className="mt-8 flex h-full w-full flex-1 flex-col items-center justify-center gap-8 px-4">
-      <h1 className="font-tanker text-3xl lowercase tracking-wide xl:text-[5rem]">
+    <div className="flex h-full w-full flex-1 flex-col items-center justify-center gap-8">
+      <h1 className="sr-only font-tanker text-3xl lowercase tracking-wide xl:text-[5rem]">
         World Map
       </h1>
 
@@ -106,6 +120,18 @@ export default function WorldMapComponent() {
                   hasReset
                 />
               </section>
+              <section className="flex flex-col gap-1 py-1">
+                <Label className="text-sm" htmlFor="continent">
+                  Continent
+                </Label>
+                <SelectSimple
+                  options={select_continents}
+                  value={continent ?? ""}
+                  onChangeAction={(value) => setContinent(value as Continents)}
+                  placeholder="--Select Continent--"
+                  hasReset
+                />
+              </section>
               <div className={cn(disabledClass, "flex flex-col gap-y-2")}>
                 <section className="flex items-center justify-between">
                   <p className="text-sm">Category</p>{" "}
@@ -115,13 +141,10 @@ export default function WorldMapComponent() {
                   <p className="text-sm">Event Type</p>{" "}
                   <Plus className="size-4" />
                 </section>
-                <section className="flex items-center justify-between">
+                {/* <section className="flex items-center justify-between">
                   <p className="text-sm">Country</p> <Plus className="size-4" />
-                </section>
-                <section className="flex items-center justify-between">
-                  <p className="text-sm">Continent</p>{" "}
-                  <Plus className="size-4" />
-                </section>
+                </section> */}
+
                 <Separator className="mb-4" thickness={2} />
                 <section className="flex items-center gap-2">
                   <Checkbox id="active" className="text-sm" checked={true} />
@@ -145,7 +168,7 @@ export default function WorldMapComponent() {
           <LazyMap
             points={filteredMapData ?? []}
             className={cn(
-              "z-0 mx-auto h-[calc(95dvh-100px)] w-full max-w-[90dvw] overflow-hidden border-l-1.5",
+              "z-0 mx-auto h-[calc(95dvh-60px)] w-full overflow-hidden border-l-1.5",
             )}
             locationType="full"
             fullScreen={fullScreen}

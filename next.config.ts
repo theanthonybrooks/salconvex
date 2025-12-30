@@ -9,6 +9,7 @@ const nextConfig: NextConfig = {
   typescript: {
     // ignoreBuildErrors: false, // Ensures TypeScript errors block builds
   },
+  // typedRoutes: true, // Is odd, to me, as it basically negates the <Link> component for any external links.
 
   webpack: (config) => {
     // Allow module resolution from the root directory

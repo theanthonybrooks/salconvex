@@ -1,8 +1,11 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { query } from "~/convex/_generated/server";
+import { categoryValidator, typeValidator } from "~/convex/schema";
 import { v } from "convex/values";
 
 export const worldMapFiltersSchema = v.object({
+  category: v.optional(categoryValidator),
+  type: v.optional(v.array(typeValidator)),
   country: v.optional(v.string()),
   continent: v.optional(v.string()),
   city: v.optional(v.string()),
@@ -25,7 +28,7 @@ export const getAvailableEditions = query({
       .collect();
 
     //   const countryMatch = event.location.country === country;
-    //   const continentMatch = event.location.continent === continent;
+    // const continentMatch = event.location.continent === continent;
     //   const cityMatch = event.location.city === city;
     //   const stateMatch = event.location.state === state;
 
@@ -108,6 +111,11 @@ export const getWorldMapData = query({
     if (edition) {
       filteredEvents = filteredEvents.filter(
         (event) => event.dates.edition === edition,
+      );
+    }
+    if (continent) {
+      filteredEvents = filteredEvents.filter(
+        (event) => event.location?.continent === continent,
       );
     }
     const eventData = filteredEvents.map((event) => {
