@@ -109,6 +109,7 @@ export const createStripeOrgCheckoutSession = action({
       const session: Stripe.Checkout.Session =
         await stripe.checkout.sessions.create({
           // payment_method_types: ["card"],
+          allow_promotion_codes: !args.isEligibleForFree ? true : undefined,
           customer: stripeCustomerId,
           line_items: [
             {

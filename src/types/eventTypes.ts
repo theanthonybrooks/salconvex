@@ -3,7 +3,7 @@ import { ArtistFull } from "@/types/artist";
 import { OpenCall, OpenCallStatus } from "@/types/openCallTypes";
 
 import type { api } from "~/convex/_generated/api";
-import type { ApplicationStatus } from "~/convex/schema";
+import type { ApplicationStatus, UserPrefsType } from "~/convex/schema";
 
 import { Doc, Id } from "~/convex/_generated/dataModel";
 import {
@@ -48,10 +48,14 @@ export type EventBaseResult = NonNullable<EventDataResult>;
 //   artist?: ArtistFull | null;
 // };
 
-export type EventCardProps = {
-  data: EventEditionResult;
-  artist?: ArtistFull | null; //todo:make this required
+export type EventBaseProps = {
+  userPref: UserPrefsType | null;
+  artist?: ArtistFull | null;
   className?: string;
+};
+
+export type EventCardProps = EventBaseProps & {
+  data: EventEditionResult;
 };
 
 export type EnrichedEvent = EventData & {

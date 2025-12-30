@@ -21,8 +21,9 @@ const EventDetail = ({ preloaded }: EventDetailProps) => {
   const { preloadedUserData } = useConvexPreload();
   // const subData = usePreloadedQuery(preloadedSubStatus);
   const userData = usePreloadedQuery(preloadedUserData);
-  const user = userData?.user ?? null;
+  const { user, userPref } = userData ?? {};
   // const isAdmin = user?.role?.includes("admin") || false;
+
   // const hasActiveSubscription =
   //   (subData?.hasActiveSubscription || isAdmin) ?? false;
 
@@ -34,7 +35,7 @@ const EventDetail = ({ preloaded }: EventDetailProps) => {
     <>
       <SalBackNavigation
         format="mobile"
-        user={user}
+        user={user ?? null}
         // activeSub={hasActiveSubscription}
         orgId={data.organizer._id}
         isOwner={isOwner}
@@ -46,11 +47,13 @@ const EventDetail = ({ preloaded }: EventDetailProps) => {
         <>
           <EventCardDetailMobile
             data={data}
+            userPref={userPref ?? null}
             artist={artist}
             className="lg:hidden"
           />
           <EventCardDetailDesktop
             data={data}
+            userPref={userPref ?? null}
             artist={artist}
             className="hidden lg:block"
           />

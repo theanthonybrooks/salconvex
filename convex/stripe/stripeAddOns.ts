@@ -81,13 +81,11 @@ export const createStripeAddOnCheckoutSession = action({
           ? [{ coupon: coupon.id }]
           : undefined;
 
-      console.log({
-        eventPrice,
-        discountAmount,
-      });
-
-      // console.log("priceId which: ", priceId);
-
+      // console.log({
+      //   eventPrice,
+      //   discountAmount,
+      // });
+      const hasDiscount = Boolean(discounts && discounts.length > 0);
       if (!eventPrice) throw new Error("Stripe price not provided");
 
       const metadata: Record<string, string> = {
@@ -121,7 +119,8 @@ export const createStripeAddOnCheckoutSession = action({
       // Create a Stripe Checkout Session.
       const session: Stripe.Checkout.Session =
         await stripe.checkout.sessions.create({
-          payment_method_types: ["card"],
+          allow_promotion_codes: hasDiscount ? undefined : true,
+          // payment_method_types: ["card"],
           customer: stripeCustomerId,
           line_items: [
             {

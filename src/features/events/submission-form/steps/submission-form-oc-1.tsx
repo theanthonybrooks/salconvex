@@ -436,7 +436,7 @@ const SubmissionFormOC1 = ({
                         ? "Please be as specific as possible"
                         : "Please be as specific as possible who can apply"
                     }
-                    charLimit={1200}
+                    charLimit={2000}
                     inputPreviewContainerClassName={cn(
                       "rounded-lg",
                       (errors?.openCall?.eligibility?.details ||

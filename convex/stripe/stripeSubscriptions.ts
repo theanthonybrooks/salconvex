@@ -1,3 +1,5 @@
+//!! Note-to-self: Stripe's checkout sessions api docs: https://docs.stripe.com/api/checkout/sessions
+
 import { Feedback } from "@/constants/stripe";
 
 import Stripe from "stripe";
@@ -210,6 +212,7 @@ export const createStripeCheckoutSession = action({
         await stripe.checkout.sessions.create({
           // payment_method_types: ["card", "sepa_debit"],
           // payment_method_types: ["card"],
+          allow_promotion_codes: true,
           customer: stripeCustomerId,
           line_items: [
             {

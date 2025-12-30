@@ -72,7 +72,6 @@ export function DateTimePickerField({
   disabled,
   timeZone,
 }: DayPickerProps) {
-  console.log(disabled, label);
   const isMobile = useIsMobile(1080);
   const [open, setOpen] = useState(false);
 

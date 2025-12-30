@@ -91,13 +91,7 @@ const OpenCallCard = ({
     allInclusive: allInclusiveBudget,
   } = budget;
 
-  const {
-    requirements: reqs,
-    more: reqsMore,
-    // destination: reqsDestination, //for email submissions?
-
-    links: reqsLinks,
-  } = requirements;
+  const { requirements: reqs, more: reqsMore, links: reqsLinks } = requirements;
 
   const reqsDocs = documents ?? [];
 
@@ -118,8 +112,6 @@ const OpenCallCard = ({
       : []),
   ];
 
-  // console.log(artistCountries);
-  //compare this to the eligibility whom array
   const artistEligible = artistCountries.some((artistCountry) =>
     eligibilityWhom.some(
       (whom) =>
@@ -185,7 +177,7 @@ const OpenCallCard = ({
       : null;
 
   const isMobile = format === "mobile";
-
+  const baseDesktopAccordionClassName = "rounded-lg border-2 bg-white/30 px-4";
   const openCallStatus = getOpenCallStatus(
     ocStart ? new Date(ocStart) : null,
     ocEnd ? new Date(ocEnd) : null,
@@ -228,19 +220,6 @@ const OpenCallCard = ({
                         deadlineTimezone,
                         callType,
                       )}
-                      {/* {icsLink && callType === "Fixed" && (
-                        <Link
-                          href={icsLink}
-                          download={`${event.name.replace(/\s+/g, "_")}.ics`}
-                          className={cn(
-                            fontSize === "text-sm" ? "text-xs" : "text-sm",
-                            "mt-2 flex items-center justify-center gap-x-2 italic text-foreground/70",
-                          )}
-                        >
-                          Add to Calendar
-                          <CalendarClockIcon className="size-5 text-foreground/70 md:size-4" />
-                        </Link>
-                      )} */}
                     </span>
                   </span>
                   <span>
@@ -370,7 +349,7 @@ const OpenCallCard = ({
                   </p>
 
                   {/*/~ <li>Must have liability insurance</li> */
-                  /* Note-to-self: this is something that coold/should be later. These sort of requirements~/
+                  /* Note-to-self: this is something that could/should be later. These sort of requirements~/
                   </div>*/}
                   <OpenCallProvided
                     categories={categories}
@@ -434,6 +413,32 @@ const OpenCallCard = ({
               </AccordionItem>
             )}
 
+            {openCall?.requirements?.otherInfo && (
+              <AccordionItem value="AppOther">
+                <AccordionTrigger
+                  title="Production Details:"
+                  fontSize={fontSize}
+                />
+                <AccordionContent>
+                  <div className="flex flex-col space-y-3 p-3">
+                    <RichTextDisplay
+                      html={openCall.requirements.otherInfo}
+                      fontSize={fontSize}
+                    />
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            )}
+            {eventTimeline && (
+              <AccordionItem value="timeline">
+                <AccordionTrigger title="Timeline:" fontSize={fontSize} />
+                <AccordionContent>
+                  <div className="flex flex-col space-y-3 p-3">
+                    <RichTextDisplay html={eventTimeline} fontSize={fontSize} />
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            )}
             {reqsDocs && reqsDocs.length > 0 && (
               <>
                 {reqsDocs.some((doc) =>
@@ -492,33 +497,6 @@ const OpenCallCard = ({
                 </AccordionContent>
               </AccordionItem>
             )}
-
-            {openCall?.requirements?.otherInfo && (
-              <AccordionItem value="AppOther">
-                <AccordionTrigger
-                  title="Production Details:"
-                  fontSize={fontSize}
-                />
-                <AccordionContent>
-                  <div className="flex flex-col space-y-3 p-3">
-                    <RichTextDisplay
-                      html={openCall.requirements.otherInfo}
-                      fontSize={fontSize}
-                    />
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-            )}
-            {eventTimeline && (
-              <AccordionItem value="timeline">
-                <AccordionTrigger title="Timeline:" fontSize={fontSize} />
-                <AccordionContent>
-                  <div className="flex flex-col space-y-3 p-3">
-                    <RichTextDisplay html={eventTimeline} fontSize={fontSize} />
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-            )}
           </Accordion>
         </Card>
       ) : (
@@ -529,7 +507,7 @@ const OpenCallCard = ({
         >
           <AccordionItem
             value="deadElig"
-            className="rounded-lg border-2 bg-white/30 px-4"
+            className={cn(baseDesktopAccordionClassName)}
           >
             <AccordionTrigger
               title="Deadline & Eligibility:"
@@ -627,7 +605,7 @@ const OpenCallCard = ({
 
           <AccordionItem
             value="budgacomp"
-            className="rounded-lg border-2 bg-white/30 px-4"
+            className={cn(baseDesktopAccordionClassName)}
           >
             <AccordionTrigger
               title=" Budget & Compensation:"
@@ -733,7 +711,7 @@ const OpenCallCard = ({
 
           <AccordionItem
             value="appRequirements"
-            className="rounded-lg border-2 bg-white/30 px-4"
+            className={cn(baseDesktopAccordionClassName)}
           >
             <AccordionTrigger
               title="Application Requirements:"
@@ -769,7 +747,7 @@ const OpenCallCard = ({
           {selectionCriteria && (
             <AccordionItem
               value="selCrit"
-              className="rounded-lg border-2 bg-white/30 px-4"
+              className={cn(baseDesktopAccordionClassName)}
             >
               <AccordionTrigger
                 title="Selection Criteria:"
@@ -786,6 +764,38 @@ const OpenCallCard = ({
             </AccordionItem>
           )}
 
+          {openCall?.requirements?.otherInfo && (
+            <AccordionItem
+              value="ApplicationOther"
+              className={cn(baseDesktopAccordionClassName)}
+            >
+              <AccordionTrigger
+                title="Production Details:"
+                fontSize={fontSize}
+              />
+              <AccordionContent>
+                <div className="flex flex-col space-y-3 p-3">
+                  <RichTextDisplay
+                    html={openCall.requirements.otherInfo}
+                    fontSize={fontSize}
+                  />
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          )}
+          {eventTimeline && (
+            <AccordionItem
+              value="eventTimeline"
+              className={cn(baseDesktopAccordionClassName)}
+            >
+              <AccordionTrigger title="Timeline:" fontSize={fontSize} />
+              <AccordionContent>
+                <div className="flex flex-col space-y-3 p-3">
+                  <RichTextDisplay html={eventTimeline} fontSize={fontSize} />
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          )}
           {reqsDocs && reqsDocs.length > 0 && (
             <>
               {reqsDocs.some((doc) =>
@@ -793,7 +803,7 @@ const OpenCallCard = ({
               ) && (
                 <AccordionItem
                   value="AppDocs"
-                  className="rounded-lg border-2 bg-white/30 px-4"
+                  className={cn(baseDesktopAccordionClassName)}
                 >
                   <AccordionTrigger title="Documents:" fontSize={fontSize} />
                   <AccordionContent>
@@ -816,7 +826,7 @@ const OpenCallCard = ({
               ) && (
                 <AccordionItem
                   value="AppImgs"
-                  className="rounded-lg border-2 bg-white/30 px-4"
+                  className={cn(baseDesktopAccordionClassName)}
                 >
                   <AccordionTrigger title="Images:" fontSize={fontSize} />
                   <AccordionContent>
@@ -835,7 +845,7 @@ const OpenCallCard = ({
           {reqsLinks && reqsLinks.length > 0 && (
             <AccordionItem
               value="ApplicationLinks"
-              className="rounded-lg border-2 bg-white/30 px-4"
+              className={cn(baseDesktopAccordionClassName)}
             >
               <AccordionTrigger title="Links:" fontSize={fontSize} />
               <AccordionContent>
@@ -854,38 +864,6 @@ const OpenCallCard = ({
                     </li>
                   ))}
                 </ol>
-              </AccordionContent>
-            </AccordionItem>
-          )}
-          {openCall?.requirements?.otherInfo && (
-            <AccordionItem
-              value="ApplicationOther"
-              className="rounded-lg border-2 bg-white/30 px-4"
-            >
-              <AccordionTrigger
-                title="Production Details:"
-                fontSize={fontSize}
-              />
-              <AccordionContent>
-                <div className="flex flex-col space-y-3 p-3">
-                  <RichTextDisplay
-                    html={openCall.requirements.otherInfo}
-                    fontSize={fontSize}
-                  />
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-          )}
-          {eventTimeline && (
-            <AccordionItem
-              value="eventTimeline"
-              className="rounded-lg border-2 bg-white/30 px-4"
-            >
-              <AccordionTrigger title="Timeline:" fontSize={fontSize} />
-              <AccordionContent>
-                <div className="flex flex-col space-y-3 p-3">
-                  <RichTextDisplay html={eventTimeline} fontSize={fontSize} />
-                </div>
               </AccordionContent>
             </AccordionItem>
           )}

@@ -3,8 +3,8 @@ import {
   openCallStatusValues,
 } from "@/constants/openCallConsts";
 
+import type { EventBaseProps } from "@/types/eventTypes";
 import type { FunctionReturnType } from "convex/server";
-import { ArtistFull } from "@/types/artist";
 
 import type { api } from "~/convex/_generated/api";
 
@@ -16,7 +16,6 @@ import {
   OpenCallStateType,
   OpenCallTypeType,
   RateUnitType,
-  UserPrefsType,
 } from "~/convex/schema";
 
 type OpenCallDataResult = FunctionReturnType<
@@ -50,9 +49,6 @@ export type OpenCallApplication = Doc<"applications">;
 //   application?: OpenCallApplication | null;
 // }
 
-export interface OpenCallCardProps {
+export type OpenCallCardProps = EventBaseProps & {
   data: OpenCallData;
-  userPref: UserPrefsType | null;
-  artist?: ArtistFull | null; //todo:make this required
-  className?: string;
-}
+};
