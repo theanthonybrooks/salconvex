@@ -168,9 +168,9 @@ export const theListNavbarMenuLinks: {
     sub: ["all"],
   },
   {
-    title: "World Map - (Old Site)",
+    title: "World Map",
     // href: "/map",
-    href: "https://archive.thestreetartlist.com/map",
+    href: "/map",
     description: "Map of all street art fests, mural projects, etc",
     sub: ["all"],
   },

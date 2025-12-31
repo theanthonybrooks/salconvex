@@ -125,7 +125,7 @@ export const FOOTER_LINKS: FooterSection[] = [
     section: "The List",
     items: [
       { name: "The List", href: "/thelist" },
-      { name: "Map", href: "https://archive.thestreetartlist.com/map" },
+      { name: "Map", href: "/map" },
       { name: "This Week", href: "/thisweek" },
       { name: "Calendar", href: "/calendar" },
       { name: "Archive", href: "https://archive.thestreetartlist.com/archive" },

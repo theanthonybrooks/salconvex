@@ -85,9 +85,6 @@ export default async function HomeLayout({
   const { user } = userData ?? {};
   const isAdmin = user?.role?.includes("admin");
 
-  // if (pathname === "/map" && !isAdmin) {
-  //   redirect("https://archive.thestreetartlist.com/map");
-  // }
   if (pathname === "/archive" && !isAdmin) {
     redirect("https://archive.thestreetartlist.com/archive");
   }

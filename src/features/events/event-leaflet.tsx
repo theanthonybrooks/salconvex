@@ -10,9 +10,12 @@ import { cn } from "@/helpers/utilsFns";
 
 import "leaflet/dist/leaflet.css";
 
-import { useMemo, useState } from "react";
+import type { ReactNode } from "react";
+
+import { useMemo, useRef, useState } from "react";
+import { useIsMobile } from "@/hooks/use-media-query";
 import L from "leaflet";
-import { MapContainer, TileLayer } from "react-leaflet";
+import { MapContainer, TileLayer, ZoomControl } from "react-leaflet";
 
 import { FiMaximize2, FiMinimize2 } from "react-icons/fi";
 
@@ -59,11 +62,11 @@ export type MapComponentProps = {
   points?: MapPoint[];
   locationType?: LocationType;
   className?: string;
-  containerClassName?: string;
   hasDirections?: boolean;
   mapType?: "event" | "full";
   fullScreen: boolean;
   setFullScreenAction: React.Dispatch<React.SetStateAction<boolean>>;
+  toolbarContent?: ReactNode;
 };
 
 interface ClusterLike {
@@ -75,11 +78,14 @@ export default function MapComponent({
   points,
   locationType,
   className,
-  containerClassName,
   mapType = "event",
   fullScreen,
   setFullScreenAction,
+  toolbarContent,
 }: MapComponentProps) {
+  const lastCenterRef = useRef<[number, number] | null>(null);
+  const isMobile = useIsMobile();
+
   const { preloadedUserData, preloadedSubStatus } = useConvexPreload();
   const userData = usePreloadedQuery(preloadedUserData);
   const isAdmin = userData?.user?.role?.includes("admin");
@@ -89,16 +95,22 @@ export default function MapComponent({
   const [overlay, setOverlay] = useState(true);
   const allPoints = useMemo(() => points ?? [], [points]);
 
-  // Determine map center — average of all points or fallback to single
   const center = useMemo(() => {
-    if (allPoints.length === 0) return [0, 0];
-    if (allPoints.length === 1)
-      return [allPoints[0].latitude, allPoints[0].longitude];
-    const avgLat =
-      allPoints.reduce((sum, p) => sum + p.latitude, 0) / allPoints.length;
-    const avgLng =
-      allPoints.reduce((sum, p) => sum + p.longitude, 0) / allPoints.length;
-    return [avgLat, avgLng];
+    if (allPoints.length === 0) {
+      return lastCenterRef.current ?? [0, 0];
+    }
+    let nextCenter: [number, number];
+    if (allPoints.length === 1) {
+      nextCenter = [allPoints[0].latitude, allPoints[0].longitude];
+    } else {
+      const avgLat =
+        allPoints.reduce((sum, p) => sum + p.latitude, 0) / allPoints.length;
+      const avgLng =
+        allPoints.reduce((sum, p) => sum + p.longitude, 0) / allPoints.length;
+      nextCenter = [avgLat, avgLng];
+    }
+    lastCenterRef.current = nextCenter;
+    return nextCenter;
   }, [allPoints]);
   //TODO: map this in to determine the zoom level based on the country. I started working on this in the locationFns file.
 
@@ -134,33 +146,106 @@ export default function MapComponent({
   // console.log(zoomLevel);
 
   return (
-    <div className={cn(containerClassName)}>
-      <div className={cn("group relative", className)}>
-        {overlay && mapType === "event" && (
-          <>
-            <div className="pointer-events-none absolute inset-0 z-20 hidden items-center justify-center rounded-xl opacity-0 transition-opacity duration-200 group-hover:opacity-100 lg:flex">
-              <p className="pointer-events-none select-none text-balance px-5 text-center text-2xl font-bold text-white">
-                Click to enable scroll-to-zoom
-              </p>
-            </div>
-            <div className="pointer-events-none absolute inset-0 z-10 hidden items-center justify-center rounded-xl bg-black/50 opacity-0 blur-sm transition-opacity duration-200 group-hover:opacity-100 lg:flex"></div>
-          </>
-        )}
-        <Dialog open={fullScreen} onOpenChange={setFullScreenAction}>
-          <DialogTrigger asChild>
-            <button className="absolute right-2 top-2 z-10 rounded border-2 border-foreground/40 bg-card p-2 hover:scale-105 hover:cursor-pointer active:scale-95">
-              <TooltipSimple content="Enter Full Screen" side="top">
-                <FiMaximize2 className="size-4 text-foreground" />
-              </TooltipSimple>
-            </button>
-          </DialogTrigger>
+    <div className={cn("group relative", className)}>
+      {overlay && mapType === "event" && (
+        <>
+          <div className="pointer-events-none absolute inset-0 z-20 hidden items-center justify-center rounded-xl opacity-0 transition-opacity duration-200 group-hover:opacity-100 lg:flex">
+            <p className="pointer-events-none select-none text-balance px-5 text-center text-2xl font-bold text-white">
+              Click to enable scroll-to-zoom
+            </p>
+          </div>
+          <div className="pointer-events-none absolute inset-0 z-10 hidden items-center justify-center rounded-xl bg-black/50 opacity-0 blur-sm transition-opacity duration-200 group-hover:opacity-100 lg:flex"></div>
+        </>
+      )}
+      <Dialog open={fullScreen} onOpenChange={setFullScreenAction}>
+        <DialogTrigger asChild>
+          <button
+            className={cn(
+              "absolute right-3 top-3 z-10 rounded border-2 border-foreground/40 bg-card p-2 hover:scale-105 hover:cursor-pointer active:scale-95",
+              isMobile && toolbarContent && "hidden",
+            )}
+          >
+            <TooltipSimple content="Enter Full Screen" side="top">
+              <FiMaximize2 className="size-4 text-foreground" />
+            </TooltipSimple>
+          </button>
+        </DialogTrigger>
+        {toolbarContent && <ToolbarContent>{toolbarContent}</ToolbarContent>}
+
+        <MapContainer
+          center={center as [number, number]}
+          zoom={zoomLevel}
+          scrollWheelZoom={false}
+          zoomControl={toolbarContent ? false : true}
+          attributionControl={false}
+          className="relative z-0 h-full w-full"
+          maxBounds={[
+            [-85, -180],
+            [85, 180],
+          ]}
+          maxBoundsViscosity={1.0}
+          minZoom={2}
+        >
+          {toolbarContent && <ZoomControl position="bottomright" />}
+          <TileLayer
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          />
+          <MarkerClusterGroup
+            chunkedLoading
+            spiderfyOnEveryClick={false}
+            showCoverageOnHover={false}
+            zoomToBoundsOnClick
+            iconCreateFunction={createClusterCustomIcon}
+            maxClusterRadius={70} //default 80
+            // spiderfyDistanceMultiplier={0} // optional
+            // showCoverageOnHover={true}
+            // maxClusterRadius={5} // optional, controls cluster tightness
+          >
+            {allPoints.map((p, i) => (
+              <LeafletMapIcon
+                key={`${p.latitude}-${p.longitude}-${i}`}
+                latitude={p.latitude}
+                longitude={p.longitude}
+                edition={p.edition}
+                label={`${p.label} (${p.edition})`}
+                meta={p.meta}
+                type={mapType === "full" ? "worldMap" : "event"}
+                activeSub={hasActiveSubscription || isAdmin}
+              />
+            ))}
+          </MarkerClusterGroup>
+          <ResetViewOnFullScreen
+            fullScreen={fullScreen}
+            center={center as [number, number]}
+            zoomLevel={zoomLevel}
+          />
+          <ClickToZoom setOverlay={setOverlay} />
+        </MapContainer>
+
+        <DialogContent className="z-[100] h-[95dvh] w-[90dvw] max-w-none overflow-hidden rounded-lg bg-background p-0 sm:h-screen sm:w-screen sm:rounded-none">
+          <DialogTitle className="sr-only">Map Full View</DialogTitle>
+          <button
+            onClick={() => setFullScreenAction(false)}
+            className="absolute right-4 top-4 z-[401] rounded border-2 border-foreground/40 bg-card p-2 hover:scale-105 active:scale-95"
+          >
+            <TooltipSimple
+              content="Exit Full Screen"
+              side="bottom"
+              className="z-[402]"
+            >
+              <FiMinimize2 className="size-4 text-foreground" />
+            </TooltipSimple>
+          </button>
+          {toolbarContent && <ToolbarContent>{toolbarContent}</ToolbarContent>}
 
           <MapContainer
             center={center as [number, number]}
             zoom={zoomLevel}
-            scrollWheelZoom={false}
+            zoomControl={toolbarContent ? false : true}
+            scrollWheelZoom
             attributionControl={false}
-            className="z-0 h-full w-full"
+            className="relative h-full w-full"
             maxBounds={[
               [-85, -180],
               [85, 180],
@@ -168,6 +253,7 @@ export default function MapComponent({
             maxBoundsViscosity={1.0}
             minZoom={2}
           >
+            {toolbarContent && <ZoomControl position="bottomright" />}
             <TileLayer
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -179,9 +265,6 @@ export default function MapComponent({
               zoomToBoundsOnClick
               iconCreateFunction={createClusterCustomIcon}
               maxClusterRadius={70} //default 80
-              // spiderfyDistanceMultiplier={0} // optional
-              // showCoverageOnHover={true}
-              // maxClusterRadius={5} // optional, controls cluster tightness
             >
               {allPoints.map((p, i) => (
                 <LeafletMapIcon
@@ -196,71 +279,37 @@ export default function MapComponent({
                 />
               ))}
             </MarkerClusterGroup>
-            <ResetViewOnFullScreen
-              fullScreen={fullScreen}
-              center={center as [number, number]}
-              zoomLevel={zoomLevel}
-            />
-            <ClickToZoom setOverlay={setOverlay} />
           </MapContainer>
-
-          <DialogContent className="z-[100] h-[95dvh] w-[90dvw] max-w-none overflow-hidden rounded-lg bg-background p-0 sm:h-screen sm:w-screen sm:rounded-none">
-            <DialogTitle className="sr-only">Map Full View</DialogTitle>
-            <button
-              onClick={() => setFullScreenAction(false)}
-              className="absolute right-4 top-4 z-[401] rounded border-2 border-foreground/40 bg-card p-2 hover:scale-105 active:scale-95"
-            >
-              <TooltipSimple
-                content="Exit Full Screen"
-                side="bottom"
-                className="z-[402]"
-              >
-                <FiMinimize2 className="size-4 text-foreground" />
-              </TooltipSimple>
-            </button>
-
-            <MapContainer
-              center={center as [number, number]}
-              zoom={zoomLevel}
-              scrollWheelZoom
-              attributionControl={false}
-              className="h-full w-full"
-              maxBounds={[
-                [-85, -180],
-                [85, 180],
-              ]}
-              maxBoundsViscosity={1.0}
-              minZoom={2}
-            >
-              <TileLayer
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-              />
-              <MarkerClusterGroup
-                chunkedLoading
-                spiderfyOnEveryClick={false}
-                showCoverageOnHover={false}
-                zoomToBoundsOnClick
-                iconCreateFunction={createClusterCustomIcon}
-                maxClusterRadius={70} //default 80
-              >
-                {allPoints.map((p, i) => (
-                  <LeafletMapIcon
-                    key={`${p.latitude}-${p.longitude}-${i}`}
-                    latitude={p.latitude}
-                    longitude={p.longitude}
-                    edition={p.edition}
-                    label={`${p.label} (${p.edition})`}
-                    meta={p.meta}
-                    type={mapType === "full" ? "worldMap" : "event"}
-                    activeSub={hasActiveSubscription || isAdmin}
-                  />
-                ))}
-              </MarkerClusterGroup>
-            </MapContainer>
-          </DialogContent>
-        </Dialog>
-      </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
+
+const ToolbarContent = ({ children }: { children: ReactNode }) => {
+  return (
+    <div className="absolute left-3 top-3 z-top min-h-15 w-[85vw] rounded border-1.5 border-foreground/30 bg-card p-3 sm:w-72">
+      {children}
+    </div>
+  );
+};
+
+// const ToolbarContent = ({ children }: { children: ReactNode }) => {
+//   const ref = useRef<HTMLDivElement | null>(null);
+
+//   useEffect(() => {
+//     if (!ref.current) return;
+
+//     L.DomEvent.disableClickPropagation(ref.current);
+//     L.DomEvent.disableScrollPropagation(ref.current);
+//   }, []);
+
+//   return (
+//     <div
+//       ref={ref}
+//       className="pointer-events-auto absolute left-3 top-3 z-[1000] min-h-15 w-72 rounded border border-foreground/30 bg-card p-3"
+//     >
+//       {children}
+//     </div>
+//   );
+// };

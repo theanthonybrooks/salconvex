@@ -67,7 +67,7 @@ export const mainMenuItems: FullPageNavMenuSection[] = [
       // },
       {
         title: "World Map",
-        path: "https://archive.thestreetartlist.com/map",
+        path: "/map",
         category: "thelist",
         public: true,
         userType: ["public"],

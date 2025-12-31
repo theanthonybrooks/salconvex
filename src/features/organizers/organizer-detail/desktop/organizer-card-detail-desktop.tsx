@@ -20,6 +20,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/state-accordion-test";
+import { EventDesktopSummaryCard } from "@/features/events/components/event-desktop-summary-card";
 import { SalBackNavigation } from "@/features/events/components/sal-back-navigation";
 import { ConvexDashboardLink } from "@/features/events/ui/convex-dashboard-link";
 import { OrganizerCard } from "@/features/organizers/components/organizer-card";
@@ -111,11 +112,7 @@ export const OrganizerCardDetailDesktop = (props: OrganizerCardProps) => {
         orgId={data?.organizer?._id}
       />
 
-      <Card
-        className={cn(
-          "row-start-2 hidden w-full max-w-[350px] grid-cols-[75px_minmax(0,1fr)] gap-x-3 self-start rounded-3xl border-foreground/20 bg-white/50 p-3 pt-5 first:mt-6 xl:sticky xl:top-24 xl:grid",
-        )}
-      >
+      <EventDesktopSummaryCard>
         <div className="col-span-1 flex items-center justify-center">
           <Image
             src={orgLogo}
@@ -204,7 +201,7 @@ export const OrganizerCardDetailDesktop = (props: OrganizerCardProps) => {
             </ConvexDashboardLink>
           </>
         )}
-      </Card>
+      </EventDesktopSummaryCard>
 
       <Card className="col-start-2 row-start-2 flex w-full flex-col gap-y-2 rounded-3xl border-foreground/20 bg-white/50 p-4">
         <div className="flex h-20 w-full items-center gap-x-4 rounded-2xl border border-dotted border-foreground/50 bg-card-secondary p-4">
