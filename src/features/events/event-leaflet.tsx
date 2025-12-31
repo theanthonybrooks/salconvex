@@ -83,6 +83,7 @@ export default function MapComponent({
   setFullScreenAction,
   toolbarContent,
 }: MapComponentProps) {
+  console.log(locationType);
   const lastCenterRef = useRef<[number, number] | null>(null);
   const isMobile = useIsMobile();
 

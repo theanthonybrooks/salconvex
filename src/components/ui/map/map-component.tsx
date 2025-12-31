@@ -84,7 +84,7 @@ export default function WorldMapComponent() {
         className={cn(
           "z-0 mx-auto h-[calc(100dvh-120px)] w-full overflow-hidden rounded border-1.5 border-foreground/50",
         )}
-        locationType="full"
+        locationType={continent ? "country" : "full"}
         fullScreen={fullScreen}
         setFullScreenAction={setFullScreen}
         mapType="full"
