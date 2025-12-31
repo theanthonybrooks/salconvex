@@ -119,13 +119,13 @@ export const formatEventDates = (
     const month = dt.toLocaleString("en-US", { month: "long" });
     return `By ${month} ${dt.getFullYear()}`;
   }
-
-  const startDate = DateTime.fromISO(start, { zone })
-    .plus({ hours: 12 })
-    .toJSDate();
-  const endDate = DateTime.fromISO(end, { zone })
-    .plus({ hours: 12 })
-    .toJSDate();
+  const hasTime = (dt: string) => dt.endsWith("Z") && dt.includes("T");
+  const startDt = DateTime.fromISO(start, { zone });
+  const endDt = DateTime.fromISO(end, { zone });
+  const safeStartDate = hasTime(start) ? startDt : startDt.plus({ hours: 12 });
+  const startDate = safeStartDate.toJSDate();
+  const safeEndDate = hasTime(end) ? endDt : endDt.plus({ hours: 12 });
+  const endDate = safeEndDate.toJSDate();
 
   const isStartDateValid = !isNaN(startDate.getTime());
   const isEndDateValid = !isNaN(endDate.getTime());
