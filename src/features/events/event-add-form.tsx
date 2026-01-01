@@ -1732,7 +1732,8 @@ export const EventOCForm = ({
           }
           if (
             eventData?.category === "event" &&
-            editedSections.includes("event")
+            editedSections.includes("event") &&
+            eventData?.dates?.edition >= new Date().getFullYear()
           ) {
             await createNotification({
               type: "newEvent",
