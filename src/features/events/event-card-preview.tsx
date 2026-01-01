@@ -33,6 +33,7 @@ import EventContextMenu from "@/features/events/ui/event-context-menu";
 import { formatOpenCallDeadline } from "@/helpers/dateFns";
 import {
   formatBudgetCurrency,
+  formatCurrencyAmount,
   formatEventLink,
   formatRate,
   getEventCategoryLabel,
@@ -78,6 +79,7 @@ const EventCardPreview = ({
   const userTZ = !!userPref?.timezone ? userPref.timezone : undefined;
   const router = useRouter();
   const {
+    orgData,
     isUserOrg,
     location,
     category: eventCategory,
@@ -101,6 +103,7 @@ const EventCardPreview = ({
     artistNationality,
     posted,
   } = event;
+  const { currency } = orgData?.orgLocation ?? {};
   const [isBookmarkedOptimistic, setIsBookmarkedOptimistic] =
     useState(bookmarked);
   const bookmarkedRef = useRef(bookmarked);
@@ -305,8 +308,8 @@ const EventCardPreview = ({
           {event.status === null && !appStatus ? (
             <CircleDollarSignIcon
               className={cn(
-                "size-6 text-red-600",
-                !basicInfo?.appFee && "opacity-0",
+                "invisible size-6 text-red-600",
+                basicInfo?.appFee && "visible",
               )}
             />
           ) : (
@@ -522,8 +525,8 @@ const EventCardPreview = ({
               >
                 <CircleDollarSignIcon
                   className={cn(
-                    "size-6 text-red-600",
-                    !basicInfo?.appFee && "hidden",
+                    "invisible size-6 text-red-600",
+                    basicInfo?.appFee && "visible",
                   )}
                 />
               </TooltipSimple>
@@ -862,7 +865,7 @@ const EventCardPreview = ({
               <span className="flex items-center gap-x-1 font-semibold">
                 <Info /> Application Fee:
               </span>
-              ${basicInfo.appFee}
+              {formatCurrencyAmount(basicInfo.appFee, currency?.code ?? "USD")}
             </p>
           )}
 

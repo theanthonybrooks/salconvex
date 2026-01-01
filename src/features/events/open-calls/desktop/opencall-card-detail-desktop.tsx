@@ -37,7 +37,11 @@ import { OrganizerLogoNameCard } from "@/features/organizers/components/organize
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { formatApplicationLink } from "@/helpers/applicationFns";
 import { formatOpenCallDeadline, formatSingleDate } from "@/helpers/dateFns";
-import { getEventCategoryLabel, getEventTypeLabel } from "@/helpers/eventFns";
+import {
+  formatCurrencyAmount,
+  getEventCategoryLabel,
+  getEventTypeLabel,
+} from "@/helpers/eventFns";
 import { getFormattedLocationString } from "@/helpers/locationFns";
 import { RichTextDisplay } from "@/helpers/richTextFns";
 import { getUserFontSizePref } from "@/helpers/stylingFns";
@@ -85,6 +89,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
     state: eventState,
     adminNote,
   } = event;
+  const { currency } = organizer.location;
 
   const manualApplied = application?.manualApplied ?? false;
   const appStatus = application?.applicationStatus ?? null;
@@ -391,10 +396,13 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                   <Info className="size-4" /> External Application
                 </p>
               )} */}
-            {basicInfo?.appFee !== 0 && (
+            {basicInfo.appFee !== 0 && (
               <p className="flex w-full items-center justify-center gap-x-1 text-center text-sm text-red-600">
                 <span className="font-semibold">Application Fee:</span>
-                {`$${basicInfo?.appFee}`}
+                {formatCurrencyAmount(
+                  basicInfo.appFee,
+                  currency?.code ?? "USD",
+                )}
               </p>
             )}
             {bothValid && ((!isUserOrg && !isAdmin) || isCreator) && (
@@ -421,7 +429,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                   isBookmarked={bookmarked}
                   isHidden={hidden}
                   eventCategory={eventCategory}
-                  appFee={basicInfo?.appFee ?? 0}
+                  appFee={basicInfo.appFee}
                   className="w-full"
                   detailCard
                   finalButton
@@ -463,7 +471,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                 isHidden={hidden}
                 orgPreview
                 eventCategory={eventCategory}
-                appFee={basicInfo?.appFee ?? 0}
+                appFee={basicInfo.appFee}
                 className="w-full"
                 detailCard
                 finalButton
@@ -687,7 +695,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
                   isBookmarked={bookmarked}
                   isHidden={hidden}
                   eventCategory={eventCategory}
-                  appFee={basicInfo?.appFee ?? 0}
+                  appFee={basicInfo.appFee}
                   className="mx-auto w-full max-w-52 lg:px-0"
                   detailCard
                   finalButton

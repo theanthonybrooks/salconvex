@@ -22,7 +22,11 @@ import OpenCallCard from "@/features/events/open-calls/components/open-call-card
 import { getOpenCallStatus } from "@/features/events/open-calls/helpers/openCallStatus";
 import { OrganizerCard } from "@/features/organizers/components/organizer-card";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
-import { getEventCategoryLabel, getEventTypeLabel } from "@/helpers/eventFns";
+import {
+  formatCurrencyAmount,
+  getEventCategoryLabel,
+  getEventTypeLabel,
+} from "@/helpers/eventFns";
 import { getFormattedLocationString } from "@/helpers/locationFns";
 import { getUserFontSizePref } from "@/helpers/stylingFns";
 import { cn } from "@/helpers/utilsFns";
@@ -73,6 +77,8 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
     state: eventState,
     slug,
   } = event;
+
+  const { currency } = organizer.location;
   //todo: now that this is dynamically calculated in the combine function, utilize it as a simpler way to show/hide info
 
   const manualApplied = application?.manualApplied ?? false;
@@ -298,10 +304,13 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
                 })}
               </p>
             )}
-            {basicInfo?.appFee !== 0 && (
+            {basicInfo.appFee !== 0 && (
               <p className="flex items-center gap-x-1 text-red-600">
                 <span className="font-semibold">Application Fee:</span>
-                {`$${basicInfo?.appFee}`}
+                {formatCurrencyAmount(
+                  basicInfo.appFee,
+                  currency?.code ?? "USD",
+                )}
               </p>
             )}
           </div>
@@ -387,7 +396,7 @@ export const OpenCallCardDetailMobile = (props: OpenCallCardProps) => {
               isHidden={hidden}
               // setIsHidden={setIsHidden}
               eventCategory={eventCategory}
-              appFee={basicInfo?.appFee ?? 0}
+              appFee={basicInfo.appFee}
               className="mx-auto mb-3 w-full"
               detailCard
               finalButton

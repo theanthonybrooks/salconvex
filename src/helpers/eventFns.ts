@@ -68,6 +68,14 @@ export const getEventCategoryLabel = (
   return (abbreviate ? match?.abbr : match?.label) ?? "Unknown";
 };
 
+export const formatCurrencyAmount = (amount: number, currency: string) =>
+  new Intl.NumberFormat(undefined, {
+    style: "currency",
+    currency,
+    minimumFractionDigits: amount % 1 === 0 ? 0 : 2,
+    maximumFractionDigits: 2,
+  }).format(amount);
+
 export const formatBudgetCurrency = (
   min: number,
   max: number | undefined,
