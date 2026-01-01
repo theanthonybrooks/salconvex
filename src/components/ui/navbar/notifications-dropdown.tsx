@@ -568,7 +568,7 @@ const NotificationDropdownItem = ({
         onClick={() => {
           updateUserLastActive({ email: user?.email ?? "" });
           if (eventId) handleRunAnalytics(eventId);
-          if (archived) return;
+          if (archived || saved) return;
           handleClearNotifications(id);
         }}
         variant="standard"

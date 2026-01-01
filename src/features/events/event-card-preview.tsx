@@ -4,18 +4,18 @@ import type { ViewOptions } from "@/features/events/event-list-client";
 import type { MergedEventPreviewData, PostStatus } from "@/types/eventTypes";
 import type { User } from "@/types/user";
 
-import { useEffect, useRef, useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
 import { useIsMobile } from "@/hooks/use-media-query";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 
-import { FaRegCheckSquare } from "react-icons/fa";
-import { FaBookmark, FaRegBookmark, FaRegSquare } from "react-icons/fa6";
 import {
   CheckCircleIcon,
   CircleDollarSignIcon,
   EyeOff,
   Info,
 } from "lucide-react";
+import { FaRegCheckSquare } from "react-icons/fa";
+import { FaBookmark, FaRegBookmark, FaRegSquare } from "react-icons/fa6";
 
 import { Card } from "@/components/ui/card";
 import { EventOrgLogo } from "@/components/ui/event-org-logo";
@@ -45,9 +45,9 @@ import { getUserFontSizePref } from "@/helpers/stylingFns";
 import { cn } from "@/helpers/utilsFns";
 import { getCallFormatLabel } from "@/lib/openCallFns";
 
+import { useMutation } from "convex/react";
 import { api } from "~/convex/_generated/api";
 import { UserPrefsType } from "~/convex/schema";
-import { useMutation } from "convex/react";
 
 export interface EventCardPreviewProps {
   event: MergedEventPreviewData;

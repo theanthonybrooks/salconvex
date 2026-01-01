@@ -1,5 +1,3 @@
-// TODO: remove the redirect from the layout.tsx file once the map is actually functional
-
 "use client";
 
 import { select_continents } from "@/constants/locationConsts";
@@ -8,7 +6,7 @@ import type { EventCategory } from "@/types/eventTypes";
 import type { Continents } from "@/types/thelist";
 import { EventType } from "@/types/eventTypes";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { Funnel, FunnelX, X } from "lucide-react";
 
@@ -29,9 +27,6 @@ import { useQueries } from "convex-helpers/react/cache/hooks";
 export default function WorldMapComponent() {
   const [fullScreen, setFullScreen] = useState(false);
   const [search, setSearch] = useState("");
-  useEffect(() => {
-    sessionStorage.setItem("previousSalPage", "/map");
-  }, []);
   const [edition, setEdition] = useState<number | null>(null);
   const [category, setCategory] = useState<EventCategory | null>(null);
   const [eventType, setEventType] = useState<EventType[] | null>(null);
