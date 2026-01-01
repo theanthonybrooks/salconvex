@@ -142,7 +142,12 @@ export const NotificationsDropdown = ({
     notificationFilter,
   );
 
-  const hasUnreadNotifications = uniqueNotifications.length > 0;
+  const filterSavedNotifications = (notifications: NotificationItemType[]) =>
+    notifications.filter((n) => !n.saved);
+
+  const checkIfSaved = (notifications: NotificationItemType[]) =>
+    notifications.every((n) => n.saved);
+
   const hasAdminNotifications = adminNotifications.length > 0;
   const hasArtistNotifications = artistNotifications.length > 0;
   const hasOrganizerNotifications = organizerNotifications.length > 0;
@@ -157,6 +162,8 @@ export const NotificationsDropdown = ({
   const fontSize = fontSizePref?.body;
 
   const totalPending = uniqueNotifications.length;
+  const hasUnreadNotifications =
+    filterSavedNotifications(uniqueNotifications).length > 0;
   const totalNotifications = visibleUserNotifications.length;
 
   const handleClearNotifications = async (
@@ -212,6 +219,8 @@ export const NotificationsDropdown = ({
                 className={cn(
                   "absolute right-1 top-0 flex h-5 min-w-5 items-center justify-center rounded-full border-1.5 border-salPinkDark bg-salPinkMed text-2xs font-semibold text-card hover:scale-105 hover:cursor-pointer sm:right-0",
                   totalPending > 99 && "px-0.5 sm:-right-1",
+                  checkIfSaved(uniqueNotifications) &&
+                    "border-foreground/70 bg-salYellowLt text-foreground",
                 )}
               >
                 {returnNinetyNinePlus(totalPending)}
@@ -255,7 +264,11 @@ export const NotificationsDropdown = ({
                 fontSize,
               )}
             >
-              All <NotificationCount count={uniqueNotifications.length} />
+              All{" "}
+              <NotificationCount
+                count={totalPending}
+                allSaved={checkIfSaved(uniqueNotifications)}
+              />
             </TabsTrigger>
 
             {isAdmin && (
@@ -264,7 +277,11 @@ export const NotificationsDropdown = ({
                 variant="underline"
                 className={cn("min-w-20 max-w-25", fontSize)}
               >
-                Admin <NotificationCount count={adminNotifications.length} />
+                Admin{" "}
+                <NotificationCount
+                  count={adminNotifications.length}
+                  allSaved={checkIfSaved(adminNotifications)}
+                />
               </TabsTrigger>
             )}
 
@@ -278,7 +295,11 @@ export const NotificationsDropdown = ({
                   fontSize,
                 )}
               >
-                Artist <NotificationCount count={artistNotifications.length} />
+                Artist{" "}
+                <NotificationCount
+                  count={artistNotifications.length}
+                  allSaved={checkIfSaved(artistNotifications)}
+                />
               </TabsTrigger>
             )}
             {isOrganizer && (
@@ -293,7 +314,10 @@ export const NotificationsDropdown = ({
                 )}
               >
                 Organizer{" "}
-                <NotificationCount count={organizerNotifications.length} />
+                <NotificationCount
+                  count={organizerNotifications.length}
+                  allSaved={checkIfSaved(organizerNotifications)}
+                />
               </TabsTrigger>
             )}
             <TabsTrigger
@@ -310,7 +334,7 @@ export const NotificationsDropdown = ({
 
           <TabsContent value="all" className="scrollable mini max-h-[50dvh]">
             {uniqueNotifications.length > 0 ? (
-              <DropdownMenuGroup>
+              <DropdownMenuGroup className="space-y-1">
                 {uniqueNotifications.map((notification, i) => (
                   <NotificationDropdownItem
                     key={notification._id}
@@ -333,7 +357,7 @@ export const NotificationsDropdown = ({
               className="scrollable mini max-h-[50dvh]"
             >
               {hasAdminNotifications ? (
-                <DropdownMenuGroup>
+                <DropdownMenuGroup className="space-y-1">
                   {adminNotifications.map((notification, i) => (
                     <NotificationDropdownItem
                       key={notification._id}
@@ -357,7 +381,7 @@ export const NotificationsDropdown = ({
               className="scrollable mini max-h-[50dvh]"
             >
               {hasArtistNotifications ? (
-                <DropdownMenuGroup>
+                <DropdownMenuGroup className="space-y-1">
                   {artistNotifications.map((notification, i) => (
                     <NotificationDropdownItem
                       key={notification._id}
@@ -380,7 +404,7 @@ export const NotificationsDropdown = ({
               className="scrollable mini max-h-[50dvh]"
             >
               {hasOrganizerNotifications ? (
-                <DropdownMenuGroup>
+                <DropdownMenuGroup className="space-y-1">
                   {organizerNotifications.map((notification, i) => (
                     <NotificationDropdownItem
                       key={notification._id}
@@ -400,7 +424,7 @@ export const NotificationsDropdown = ({
             value="archive"
             className="scrollable mini max-h-[50dvh]"
           >
-            <DropdownMenuGroup>
+            <DropdownMenuGroup className="space-y-1">
               {userDismissedNotifications.length > 0 ? (
                 userDismissedNotifications.map((notification, i) => (
                   <NotificationDropdownItem
@@ -437,12 +461,7 @@ export const NotificationsDropdown = ({
               Mark all as read
             </Button>
           )}
-          <Button
-            variant="link"
-            size="sm"
-            asChild
-            // className="hover:scale-[1.025]"
-          >
+          <Button variant="link" size="sm" asChild>
             <Link href="/dashboard/settings/notifications" variant="standard">
               Manage Notifications
             </Link>
@@ -630,7 +649,13 @@ const EmptyNotifications = ({ type }: { type?: string }) => (
   </div>
 );
 
-const NotificationCount = ({ count }: { count: number }) => {
+const NotificationCount = ({
+  count,
+  allSaved,
+}: {
+  count: number;
+  allSaved?: boolean;
+}) => {
   if (count === 0) return null;
   return (
     <p
@@ -638,6 +663,7 @@ const NotificationCount = ({ count }: { count: number }) => {
         "ml-2 flex h-5 min-w-5 items-center justify-center rounded-lg border-1.5 border-salPinkDark bg-salPinkLt text-2xs font-semibold text-foreground",
         count === 0 && "invisible",
         count > 99 && "px-0.5",
+        allSaved && "border-salYellowDark bg-salYellowLt",
       )}
     >
       {returnNinetyNinePlus(count)}
