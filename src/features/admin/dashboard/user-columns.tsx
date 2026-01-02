@@ -470,9 +470,9 @@ export const userColumns: ColumnDef<UserResult>[] = [
       return (
         <div className="truncate text-center text-sm text-muted-foreground">
           {website ? (
-            <Link href={website} target="_blank">
+            <a href={website} target="_blank">
               {displayLink}
-            </Link>
+            </a>
           ) : (
             "-"
           )}

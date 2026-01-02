@@ -407,7 +407,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
             )}
             {bothValid && ((!isUserOrg && !isAdmin) || isCreator) && (
               <>
-                {isUserOrg && <p>Open Call Actions</p>}
+                {isUserOrg && <p className="text-center">Open Call Actions</p>}
                 <ApplyButton
                   src="ocPage"
                   user={user}

@@ -51,3 +51,6 @@ next-env.d.ts
 
 # Trash
 trash/
+
+# SAC
+src/features/events/data/

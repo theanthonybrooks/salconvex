@@ -89,7 +89,18 @@ export const sacColumns: ColumnDef<SacResult>[] = [
     ),
     cell: ({ row }) => {
       const { email } = row.original;
-      return <div className="truncate">{email}</div>;
+
+      return (
+        <div className="truncate text-center text-sm">
+          {email ? (
+            <a href={`mailto:${email}`} target="_blank">
+              {email}
+            </a>
+          ) : (
+            "-"
+          )}
+        </div>
+      );
     },
     sortUndefined: "last",
   },
@@ -102,7 +113,20 @@ export const sacColumns: ColumnDef<SacResult>[] = [
     ),
     cell: ({ row }) => {
       const { website } = row.original;
-      return <div className="truncate">{website ?? "-"}</div>;
+      const displayLink = website?.startsWith("http")
+        ? website.slice(website.indexOf("//") + 2)
+        : website;
+      return (
+        <div className="truncate text-center text-sm">
+          {website ? (
+            <a href={website} target="_blank">
+              {displayLink}
+            </a>
+          ) : (
+            "-"
+          )}
+        </div>
+      );
     },
     sortUndefined: "last",
   },
@@ -116,7 +140,20 @@ export const sacColumns: ColumnDef<SacResult>[] = [
     ),
     cell: ({ row }) => {
       const { appLink } = row.original;
-      return <div className="truncate">{appLink ?? "-"}</div>;
+      const displayLink = appLink?.startsWith("http")
+        ? appLink.slice(appLink.indexOf("//") + 2)
+        : appLink;
+      return (
+        <div className="truncate text-center text-sm">
+          {appLink ? (
+            <a href={appLink} target="_blank">
+              {displayLink}
+            </a>
+          ) : (
+            "-"
+          )}
+        </div>
+      );
     },
     sortUndefined: "last",
   },
@@ -130,7 +167,7 @@ export const sacColumns: ColumnDef<SacResult>[] = [
     cell: ({ row }) => {
       const { deadline } = row.original;
       return (
-        <div className="truncate">
+        <div className="truncate text-center">
           {" "}
           {deadline
             ? new Date(deadline).toLocaleString("en-US", {
@@ -226,10 +263,11 @@ export const sacColumns: ColumnDef<SacResult>[] = [
   },
   {
     accessorKey: "salUpdatedAt",
+    id: "salUpdatedAt",
     minSize: 120,
     maxSize: 200,
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Updated At" />
+      <DataTableColumnHeader column={column} title="SAL Updated At" />
     ),
     cell: ({ row }) => {
       const { salUpdatedAt } = row.original;
