@@ -37,6 +37,8 @@ export const getOrganizationStaff = query({
       }),
     );
 
+    const allMembers = [{ ...orgOwner, role: "owner" }, ...enrichedMembers];
+
     return { data: enrichedMembers, success: true, error: null };
   },
 });

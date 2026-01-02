@@ -68,14 +68,10 @@ export const OrgMainPage = () => {
   const tabList = [
     { id: "orgInfo", label: "Organization Info" },
     { id: "events", label: "My Events" },
+    { id: "staff", label: "Staff" },
 
     // { id: "analytics", label: "Analytics" },
-    ...(isAdmin
-      ? [
-          { id: "staff", label: "Staff" },
-          { id: "invoices", label: "Invoices" },
-        ]
-      : []),
+    ...(isAdmin ? [{ id: "invoices", label: "Invoices" }] : []),
   ] as const;
 
   const tabListMobile = tabList.map((tab) => tab.id);

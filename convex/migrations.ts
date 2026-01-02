@@ -1,3 +1,5 @@
+import type { Id } from "./_generated/dataModel.js";
+
 import { Migrations } from "@convex-dev/migrations";
 import {
   eventsAggregate,
@@ -22,6 +24,55 @@ export const run = migrations.runner();
 function needsLowercase(value: string): boolean {
   return value !== value.toLowerCase();
 }
+
+export const backfillOrgStaff = migrations.define({
+  table: "organizations",
+  migrateOne: async (ctx, org) => {
+    const orgOwner = await ctx.db.get(org.ownerId);
+    const members = await ctx.db
+      .query("orgStaff")
+      .withIndex("by_orgId", (q) => q.eq("organizationId", org._id))
+      .collect();
+
+    const allowedEditors = org.allowedEditors ?? [];
+
+    const existingMembers = members.map((member) => member.userId);
+    const ownerAdded = orgOwner
+      ? existingMembers.includes(orgOwner?._id)
+      : true;
+
+    const filterAlreadyAdded = (member: Id<"users">) =>
+      !existingMembers.includes(member);
+
+    const editors = allowedEditors.filter(filterAlreadyAdded);
+
+    await Promise.all(
+      editors.map(async (editor) => {
+        await ctx.db.insert("orgStaff", {
+          organizationId: org._id,
+          userId: editor,
+          role: "editor",
+          lastUpdatedAt: Date.now(),
+          lastUpdatedBy: orgOwner?._id,
+        });
+      }),
+    );
+
+    if (ownerAdded || !orgOwner) return;
+
+    //filter out the owner if they already exist, otherwise add them
+
+    await ctx.db.insert("orgStaff", {
+      organizationId: org._id,
+      userId: orgOwner._id,
+      role: "owner",
+      lastUpdatedAt: Date.now(),
+      lastUpdatedBy: orgOwner?._id,
+    });
+  },
+});
+
+export const runBFOS = migrations.runner(internal.migrations.backfillOrgStaff);
 
 export const addFalseSavedFieldToNotifications = migrations.define({
   table: "notifications",

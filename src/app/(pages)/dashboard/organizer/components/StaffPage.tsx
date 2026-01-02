@@ -23,7 +23,6 @@ export const StaffPage = ({ orgId, adminActions, isOwner }: StaffPageProps) => {
   //   const userData = usePreloadedQuery(preloadedUserData);
   //   const { user } = userData ?? {};
   const { isAdmin } = adminActions;
-  console.log(orgId);
   const updateOrgOwner = useMutation(
     api.organizer.organizations.updateOrgOwnerMutation,
   );
@@ -41,15 +40,17 @@ export const StaffPage = ({ orgId, adminActions, isOwner }: StaffPageProps) => {
       {isAdmin && !isOwner && (
         <Button onClick={() => handleUpdateOrgOwner()}>Claim Ownership</Button>
       )}
-      {!isAdmin && (
-        <p className="text-sm italic text-muted-foreground">
-          {" "}
-          Ability to add members (other staff, judges, etc) is coming soon.
-        </p>
-      )}
+
       <ResponsiveDataTable
         title="Staff"
         description="View current members, change roles, and invite new members"
+        extraToolbar={
+          isAdmin ? undefined : (
+            <p className="rounded border-1.5 bg-salYellowLt p-3 text-center text-sm italic">
+              Ability to add members (other staff, judges, etc) is coming soon.
+            </p>
+          )
+        }
         data={staffData ?? []}
         columns={orgStaffColumns}
         defaultVisibility={{

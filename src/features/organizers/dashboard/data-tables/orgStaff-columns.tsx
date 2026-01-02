@@ -78,7 +78,7 @@ export const orgStaffColumns: ColumnDef<OrgStaffData>[] = [
       // const isAdmin = table.options.meta?.isAdmin;
       return (
         <div className="flex space-x-2">
-          <span className="max-w-[20ch] truncate pl-1 capitalize sm:max-w-[500px] sm:pl-0">
+          <span className="max-w-[20ch] truncate pl-1 sm:max-w-[500px] sm:pl-0">
             {name}
           </span>
         </div>
@@ -116,7 +116,7 @@ export const orgStaffColumns: ColumnDef<OrgStaffData>[] = [
 
     cell: ({ row }) => {
       const { role } = row.original;
-      return <div className="flex justify-center">{role}</div>;
+      return <div className="flex justify-center capitalize">{role}</div>;
     },
     filterFn: (row, columnId, filterValue) => {
       if (!Array.isArray(filterValue)) return true;

@@ -1,5 +1,7 @@
 "use client";
 
+import type { TableTypes } from "@/types/tanstack-table";
+
 import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
 import { Table } from "@tanstack/react-table";
 
@@ -27,27 +29,31 @@ import { bookmarkColumnLabels } from "@/features/artists/dashboard/data-tables/b
 import { hiddenColumnLabels } from "@/features/artists/dashboard/data-tables/hidden-columns";
 import { columnLabels } from "@/features/events/components/events-data-table/event-columns";
 import { orgEventColumnLabels } from "@/features/organizers/dashboard/data-tables/organizer-columns";
+import { orgStaffColumnLabels } from "@/features/organizers/dashboard/data-tables/orgStaff-columns";
 
 interface DataTableViewOptionsProps<TData> {
   table: Table<TData>;
 }
 
-const labelMaps: Record<string, Record<string, string>> = {
-  bookmarks: bookmarkColumnLabels,
-  applications: applicationColumnLabels,
-  hidden: hiddenColumnLabels,
+const labelMaps: Partial<Record<TableTypes, Record<string, string>>> = {
+  campaigns: campaignColumnLabels,
+  audience: audienceColumnLabels,
+  users: userColumnLabels,
+  // newsletter
+  resources: resourcesColumnLabels,
+  artists: artistColumnLabels,
+  sac: sacColumnLabels,
+  support: supportColumnLabels,
+  userAddOns: userAddOnColumnLabels,
   events: columnLabels,
   socials: socialsColumnLabels,
   orgEvents: orgEventColumnLabels,
-  users: userColumnLabels,
-  artists: artistColumnLabels,
-  audience: audienceColumnLabels,
-  campaigns: campaignColumnLabels,
-
-  userAddOns: userAddOnColumnLabels,
-  resources: resourcesColumnLabels,
-  support: supportColumnLabels,
-  sac: sacColumnLabels,
+  // organizations
+  organizationStaff: orgStaffColumnLabels,
+  applications: applicationColumnLabels,
+  // openCalls
+  bookmarks: bookmarkColumnLabels,
+  hidden: hiddenColumnLabels,
 };
 
 export function DataTableViewOptions<TData>({
