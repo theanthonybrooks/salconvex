@@ -18,6 +18,7 @@ import { ColumnDef } from "@tanstack/react-table";
 
 import { DataTableColumnHeader } from "@/components/data-table/DataTableColumnHeader";
 import { SacCheckedSelector } from "@/features/admin/dashboard/components/admin-sac-actions";
+import { cn } from "@/helpers/utilsFns";
 
 import { api } from "~/convex/_generated/api";
 
@@ -91,7 +92,7 @@ export const sacColumns: ColumnDef<SacResult>[] = [
       const { email } = row.original;
 
       return (
-        <div className="truncate text-center text-sm">
+        <div className={cn("truncate text-sm", !email && "text-center")}>
           {email ? (
             <a href={`mailto:${email}`} target="_blank">
               {email}
@@ -117,7 +118,7 @@ export const sacColumns: ColumnDef<SacResult>[] = [
         ? website.slice(website.indexOf("//") + 2)
         : website;
       return (
-        <div className="truncate text-center text-sm">
+        <div className={cn("truncate text-sm", !website && "text-center")}>
           {website ? (
             <a href={website} target="_blank">
               {displayLink}
@@ -144,7 +145,8 @@ export const sacColumns: ColumnDef<SacResult>[] = [
         ? appLink.slice(appLink.indexOf("//") + 2)
         : appLink;
       return (
-        <div className="truncate text-center text-sm">
+        <div className={cn("truncate text-sm", !appLink && "text-center")}>
+          {" "}
           {appLink ? (
             <a href={appLink} target="_blank">
               {displayLink}

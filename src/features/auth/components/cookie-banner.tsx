@@ -1,11 +1,11 @@
 "use client";
 
+import { CookiePref } from "@/types/user";
+
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
-import { CookiePref } from "@/types/user";
-import { api } from "~/convex/_generated/api";
-import { useMutation, usePreloadedQuery } from "convex/react";
 import Cookies from "js-cookie";
+
 import { CookieIcon, ExternalLink } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -21,6 +21,9 @@ import {
 } from "@/components/ui/dialog";
 import { useConvexPreload } from "@/features/wrapper-elements/convex-preload-context";
 import { cn } from "@/helpers/utilsFns";
+
+import { api } from "~/convex/_generated/api";
+import { useMutation, usePreloadedQuery } from "convex/react";
 
 interface CookieBannerProps {
   localCookiePrefs: CookiePref | null;
@@ -40,6 +43,7 @@ export const CookieBanner = ({ localCookiePrefs }: CookieBannerProps) => {
 
   const authPage = pathname?.includes("auth");
   const renderPage = pathname?.includes("render");
+  const linksPage = pathname?.includes("links");
 
   useEffect(() => {
     if (!user) return;
@@ -61,7 +65,7 @@ export const CookieBanner = ({ localCookiePrefs }: CookieBannerProps) => {
     updateCookiePreferences,
     localCookiePrefs,
   ]);
-  const hiddenPage = authPage || renderPage;
+  const hiddenPage = authPage || renderPage || linksPage;
 
   return (
     <Dialog defaultOpen={!cookiePreferences && !hiddenPage}>
