@@ -36,7 +36,7 @@ export const OrganizerCard = ({
   return (
     <>
       {isMobile ? (
-        <Card className="w-full max-w-full space-y-6 overflow-hidden rounded-xl border-foreground/20 bg-white/60 p-5">
+        <Card className="dark:bg-tab-a10 w-full max-w-full space-y-6 overflow-hidden rounded-xl border-foreground/20 bg-white/60 p-5">
           <OrganizerCardLogoName organizer={organizer} fontSize={fontSize} />
           <div className="w-full space-y-5">
             {organizer.about && (
@@ -79,7 +79,7 @@ export const OrganizerCard = ({
       ) : (
         <Card
           className={cn(
-            "grid w-full max-w-full grid-cols-2 space-y-6 divide-x-2 divide-dotted divide-foreground/20 overflow-hidden rounded-lg border-2 border-dotted border-foreground/20 bg-white/30 p-5",
+            "dark:bg-tab-a20 grid w-full max-w-full grid-cols-2 space-y-6 divide-x-2 divide-dotted divide-foreground/20 overflow-hidden rounded-lg border-2 border-dotted border-foreground/20 bg-white/30 p-5",
             fontSize,
           )}
           ref={aboutRef}

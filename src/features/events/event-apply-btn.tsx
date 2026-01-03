@@ -110,7 +110,7 @@ export const ApplyButtonShort = ({
         variant="salWithShadowHidden"
         size="lg"
         className={cn(
-          "w-full min-w-[100px] cursor-pointer bg-white",
+          "w-full min-w-[100px] cursor-pointer bg-card",
           className,
           appStatus !== null &&
             !publicView &&
@@ -412,7 +412,7 @@ export const ApplyButton = ({
           variant="salWithoutShadow"
           size="lg"
           className={cn(
-            "pointer-events-none relative z-[2] h-14 w-fit rounded-none border-x border-foreground/50 bg-background px-4 text-foreground/50 hover:bg-background sm:h-11 sm:px-3 [&_svg]:size-6",
+            "dark:bg-tab-a40 pointer-events-none relative z-[2] h-14 w-fit rounded-none border-x border-foreground/50 bg-background px-4 text-foreground/50 hover:bg-background sm:h-11 sm:px-3 dark:border-foreground/60 [&_svg]:size-6",
           )}
         >
           <CheckCircleIcon className="text-emerald-600 sm:size-5" />

@@ -259,7 +259,10 @@ export const NotificationsSettings = () => {
   };
   return (
     <>
-      <Card aria-description="Notifications Settings">
+      <Card
+        aria-description="Notifications Settings"
+        className="dark:bg-tab-a10"
+      >
         <CardHeader>
           <CardTitle>Notifications</CardTitle>
           <CardDescription>

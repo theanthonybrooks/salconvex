@@ -226,7 +226,7 @@ export const ArtistProfileForm = ({ type }: ArtistProfileFormProps) => {
                     {...field}
                     placeholder="(if different from your profile name)"
                     className={cn(
-                      "w-full rounded border border-foreground/30 p-3 text-base focus:outline-none focus:ring-1 focus:ring-foreground",
+                      "dark:bg-tab-a0 w-full rounded border border-foreground/30 p-3 text-base focus:outline-none focus:ring-1 focus:ring-foreground",
                     )}
                     fontSize={fontSize}
                   />
@@ -275,6 +275,7 @@ export const ArtistProfileForm = ({ type }: ArtistProfileFormProps) => {
                   placeholder="@username"
                   transform={(val) => formatHandleInput(val, "instagram")}
                   fontSize={fontSize}
+                  className="dark:bg-tab-a0"
                 />
               </FormControl>
               <FormMessage />
@@ -295,6 +296,7 @@ export const ArtistProfileForm = ({ type }: ArtistProfileFormProps) => {
                   placeholder="yoursite.com"
                   transform={autoHttps}
                   fontSize={fontSize}
+                  className="dark:bg-tab-a0"
 
                   // onBlur={() => {
                   //   field.onBlur?.();
@@ -339,7 +341,7 @@ export const ArtistProfileForm = ({ type }: ArtistProfileFormProps) => {
              <Label htmlFor="artistName">Artist Name </Label>
              </div> */}
         <div className="relative mt-3 flex flex-col gap-3 rounded-md border border-dotted border-foreground/50 bg-salYellow/30 p-4 pt-8 text-foreground/75 lg:pt-4">
-          <span className="absolute -top-4 left-1/2 -translate-x-1/2 rounded-full border border-foreground/50 bg-card px-3 py-1 text-sm">
+          <span className="dark:bg-tab-a0 absolute -top-4 left-1/2 -translate-x-1/2 rounded-full border border-foreground/50 bg-card px-3 py-1 text-sm">
             <p className="hidden sm:block"> Eligibility Details:</p>
             <p className="sm:hidden"> Eligibility:</p>
           </span>
@@ -374,7 +376,9 @@ export const ArtistProfileForm = ({ type }: ArtistProfileFormProps) => {
                       "altSpellings",
                     ]}
                     tabIndex={5}
-                    className={cn("h-12 bg-card text-base hover:bg-card")}
+                    className={cn(
+                      "dark:bg-tab-a0 dark:hover:bg-tab-a0 h-12 bg-card text-base hover:bg-card",
+                    )}
                     fontSize={fontSize}
                   />
                   {fieldState.error && (
@@ -404,7 +408,10 @@ export const ArtistProfileForm = ({ type }: ArtistProfileFormProps) => {
                   tabIndex={6}
                   placeholder="Place of residence (city, state, country, etc).."
                   className="mb-3 w-full lg:mb-0"
-                  inputClassName={cn("rounded-lg border-foreground", fontSize)}
+                  inputClassName={cn(
+                    "dark:bg-tab-a0 rounded-lg border-foreground",
+                    fontSize,
+                  )}
                   isArtist={true}
                 />
               )}
@@ -423,7 +430,7 @@ export const ArtistProfileForm = ({ type }: ArtistProfileFormProps) => {
           }
           onMouseEnter={handleOnHoverSave}
           onMouseLeave={handleOnHoverSaveEnd}
-          className="mt-4 w-full sm:w-auto dark:text-primary-foreground"
+          className="mt-4 w-full sm:w-auto"
           fontSize={fontSize}
         >
           {pending ? (

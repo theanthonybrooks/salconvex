@@ -383,7 +383,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
             </p>
           </div>
 
-          <Card className="col-span-full flex w-full flex-col gap-y-2 rounded-xl border-foreground/20 bg-white/60 p-5">
+          <Card className="dark:bg-tab-a30 col-span-full flex w-full flex-col gap-y-2 rounded-xl border-foreground/20 bg-white/60 p-5">
             {/* TODO: add this back once application system is made to signify when something is external */}
             {/* {!appUrl && (
                 <p
@@ -504,8 +504,8 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
         </>
       </EventDesktopSummaryCard>
 
-      <Card className="col-start-2 row-start-2 flex w-full flex-col gap-y-2 rounded-3xl border-foreground/20 bg-white/50 p-4">
-        <div className="flex min-h-20 w-full flex-col rounded-2xl border border-dotted border-foreground/50 bg-card-secondary p-4 white:bg-card">
+      <Card className="dark:bg-tab-a10 col-start-2 row-start-2 flex w-full flex-col gap-y-2 rounded-3xl border-foreground/20 bg-white/50 p-4">
+        <div className="dark:bg-tab-a20 flex min-h-20 w-full flex-col rounded-2xl border border-dotted border-foreground/50 bg-card-secondary p-4 white:bg-card">
           {(isAdmin || isUserOrg) && (
             <DraftPendingBanner
               admin={{
@@ -517,7 +517,7 @@ export const OpenCallCardDetailDesktop = (props: OpenCallCardProps) => {
               eventId={event._id}
             />
           )}
-          <div className="flex w-full items-center gap-x-4 divide-x-2">
+          <div className="flex w-full items-center gap-x-4 divide-x-2 dark:divide-foreground/50">
             <div
               className={cn(
                 "flex h-14 w-20 flex-col items-center justify-center rounded-lg border-1.5 border-dotted py-[5px]",

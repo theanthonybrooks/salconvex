@@ -14,8 +14,9 @@ const PopoverTrigger = PopoverPrimitive.Trigger;
 
 const PopoverAnchor = PopoverPrimitive.Anchor;
 
-interface CustomArrowProps
-  extends React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Arrow> {
+interface CustomArrowProps extends React.ComponentPropsWithoutRef<
+  typeof PopoverPrimitive.Arrow
+> {
   shiftOffset?: number; // optional prop to offset the arrow
 }
 
@@ -77,8 +78,8 @@ const CustomArrow = React.forwardRef<SVGSVGElement, CustomArrowProps>(
           viewBox="0 0 30 10"
           preserveAspectRatio="none"
         >
-          <polygon points="0,0 30,0 15,10" fill="black" />
-          <polygon points="2,0 28,0 15,8" fill="white" />
+          <polygon points="0,0 30,0 15,10" className="fill-border" />
+          <polygon points="2,0 28,0 15,8" className="fill-popover" />
         </svg>
       </PopoverPrimitive.Arrow>
     );

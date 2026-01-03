@@ -30,7 +30,7 @@ export const PreviewCard = ({
     setSidebarCollapsed(true);
   };
   return (
-    <Card className="min-w-50 flex-1 md:max-w-80">
+    <Card className="dark:bg-tab-a10 min-w-50 flex-1 md:max-w-80">
       <CardHeader className="flex flex-col pb-2">
         <span className="flex items-center justify-between gap-2">
           <CardTitle className="text-sm font-medium">{title}</CardTitle>

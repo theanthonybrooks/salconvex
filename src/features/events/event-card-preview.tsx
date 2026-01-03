@@ -4,18 +4,18 @@ import type { ViewOptions } from "@/features/events/event-list-client";
 import type { MergedEventPreviewData, PostStatus } from "@/types/eventTypes";
 import type { User } from "@/types/user";
 
-import { useIsMobile } from "@/hooks/use-media-query";
-import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useIsMobile } from "@/hooks/use-media-query";
 
+import { FaRegCheckSquare } from "react-icons/fa";
+import { FaBookmark, FaRegBookmark, FaRegSquare } from "react-icons/fa6";
 import {
   CheckCircleIcon,
   CircleDollarSignIcon,
   EyeOff,
   Info,
 } from "lucide-react";
-import { FaRegCheckSquare } from "react-icons/fa";
-import { FaBookmark, FaRegBookmark, FaRegSquare } from "react-icons/fa6";
 
 import { Card } from "@/components/ui/card";
 import { EventOrgLogo } from "@/components/ui/event-org-logo";
@@ -45,9 +45,9 @@ import { getUserFontSizePref } from "@/helpers/stylingFns";
 import { cn } from "@/helpers/utilsFns";
 import { getCallFormatLabel } from "@/lib/openCallFns";
 
-import { useMutation } from "convex/react";
 import { api } from "~/convex/_generated/api";
 import { UserPrefsType } from "~/convex/schema";
+import { useMutation } from "convex/react";
 
 export interface EventCardPreviewProps {
   event: MergedEventPreviewData;
@@ -260,7 +260,7 @@ const EventCardPreview = ({
   return (
     <>
       {/* //---------------------- (Mobile) Layout ---------------------- */}
-      <Card className="mb-6 grid w-[90vw] min-w-[340px] max-w-[400px] grid-cols-[75px_minmax(0,auto)_50px] grid-rows-[repeat(3_auto)] gap-x-3 rounded-3xl border-foreground/20 bg-white/40 px-1 py-2 first:mt-6 last:mb-2 lg:hidden">
+      <Card className="dark:text-foregroundLt dark:border-foregroundLt mb-6 grid w-[90vw] min-w-[340px] max-w-[400px] grid-cols-[75px_minmax(0,auto)_50px] grid-rows-[repeat(3_auto)] gap-x-3 rounded-3xl border-foreground/20 bg-white/40 px-1 py-2 first:mt-6 last:mb-2 lg:hidden dark:bg-white/20 dark:hover:bg-white/30">
         <div
           onClick={() => {
             if (!isAdmin) {
@@ -315,7 +315,7 @@ const EventCardPreview = ({
           ) : (
             <CheckCircleIcon
               className={cn(
-                "size-6 text-emerald-600",
+                "size-6 text-emerald-600 dark:text-emerald-500",
                 (publicView || !hasOpenCall) && "hidden",
               )}
             />
@@ -404,7 +404,8 @@ const EventCardPreview = ({
                       !publicView &&
                       !publicPreview &&
                       "text-red-600",
-                    artistIsEligible && "text-emerald-800",
+                    artistIsEligible &&
+                      "text-emerald-800 dark:text-emerald-500",
                   )}
                 >
                   <EligibilityLabel
@@ -469,7 +470,7 @@ const EventCardPreview = ({
       {/* //---------------------- (Desktop) Layout ---------------------- */}
       <Card
         className={cn(
-          "mb-10 hidden min-h-[15em] w-[95vw] min-w-[640px] grid-cols-[60px_minmax(0,auto)_15%_22%_20%] gap-x-3 rounded-3xl border-foreground/20 bg-white/40 transition-colors duration-100 ease-in-out first:mt-6 hover:bg-white/50 hover:shadow-lg lg:grid lg:max-w-[min(100rem,93vw)] xl:grid-cols-[60px_minmax(0,auto)_15%_27%_25%] 2xl:w-[90vw]",
+          "dark:text-foregroundLt dark:bg-white/4 dark:hover:bg-white/6 mb-10 hidden min-h-[15em] w-[95vw] min-w-[640px] grid-cols-[60px_minmax(0,auto)_15%_22%_20%] gap-x-3 rounded-3xl border-foreground/20 bg-white/40 transition-colors duration-100 ease-in-out first:mt-6 hover:bg-white/50 hover:shadow-lg lg:grid lg:max-w-[min(100rem,93vw)] xl:grid-cols-[60px_minmax(0,auto)_15%_27%_25%] 2xl:w-[90vw]",
         )}
       >
         <div className="flex flex-col items-center justify-between border-r border-foreground/20 pb-3 pt-5">
@@ -738,7 +739,8 @@ const EventCardPreview = ({
                           !publicView &&
                           !publicPreview &&
                           "text-red-600",
-                        artistIsEligible && "text-emerald-800",
+                        artistIsEligible &&
+                          "text-emerald-800 dark:text-emerald-500",
                       )}
                     >
                       <EligibilityLabel
@@ -759,7 +761,8 @@ const EventCardPreview = ({
                           !publicPreview &&
                           eligibilityType !== "International" &&
                           "text-red-600",
-                        artistEligible && "text-emerald-800",
+                        artistEligible &&
+                          "text-emerald-800 dark:text-emerald-500",
                       )}
                     >
                       <EligibilityLabel

@@ -1,5 +1,7 @@
 "use client";
 
+import type { ThemeType } from "@/types/themeTypes";
+
 import {
   Children,
   isValidElement,
@@ -7,6 +9,7 @@ import {
   ReactNode,
   useState,
 } from "react";
+import { useTheme } from "next-themes";
 
 import { cn } from "@/helpers/utilsFns";
 
@@ -27,6 +30,7 @@ export interface NavTabsProps {
 }
 
 type BgVariant = "card" | "neutral";
+type BgTheme = Extract<ThemeType, "default" | "dark">;
 
 // const bgMap: Record<BgVariant, { active: string; inactive: string }> = {
 //   card: { active: "bg-card", inactive: "bg-background" },
@@ -35,17 +39,38 @@ type BgVariant = "card" | "neutral";
 
 const bgMap: Record<
   BgVariant,
-  { active: string; activeTab: string; inactive: string }
+  Record<
+    BgTheme,
+    { active: string; activeTab: string; inactive: string; inactiveTab: string }
+  >
 > = {
   card: {
-    active: "bg-card",
-    activeTab: "before:bg-card after:bg-card",
-    inactive: "bg-background before:bg-background after:bg-background",
+    default: {
+      active: "bg-card",
+      activeTab: "before:bg-card after:bg-card",
+      inactive: "bg-background ",
+      inactiveTab: "before:bg-background after:bg-background",
+    },
+    dark: {
+      active: "bg-card-dark",
+      activeTab: "before:bg-card-dark after:bg-card-dark",
+      inactive: "bg-background-dark ",
+      inactiveTab: "before:bg-background-dark after:bg-background-dark",
+    },
   },
   neutral: {
-    active: "bg-card-secondary",
-    activeTab: "before:bg-card-secondary after:bg-card-secondary",
-    inactive: "bg-background before:bg-background after:bg-background",
+    default: {
+      active: "bg-card-secondary",
+      activeTab: "before:bg-card-secondary after:bg-card-secondary",
+      inactive: "bg-background ",
+      inactiveTab: "before:bg-background after:bg-background",
+    },
+    dark: {
+      active: "bg-tab-a40 text-foreground",
+      activeTab: "before:bg-tab-a40 after:bg-tab-a40",
+      inactive: "bg-tab-a30 ",
+      inactiveTab: "before:bg-tab-a30 after:bg-tab-a30",
+    },
   },
 };
 
@@ -59,11 +84,13 @@ export default function NavTabs({
   fontSize = "text-sm",
   variant = "neutral",
 }: NavTabsProps) {
+  const { theme } = useTheme();
   const {
     active: activeClass,
     inactive: inactiveClass,
     activeTab: activeTabClass,
-  } = bgMap[variant];
+    inactiveTab: inactiveTabClass,
+  } = bgMap[variant][theme === "dark" ? "dark" : "default"];
 
   const internalTab = useState(defaultTab ?? tabs[0]?.id);
   const activeTab = controlledTab ?? internalTab[0];
@@ -93,11 +120,11 @@ export default function NavTabs({
                   fontSize,
                   isActive
                     ? `active px-2 py-2 font-bold ${activeTabClass} ${activeClass} `
-                    : `translate-y-1 ${inactiveClass} px-2 py-1 leading-[0.5] text-foreground`,
+                    : `translate-y-1 ${inactiveClass}${inactiveTabClass} px-2 py-1 leading-[0.5]`,
                 )}
                 onClick={() => setActiveTab(tab.id)}
               >
-                <div className={cn(activeClass)}>
+                <div className={cn(isActive ? activeClass : inactiveClass)}>
                   <span className="py-2">{tab.label}</span>
                 </div>
               </button>

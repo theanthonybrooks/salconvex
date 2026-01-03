@@ -28,8 +28,11 @@ const CustomArrow = React.forwardRef<
       viewBox="0 0 30 10"
       preserveAspectRatio="none"
     >
-      <polygon points="0,0 30,0 15,10" fill="black" />
-      <polygon points="2,0 28,0 15,8" style={{ fill: "white" }} />
+      <polygon points="0,0 30,0 15,10" className="fill-border" />
+      <polygon
+        points="2,0 28,0 15,8"
+        className="dark:fill-tab-a10 fill-popover"
+      />
     </svg>
   </TooltipPrimitive.Arrow>
 ));
@@ -63,7 +66,7 @@ const TooltipContent = React.forwardRef<
         ref={ref}
         sideOffset={sideOffset}
         className={cn(
-          "group z-50 overflow-hidden rounded-md border-1.5 bg-card px-3 py-1.5 text-xs text-foreground",
+          "dark:bg-tab-a10 group z-50 overflow-hidden rounded-md border-1.5 bg-card px-3 py-1.5 text-xs text-foreground",
           "opacity-0 transition-opacity duration-200",
           "data-[state=closed]:opacity-0 data-[state=delayed-open]:opacity-100",
 

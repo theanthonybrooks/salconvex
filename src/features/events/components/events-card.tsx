@@ -50,12 +50,12 @@ export const EventCard = ({
   const isMobile = format === "mobile";
   const { prodDates } = dates;
   const prodEnd = prodDates?.[0]?.end;
-  const baseDesktopAccordionClassName = "rounded-lg border-2 bg-white/30 px-4";
-
+  const baseDesktopAccordionClassName =
+    "rounded-lg border-2 bg-white/30 px-4 dark:bg-tab-a20";
   return (
     <>
       {isMobile ? (
-        <Card className="w-full rounded-xl border-foreground/20 bg-white/60 p-5">
+        <Card className="dark:bg-tab-a10 w-full rounded-xl border-foreground/20 bg-white/60 p-5">
           <Accordion type="multiple" defaultValue={["location"]}>
             {location.coordinates && (
               <AccordionItem value="location">

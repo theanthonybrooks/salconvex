@@ -266,7 +266,7 @@ export default function Dashboard() {
 
       {/* Quick Actions */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="lg:col-span-2 min-[1400px]:col-span-1 2xl:col-span-1">
+        <Card className="dark:bg-tab-a10 lg:col-span-2 min-[1400px]:col-span-1 2xl:col-span-1">
           <CardHeader>
             <CardTitle>Quick Actions</CardTitle>
             <CardDescription>Common tasks and shortcuts</CardDescription>
@@ -384,7 +384,7 @@ export default function Dashboard() {
         </Card>
 
         {(hasValidSub || adminPrivileges) && (
-          <Card className="lg:col-span-2 min-[1400px]:col-span-3">
+          <Card className="dark:bg-tab-a10 lg:col-span-2 min-[1400px]:col-span-3">
             <CardHeader>
               <CardTitle>Latest Updates</CardTitle>
               <CardDescription>Recently added open calls</CardDescription>

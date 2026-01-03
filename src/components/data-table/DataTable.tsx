@@ -362,7 +362,7 @@ export function DataTable<TData, TValue>({
           )}
           className={cn(hasRows && "table-fixed")}
         >
-          <TableHeader className="sticky top-0 z-10 bg-background shadow-[0_0.5px_0_0_rgba(0,0,0,1)]">
+          <TableHeader className="sticky top-0 z-10 bg-background shadow-[0_0.5px_0_0_rgba(0,0,0,1)] dark:bg-tab-a20">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
@@ -479,7 +479,9 @@ export function DataTable<TData, TValue>({
                         isSelectable &&
                           "hover:cursor-pointer hover:bg-salYellow/10",
 
+                        "dark:bg-tab-a30",
                         bgStatusClass,
+                        "dark:text-foregroundLt",
                       )}
                     >
                       {row.getVisibleCells().map((cell) => (

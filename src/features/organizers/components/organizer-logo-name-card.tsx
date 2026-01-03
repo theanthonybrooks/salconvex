@@ -41,7 +41,7 @@ export const OrganizerLogoNameCard = ({
 
   return (
     <Card
-      className="grid w-full grid-cols-[50px_minmax(0,1fr)] items-center rounded-xl border-1.5 border-foreground/30 bg-white/50 p-2 hover:cursor-pointer"
+      className="dark:bg-tab-a20 grid w-full grid-cols-[50px_minmax(0,1fr)] items-center rounded-xl border-1.5 border-foreground/30 bg-white/50 p-2 hover:cursor-pointer"
       onClick={() => {
         window.scrollTo({
           top: document.body.scrollHeight * 0.1,

@@ -35,6 +35,8 @@ export const getUserThemeOptions = (user: User | undefined): ThemeType[] => {
   if (user) {
     if (user.role.includes("admin")) {
       userRoleType = "admin";
+    } else if (user.betaType?.includes("darkMode")) {
+      userRoleType = "beta";
     } else {
       userRoleType = "user";
     }
@@ -50,6 +52,8 @@ export const getUserThemeOptionsFull = (
   if (user) {
     if (user.role.includes("admin")) {
       userRoleType = "admin";
+    } else if (user.betaType?.includes("darkMode")) {
+      userRoleType = "beta";
     } else {
       userRoleType = "user";
     }

@@ -15,7 +15,7 @@ export const FormSuccess = ({ message, className, icon }: FormSuccessProps) => {
   return (
     <div
       className={cn(
-        "flex items-center justify-center gap-x-2 rounded-md border-2 border-emerald-500/30 bg-emerald-500/15 p-3 text-sm font-medium text-emerald-700",
+        "flex items-center justify-center gap-x-2 rounded-md border-2 border-emerald-500/30 bg-emerald-500/15 p-3 text-sm font-medium text-emerald-700 dark:text-emerald-500",
         className,
       )}
     >

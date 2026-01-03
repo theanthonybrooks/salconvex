@@ -131,7 +131,7 @@ export const ApproveBtn = ({
                 }
               }
             }}
-            className={cn("w-full")}
+            className={cn("dark:bg-tab-a20 w-full")}
           >
             {bothSubmitted
               ? "Approve Both"
@@ -158,7 +158,7 @@ export const ApproveBtn = ({
               router.push(`/dashboard/organizer/update-event?_id=${eventId}`);
               // }
             }}
-            className={cn("w-full")}
+            className={cn("dark:bg-tab-a20 w-full")}
           >
             {bothDraft || openCallDraft
               ? "Finish Open Call"

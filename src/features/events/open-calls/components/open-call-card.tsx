@@ -177,7 +177,8 @@ const OpenCallCard = ({
       : null;
 
   const isMobile = format === "mobile";
-  const baseDesktopAccordionClassName = "rounded-lg border-2 bg-white/30 px-4";
+  const baseDesktopAccordionClassName =
+    "rounded-lg border-2 bg-white/30 px-4 dark:bg-tab-a20";
   const openCallStatus = getOpenCallStatus(
     ocStart ? new Date(ocStart) : null,
     ocEnd ? new Date(ocEnd) : null,
@@ -226,7 +227,7 @@ const OpenCallCard = ({
                     <span className="flex items-center gap-1 font-semibold underline underline-offset-2">
                       Eligible:
                       {artistIsEligible && (
-                        <CheckIcon className="size-4 shrink-0 text-emerald-800" />
+                        <CheckIcon className="size-4 shrink-0 text-emerald-800 dark:text-emerald-500" />
                       )}
                       {artistNotEligible && (
                         <X className="size-4 shrink-0 text-red-600" />
@@ -238,7 +239,8 @@ const OpenCallCard = ({
                         "flex items-center gap-2",
                         (artistNotEligible || noEligibilityParams) &&
                           "text-red-600",
-                        artistIsEligible && "text-emerald-800",
+                        artistIsEligible &&
+                          "text-emerald-800 dark:text-emerald-500",
                       )}
                     >
                       <EligibilityLabel
@@ -557,7 +559,7 @@ const OpenCallCard = ({
                       Eligible:
                     </p>
                     {artistIsEligible && (
-                      <span className="flex items-center gap-1 text-xs text-emerald-800">
+                      <span className="flex items-center gap-1 text-xs text-emerald-800 dark:text-emerald-500">
                         (Eligible <CheckIcon className="size-4 shrink-0" />)
                       </span>
                     )}
@@ -574,7 +576,8 @@ const OpenCallCard = ({
                       "flex items-center gap-2",
                       (artistNotEligible || noEligibilityParams) &&
                         "text-red-600",
-                      artistIsEligible && "text-emerald-800",
+                      artistIsEligible &&
+                        "text-emerald-800 dark:text-emerald-500",
                     )}
                   >
                     <EligibilityLabel

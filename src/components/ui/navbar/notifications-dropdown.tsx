@@ -249,7 +249,9 @@ export const NotificationsDropdown = ({
               onChangeAction={(value) =>
                 setNotificationFilter(value as ExtendedNotificationType)
               }
-              className="!h-8 w-40 border bg-card"
+              className="dark:bg-tab-a20 !h-8 w-40 border bg-card"
+              contentClassName="dark:bg-tab-a20"
+              itemClassName="dark:hover:text-primary-foreground"
             />
           )}
         </div>
@@ -259,7 +261,7 @@ export const NotificationsDropdown = ({
               value="all"
               variant="underline"
               className={cn(
-                "min-w-20",
+                "min-w-20 dark:text-foreground",
                 !isBoth && "w-full max-w-full",
                 fontSize,
               )}
@@ -275,7 +277,10 @@ export const NotificationsDropdown = ({
               <TabsTrigger
                 value="admin"
                 variant="underline"
-                className={cn("min-w-20 max-w-25", fontSize)}
+                className={cn(
+                  "min-w-20 max-w-25 dark:text-foreground",
+                  fontSize,
+                )}
               >
                 Admin{" "}
                 <NotificationCount
@@ -290,7 +295,7 @@ export const NotificationsDropdown = ({
                 value="artist"
                 variant="underline"
                 className={cn(
-                  "min-w-20 max-w-30",
+                  "min-w-20 max-w-30 dark:text-foreground",
                   !isBoth && "w-full max-w-full",
                   fontSize,
                 )}
@@ -307,7 +312,7 @@ export const NotificationsDropdown = ({
                 value="organizer"
                 variant="underline"
                 className={cn(
-                  "min-w-25",
+                  "min-w-25 dark:text-foreground",
                   isUser && isOrganizer && "w-full",
                   !isBoth && "w-full max-w-full",
                   fontSize,
@@ -323,7 +328,7 @@ export const NotificationsDropdown = ({
             <TabsTrigger
               value="archive"
               variant="underline"
-              className={cn("px-3", fontSize)}
+              className={cn("px-3 dark:text-foreground", fontSize)}
             >
               <TooltipSimple content="View Archive" className="z-top">
                 <Archive className="size-4 shrink-0" />
@@ -642,7 +647,7 @@ const NotificationDropdownItem = ({
 
 const EmptyNotifications = ({ type }: { type?: string }) => (
   <div className="flex w-full flex-col items-center justify-center gap-3 py-3">
-    <Inbox className="size-5 shrink-0 rounded-full text-foreground/30 ring-1.5 ring-foreground/30 ring-offset-4" />
+    <Inbox className="size-5 shrink-0 rounded-full text-foreground/30 ring-1.5 ring-foreground/30 ring-offset-4 ring-offset-popover" />
     <p className="w-full py-1 text-center text-sm text-muted-foreground">
       No {type ?? "new"} notifications
     </p>
@@ -660,7 +665,7 @@ const NotificationCount = ({
   return (
     <p
       className={cn(
-        "ml-2 flex h-5 min-w-5 items-center justify-center rounded-lg border-1.5 border-salPinkDark bg-salPinkLt text-2xs font-semibold text-foreground",
+        "ml-2 flex h-5 min-w-5 items-center justify-center rounded-lg border-1.5 border-salPinkDark bg-salPinkLt text-2xs font-semibold text-foreground dark:text-primary-foreground",
         count === 0 && "invisible",
         count > 99 && "px-0.5",
         allSaved && "border-salYellowDark bg-salYellowLt",

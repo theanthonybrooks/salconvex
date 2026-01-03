@@ -273,7 +273,7 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
             </div>
           </div>
           {(isAdmin || isUserOrg) && (
-            <Card className="col-span-full flex w-full flex-col gap-y-2 rounded-xl border-foreground/20 bg-white/60 p-5">
+            <Card className="dark:bg-tab-a30 col-span-full flex w-full flex-col gap-y-2 rounded-xl border-foreground/20 bg-white/60 p-5">
               <ApproveBtn
                 user={user}
                 event={event}
@@ -292,8 +292,8 @@ export const EventCardDetailDesktop = (props: EventCardProps) => {
         </>
       </EventDesktopSummaryCard>
 
-      <Card className="col-start-2 row-start-2 flex w-full flex-col gap-y-2 rounded-3xl border-foreground/20 bg-white/50 p-4">
-        <div className="flex min-h-20 w-full flex-col items-center gap-2 rounded-2xl border border-dotted border-foreground/50 bg-card-secondary p-4">
+      <Card className="dark:bg-tab-a10 col-start-2 row-start-2 flex w-full flex-col gap-y-2 rounded-3xl border-foreground/20 bg-white/50 p-4">
+        <div className="dark:bg-tab-a20 flex min-h-20 w-full flex-col items-center gap-2 rounded-2xl border border-dotted border-foreground/50 bg-card-secondary p-4">
           {(isAdmin || isUserOrg) && (
             <DraftPendingBanner
               admin={{

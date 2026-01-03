@@ -205,7 +205,7 @@ export const AccountSettings = () => {
   return (
     <>
       {/* Profile Settings */}
-      <Card>
+      <Card className="dark:bg-tab-a10">
         <CardHeader>
           <CardTitle>Profile</CardTitle>
           <CardDescription>Update your personal information</CardDescription>
@@ -235,7 +235,6 @@ export const AccountSettings = () => {
                   disabled={pending}
                   id="firstName"
                   placeholder="Your first name/given name"
-                  className="dark:text-primary-foreground"
                 />
               </div>
               <div className="space-y-2">
@@ -247,7 +246,6 @@ export const AccountSettings = () => {
                   {...updateRegister("lastName")}
                   id="lastName"
                   placeholder="Your last name/family name"
-                  className="dark:text-primary-foreground"
                 />
               </div>
               <div className="space-y-2">
@@ -263,21 +261,18 @@ export const AccountSettings = () => {
                   id="email"
                   type="email"
                   placeholder="Your email"
-                  className="dark:text-primary-foreground"
                 />
               </div>
               <div className="space-y-2">
-                <div className="flex items-center justify-start gap-x-2">
-                  <Label htmlFor="name" className={fontSize}>
-                    {isArtist ? "Artist Name/" : null}Preferred Name
-                  </Label>
-                  <p className="text-sm font-light italic">(Optional)</p>
-                </div>
+                <Label htmlFor="name" className={cn(fontSize)}>
+                  {isArtist ? "Artist Name/" : null}Preferred Name{" "}
+                  <i className="text-xs font-light">(Optional)</i>
+                </Label>
+
                 <Input
                   {...updateRegister("name")}
                   id="name"
                   placeholder="Artist Name/Preferred Name"
-                  className="dark:text-primary-foreground"
                 />
               </div>
             </div>
@@ -287,7 +282,7 @@ export const AccountSettings = () => {
               variant={unsavedChanges ? "salWithShadow" : "salWithoutShadow"}
               onMouseEnter={handleOnHoverSave}
               onMouseLeave={handleOnHoverSaveEnd}
-              className="mt-4 w-full sm:w-auto dark:text-primary-foreground"
+              className="mt-4 w-full sm:w-auto"
             >
               {isSaving ? (
                 <span className="flex items-center gap-2">
@@ -313,9 +308,7 @@ export const AccountSettings = () => {
         )}
       >
         {isArtist && hasActiveSubscription && (
-          <Card
-            className={cn(isArtist && hasActiveSubscription && "self-start")}
-          >
+          <Card className={cn("dark:bg-tab-a10 self-start")}>
             <CardHeader>
               <CardTitle>Artist Profile</CardTitle>
               <CardDescription>Manage your artist profile</CardDescription>
@@ -346,9 +339,7 @@ export const AccountSettings = () => {
 
         {/* Preferences */}
         {((isArtist && hasActiveSubscription) || isAdmin) && (
-          <Card
-            className={cn(isArtist && hasActiveSubscription && "self-start")}
-          >
+          <Card className={cn("dark:bg-tab-a10 self-start")}>
             <CardHeader>
               <CardTitle>Open Call Preferences</CardTitle>
               <CardDescription>
@@ -415,7 +406,7 @@ export const AccountSettings = () => {
                   }
                   className={cn(
                     fontSize === "text-base" ? "sm:text-base" : fontSize,
-                    "max-w-[72vw] sm:w-[350px]",
+                    "dark:bg-tab-a0 max-w-[72vw] sm:w-[350px]",
                   )}
                   data={timezones[0]}
                   getItemLabel={(timezone) =>
@@ -481,8 +472,9 @@ export const AccountSettings = () => {
                   fontSize={fontSize}
                   center
                   className={cn(
-                    "w-full border-1.5 border-foreground/20 sm:h-10 sm:w-40",
+                    "dark:bg-tab-a0 w-full border-1.5 border-foreground/20 sm:h-10 sm:w-40",
                   )}
+                  itemClassName={cn("dark:hover:text-primary-foreground")}
                 />
               </div>
               <Separator />
@@ -513,8 +505,9 @@ export const AccountSettings = () => {
                   fontSize={fontSize}
                   center
                   className={cn(
-                    "w-full border-1.5 border-foreground/20 sm:h-10 sm:w-40",
+                    "dark:bg-tab-a0 w-full border-1.5 border-foreground/20 sm:h-10 sm:w-40",
                   )}
+                  itemClassName={cn("dark:hover:text-primary-foreground")}
                 />
               </div>
             </CardContent>

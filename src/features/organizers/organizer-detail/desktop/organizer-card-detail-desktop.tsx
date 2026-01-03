@@ -203,8 +203,8 @@ export const OrganizerCardDetailDesktop = (props: OrganizerCardProps) => {
         )}
       </EventDesktopSummaryCard>
 
-      <Card className="col-start-2 row-start-2 flex w-full flex-col gap-y-2 rounded-3xl border-foreground/20 bg-white/50 p-4">
-        <div className="flex h-20 w-full items-center gap-x-4 rounded-2xl border border-dotted border-foreground/50 bg-card-secondary p-4">
+      <Card className="dark:bg-tab-a10 col-start-2 row-start-2 flex w-full flex-col gap-y-2 rounded-3xl border-foreground/20 bg-white/50 p-4">
+        <div className="dark:bg-tab-a20 flex h-20 w-full items-center gap-x-4 rounded-2xl border border-dotted border-foreground/50 bg-card-secondary p-4">
           <div className="flex w-full items-center justify-between pr-2">
             <div className="flex items-center gap-x-4 px-4">
               <Image

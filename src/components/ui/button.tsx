@@ -10,7 +10,7 @@ export type ButtonVariant = VariantProps<typeof buttonVariants>["variant"];
 export type ButtonSize = VariantProps<typeof buttonVariants>["size"];
 
 const salBase =
-  "linear border-2 border-foreground font-medium text-foreground transition-all duration-300 dark:border-primary-foreground dark:text-primary-foreground active:shadow-none bg-card";
+  "linear border-2 border-foreground font-medium text-foreground transition-all duration-300 dark:border-tab-a40 dark:text-tab-a60 active:shadow-none bg-card dark:bg-tab-a0";
 const salShadowBase = cn(
   salBase,
   "translate-y-[-3px] shadow-slg hover:translate-x-[-1px] hover:shadow-slgHover focus:translate-x-[-1px] focus:shadow-slgHover active:translate-x-0 active:translate-y-0",
@@ -55,7 +55,10 @@ const buttonVariants = cva(
           salShadowBase,
           "bg-salPink hover:bg-salPinkLt focus:bg-salPinkLt",
         ),
-        salWithShadowHidden: cn(salShadowHiddenBase),
+        salWithShadowHidden: cn(
+          salShadowHiddenBase,
+          "dark:text-foregroundLt dark:border-foreground",
+        ),
         salWithShadowHiddenYlw: cn(
           salShadowHiddenBase,
           "bg-salYellow white:bg-white",
@@ -64,15 +67,15 @@ const buttonVariants = cva(
         salWithShadowHiddenBg: cn(salShadowHiddenBase, "bg-background"),
         salWithShadowHiddenLeft: cn(
           salShadowHiddenBase,
-          "!rounded-r-none border-r border-foreground hover:-translate-x-[3px] hover:shadow-llg",
+          "dark:bg-tab-a20 !rounded-r-none border-r border-foreground hover:-translate-x-[3px] hover:shadow-llg dark:border-foreground dark:text-foreground",
         ),
         salWithShadowHiddenVert: cn(
           salShadowHiddenBase,
-          "rounded-none border-x hover:translate-x-0 hover:shadow-vlg",
+          "dark:bg-tab-a20 rounded-none border-x hover:translate-x-0 hover:shadow-vlg dark:border-foreground dark:text-foreground",
         ),
         salWithShadowHiddenRight: cn(
           salShadowHiddenBase,
-          "rounded-l-none border-l px-3 active:scale-95",
+          "dark:bg-tab-a20 rounded-l-none border-l px-3 active:scale-95 dark:border-foreground dark:text-foreground",
         ),
       },
       size: {

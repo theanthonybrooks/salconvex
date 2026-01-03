@@ -72,7 +72,7 @@ export const AppearanceSettings = () => {
   };
 
   return (
-    <Card>
+    <Card className="dark:bg-tab-a10">
       <CardHeader>
         <CardTitle>Appearance </CardTitle>
         <CardDescription>Customize your display preferences</CardDescription>
@@ -99,7 +99,8 @@ export const AppearanceSettings = () => {
             placeholder="Select theme"
             fontSize={fontSize}
             center
-            className="border-1.5 border-foreground/20 sm:h-10 sm:w-[220px]"
+            className="dark:bg-tab-a0 border-1.5 border-foreground/20 sm:h-10 sm:w-[220px]"
+            itemClassName={cn("dark:hover:text-primary-foreground")}
           />
         </SectionItem>
         <SectionItem
@@ -135,8 +136,9 @@ export const AppearanceSettings = () => {
             fontSize={fontSize}
             center
             className={cn(
-              "w-full border-1.5 border-foreground/20 sm:h-10 sm:w-[220px]",
+              "dark:bg-tab-a0 w-full border-1.5 border-foreground/20 sm:h-10 sm:w-[220px]",
             )}
+            itemClassName={cn("dark:hover:text-primary-foreground")}
           />
         </SectionItem>
       </CardContent>

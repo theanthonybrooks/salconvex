@@ -259,32 +259,32 @@ export const ChangeEmailDialog = ({ className }: ChangeEmailDialogProps) => {
                           <InputOTPGroup>
                             <InputOTPSlot
                               index={0}
-                              className="bg-white"
+                              className="dark:bg-tab-a10 bg-white"
                               border="2"
                             />
                             <InputOTPSlot
                               index={1}
-                              className="bg-white"
+                              className="dark:bg-tab-a10 bg-white"
                               border="2"
                             />
                             <InputOTPSlot
                               index={2}
-                              className="bg-white"
+                              className="dark:bg-tab-a10 bg-white"
                               border="2"
                             />
                             <InputOTPSlot
                               index={3}
-                              className="bg-white"
+                              className="dark:bg-tab-a10 bg-white"
                               border="2"
                             />
                             <InputOTPSlot
                               index={4}
-                              className="bg-white"
+                              className="dark:bg-tab-a10 bg-white"
                               border="2"
                             />
                             <InputOTPSlot
                               index={5}
-                              className="bg-white"
+                              className="dark:bg-tab-a10 bg-white"
                               border="2"
                             />
                           </InputOTPGroup>

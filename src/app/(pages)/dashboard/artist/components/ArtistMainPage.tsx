@@ -29,7 +29,7 @@ export const ArtistMainPage = () => {
   return (
     <div className={cn("grid gap-4 p-6 md:grid-cols-2")}>
       {hasValidSub ? (
-        <Card>
+        <Card className="dark:bg-tab-a10">
           <CardHeader>
             <CardTitle>Artist Profile</CardTitle>
             <CardDescription>Update your artist info</CardDescription>

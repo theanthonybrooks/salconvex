@@ -173,7 +173,7 @@ export const ChartWrapper = ({ eventId, className }: ChartContainerProps) => {
   const Icon = inView === "chart" ? ChartArea : Table;
 
   return (
-    <Card className={cn("relative pt-0", className)}>
+    <Card className={cn("dark:bg-tab-a10 relative pt-0", className)}>
       <CardHeader className="flex items-center gap-2 space-y-0 border-b py-5 sm:flex-row">
         <div className="grid flex-1 gap-1">
           <CardTitle>

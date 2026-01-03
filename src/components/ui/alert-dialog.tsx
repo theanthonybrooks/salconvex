@@ -18,7 +18,7 @@ const AlertDialogOverlay = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <AlertDialogPrimitive.Overlay
     className={cn(
-      "fixed inset-0 z-50 bg-foreground/60 backdrop-blur-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+      "dark:bg-tab-a0/60 fixed inset-0 z-50 bg-foreground/60 backdrop-blur-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
       className,
     )}
     {...props}
@@ -27,8 +27,9 @@ const AlertDialogOverlay = React.forwardRef<
 ));
 AlertDialogOverlay.displayName = AlertDialogPrimitive.Overlay.displayName;
 
-interface AlertDialogContentProps
-  extends React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Content> {
+interface AlertDialogContentProps extends React.ComponentPropsWithoutRef<
+  typeof AlertDialogPrimitive.Content
+> {
   overlayClassName?: string;
   forceMount?: true | undefined;
 }
@@ -42,7 +43,7 @@ const AlertDialogContent = React.forwardRef<
     <AlertDialogPrimitive.Content
       ref={ref}
       className={cn(
-        "fixed left-[50%] top-[50%] z-50 grid w-full max-w-xl translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg",
+        "dark:bg-tab-a20 dark:border-tab-a20 fixed left-[50%] top-[50%] z-50 grid w-full max-w-xl translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg",
         className,
       )}
       {...props}
@@ -118,8 +119,9 @@ const AlertDialogAction = React.forwardRef<
 ));
 AlertDialogAction.displayName = AlertDialogPrimitive.Action.displayName;
 
-interface AlertDialogPrimaryActionProps
-  extends React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Action> {
+interface AlertDialogPrimaryActionProps extends React.ComponentPropsWithoutRef<
+  typeof AlertDialogPrimitive.Action
+> {
   variant?: ButtonVariant;
 }
 
@@ -138,8 +140,9 @@ const AlertDialogPrimaryAction = React.forwardRef<
 ));
 AlertDialogPrimaryAction.displayName = AlertDialogPrimitive.Action.displayName;
 
-interface AlertDialogCancelProps
-  extends React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Cancel> {
+interface AlertDialogCancelProps extends React.ComponentPropsWithoutRef<
+  typeof AlertDialogPrimitive.Cancel
+> {
   iconOnly?: boolean;
 }
 

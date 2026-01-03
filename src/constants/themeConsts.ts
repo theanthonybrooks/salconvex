@@ -12,8 +12,11 @@ export const ThemeOptions: ThemeTypeOptions[] = [
   { value: "system", label: "System" },
 ];
 
-export const roleThemeMap: Record<UserRoles, ThemeType[]> = {
+type ExtendedRoles = UserRoles | "beta";
+
+export const roleThemeMap: Record<ExtendedRoles, ThemeType[]> = {
   user: ["default", "light", "white"],
+  beta: ["default", "light", "dark", "system"],
   admin: ["default", "light", "dark", "system", "white"],
   guest: ["default"],
 };

@@ -54,7 +54,7 @@ export function DashboardWrapper({ children }: DashboardWrapperProps) {
         />
         <main
           className={cn(
-            "scrollable max-h-[calc(100dvh-5rem)] flex-1 bg-dashboardBgLt white:bg-stone-100",
+            "scrollable dark:bg-tab-a0 max-h-[calc(100dvh-5rem)] flex-1 bg-dashboardBgLt white:bg-stone-100",
             isMobile && "mini darkbar",
           )}
         >

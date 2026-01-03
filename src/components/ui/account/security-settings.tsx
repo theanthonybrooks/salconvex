@@ -147,7 +147,7 @@ export const SecuritySettings = () => {
 
   return (
     <>
-      <Card aria-description="Privacy Settings">
+      <Card aria-description="Privacy Settings" className="dark:bg-tab-a10">
         <CardHeader>
           <CardTitle>Privacy</CardTitle>
           <CardDescription>Manage your privacy settings</CardDescription>
@@ -172,17 +172,25 @@ export const SecuritySettings = () => {
             >
               <SelectTrigger
                 className={cn(
-                  "w-full border-1.5 border-foreground/20 sm:h-10 sm:w-[220px]",
+                  "dark:bg-tab-a0 w-full border-1.5 border-foreground/20 sm:h-10 sm:w-[220px]",
                   fontSize === "text-base" ? "sm:text-base" : fontSize,
                 )}
               >
                 <SelectValue placeholder="Select One" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all" center>
+                <SelectItem
+                  value="all"
+                  center
+                  className="dark:hover:text-primary-foreground"
+                >
                   All Cookies
                 </SelectItem>
-                <SelectItem value="required" center>
+                <SelectItem
+                  value="required"
+                  center
+                  className="dark:hover:text-primary-foreground"
+                >
                   Required Only
                 </SelectItem>
               </SelectContent>
@@ -190,7 +198,7 @@ export const SecuritySettings = () => {
           </SectionItem>
         </CardContent>
       </Card>
-      <Card aria-description="Security Settings">
+      <Card aria-description="Security Settings" className="dark:bg-tab-a10">
         <CardHeader>
           <CardTitle>Security</CardTitle>
           <CardDescription>Manage your security settings</CardDescription>
@@ -216,7 +224,7 @@ export const SecuritySettings = () => {
         </CardContent>
       </Card>
 
-      <Card aria-description="Sessions Settings">
+      <Card aria-description="Sessions Settings" className="dark:bg-tab-a10">
         <CardHeader>
           <CardTitle>Sessions</CardTitle>
           <CardDescription>Manage your active sessions</CardDescription>

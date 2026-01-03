@@ -24,42 +24,50 @@ const CustomArrow = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Arrow> & {
     thick?: boolean;
   }
->(({ thick, className, ...props }, ref) => (
-  <DropdownMenuPrimitive.Arrow
-    asChild
-    ref={ref}
-    {...props}
-    className={cn(
-      "group-data-[side=bottom]/content:-translate-y-[2px]",
-      "group-data-[side=top]/content:-translate-y-[2px]",
-    )}
-  >
-    <svg
+>(({ thick, className, ...props }, ref) => {
+  return (
+    <DropdownMenuPrimitive.Arrow
+      asChild
+      ref={ref}
+      {...props}
       className={cn(
-        "block",
-        // "group-data-[side=top]/content:-translate-y-[1.8px]",
-        // "group-data-[side=bottom]/content:-translate-y-[1.4px]",
-        className,
+        "group-data-[side=bottom]/content:-translate-y-[2px]",
+        "group-data-[side=top]/content:-translate-y-[2px]",
       )}
-      width="15"
-      height="10"
-      viewBox="0 0 30 10"
-      preserveAspectRatio="none"
     >
-      {thick ? (
-        <>
-          <polygon points="0,0 30,0 15,10" fill="black" />
-          <polygon points="4,0 26,0 15,6" fill="white" />
-        </>
-      ) : (
-        <>
-          <polygon points="0,0 30,0 15,10" fill="black" />
-          <polygon points="2,0 28,0 15,8" fill="white" />
-        </>
-      )}
-    </svg>
-  </DropdownMenuPrimitive.Arrow>
-));
+      <svg
+        className={cn(
+          "block",
+          // "group-data-[side=top]/content:-translate-y-[1.8px]",
+          // "group-data-[side=bottom]/content:-translate-y-[1.4px]",
+          className,
+        )}
+        width="15"
+        height="10"
+        viewBox="0 0 30 10"
+        preserveAspectRatio="none"
+      >
+        {thick ? (
+          <>
+            <polygon points="0,0 30,0 15,10" className="fill-border" />
+            <polygon
+              points="4,0 26,0 15,6"
+              className="dark:fill-tab-a10 fill-popover"
+            />
+          </>
+        ) : (
+          <>
+            <polygon points="0,0 30,0 15,10" className="fill-border" />
+            <polygon
+              points="2,0 28,0 15,8"
+              className="dark:fill-tab-a10 fill-popover"
+            />
+          </>
+        )}
+      </svg>
+    </DropdownMenuPrimitive.Arrow>
+  );
+});
 CustomArrow.displayName = "CustomArrow";
 
 const DropdownMenuSubTrigger = React.forwardRef<
@@ -92,7 +100,7 @@ const DropdownMenuSubContent = React.forwardRef<
   <DropdownMenuPrimitive.SubContent
     ref={ref}
     className={cn(
-      "group z-[51] min-w-[8rem] overflow-hidden border-1.5 bg-popover p-1 text-popover-foreground shadow-lg data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1.5 data-[side=left]:rounded-l-md data-[side=right]:rounded-r-md data-[side=left]:rounded-br-md data-[side=right]:rounded-bl-md data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+      "dark:bg-tab-a10 group z-[51] min-w-[8rem] overflow-hidden border-1.5 bg-popover p-1 text-popover-foreground shadow-lg data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1.5 data-[side=left]:rounded-l-md data-[side=right]:rounded-r-md data-[side=left]:rounded-br-md data-[side=right]:rounded-bl-md data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
       className,
     )}
     {...props}
@@ -117,7 +125,7 @@ const DropdownMenuContent = React.forwardRef<
         alignOffset={alignOffset}
         sideOffset={sideOffset}
         className={cn(
-          "group/content z-50 min-w-[8rem] overflow-hidden rounded-md border-1.5 bg-popover p-1 text-popover-foreground shadow-md",
+          "dark:bg-tab-a10 group/content z-50 min-w-[8rem] overflow-hidden rounded-md border-1.5 bg-popover p-1 text-popover-foreground shadow-md",
           "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
           thick && "border-2",
           className,

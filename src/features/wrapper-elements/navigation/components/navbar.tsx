@@ -45,6 +45,7 @@ import logoText from "/public/saltext.png";
 export default function NavBar() {
   const isMobile = useIsMobile();
   const { theme } = useTheme();
+  const darkMode = theme === "dark";
   const viewportHeight = useViewportHeight();
   const { preloadedUserData, preloadedSubStatus } = useConvexPreload();
   const userData = usePreloadedQuery(preloadedUserData);
@@ -136,7 +137,7 @@ export default function NavBar() {
   );
 
   const activeMainItemClasses =
-    "border-foreground/50   hover:border-foreground/70 data-[state=open]:border-foreground/70";
+    "border-foreground/50   hover:border-foreground/70 data-[state=open]:border-foreground/70 data-[state=open]:text-primary";
 
   const getNavBarVariants = (
     scrolled: boolean | undefined,
@@ -219,9 +220,10 @@ export default function NavBar() {
                 backgroundColor: "rgba(255, 255, 255, 1)",
               }}
               animate={{
-                backgroundColor: isScrolled
-                  ? "rgba(255, 255, 255, 0)"
-                  : "rgba(255, 255, 255, 1)",
+                backgroundColor:
+                  isScrolled && !darkMode
+                    ? "rgba(255, 255, 255, 0)"
+                    : "rgba(255, 255, 255, 1)",
               }}
               transition={{ duration: 0.3, ease: "easeOut" }}
               className="absolute bottom-0 left-1/2 z-10 -translate-x-1/2 translate-y-[14px] rounded-full"
@@ -273,9 +275,10 @@ export default function NavBar() {
                 }}
                 animate={{
                   width: isScrolled ? 60 : 250,
-                  backgroundColor: isScrolled
-                    ? "rgba(255, 255, 255, 0)"
-                    : "rgba(255, 255, 255, 1)",
+                  backgroundColor:
+                    isScrolled && !darkMode
+                      ? "rgba(255, 255, 255, 0) "
+                      : "rgba(255, 255, 255, 1)",
                 }}
                 transition={{ duration: 0.4, ease: "easeInOut" }}
               >
@@ -660,7 +663,9 @@ export const ListItem = React.forwardRef<
           )}
           {...props}
         >
-          <div className="text-base font-medium leading-none">{title}</div>
+          <div className="dark:text-foregroundLt text-base font-medium leading-none">
+            {title}
+          </div>
         </Link>
       </NavigationMenuLink>
     </div>

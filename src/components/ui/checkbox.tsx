@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
+
 import { FaCheck } from "react-icons/fa";
 
 import { cn } from "@/helpers/utilsFns";
@@ -24,7 +25,7 @@ const Checkbox = React.forwardRef<
   >
     <CheckboxPrimitive.Indicator
       className={cn(
-        "flex scale-0 items-center justify-center text-foreground transition-transform duration-200 data-[state=checked]:scale-100",
+        "flex scale-0 items-center justify-center text-foreground transition-transform duration-200 data-[state=checked]:scale-100 dark:text-primary-foreground",
         size,
       )}
     >

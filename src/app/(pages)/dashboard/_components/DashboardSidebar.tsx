@@ -163,7 +163,7 @@ export default function DashboardSideBar({
   return (
     <div
       className={cn(
-        "relative hidden h-screen max-h-[calc(100dvh-80px)] w-64 border-r bg-background min-[1024px]:block",
+        "dark:bg-tab-a10 relative hidden h-screen max-h-[calc(100dvh-80px)] w-64 border-r bg-background min-[1024px]:block",
         userPref?.fontSize === "large" && "w-72",
         collapsedSidebar && "w-fit",
       )}

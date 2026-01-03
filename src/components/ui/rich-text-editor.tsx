@@ -956,7 +956,7 @@ export const RichTextEditor = ({
       <>
         <div
           className={cn(
-            "relative cursor-pointer rounded border bg-card p-2",
+            "dark:bg-tab-a10 relative cursor-pointer rounded border bg-card p-2",
             readOnly && "pointer-events-none border-foreground/50 opacity-50",
             "focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary",
             inputPreviewContainerClassName,
@@ -977,7 +977,7 @@ export const RichTextEditor = ({
         >
           <div
             className={cn(
-              "scrollable justy mini min-h-14 text-sm text-muted-foreground",
+              "scrollable justy mini dark:text-foregroundLt min-h-14 text-sm text-muted-foreground",
               !value && "line-clamp-5",
               ((formInputPreview && !editorOpen) || inputPreview) &&
                 "line-clamp-3 max-h-25",

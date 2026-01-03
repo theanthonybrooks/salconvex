@@ -401,7 +401,7 @@ export const ArtistProfileForm = ({
 
         <div className={cn("flex flex-col gap-4")}>
           <div className="relative mt-3 flex h-max flex-col gap-3 rounded-md border border-dotted border-foreground/50 bg-salYellow/30 p-4 pb-6 pt-8 text-foreground/75">
-            <span className="absolute -top-4 left-1/2 -translate-x-1/2 rounded-full border border-foreground/50 bg-card px-3 py-1 text-sm">
+            <span className="dark:bg-tab-a0 absolute -top-4 left-1/2 -translate-x-1/2 rounded-full border border-foreground/50 bg-card px-3 py-1 text-sm">
               Eligibility Details:
             </span>
 
@@ -433,7 +433,7 @@ export const ArtistProfileForm = ({
                         "altSpellings",
                       ]}
                       tabIndex={5}
-                      className="h-12 bg-card text-base hover:bg-card"
+                      className="dark:bg-tab-a0 dark:hover:bg-tab-a0 h-12 bg-card text-base hover:bg-card"
                       fontSize={fontSize}
                     />
                     {fieldState.error && (

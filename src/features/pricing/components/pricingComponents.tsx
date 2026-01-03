@@ -209,7 +209,7 @@ export const PricingCard = ({
     <Card
       id={`pricing-card-${title}`}
       className={cn(
-        "pricing-card mx-auto flex w-full max-w-sm flex-col justify-between border-2 px-2 py-1 transition-opacity duration-200 ease-in-out lg:mx-0",
+        "pricing-card dark:bg-tab-a10 mx-auto flex w-full max-w-sm flex-col justify-between border-2 px-2 py-1 transition-opacity duration-200 ease-in-out lg:mx-0",
         {
           relative: popular || isFree || isCurrentUserPlan,
         },
@@ -221,17 +221,23 @@ export const PricingCard = ({
     >
       {popular && !activeSub && (
         <div className="absolute -top-4 left-0 right-0 mx-auto w-fit rounded-full border-2 bg-salPinkLt px-3 py-1">
-          <p className="text-sm font-medium text-foreground">Recommended</p>
+          <p className="text-sm font-medium text-foreground dark:text-primary-foreground">
+            Recommended
+          </p>
         </div>
       )}
       {isCurrentUserPlan && (
         <div className="absolute -top-5 left-0 right-0 mx-auto w-fit rounded-full border-2 bg-salPinkLt px-4 py-2">
-          <p className="text-sm font-medium text-foreground">Current Plan</p>
+          <p className="text-sm font-medium text-foreground dark:text-primary-foreground">
+            Current Plan
+          </p>
         </div>
       )}
       {isFree && (
         <div className="absolute -top-4 left-0 right-0 mx-auto w-fit rounded-full border-2 bg-salPinkLt px-3 py-1">
-          <p className="text-sm font-medium text-foreground">Free Listing</p>
+          <p className="text-sm font-medium text-foreground dark:text-primary-foreground">
+            Free Listing
+          </p>
         </div>
       )}
 
@@ -375,7 +381,10 @@ export const PricingCard = ({
                 ? "salWithShadowPink"
                 : "salWithShadowHiddenYlw"
             }
-            className={cn("h-14 w-full text-lg sm:h-11 sm:text-base")}
+            className={cn(
+              "h-14 w-full text-lg sm:h-11 sm:text-base",
+              isCurrentUserPlan && "dark:hover:text-primary-foreground",
+            )}
           >
             {pending ? (
               <LoaderCircle className="size-4 animate-spin" />

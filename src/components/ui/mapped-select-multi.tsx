@@ -330,7 +330,8 @@ export function SearchMappedMultiSelect<T>({
                         }}
                         className={cn(
                           "flex items-center justify-start gap-x-2 hover:cursor-pointer hover:bg-salPink/30",
-                          isSelected && "bg-salYellow",
+                          isSelected &&
+                            "bg-salYellow dark:text-primary-foreground",
                           isLimit && "hover:cursor-default",
                           isLimit && !isSelected && "text-foreground/50",
                         )}

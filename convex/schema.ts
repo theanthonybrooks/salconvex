@@ -25,6 +25,7 @@ export type StripeIntervalPricesType = Infer<
 
 // #region -------------Account Validators --------------
 //TODO: Add Judge and other types to this later on.
+
 export const accountTypeValidator = v.union(
   v.literal("artist"),
   v.literal("organizer"),
@@ -538,6 +539,7 @@ const customUserSchema = v.object({
 
   emailVerified: v.optional(v.boolean()),
   lastActive: v.optional(v.number()),
+  betaType: v.optional(v.string()),
 });
 
 export type UserType = Infer<typeof customUserSchema>;
@@ -1372,6 +1374,7 @@ export default defineSchema({
     .index("by_token", ["tokenIdentifier"])
     .index("by_subscription", ["subscription"])
     .index("by_plan", ["plan"])
+    .index("by_betaType", ["betaType"])
     .index("by_createdAt", ["createdAt"]),
 
   userLog: defineTable(userLogSchema)

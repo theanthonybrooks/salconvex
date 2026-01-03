@@ -138,7 +138,7 @@ export const AccountSubscribeForm = ({
         showCloseButton={false}
         onEscapeKeyDown={(e) => e.preventDefault()}
         className={cn(
-          "max-h-dvh w-full max-w-full bg-card md:h-auto",
+          "dark:bg-tab-a10 max-h-dvh w-full max-w-full bg-card md:h-auto",
           // "scrollable",
           className,
           isArtist && "md:max-w-[max(60rem,32vw)]",

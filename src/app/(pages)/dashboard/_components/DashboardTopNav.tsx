@@ -45,7 +45,7 @@ export default function DashboardNavBar({
   return (
     <>
       {/* ------ Desktop & Mobile: Main Navbar ----- */}
-      <div className="h-20 border-b border-foreground bg-background">
+      <div className="dark:bg-tab-a10 h-20 border-b border-foreground bg-background dark:border-foreground/30">
         <div className="relative z-20 mx-auto flex h-full w-screen items-center justify-between pl-6 pr-8 lg:py-4">
           <Search
             iconOnly

@@ -201,9 +201,10 @@ body {
   }
   .dark {
     --color-picker-preview: hsl(47, 1%, 10%);
-    --background: 51, 0%, 13%;
+    /* --background: 51, 0%, 13%; */
     --background-hex: #212121;
-
+    --background: 46 18% 13%;
+    --foreground-light: 40 0% 95%;
     --foreground: 40 0% 88%;
     --foreground-hex: #e0e0e0;
 
@@ -269,6 +270,55 @@ body {
     --sidebar-border: 240 3.7% 15.9%;
 
     --sidebar-ring: 40 91.2% 59.8%;
+
+    /** Base colors */
+    --clr-dark-a0: #000000;
+    --clr-light-a0: #ffffff;
+
+    /** Theme primary colors */
+    --clr-primary-a0: 50, 100%, 72%;
+    --clr-primary-a10: 50, 100%, 75%;
+    --clr-primary-a20: 50, 100%, 78%;
+    --clr-primary-a30: 50, 100%, 81%;
+    --clr-primary-a40: 48, 100%, 85%;
+    --clr-primary-a50: 49, 100%, 88%;
+
+    /** Theme surface colors */
+    --clr-surface-a0: 0 0% 7%;
+    --clr-surface-a10: 0 0% 15%;
+    --clr-surface-a20: 0 0% 25%;
+    --clr-surface-a30: 0 0% 34%;
+    --clr-surface-a40: 0 0% 45%;
+    --clr-surface-a50: 0 0% 54%;
+
+    /** Theme tonal surface colors */
+    --tabs-a0: 46 18% 13%;
+    --tabs-a10: 46 11% 21%;
+    --tabs-a20: 47 7% 30%;
+    --tabs-a30: 48 6% 38%;
+    --tabs-a40: 48 4% 47%;
+    --tabs-a50: 47 3% 57%;
+    --tabs-a60: 46 18% 70%;
+
+    /** Success colors */
+    --clr-success-a0: 160 62% 36%;
+    --clr-success-a10: 158 64% 56%;
+    --clr-success-a20: 159 64% 74%;
+
+    /** Warning colors */
+    --clr-warning-a0: 38 60% 41%;
+    --clr-warning-a10: 38 59% 61%;
+    --clr-warning-a20: 38 61% 80%;
+
+    /** Danger colors */
+    --clr-danger-a0: 0 64% 37%;
+    --clr-danger-a10: 0 65% 57%;
+    --clr-danger-a20: 0 68% 77%;
+
+    /** Info colors */
+    --clr-info-a0: 218 61% 33%;
+    --clr-info-a10: 218 59% 53%;
+    --clr-info-a20: 218 63% 74%;
   }
   .white {
     --background-prev: 60 90% 75%; /* #f8f16b */
@@ -569,6 +619,7 @@ form {
   input:not(:placeholder-shown):valid {
     &:not(.kanban) {
       background-color: rgb(255, 255, 255);
+      @apply dark:bg-tab-a0 dark:text-foregroundLt;
     }
   }
 }
@@ -803,10 +854,6 @@ button:active {
   &.active {
     z-index: 11;
     position: relative;
-    span {
-      border-radius: 5px;
-      color: black;
-    }
   }
 }
 
@@ -853,9 +900,9 @@ button:active {
     }
 
     &:not(.active) {
-      & > div {
+      /* & > div {
         background: hsl(var(--background));
-      }
+      } */
 
       border-bottom: 1.5px solid rgba(0, 0, 0, 0.15);
       /* &:before,

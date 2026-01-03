@@ -42,13 +42,13 @@ export type NonNullApplicationStatus = Exclude<ApplicationStatus, null>;
 export const statusColorMap: Record<NonNullApplicationStatus, string> = {
   "external apply": "",
   applied: "",
-  accepted: "text-green-700",
-  rejected: "text-red-700",
+  accepted: "text-green-700 dark:text-green-300",
+  rejected: "text-red-700 dark:text-red-300",
   pending: "",
-  roster: "text-blue-700",
-  shortlisted: "text-yellow-700",
-  "to next step": "text-orange-700",
-  considering: "text-purple-700",
+  roster: "text-blue-700 dark:text-blue-300",
+  shortlisted: "text-yellow-700 dark:text-yellow-300",
+  "to next step": "text-orange-700 dark:text-orange-300",
+  considering: "text-purple-700 dark:text-purple-300",
 };
 export const statusBgColorMap: Record<NonNullApplicationStatus, string> = {
   accepted: "bg-green-100",

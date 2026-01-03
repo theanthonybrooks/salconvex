@@ -272,7 +272,7 @@ export default function Home() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.5, ease: "easeInOut" }}
-                  className="absolute bottom-5 right-1/2 flex w-max translate-x-1/2 flex-col gap-1 rounded-3xl bg-card px-6 py-2 text-foreground shadow-xl transition-all ease-in-out hover:cursor-pointer hover:bg-salYellowLt sm:right-10 sm:w-auto sm:translate-x-0 sm:px-6"
+                  className="absolute bottom-5 right-1/2 flex w-max translate-x-1/2 flex-col gap-1 rounded-3xl bg-card px-6 py-2 text-foreground shadow-xl transition-all ease-in-out hover:cursor-pointer hover:bg-salYellowLt sm:right-10 sm:w-auto sm:translate-x-0 sm:px-6 hover:dark:text-primary-foreground"
                 >
                   <div className="group flex cursor-pointer flex-col items-center gap-2 sm:flex-row">
                     <span className={cn("flex items-center gap-2")}>
@@ -375,7 +375,7 @@ export default function Home() {
             animate={{ opacity: 1 }}
             transition={{ duration: 1, ease: "easeInOut" }}
             className={cn(
-              "absolute bottom-5 left-5 z-10 hidden origin-bottom-left select-none flex-col items-start gap-1 font-tanker lowercase tracking-wide text-card transition-transform duration-700 ease-in-out [text-shadow:0_0_15px_rgba(0,0,0,1)] sm:left-7 sm:flex",
+              "absolute bottom-5 left-5 z-10 hidden origin-bottom-left select-none flex-col items-start gap-1 font-tanker lowercase tracking-wide text-white transition-transform duration-700 ease-in-out [text-shadow:0_0_15px_rgba(0,0,0,1)] sm:left-7 sm:flex",
 
               currentSlide === 1
                 ? "sm:scale-[1.2] lg:scale-100"
@@ -395,7 +395,9 @@ export default function Home() {
               <h1 className={cn("text-[4rem]")}>Oldhues</h1>
             </div>
             <h2
-              className={cn("mt-1 border-t-4 border-card text-center text-4xl")}
+              className={cn(
+                "mt-1 border-t-4 border-white text-center text-4xl",
+              )}
             >
               Nov / Dec 2025
             </h2>
