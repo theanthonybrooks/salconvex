@@ -31,6 +31,8 @@ export function getGroupKeyFromEvent(
   };
   isEnded?: boolean;
 } {
+  const systemTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
   const basicInfo = event.tabs.openCall?.basicInfo;
   // const isPublished = event.tabs.opencall?.state === "published";
   const callType = basicInfo?.callType;
@@ -39,7 +41,7 @@ export function getGroupKeyFromEvent(
     ocEnd && isValidIsoDate(ocEnd)
       ? DateTime.fromISO(ocEnd, { zone: timeZone }).toJSDate()
       : null;
-  const ocEndTZ = basicInfo?.dates?.timezone;
+  // const ocEndTZ = basicInfo?.dates?.timezone;
 
   const ocStatus = event.openCallStatus;
   // const eventFormat = event.dates.eventFormat;
@@ -52,7 +54,7 @@ export function getGroupKeyFromEvent(
   const ocEndDT =
     ocEnd && isValidIsoDate(ocEnd)
       ? DateTime.fromISO(ocEnd, {
-          zone: hasTZPref ? timeZone : (ocEndTZ ?? "Europe/Berlin"),
+          zone: hasTZPref ? timeZone : systemTimeZone,
         })
       : null;
 
@@ -87,7 +89,7 @@ export function getGroupKeyFromEvent(
   ) {
     if (ocEndDate) {
       const dt = DateTime.fromISO(ocEnd, {
-        zone: hasTZPref ? timeZone : (ocEndTZ ?? "Europe/Berlin"),
+        zone: hasTZPref ? timeZone : systemTimeZone,
       });
 
       const day = dt.day;

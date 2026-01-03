@@ -157,7 +157,7 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
         const newOrg = existingOrgResult.isNew;
 
         if (newOrg) {
-          await ctx.db.insert("organizations", {
+          const newOrgId = await ctx.db.insert("organizations", {
             ownerId: newUserId,
             allowedEditors: [],
             name: profile.organizationName,
@@ -169,6 +169,11 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
             hadFreeCall: false,
             isComplete: false,
             events: [],
+          });
+          await ctx.db.insert("orgStaff", {
+            organizationId: newOrgId,
+            userId: newUserId,
+            role: "owner",
           });
         } else if (
           existingOrgResult?.domainsMatch &&
