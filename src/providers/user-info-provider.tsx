@@ -89,6 +89,7 @@ type UserInfoType = {
   currency: CurrencyOptions;
   location: string;
   ip: string;
+  timeZone: string | undefined;
 };
 type ClientInfoReturnType = {
   status: "success" | "error";
@@ -98,6 +99,7 @@ async function getClientInfo(): Promise<ClientInfoReturnType> {
   let currency: CurrencyOptions = "usd";
   let location: string = "";
   let ip: string = "0.0.0.0";
+  let timeZone: string = "";
 
   let res = await fetch("https://ipapi.co/json/").catch(() => null);
 
@@ -112,14 +114,17 @@ async function getClientInfo(): Promise<ClientInfoReturnType> {
         currency,
         location,
         ip,
+        timeZone,
       },
     };
   const data = await res.json();
+  console.log(data);
   if (data.country && IBAN_COUNTRIES.has(data.country)) {
     currency = "eur";
   }
   location = `${data.city}, ${data.region_code ? data.region_code + ", " : ""} ${data.country}`;
   ip = data.ip;
+  timeZone = data.timezone;
 
   return {
     status: "success",
@@ -127,6 +132,7 @@ async function getClientInfo(): Promise<ClientInfoReturnType> {
       currency,
       location,
       ip,
+      timeZone,
     },
   };
 }
@@ -142,10 +148,12 @@ export const UserInfoProvider = ({ children }: Props) => {
   const userData = usePreloadedQuery(preloadedUserData);
   const { user, userPref } = userData ?? {};
   const userPrefCurrency = userPref?.currency;
+  const userPrefTimeZone = userPref?.timezone;
   const [userInfo, setUserInfo] = useState<UserInfoType>({
     currency: "usd",
     location: "",
     ip: "0.0.0.0",
+    timeZone: "",
   });
 
   useEffect(() => {
@@ -155,11 +163,11 @@ export const UserInfoProvider = ({ children }: Props) => {
       const userData = await getClientInfo();
       // console.log(userData);
       const { status, userInfo: userInfoResults } = userData;
-      const { currency } = userInfoResults;
+      const { currency, timeZone } = userInfoResults;
       // console.log(userPrefCurrency, status, currency);
       const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
       if (user) {
-        if (userPrefCurrency) {
+        if (userPrefCurrency && userPrefTimeZone) {
           setUserInfo({
             ...userInfoResults,
             currency:
@@ -169,7 +177,7 @@ export const UserInfoProvider = ({ children }: Props) => {
             // currency: userPrefCurrency.toLowerCase() as CurrencyOptions,
           });
         } else {
-          await updateUserPrefs({ currency });
+          await updateUserPrefs({ currency, timezone: timeZone });
         }
         return;
       }
@@ -191,7 +199,7 @@ export const UserInfoProvider = ({ children }: Props) => {
     };
 
     loadUserInfo();
-  }, [user, userPrefCurrency, updateUserPrefs]);
+  }, [user, userPrefCurrency, updateUserPrefs, userPrefTimeZone]);
   const symbol = userInfo.currency === "usd" ? "$" : "€";
 
   return (

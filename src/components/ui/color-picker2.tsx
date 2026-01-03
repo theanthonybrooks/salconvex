@@ -398,7 +398,7 @@ export default function GradientColorPicker({
   const {
     showPreview,
     showCode,
-    defaultPalette = "tailwind-light",
+    defaultPalette = "2026-Socials-January",
   } = options ?? {};
 
   const palettes = useQuery(api.functions.palettes.getPalettes);

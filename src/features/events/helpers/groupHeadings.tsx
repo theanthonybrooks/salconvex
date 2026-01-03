@@ -78,7 +78,7 @@ export function getGroupKeyFromEvent(
   const isAfterThisYear = eventStartDT ? eventStartDT.year > thisYear : false;
   const ocEndsAfterThisYear = ocEndDT ? ocEndDT.year > thisYear : false;
   const isSeason = seasonalTerms.includes(eventStart.trim());
-
+  //TODO: Create the ability to disable the timezone. It now defaults to being on using the user's timezone, but it should be able to turn off if you desire and default back to the event's timezone.
   if (
     sortBy === "openCall" &&
     callType === "Fixed" &&

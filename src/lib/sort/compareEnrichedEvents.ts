@@ -33,6 +33,7 @@ export const compareEnrichedEvents = (
   const { sortBy, sortDirection } = sortOptions;
   const directionMultiplier = sortDirection === "asc" ? 1 : -1;
   const thisWeekPg = pageType === "thisweek" || pageType === "nextweek";
+  const now = new Date();
   if (sortBy === "eventStart") {
     const getPriority = (item: EnrichedEventsCardData) => {
       const now = new Date();
@@ -121,40 +122,195 @@ export const compareEnrichedEvents = (
   //   : priorityB.eventStart - priorityA.eventStart;
   // }
 
-  if (sortBy === "openCall") {
-    const getPriority = (item: EnrichedEventsCardData) => {
-      const now = new Date();
-      // now.setHours(0, 0, 0, 0);
+  // if (sortBy === "openCall") {
+  //   const getPriority = (item: EnrichedEventsCardData) => {
+  //     const now = new Date();
+  //     // now.setHours(0, 0, 0, 0);
 
-      const hasOpenCall = item.hasActiveOpenCall;
+  //     const hasOpenCall = item.hasActiveOpenCall;
+  //     const callType = item.tabs.openCall?.basicInfo?.callType;
+  //     const ocEndRaw = item.tabs.openCall?.basicInfo?.dates?.ocEnd;
+  //     const ocState = item.tabs.openCall?.state;
+  //     const isPublished = ocState === "published" && item.state === "published";
+  //     const isArchivedOC =
+  //       ocState === "archived" &&
+  //       (item.state === "published" || item.state === "archived");
+  //     //TODO: Include archived events in the sort.
+  //     // const isArchivedEvent = item.state === "archived";
+  //     const isApproved = isPublished || isArchivedOC;
+  //     const ocStatus = item.openCallStatus;
+  //     const isRolling = callType === "Rolling";
+  //     const startDate = item.dates.eventDates[0].start;
+
+  //     const ocEnd = new Date(ocEndRaw ?? 0);
+  //     const isPast = ocEnd < now;
+  //     const eventStartDate = parseEventDate(startDate) ?? FAR_FUTURE;
+  //     const eventFormat = item.dates.eventFormat;
+
+  //     // if (item.name === "asdfasfd") {
+  //     //   console.log(
+  //     //     item.name,
+  //     //     eventStartDate,
+  //     //     startDate,
+  //     //     parseEventDate(startDate),
+  //     //     eventFormat,
+  //     //   );
+  //     // }
+
+  //     let priority: number;
+
+  //     if (hasOpenCall && (!isPast || isRolling)) {
+  //       if (callType === "Fixed") priority = 0;
+  //       else if (callType === "Unknown") priority = 1;
+  //       else if (callType === "Rolling") priority = 2;
+  //       else if (callType === "Email") priority = 3;
+  //       else priority = 4;
+  //     } else if (ocStatus === "coming-soon") {
+  //       priority = 5;
+  //     } else if (!hasOpenCall && !!callType && isApproved) {
+  //       priority = 6;
+  //     } else if (thisWeekPg && isPast) {
+  //       priority = 6;
+  //     } else if (eventFormat === "ongoing") {
+  //       priority = 7;
+  //     } else if (eventFormat === "noEvent") {
+  //       priority = 9;
+  //     } else {
+  //       priority = eventFormat ? 8 : Infinity;
+  //     }
+
+  //     // if (item.name === "asdfasfd ") {
+  //     // console.log(item.name, priority);
+  //     // } else if (item.name === "something newer") {
+  //     //   console.log(item.name, priority);
+  //     // }
+
+  //     return {
+  //       name: item.name,
+  //       priority,
+  //       ocEnd: ocEnd.getTime(),
+  //       ocEndDate: ocEnd,
+  //       eventStart: eventStartDate.getTime(),
+  //     };
+  //   };
+
+  //   const priorityA = getPriority(a);
+  //   const priorityB = getPriority(b);
+
+  //   if (priorityA.priority !== priorityB.priority) {
+  //     return priorityA.priority - priorityB.priority;
+  //   }
+
+  //   if (priorityA.priority < 3) {
+  //     return directionMultiplier * (priorityA.ocEnd - priorityB.ocEnd);
+  //   }
+
+  //   if (priorityA.priority === 5) {
+  //     const aDate = priorityA.ocEndDate ?? FAR_FUTURE;
+  //     const bDate = priorityB.ocEndDate ?? FAR_FUTURE;
+
+  //     // console.log(aDate.getTime(), bDate.getTime());
+  //     const aYear = aDate.getFullYear();
+  //     const bYear = bDate.getFullYear();
+
+  //     if (aYear !== bYear) {
+  //       // Prefer this year first, then descending by year
+  //       const thisYear = new Date().getFullYear();
+  //       if (aYear === thisYear && bYear !== thisYear) return -1;
+  //       if (bYear === thisYear && aYear !== thisYear) return 1;
+  //       return bYear - aYear; // Descending order
+  //     }
+
+  //     // If same year, compare by month/day ascending
+  //     const aMonth = aDate.getMonth();
+  //     const bMonth = bDate.getMonth();
+  //     if (aMonth !== bMonth) return aMonth - bMonth;
+
+  //     const aDay = aDate.getDate();
+  //     const bDay = bDate.getDate();
+  //     if (aDay !== bDay) return aDay - bDay;
+
+  //     // Same day — now compare by full timestamp
+  //     return aDate.getTime() - bDate.getTime();
+  //   }
+
+  //   if (priorityA.priority === 6 || priorityA.priority === 8) {
+  //     const aName = a.name.toLowerCase();
+  //     const bName = b.name.toLowerCase();
+  //     return directionMultiplier * aName.localeCompare(bName);
+  //   }
+
+  //   if (priorityA.priority === 7) {
+  //     const aEventStart = new Date(priorityA.eventStart) ?? FAR_FUTURE;
+  //     const bEventStart = new Date(priorityB.eventStart) ?? FAR_FUTURE;
+  //     // const aName = a.name.toLowerCase();
+  //     // const bName = b.name.toLowerCase();
+
+  //     // console.log(aName, bName, aEventStart, bEventStart);
+
+  //     const aYear = aEventStart.getFullYear();
+  //     const bYear = bEventStart.getFullYear();
+  //     const thisYear = new Date().getFullYear();
+
+  //     const aIsThisYear = aYear === thisYear;
+  //     const bIsThisYear = bYear === thisYear;
+
+  //     // Prefer events from this year
+  //     if (aIsThisYear && !bIsThisYear) return -1;
+  //     if (!aIsThisYear && bIsThisYear) return 1;
+
+  //     // If both in same year, sort by time
+  //     if (aYear === bYear) {
+  //       return (
+  //         directionMultiplier * (aEventStart.getTime() - bEventStart.getTime())
+  //       );
+  //     }
+
+  //     // Otherwise, sort by year descending (newer first)
+  //     return 1;
+  //   }
+
+  //   return directionMultiplier * (priorityA.ocEnd - priorityB.ocEnd);
+  // }
+  if (sortBy === "openCall") {
+    const nowTime = now.getTime();
+    const thisYear = now.getFullYear();
+
+    type SortKey = {
+      priority: number;
+      ocEndTime: number;
+      ocYear: number;
+      ocMonth: number;
+      ocDay: number;
+      isThisYear: boolean;
+      eventStartTime: number;
+    };
+
+    const getKey = (item: EnrichedEventsCardData): SortKey => {
       const callType = item.tabs.openCall?.basicInfo?.callType;
       const ocEndRaw = item.tabs.openCall?.basicInfo?.dates?.ocEnd;
       const ocState = item.tabs.openCall?.state;
+
+      const hasOpenCall = item.hasActiveOpenCall;
+      const isRolling = callType === "Rolling";
+      const ocStatus = item.openCallStatus;
+
       const isPublished = ocState === "published" && item.state === "published";
+
       const isArchivedOC =
         ocState === "archived" &&
         (item.state === "published" || item.state === "archived");
-      //TODO: Include archived events in the sort.
-      // const isArchivedEvent = item.state === "archived";
+
       const isApproved = isPublished || isArchivedOC;
-      const ocStatus = item.openCallStatus;
-      const isRolling = callType === "Rolling";
-      const startDate = item.dates.eventDates[0].start;
 
-      const ocEnd = new Date(ocEndRaw ?? 0);
-      const isPast = ocEnd < now;
-      const eventStartDate = parseEventDate(startDate) ?? FAR_FUTURE;
+      const ocEndDate = ocEndRaw ? new Date(ocEndRaw) : null;
+      const ocEndTime = ocEndDate ? ocEndDate.getTime() : FAR_FUTURE.getTime();
+      const isPast = ocEndTime < nowTime;
+
+      const eventStartTime =
+        parseEventDate(item.dates.eventDates[0].start)?.getTime() ?? 0;
+
       const eventFormat = item.dates.eventFormat;
-
-      // if (item.name === "asdfasfd") {
-      //   console.log(
-      //     item.name,
-      //     eventStartDate,
-      //     startDate,
-      //     parseEventDate(startDate),
-      //     eventFormat,
-      //   );
-      // }
 
       let priority: number;
 
@@ -178,98 +334,54 @@ export const compareEnrichedEvents = (
         priority = eventFormat ? 8 : Infinity;
       }
 
-      // if (item.name === "asdfasfd ") {
-      // console.log(item.name, priority);
-      // } else if (item.name === "something newer") {
-      //   console.log(item.name, priority);
-      // }
-
       return {
-        name: item.name,
         priority,
-        ocEnd: ocEnd.getTime(),
-        ocEndDate: ocEnd,
-        eventStart: eventStartDate.getTime(),
+        ocEndTime,
+        ocYear: ocEndDate?.getFullYear() ?? 9999,
+        ocMonth: ocEndDate?.getMonth() ?? 11,
+        ocDay: ocEndDate?.getDate() ?? 31,
+        isThisYear: ocEndDate ? ocEndDate.getFullYear() === thisYear : false,
+        eventStartTime,
       };
     };
 
-    const priorityA = getPriority(a);
-    const priorityB = getPriority(b);
+    const keyA = getKey(a);
+    const keyB = getKey(b);
 
-    if (priorityA.priority !== priorityB.priority) {
-      return priorityA.priority - priorityB.priority;
+    // 1. Priority
+    if (keyA.priority !== keyB.priority) {
+      return keyA.priority - keyB.priority;
     }
 
-    if (priorityA.priority < 3) {
-      return directionMultiplier * (priorityA.ocEnd - priorityB.ocEnd);
+    // 2. Active open calls (0–4): earliest ocEnd first
+    if (keyA.priority <= 4) {
+      return directionMultiplier * (keyA.ocEndTime - keyB.ocEndTime);
     }
 
-    if (priorityA.priority === 5) {
-      const aDate = priorityA.ocEndDate ?? FAR_FUTURE;
-      const bDate = priorityB.ocEndDate ?? FAR_FUTURE;
-
-      // console.log(aDate.getTime(), bDate.getTime());
-      const aYear = aDate.getFullYear();
-      const bYear = bDate.getFullYear();
-
-      if (aYear !== bYear) {
-        // Prefer this year first, then descending by year
-        const thisYear = new Date().getFullYear();
-        if (aYear === thisYear && bYear !== thisYear) return -1;
-        if (bYear === thisYear && aYear !== thisYear) return 1;
-        return bYear - aYear; // Descending order
+    // 3. Coming soon (5)
+    if (keyA.priority === 5) {
+      if (keyA.isThisYear !== keyB.isThisYear) {
+        return keyA.isThisYear ? -1 : 1;
       }
 
-      // If same year, compare by month/day ascending
-      const aMonth = aDate.getMonth();
-      const bMonth = bDate.getMonth();
-      if (aMonth !== bMonth) return aMonth - bMonth;
-
-      const aDay = aDate.getDate();
-      const bDay = bDate.getDate();
-      if (aDay !== bDay) return aDay - bDay;
-
-      // Same day — now compare by full timestamp
-      return aDate.getTime() - bDate.getTime();
-    }
-
-    if (priorityA.priority === 6 || priorityA.priority === 8) {
-      const aName = a.name.toLowerCase();
-      const bName = b.name.toLowerCase();
-      return directionMultiplier * aName.localeCompare(bName);
-    }
-
-    if (priorityA.priority === 7) {
-      const aEventStart = new Date(priorityA.eventStart) ?? FAR_FUTURE;
-      const bEventStart = new Date(priorityB.eventStart) ?? FAR_FUTURE;
-      // const aName = a.name.toLowerCase();
-      // const bName = b.name.toLowerCase();
-
-      // console.log(aName, bName, aEventStart, bEventStart);
-
-      const aYear = aEventStart.getFullYear();
-      const bYear = bEventStart.getFullYear();
-      const thisYear = new Date().getFullYear();
-
-      const aIsThisYear = aYear === thisYear;
-      const bIsThisYear = bYear === thisYear;
-
-      // Prefer events from this year
-      if (aIsThisYear && !bIsThisYear) return -1;
-      if (!aIsThisYear && bIsThisYear) return 1;
-
-      // If both in same year, sort by time
-      if (aYear === bYear) {
-        return (
-          directionMultiplier * (aEventStart.getTime() - bEventStart.getTime())
-        );
+      if (keyA.ocYear !== keyB.ocYear) {
+        return keyB.ocYear - keyA.ocYear;
       }
 
-      // Otherwise, sort by year descending (newer first)
-      return 1;
+      if (keyA.ocMonth !== keyB.ocMonth) {
+        return keyA.ocMonth - keyB.ocMonth;
+      }
+
+      return keyA.ocDay - keyB.ocDay;
     }
 
-    return directionMultiplier * (priorityA.ocEnd - priorityB.ocEnd);
+    // 4. Ongoing events (7)
+    if (keyA.priority === 7) {
+      return directionMultiplier * (keyA.eventStartTime - keyB.eventStartTime);
+    }
+
+    // 5. Equal by definition
+    return 0;
   }
 
   if (sortBy === "name") {
