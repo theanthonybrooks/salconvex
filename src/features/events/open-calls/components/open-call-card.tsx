@@ -188,7 +188,7 @@ const OpenCallCard = ({
   return (
     <>
       {isMobile ? (
-        <Card className="w-full rounded-xl border-foreground/20 bg-white/60 p-5">
+        <Card className="dark:bg-tab-a10 w-full rounded-xl border-foreground/20 bg-white/60 p-5">
           <Accordion type="multiple" defaultValue={["Deadline"]}>
             <AccordionItem value="Deadline">
               <AccordionTrigger

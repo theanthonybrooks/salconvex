@@ -1,11 +1,13 @@
 "use client";
 
 import { User } from "@/types/user";
-import { UserPrefsType } from "~/convex/schema";
+
 import { motion as m, Variants } from "framer-motion";
 import { useTheme } from "next-themes";
 
 import { cn } from "@/helpers/utilsFns";
+
+import { UserPrefsType } from "~/convex/schema";
 
 interface ThemeToggleProps {
   className?: string;
@@ -20,6 +22,7 @@ export default function ThemeToggle({
 }: ThemeToggleProps) {
   const { setTheme, theme } = useTheme();
   const isAdmin = user?.role?.includes("admin");
+  const betaTester = user?.betaType?.includes("darkMode");
 
   const handleClick = async (nextTheme: string) => {
     setTheme(nextTheme);
@@ -74,7 +77,8 @@ export default function ThemeToggle({
           let nextTheme: string;
           if (theme === "default") nextTheme = "light";
           else if (theme === "light") nextTheme = "white";
-          else if (theme === "white" && isAdmin) nextTheme = "dark";
+          else if (theme === "white" && (isAdmin || betaTester))
+            nextTheme = "dark";
           else nextTheme = "default";
           handleClick(nextTheme);
         }}
